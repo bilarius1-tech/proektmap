@@ -1,5 +1,8 @@
 import { db } from "@/lib/db";
+<<<<<<< HEAD
 export const dynamic = "force-dynamic";
+=======
+>>>>>>> cdf468cc (feat: динамический роутинг + главная-дашборд)
 import { notFound } from "next/navigation";
 import BlueprintPageClient from "./client";
 
