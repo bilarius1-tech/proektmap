@@ -10,28 +10,102 @@ model User {
   id        String   @id @default(uuid())
   email     String   @unique
   name      String?
+  xp        Int      @default(0)
+  level     String   @default("novice")
+  streak    Int      @default(0)
+  lastLogin DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  progress  ProjectProgress[]
+  projects  Project[]
   decisions Decision[]
-
   @@map("users")
 }
 
-model ProjectProgress {
-  id        String   @id @default(uuid())
-  userId    String
-  phase     String
-  step      String
-  completed Boolean  @default(false)
-  notes     String?
-  createdAt DateTime @default(now())
+model Blueprint {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  description String?
+  icon        String   @default("Globe")
+  difficulty  String   @default("easy")
+  totalXp     Int      @default(0)
+  totalCards  Int      @default(0)
+  isPublished Boolean  @default(false)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  stages      BlueprintStage[]
+  projects    Project[]
+  @@map("blueprints")
+}
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+model Stage {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  description String?
+  icon        String   @default("Zap")
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  cards       Card[]
+  blueprints  BlueprintStage[]
+  @@map("stages")
+}
 
-  @@unique([userId, phase, step])
-  @@map("project_progress")
+model BlueprintStage {
+  id          String   @id @default(uuid())
+  blueprintId String
+  stageId     String
+  sortOrder   Int      @default(0)
+  blueprint Blueprint @relation(fields: [blueprintId], references: [id], onDelete: Cascade)
+  stage     Stage     @relation(fields: [stageId], references: [id], onDelete: Cascade)
+  @@unique([blueprintId, stageId])
+  @@map("blueprint_stages")
+}
+
+model Card {
+  id           String   @id @default(uuid())
+  stageId      String
+  title        String
+  content      String   @default("")
+  xpReward     Int      @default(15)
+  timeEstimate String   @default("15 мин")
+  aiPrompt     String?
+  sortOrder    Int      @default(0)
+  difficulty   String   @default("easy")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  stage        Stage          @relation(fields: [stageId], references: [id], onDelete: Cascade)
+  progress     CardProgress[]
+  @@map("cards")
+}
+
+model Project {
+  id          String   @id @default(uuid())
+  userId      String
+  blueprintId String
+  progress    Int      @default(0)
+  status      String   @default("active")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  blueprint Blueprint     @relation(fields: [blueprintId], references: [id])
+  cards     CardProgress[]
+  @@map("projects")
+}
+
+model CardProgress {
+  id          String    @id @default(uuid())
+  projectId   String
+  cardId      String
+  status      String    @default("pending")
+  notes       String?
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  card    Card    @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  @@unique([projectId, cardId])
+  @@map("card_progress")
 }
 
 model Decision {
@@ -42,8 +116,6 @@ model Decision {
   answer    String
   aiAdvice  String?
   createdAt DateTime @default(now())
-
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
   @@map("decisions")
 }
