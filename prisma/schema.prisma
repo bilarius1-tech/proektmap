@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  progress  ProjectProgress[]
+  decisions Decision[]
+
+  @@map("users")
+}
+
+model ProjectProgress {
+  id        String   @id @default(uuid())
+  userId    String
+  phase     String
+  step      String
+  completed Boolean  @default(false)
+  notes     String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, phase, step])
+  @@map("project_progress")
+}
+
+model Decision {
+  id        String   @id @default(uuid())
+  userId    String
+  phase     String
+  question  String
+  answer    String
+  aiAdvice  String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("decisions")
+}
