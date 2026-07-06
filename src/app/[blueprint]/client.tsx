@@ -38,6 +38,8 @@ export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprin
   const progress = Math.round((totalDone / totalDecs) * 100);
 
   function toggle(id: string) {
+    // Сохраняем в БД
+    fetch("/api/progress", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ decisionId: id, status: completed.has(id) ? "pending" : "done" }) });
     setCompleted(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
   }
 
