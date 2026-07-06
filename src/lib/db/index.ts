@@ -2,33 +2,41 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 
 let _db: PrismaClient | null = null;
-let _initError: string | null = null;
 
 async function getDb(): Promise<PrismaClient> {
   if (_db) return _db;
-  if (_initError) throw new Error(_initError);
-  try {
-    const url = process.env.DATABASE_URL;
-    if (!url) throw new Error("DATABASE_URL не задан");
-    const { PrismaPg: Pg } = await import("@prisma/adapter-pg");
-    _db = new PrismaClient({ adapter: new Pg({ connectionString: url }) });
-    return _db;
-  } catch (e: any) {
-    _initError = e.message;
-    throw e;
-  }
+  const url = process.env.DATABASE_URL;
+  if (!url) throw new Error("DATABASE_URL не задан");
+  _db = new PrismaClient({ adapter: new PrismaPg({ connectionString: url }) });
+  return _db;
 }
 
-// Simple proxy that calls getDb() on each access
-function createProxy(): PrismaClient {
+// Прокси для ленивого подключения
+// Каждое обращение к db.table.method() резолвит getDb()
+function createLazyPrisma(): PrismaClient {
+  const cache = new Map<string, any>();
+
   return new Proxy({} as PrismaClient, {
-    get(_, prop) {
+    get(_, prop: string) {
       if (prop === "then") return undefined;
-      return (...args: any[]) => {
-        return getDb().then(db => (db as any)[prop](...args));
-      };
+      if (prop === "$connect" || prop === "$disconnect") {
+        return (...args: any[]) => (getDb() as any).then((db: any) => db[prop](...args));
+      }
+      
+      // Для db.blueprint.findUnique()
+      if (!cache.has(prop)) {
+        cache.set(prop, new Proxy({}, {
+          get(_, method: string) {
+            return (...args: any[]) => getDb().then((db: any) => {
+              const delegate = db[prop];
+              return delegate[method](...args);
+            });
+          },
+        }));
+      }
+      return cache.get(prop);
     },
   });
 }
 
-export const db = createProxy();
+export const db = createLazyPrisma();
