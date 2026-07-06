@@ -1,0 +1,7 @@
+{
+  "/[blueprint]/page": "/[blueprint]",
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/api/blueprints/route": "/api/blueprints",
+  "/page": "/"
+}
