@@ -1,110 +1,162 @@
-import { ArrowRight, Globe, Database, Wrench, Rocket, Bot } from "lucide-react";
-
-const phases = [
-  {
-    num: "01",
-    title: "Структура проекта",
-    desc: "Дизайн-система, токены, страницы, структура данных",
-    icon: Globe,
-    steps: ["Дизайн-система и токены", "Какие страницы нужны", "Структура данных (Prisma)"],
-  },
-  {
-    num: "02",
-    title: "Технологии",
-    desc: "Next.js vs Vue vs Laravel. Нужна ли админка? База данных.",
-    icon: Database,
-    steps: ["Выбор фреймворка", "Админка: Payload vs Strapi", "SQLite vs PostgreSQL"],
-  },
-  {
-    num: "03",
-    title: "Реализация",
-    desc: "Формы, Telegram бот, SEO, авторизация",
-    icon: Wrench,
-    steps: ["Формы (React Hook Form + Zod)", "Telegram бот (BotFather → webhook)", "SEO и мета-теги"],
-  },
-  {
-    num: "04",
-    title: "Запуск",
-    desc: "Домен, SSL, Яндекс.Метрика, Cookie-баннер",
-    icon: Rocket,
-    steps: ["Покупка домена и DNS", "SSL (Let's Encrypt)", "Яндекс.Метрика + Вебмастер", "Cookie и Политика"],
-  },
-];
-
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-      {/* Hero */}
-      <header className="max-w-4xl mx-auto px-6 pt-24 pb-16 text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 text-blue-700 text-sm font-medium mb-6">
-          <Bot size={16} />
-          Инженерный навигатор
+    <div style={{ fontFamily: "Inter, sans-serif", background: "#fafafa", color: "#222", minHeight: "100vh" }}>
+      {/* Header */}
+      <header style={{ height: 72, background: "white", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 40px", borderBottom: "1px solid #ececec", position: "sticky", top: 0, zIndex: 100 }}>
+        <div style={{ fontSize: 22, fontWeight: 800 }}>
+          Engineering <span style={{ color: "#0FB880" }}>Blueprint</span>
         </div>
-        <h1 className="text-5xl font-bold tracking-tight text-slate-900 mb-4">
-          От идеи до продукта
-          <br />
-          <span className="text-blue-600">за 4 этапа</span>
-        </h1>
-        <p className="text-lg text-slate-500 max-w-2xl mx-auto leading-relaxed">
-          Не курсы. Не генератор кода. Инженерное сопровождение: что делать, почему именно так, какие альтернативы.
-          AI-консультант объясняет каждое решение.
-        </p>
-        <button className="mt-8 px-8 py-4 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition flex items-center gap-2 mx-auto">
-          Начать путь <ArrowRight size={18} />
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: 15 }}>
+          <div style={{ textAlign: "right" }}>
+            <strong>Маршрут</strong><br />
+            <small style={{ color: "#888" }}>Корпоративный сайт</small>
+          </div>
+          <div style={{ width: 42, height: 42, borderRadius: "50%", background: "#e5e7eb" }} />
+        </div>
       </header>
 
-      {/* Phases */}
-      <section className="max-w-5xl mx-auto px-6 pb-24">
-        <div className="grid gap-4">
-          {phases.map((phase, i) => (
-            <div
-              key={i}
-              className="group relative bg-white border border-slate-200 rounded-2xl p-6 hover:border-blue-300 hover:shadow-lg transition-all cursor-pointer"
-            >
-              <div className="flex items-start gap-5">
-                <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center">
-                  <phase.icon size={24} className="text-blue-600" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-3 mb-1">
-                    <span className="text-xs font-bold text-blue-500 tracking-wider">{phase.num}</span>
-                    <h3 className="text-lg font-bold text-slate-900">{phase.title}</h3>
-                  </div>
-                  <p className="text-slate-500 text-sm mb-3">{phase.desc}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {phase.steps.map((step, j) => (
-                      <span key={j} className="px-3 py-1 bg-slate-50 text-slate-600 rounded-lg text-xs font-medium">
-                        {step}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                <ArrowRight size={20} className="text-slate-300 group-hover:text-blue-500 transition flex-shrink-0 mt-4" />
-              </div>
+      {/* Wrapper */}
+      <div style={{ display: "flex" }}>
+        {/* Sidebar */}
+        <aside style={{ width: 310, background: "white", borderRight: "1px solid #ececec", minHeight: "calc(100vh - 72px)", padding: 35 }}>
+          <h3 style={{ marginBottom: 20, fontSize: 14, color: "#777", textTransform: "uppercase", letterSpacing: "0.08em" }}>Путь проекта</h3>
+
+          {[
+            { n: "1", t: "Фундамент", d: "Определяем будущий проект", active: true },
+            { n: "2", t: "Контент", d: "Структура сайта" },
+            { n: "3", t: "Design System", d: "Создаем основу интерфейса" },
+            { n: "4", t: "UI Kit", d: "Компоненты" },
+            { n: "5", t: "Frontend", d: "Генерация проекта" },
+            { n: "6", t: "Backend", d: "Если необходим" },
+            { n: "7", t: "SEO", d: "" },
+            { n: "8", t: "Deploy", d: "" },
+            { n: "9", t: "Поддержка", d: "" },
+          ].map((step) => (
+            <div key={step.n} style={{
+              padding: 15, borderRadius: 14, marginBottom: 10, cursor: "pointer",
+              background: step.active ? "#eef3ff" : "transparent",
+              border: step.active ? "1px solid #d8e2ff" : "1px solid transparent",
+              transition: ".2s",
+            }}>
+              <strong style={{ display: "block", marginBottom: 5, color: step.active ? "#0FB880" : "#222" }}>
+                {step.n}. {step.t}
+              </strong>
+              {step.d && <small style={{ color: "#888" }}>{step.d}</small>}
             </div>
           ))}
-        </div>
-      </section>
 
-      {/* AI Assistant CTA */}
-      <section className="max-w-3xl mx-auto px-6 pb-24 text-center">
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-10 text-white">
-          <Bot size={40} className="mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-3">AI-консультант на каждом шаге</h2>
-          <p className="text-blue-100 mb-6 max-w-md mx-auto">
-            Не понимаете какое решение принять? Спросите AI — он объяснит почему именно этот выбор правильный для вашего проекта.
+          {/* XP Stats */}
+          <div style={{ marginTop: 30, padding: "16px", borderRadius: 14, background: "#f8f8f8" }}>
+            <strong style={{ display: "block", marginBottom: 8, fontSize: 13 }}>Прогресс</strong>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4, fontSize: 13 }}>
+              <span style={{ color: "#666" }}>XP</span>
+              <span style={{ fontWeight: 700, color: "#0FB880" }}>250</span>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4, fontSize: 13 }}>
+              <span style={{ color: "#666" }}>Уровень</span>
+              <span style={{ fontWeight: 600 }}>🥈 Практик</span>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
+              <span style={{ color: "#666" }}>Streak</span>
+              <span style={{ fontWeight: 600 }}>🔥 3 дня</span>
+            </div>
+          </div>
+        </aside>
+
+        {/* Main */}
+        <main style={{ flex: 1, padding: "60px", maxWidth: 1200 }}>
+          {/* Progress */}
+          <div style={{ height: 8, background: "#ececec", borderRadius: 30, overflow: "hidden", marginBottom: 20 }}>
+            <div style={{ width: "18%", height: "100%", background: "#0FB880", borderRadius: 30, transition: "width 0.6s ease" }} />
+          </div>
+
+          <div style={{ display: "inline-block", padding: "8px 16px", borderRadius: 30, background: "#eef3ff", color: "#0FB880", fontSize: 13, marginBottom: 18 }}>
+            Blueprint • Корпоративный сайт
+          </div>
+
+          <h1 style={{ fontSize: 44, marginBottom: 18, fontWeight: 800, lineHeight: 1.15 }}>
+            Этап 1. Фундамент проекта
+          </h1>
+
+          <p style={{ fontSize: 18, lineHeight: 1.7, maxWidth: 900, color: "#555", marginBottom: 50 }}>
+            Не открывайте Cursor, VS Code или любой другой редактор кода.
+            Хороший проект начинается не с программирования, а с принятия нескольких важных инженерных решений.
+            Сейчас мы заложим фундамент, который сэкономит десятки часов в будущем.
           </p>
-          <button className="px-6 py-3 bg-white text-blue-700 rounded-xl font-semibold hover:bg-blue-50 transition">
-            Задать вопрос AI
-          </button>
-        </div>
-      </section>
 
-      {/* Footer */}
-      <footer className="text-center pb-8 text-slate-400 text-sm">
-        ProektMap © 2026 · Инженерный навигатор
-      </footer>
+          {/* Grid */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: 35 }}>
+            {/* Left: Cards */}
+            <div>
+              <div style={{ background: "white", borderRadius: 22, padding: 35, border: "1px solid #ececec", marginBottom: 25 }}>
+                <h2 style={{ fontSize: 26, marginBottom: 20 }}>Что нужно сделать</h2>
+
+                <div style={{ marginTop: 25 }}>
+                  {[
+                    "Определить цель сайта",
+                    "Определить целевую аудиторию",
+                    "Составить карту страниц",
+                    "Подготовить структуру блоков",
+                    "Определить необходимые интеграции",
+                  ].map((task, i) => (
+                    <div key={i} style={{
+                      display: "flex", alignItems: "center", gap: 12,
+                      padding: "14px 0", borderBottom: i < 4 ? "1px solid #f2f2f2" : "none",
+                    }}>
+                      <div style={{ width: 22, height: 22, borderRadius: "50%", border: "2px solid #0FB880", flexShrink: 0 }} />
+                      <span style={{ fontSize: 16 }}>{task}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div style={{ background: "#FFF9EA", border: "1px solid #FFE29A", padding: 20, borderRadius: 16, marginTop: 25 }}>
+                  <strong style={{ display: "block", marginBottom: 8 }}>Почему это важно?</strong>
+                  <p style={{ lineHeight: 1.8, color: "#666", fontSize: 15 }}>
+                    90% новичков начинают писать код сразу. Через несколько часов они понимают,
+                    что структура проекта постоянно меняется. Мы сначала принимаем инженерные решения,
+                    и только потом начинаем разработку.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Right: AI + Info */}
+            <div>
+              <div style={{ background: "white", padding: 28, borderRadius: 22, border: "1px solid #ececec", marginBottom: 20 }}>
+                <h3 style={{ marginBottom: 15 }}>🤖 AI Архитектор</h3>
+                <p style={{ lineHeight: 1.7, color: "#666", fontSize: 15, marginBottom: 20 }}>
+                  Я буду сопровождать вас на протяжении всего проекта. Моя задача — не писать код вместо вас,
+                  а помогать принимать правильные инженерные решения.
+                </p>
+                <button style={{
+                  display: "block", width: "100%", padding: 18, background: "#0FB880", color: "white",
+                  border: "none", borderRadius: 14, fontSize: 16, fontWeight: 600, cursor: "pointer",
+                }}>
+                  Начать этап →
+                </button>
+                <div style={{ padding: 15, background: "#F8F8F8", borderRadius: 14, marginTop: 15, fontSize: 14, lineHeight: 1.6, color: "#666" }}>
+                  💡 <strong>Совет:</strong> не пытайтесь сделать всё идеально с первого раза. Инженерные решения можно уточнять по мере движения.
+                </div>
+              </div>
+
+              <div style={{ background: "white", padding: 28, borderRadius: 22, border: "1px solid #ececec", marginBottom: 20 }}>
+                <h3 style={{ marginBottom: 15 }}>После завершения этапа</h3>
+                <div style={{ lineHeight: 2.2, color: "#444", fontSize: 15 }}>
+                  ✔ Карта страниц<br />
+                  ✔ Структура проекта<br />
+                  ✔ Техническое задание<br />
+                  ✔ Промпт для AI
+                </div>
+              </div>
+
+              <div style={{ padding: 18, background: "#eef3ff", borderRadius: 14 }}>
+                <strong style={{ display: "block", marginBottom: 8 }}>Следующий этап</strong>
+                <span style={{ color: "#666" }}>Создание Design System и Design Tokens</span>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

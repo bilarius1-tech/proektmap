@@ -2,14 +2,19 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ProektMap — Инженерный навигатор",
-  description: "Пошаговое сопровождение от идеи до готового продукта. AI-консультант на каждом этапе.",
+  title: "Engineering Blueprint — Инженерный навигатор",
+  description: "Пошаговое сопровождение от идеи до продукта. Принимайте правильные инженерные решения.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ru">
-      <body className="min-h-screen bg-white antialiased">{children}</body>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+      </head>
+      <body className="font-sans antialiased">{children}</body>
     </html>
   );
 }
