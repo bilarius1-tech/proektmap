@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface Decision {
   id: string; title: string; slug: string;
@@ -19,11 +19,43 @@ interface Blueprint {
   stages: Array<{ stage: Stage; sortOrder: number }>;
 }
 
+interface Constraints {
+  budget: "zero" | "low" | "unlimited";
+  time: "week" | "month" | "relaxed";
+  level: "novice" | "practitioner";
+}
+
+const BUDGET_LABELS: Record<string, string> = { zero: "0 ₽", low: "до 5 000 ₽", unlimited: "Безлимит" };
+const TIME_LABELS: Record<string, string> = { week: "За неделю", month: "За месяц", relaxed: "Без спешки" };
+const LEVEL_LABELS: Record<string, string> = { novice: "Новичок", practitioner: "Практик" };
+
 const ICON_MAP: Record<string, string> = {
   Wrench: "🔧", Palette: "🎨", Layout: "📐", Code: "💻", Rocket: "🚀",
   Search: "🔍", BarChart: "📊", Shield: "⚖️", Send: "✈️", Heart: "🔄",
   Globe: "🌐", Zap: "⚡",
 };
+
+// Фильтр контента по ограничениям
+function filterRecommended(dec: Decision, c: Constraints): string {
+  let text = dec.recommended;
+  if (c.budget === "zero" && dec.slug === "choose-hosting") return "Бесплатный Vercel или Netlify. Для старта хватит.";
+  if (c.budget === "zero" && dec.slug === "buy-domain") return "Бесплатный .tk или .ml домен (фрином). Или github.io.";
+  if (c.budget === "zero" && dec.slug === "launch-site") return "Vercel (бесплатный) или GitHub Pages. Не нужен VPS.";
+  if (c.time === "week" && dec.slug === "build-pages") return "Только главная страница. Остальные — позже.";
+  if (c.level === "novice" && dec.slug === "create-next-app") return "Попроси AI: «Создай простой Next.js проект». Не настраивай вручную.";
+  return text;
+}
+
+// Сборка промпта из шаблона
+function buildPrompt(dec: Decision, c: Constraints, bp: Blueprint): string {
+  if (!dec.promptTemplate) return "";
+  return dec.promptTemplate
+    .replace(/{{project}}/g, bp.title)
+    .replace(/{{level}}/g, LEVEL_LABELS[c.level])
+    .replace(/{{budget}}/g, BUDGET_LABELS[c.budget])
+    .replace(/{{time}}/g, TIME_LABELS[c.time])
+    .replace(/{{currentStage}}/g, dec.title);
+}
 
 export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprint }) {
   const stages = blueprint.stages.map(bs => bs.stage);
@@ -31,24 +63,51 @@ export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprin
   const [completed, setCompleted] = useState<Set<string>>(new Set());
   const [expandedDec, setExpandedDec] = useState<string | null>(null);
   const [promptCopied, setPromptCopied] = useState<string | null>(null);
+  const [totalXp, setTotalXp] = useState(0);
+
+  // Constraints — из localStorage
+  const [constraints, setConstraints] = useState<Constraints>({
+    budget: "zero",
+    time: "month",
+    level: "novice",
+  });
+
+  useEffect(() => {
+    const saved = localStorage.getItem("proektmap-constraints");
+    if (saved) setConstraints(JSON.parse(saved));
+    
+    fetch("/api/progress").then(r => r.json()).then(d => {
+      setCompleted(new Set(d.completed));
+      setTotalXp(d.totalXp);
+    });
+  }, []);
+
+  function updateConstraints(partial: Partial<Constraints>) {
+    const next = { ...constraints, ...partial };
+    setConstraints(next);
+    localStorage.setItem("proektmap-constraints", JSON.stringify(next));
+  }
+
+  function toggle(id: string) {
+    const newStatus = completed.has(id) ? "pending" : "done";
+    const next = new Set(completed);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    setCompleted(next);
+    fetch("/api/progress", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ decisionId: id, status: newStatus }) })
+      .then(r => r.json()).then(d => { if (d.xpGained) setTotalXp(x => x + d.xpGained); });
+  }
+
+  function copyPrompt(dec: Decision) {
+    const prompt = buildPrompt(dec, constraints, blueprint);
+    navigator.clipboard.writeText(prompt);
+    setPromptCopied(dec.id);
+    setTimeout(() => setPromptCopied(null), 2000);
+  }
 
   const currentStage = stages.find(s => s.slug === activeStage) || stages[0];
   const totalDone = completed.size;
   const totalDecs = blueprint.totalDecisions;
   const progress = Math.round((totalDone / totalDecs) * 100);
-
-  function toggle(id: string) {
-    // Сохраняем в БД
-    fetch("/api/progress", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ decisionId: id, status: completed.has(id) ? "pending" : "done" }) });
-    setCompleted(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
-  }
-
-  function copyPrompt(dec: Decision) {
-    const prompt = dec.promptTemplate || `Помоги с задачей: ${dec.title}. Контекст: ${dec.problem}`;
-    navigator.clipboard.writeText(prompt);
-    setPromptCopied(dec.id);
-    setTimeout(() => setPromptCopied(null), 2000);
-  }
 
   return (
     <div style={{ fontFamily: "Inter, sans-serif", background: "#fafafa", color: "#222", minHeight: "100vh" }}>
@@ -57,18 +116,31 @@ export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprin
         <a href="/" style={{ fontSize: 22, fontWeight: 800, textDecoration: "none", color: "#222" }}>
           Engineering <span style={{ color: "#0FB880" }}>Blueprint</span>
         </a>
-        <div style={{ display: "flex", alignItems: "center", gap: 15 }}>
-          <div style={{ textAlign: "right" }}>
-            <strong>{blueprint.title}</strong><br />
-            <small style={{ color: "#888" }}>{blueprint.totalXp} XP · {blueprint.totalDecisions} решений</small>
-          </div>
-          <div style={{ width: 42, height: 42, borderRadius: "50%", background: "#e5e7eb" }} />
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <span style={{ fontSize: 13, fontWeight: 600, color: "#0FB880" }}>{totalXp} XP</span>
+          <div style={{ width: 38, height: 38, borderRadius: "50%", background: "#e5e7eb" }} />
         </div>
       </header>
 
+      {/* Constraints bar */}
+      <div style={{ background: "white", borderBottom: "1px solid #ececec", padding: "8px 40px", display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
+        <span style={{ fontSize: 12, fontWeight: 700, color: "#888", textTransform: "uppercase", letterSpacing: "0.06em" }}>Ограничения:</span>
+        {(["budget", "time", "level"] as const).map(key => {
+          const opts = key === "budget" ? ["zero", "low", "unlimited"] : key === "time" ? ["week", "month", "relaxed"] : ["novice", "practitioner"];
+          const labels = key === "budget" ? BUDGET_LABELS : key === "time" ? TIME_LABELS : LEVEL_LABELS;
+          return (
+            <select key={key} value={constraints[key]} onChange={e => updateConstraints({ [key]: e.target.value } as any)}
+              style={{ padding: "4px 10px", borderRadius: 8, border: "1px solid #e5e7eb", fontSize: 12, color: "#333", background: "#f9fafb", cursor: "pointer" }}>
+              {opts.map(o => <option key={o} value={o}>{key === "budget" ? "💰" : key === "time" ? "⏱" : "🎓"} {labels[o]}</option>)}
+            </select>
+          );
+        })}
+        <span style={{ marginLeft: "auto", fontSize: 11, color: "#aaa" }}>{blueprint.totalDecisions} решений · {blueprint.totalXp} XP</span>
+      </div>
+
       <div style={{ display: "flex" }}>
         {/* Sidebar */}
-        <aside style={{ width: 310, background: "white", borderRight: "1px solid #ececec", minHeight: "calc(100vh - 72px)", padding: 35 }}>
+        <aside style={{ width: 310, background: "white", borderRight: "1px solid #ececec", minHeight: "calc(100vh - 144px)", padding: 35 }}>
           <h3 style={{ marginBottom: 20, fontSize: 14, color: "#777", textTransform: "uppercase", letterSpacing: "0.08em" }}>Путь проекта</h3>
           {stages.map((s, i) => {
             const done = s.decisions.filter(d => completed.has(d.id)).length;
@@ -120,6 +192,8 @@ export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprin
                 {currentStage?.decisions.map((dec, i) => {
                   const done = completed.has(dec.id);
                   const expanded = expandedDec === dec.id;
+                  const adaptedRecommended = filterRecommended(dec, constraints);
+                  const builtPrompt = buildPrompt(dec, constraints, blueprint);
                   return (
                     <div key={dec.id} style={{ padding: "16px 0", borderBottom: i < currentStage.decisions.length - 1 ? "1px solid #f2f2f2" : "none" }}>
                       <div style={{ display: "flex", alignItems: "flex-start", gap: 14, cursor: "pointer", opacity: done ? 0.5 : 1 }}
@@ -135,12 +209,11 @@ export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprin
                         </div>
                       </div>
 
-                      {/* Expand button */}
                       {!done && (
                         <div style={{ marginTop: 8, marginLeft: 38, display: "flex", gap: 8, flexWrap: "wrap" }}>
                           <button onClick={(e) => { e.stopPropagation(); setExpandedDec(expanded ? null : dec.id); }}
                             style={{ background: "none", border: "none", color: "#0FB880", fontSize: 13, cursor: "pointer", fontWeight: 500 }}>
-                            {expanded ? "Скрыть детали ▲" : "Подробнее ▼"}
+                            {expanded ? "Скрыть ▲" : "Подробнее ▼"}
                           </button>
                           {dec.promptTemplate && (
                             <button onClick={(e) => { e.stopPropagation(); copyPrompt(dec); }}
@@ -151,7 +224,6 @@ export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprin
                         </div>
                       )}
 
-                      {/* Expanded details */}
                       {expanded && !done && (
                         <div style={{ marginTop: 12, marginLeft: 38, padding: "16px", background: "#f8f9fa", borderRadius: 14, border: "1px solid #ececec" }}>
                           {dec.why && (
@@ -160,12 +232,15 @@ export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprin
                               <div style={{ fontSize: 13, color: "#666", lineHeight: 1.6 }}>{dec.why}</div>
                             </div>
                           )}
-                          {dec.recommended && (
-                            <div style={{ marginBottom: 10, padding: "12px", background: "#f0fdf6", borderRadius: 10, border: "1px solid #d1fae5" }}>
-                              <div style={{ fontWeight: 600, fontSize: 13, color: "#0FB880", marginBottom: 4 }}>✅ Рекомендуем</div>
-                              <div style={{ fontSize: 13, color: "#333" }}>{dec.recommended}</div>
+                          <div style={{ marginBottom: 10, padding: "12px", background: "#f0fdf6", borderRadius: 10, border: "1px solid #d1fae5" }}>
+                            <div style={{ fontWeight: 600, fontSize: 13, color: "#0FB880", marginBottom: 4 }}>
+                              ✅ Рекомендуем
+                              <span style={{ marginLeft: 8, fontSize: 11, fontWeight: 400, color: "#999" }}>
+                                (с учётом: {BUDGET_LABELS[constraints.budget]} · {TIME_LABELS[constraints.time]} · {LEVEL_LABELS[constraints.level]})
+                              </span>
                             </div>
-                          )}
+                            <div style={{ fontSize: 13, color: "#333" }}>{adaptedRecommended}</div>
+                          </div>
                           {dec.content && (
                             <div style={{ marginBottom: 10 }}>
                               <div style={{ fontWeight: 600, fontSize: 13, color: "#333", marginBottom: 4 }}>Как сделать</div>
@@ -184,8 +259,15 @@ export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprin
                               <div style={{ fontSize: 13, color: "#666" }}>{dec.mistakes}</div>
                             </div>
                           )}
-                          {dec.whenNotUse && (
-                            <div style={{ fontSize: 12, color: "#999", fontStyle: "italic" }}>ℹ️ Когда не применять: {dec.whenNotUse}</div>
+                          {builtPrompt && (
+                            <div style={{ marginTop: 10, padding: "12px", background: "#f0f0ff", borderRadius: 10, border: "1px solid #d4d4ff" }}>
+                              <div style={{ fontWeight: 600, fontSize: 13, color: "#6366f1", marginBottom: 6 }}>🤖 Готовый промпт</div>
+                              <div style={{ fontSize: 12, color: "#444", background: "#fafafe", padding: "10px", borderRadius: 8, fontFamily: "monospace", whiteSpace: "pre-wrap", lineHeight: 1.5 }}>{builtPrompt}</div>
+                              <button onClick={(e) => { e.stopPropagation(); copyPrompt(dec); }}
+                                style={{ marginTop: 8, padding: "6px 14px", borderRadius: 8, border: "1px solid #6366f1", background: "white", color: "#6366f1", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
+                                {promptCopied === dec.id ? "✅ Скопировано!" : "📋 Скопировать"}
+                              </button>
+                            </div>
                           )}
                         </div>
                       )}
@@ -198,10 +280,14 @@ export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprin
             {/* Right panel */}
             <div>
               <div style={{ background: "white", padding: 28, borderRadius: 22, border: "1px solid #ececec", marginBottom: 20 }}>
-                <h3 style={{ marginBottom: 12 }}>📋 Промпты</h3>
-                <p style={{ lineHeight: 1.7, color: "#666", fontSize: 15, marginBottom: 16 }}>
-                  У каждого решения есть готовый промпт. Скопируйте и вставьте в ChatGPT/DeepSeek.
-                </p>
+                <h3 style={{ marginBottom: 12 }}>⚙️ Контекст</h3>
+                <div style={{ lineHeight: 2, fontSize: 13, color: "#666" }}>
+                  <div>📦 Проект: <b>{blueprint.title}</b></div>
+                  <div>💰 Бюджет: <b>{BUDGET_LABELS[constraints.budget]}</b></div>
+                  <div>⏱ Срок: <b>{TIME_LABELS[constraints.time]}</b></div>
+                  <div>🎓 Уровень: <b>{LEVEL_LABELS[constraints.level]}</b></div>
+                  <div>⭐ XP: <b>{totalXp}</b></div>
+                </div>
               </div>
 
               <div style={{ background: "white", padding: 28, borderRadius: 22, border: "1px solid #ececec", marginBottom: 20 }}>
