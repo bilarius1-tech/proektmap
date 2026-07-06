@@ -1,42 +1,25 @@
 import { PrismaClient } from "@prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
 
-let _db: PrismaClient | null = null;
+// Глобальный синглтон — создаётся при первом использовании в runtime
+const globalForPrisma = globalThis as unknown as { db: PrismaClient | null };
+
+async function createPrisma(): Promise<PrismaClient> {
+  const url = process.env.DATABASE_URL;
+  if (!url) throw new Error("DATABASE_URL не задан в .env. Добавьте DATABASE_URL.");
+  const { PrismaPg } = await import("@prisma/adapter-pg");
+  return new PrismaClient({ adapter: new PrismaPg({ connectionString: url }) });
+}
+
+let _dbPromise: Promise<PrismaClient> | null = null;
 
 async function getDb(): Promise<PrismaClient> {
-  if (_db) return _db;
-  const url = process.env.DATABASE_URL;
-  if (!url) throw new Error("DATABASE_URL не задан");
-  _db = new PrismaClient({ adapter: new PrismaPg({ connectionString: url }) });
-  return _db;
+  if (globalForPrisma.db) return globalForPrisma.db;
+  if (!_dbPromise) _dbPromise = createPrisma();
+  const db = await _dbPromise;
+  globalForPrisma.db = db;
+  return db;
 }
 
-// Прокси для ленивого подключения
-// Каждое обращение к db.table.method() резолвит getDb()
-function createLazyPrisma(): PrismaClient {
-  const cache = new Map<string, any>();
-
-  return new Proxy({} as PrismaClient, {
-    get(_, prop: string) {
-      if (prop === "then") return undefined;
-      if (prop === "$connect" || prop === "$disconnect") {
-        return (...args: any[]) => (getDb() as any).then((db: any) => db[prop](...args));
-      }
-      
-      // Для db.blueprint.findUnique()
-      if (!cache.has(prop)) {
-        cache.set(prop, new Proxy({}, {
-          get(_, method: string) {
-            return (...args: any[]) => getDb().then((db: any) => {
-              const delegate = db[prop];
-              return delegate[method](...args);
-            });
-          },
-        }));
-      }
-      return cache.get(prop);
-    },
-  });
-}
-
-export const db = createLazyPrisma();
+// Экспортируем асинхронные функции вместо синхронного db
+// Каждая страница делает: const db = await getDb(); db.blueprint.findUnique(...)
+export { getDb };
