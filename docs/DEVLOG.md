@@ -151,3 +151,26 @@
 - awesome-design-md (75+ примеров от Stripe, Apple, Linear)
 - shadcn/ui theming (стандарт индустрии)
 - DESIGN.md формат (v0, Bolt.new, Cursor)
+
+---
+
+## 🎉 Этапы 2-9 заполнены! Blueprint «Корпоративный сайт» готов.
+
+### Все 10 этапов, 42 решения, 715 XP
+
+- Этап 0: Философия общения с AI (3)
+- Этап 1: Инструменты (8) — домен, хостинг, VS Code, SourceCraft, OpenRouter, Git, выбор среды
+- Этап 2: Дизайн-система (3) — токены, шрифты, DESIGN.md
+- Этап 3: UI Kit (4) — Header/Footer, Button, Card
+- Этап 4: Next.js (3) — create-next-app, страницы, Server/Client
+- Этап 5: Деплой (4) — DNS, SSL, запуск, Git-откат
+- Этап 6: SEO (4) — мета-теги, sitemap, llms.txt, Schema.org
+- Этап 7: Аналитика (3) — Метрика, Вебмастер, оптимизация
+- Этап 8: Право (4) — политика, соглашение, cookie, реквизиты
+- Этап 9: Telegram (5) — бот, webhook, chat_id, форма, безопасность
+
+### Каждое решение содержит:
+- problem, why, recommended, content
+- tradeoffs, whenNotUse, mistakes
+- context, constraints, validation, iteration
+- promptTitle, promptTemplate (готовый для AI)
