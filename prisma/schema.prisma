@@ -15,6 +15,7 @@ model User {
   level     String   @default("novice")
   role      String   @default("user")
   streak    Int      @default(0)
+  lastLogin DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   projects  Project[]
