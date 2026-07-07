@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Eye, CheckCircle, RefreshCw, Copy, ChevronDown, ChevronUp, Menu, X, ArrowRight } from "lucide-react";
+import AIRadar from "./ai-radar";
 
 interface Decision {
   id: string; title: string; slug: string;
