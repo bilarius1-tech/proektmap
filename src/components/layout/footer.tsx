@@ -57,7 +57,7 @@ export default async function GlobalFooter() {
       </div>
 
       <div style={{ maxWidth: 1000, margin: "var(--space-xl) auto 0", paddingTop: "var(--space-m)", borderTop: "1px solid var(--color-border-light)", textAlign: "center", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>
-        © 2026 Карта роста. Школа AI-инженеров. ИП Тимофеев А.Г.
+        © 2026 Карта роста. Школа AI-инженеров. ИП Тимофеев Алексей Геннадьевич, ИНН 532002912418.
         <div style={{ marginTop: 4 }}>
           <a href="/admin" style={{ color: "var(--color-text-tertiary)", fontSize: "10px", textDecoration: "none", opacity: 0.3 }}>админка</a>
         </div>
