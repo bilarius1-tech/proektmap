@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#0fb880"/>
+  <rect x="60" y="60" width="1080" height="510" rx="24" fill="rgba(255,255,255,0.1)"/>
+  <text x="600" y="260" text-anchor="middle" fill="white" font-family="Inter,sans-serif" font-weight="800" font-size="72">Карта роста</text>
+  <text x="600" y="340" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-family="Inter,sans-serif" font-size="28">AI-инженерный навигатор</text>
+  <text x="600" y="420" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-family="Inter,sans-serif" font-size="18">proektmap.ru</text>
+</svg>
