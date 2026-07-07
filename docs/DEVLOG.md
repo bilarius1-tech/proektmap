@@ -434,3 +434,11 @@
 ### Decision Engine
 - userChoice в ProjectDecision — запись что выбрал пользователь
 - Основа для аналитики: 80% выбрали Next.js → рекомендация будущим
+
+---
+
+## 🐛 Документированы баги гидрации в docs/BUGS.md
+
+- Hydration #418: 3 причины + решения + ядерный suppressHydrationWarning
+- Правило для будущих Client Components
+- Favicon 404 fix
