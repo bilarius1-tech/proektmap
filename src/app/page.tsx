@@ -52,7 +52,6 @@ export default function Home() {
                 opacity: bp.active ? 1 : 0.5, transition: "box-shadow var(--transition-normal)",
               }}
               className={bp.active ? "card-hover" : ""}
-              onClick={e => { if (!bp.active) e.preventDefault(); }}
             >
               <div style={{ width: 48, height: 48, borderRadius: "var(--radius-m)", background: "var(--color-accent-light)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 <bp.icon size={24} color="var(--color-accent)" />
