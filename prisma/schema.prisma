@@ -175,6 +175,7 @@ model MenuItem {
   href      String
   parentId  String?
   sortOrder Int      @default(0)
+  location  String   @default("header")
   isActive  Boolean  @default(true)
   icon      String?
   createdAt DateTime @default(now())

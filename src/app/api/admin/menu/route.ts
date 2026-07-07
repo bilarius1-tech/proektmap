@@ -11,20 +11,20 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const { label, href, parentId, sortOrder, icon } = await req.json();
+  const { label, href, parentId, sortOrder, icon, location } = await req.json();
   if (!label || !href) return NextResponse.json({ error: "label и href обязательны" }, { status: 400 });
   const db = await getDb();
   const item = await db.menuItem.create({
-    data: { label, href, parentId: parentId || null, sortOrder: sortOrder || 0, icon: icon || null },
+    data: { label, href, parentId: parentId || null, sortOrder: sortOrder || 0, icon: icon || null, location: location || "header" },
   });
   return NextResponse.json({ ok: true, item });
 }
 
 export async function PUT(req: NextRequest) {
-  const { id, label, href, parentId, sortOrder, icon, isActive } = await req.json();
+  const { id, label, href, parentId, sortOrder, icon, location, isActive } = await req.json();
   if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
   const db = await getDb();
-  await db.menuItem.update({ where: { id }, data: { label, href, parentId, sortOrder, icon, isActive } });
+  await db.menuItem.update({ where: { id }, data: { label, href, parentId, sortOrder, icon, location, isActive } });
   return NextResponse.json({ ok: true });
 }
 

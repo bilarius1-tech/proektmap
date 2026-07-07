@@ -1,6 +1,19 @@
 import Link from "next/link";
+import { getDb } from "@/lib/db";
 
-export default function GlobalFooter() {
+async function getFooterLinks() {
+  try {
+    const db = await getDb();
+    return await db.menuItem.findMany({
+      where: { parentId: null, isActive: true, location: "footer" },
+      orderBy: { sortOrder: "asc" },
+    });
+  } catch { return []; }
+}
+
+export default async function GlobalFooter() {
+  const footerLinks = await getFooterLinks();
+
   return (
     <footer style={{
       background: "var(--color-bg-primary)", borderTop: "1px solid var(--color-border-light)",
@@ -19,18 +32,26 @@ export default function GlobalFooter() {
         <div>
           <div style={{ fontWeight: 600, fontSize: "var(--text-xs)", marginBottom: "var(--space-s)", textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--color-text-tertiary)" }}>Проект</div>
           <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-xs)" }}>
-            <Link href="/" style={footerLink}>Шаблоны</Link>
-            <Link href="/dashboard" style={footerLink}>Личный кабинет</Link>
-            <Link href="/auth" style={footerLink}>Войти</Link>
+            <Link href="/" style={fl}>Шаблоны</Link>
+            <Link href="/dashboard" style={fl}>Личный кабинет</Link>
+            <Link href="/auth" style={fl}>Войти</Link>
           </div>
         </div>
 
         <div>
           <div style={{ fontWeight: 600, fontSize: "var(--text-xs)", marginBottom: "var(--space-s)", textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--color-text-tertiary)" }}>Документы</div>
           <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-xs)" }}>
-            <Link href="#" style={footerLink}>Политика конфиденциальности</Link>
-            <Link href="#" style={footerLink}>Условия использования</Link>
-            <Link href="#" style={footerLink}>Оферта</Link>
+            {footerLinks.length > 0 ? (
+              footerLinks.map(item => (
+                <Link key={item.id} href={item.href} style={fl}>{item.label}</Link>
+              ))
+            ) : (
+              <>
+                <Link href="#" style={fl}>Политика конфиденциальности</Link>
+                <Link href="#" style={fl}>Условия использования</Link>
+                <Link href="#" style={fl}>Оферта</Link>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -45,6 +66,4 @@ export default function GlobalFooter() {
   );
 }
 
-const footerLink: React.CSSProperties = {
-  fontSize: "var(--text-s)", color: "var(--color-text-secondary)", textDecoration: "none",
-};
+const fl: React.CSSProperties = { fontSize: "var(--text-s)", color: "var(--color-text-secondary)", textDecoration: "none" };

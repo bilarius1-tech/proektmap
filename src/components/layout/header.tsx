@@ -9,7 +9,7 @@ export default async function GlobalHeader() {
   try {
     const db = await getDb();
     menuItems = await db.menuItem.findMany({
-      where: { parentId: null, isActive: true },
+      where: { parentId: null, isActive: true, location: "header" },
       orderBy: { sortOrder: "asc" },
       include: { children: { where: { isActive: true }, orderBy: { sortOrder: "asc" } } },
     });
