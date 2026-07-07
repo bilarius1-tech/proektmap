@@ -14,6 +14,7 @@ model User {
   xp        Int      @default(0)
   level     String   @default("novice")
   role      String   @default("user")
+  subscription String   @default("free")
   streak    Int      @default(0)
   lastLogin DateTime?
   createdAt DateTime @default(now())
