@@ -321,3 +321,24 @@
 - CookieConsent — баннер снизу с кнопкой «Принять»
 - Логотип: ProektMap → Карта роста
 - Все страницы: ИП Тимофеев А.Г., ИНН 532002912418
+
+---
+
+## 💰 Система оплаты + доступ
+
+### Модель
+- **Бесплатный**: Blueprint'ы, промпты, прогресс — без AI-консультанта
+- **Pro (300 ₽/мес)**: AI-консультант, все функции
+- **Admin**: всё включено без оплаты
+
+### Технически
+- Роли: role (user/admin) + subscription (free/pro) в JWT
+- Middleware: /api/ai/ask → 402 если не pro/admin
+- /dashboard → статус подписки + кнопка оплаты
+- /dashboard/billing → тариф Pro, 300 ₽/мес
+- Yandex OAuth → авто-создание user с subscription=free
+- Админ: bilariuss@yandex.ru, role=admin, subscription=pro
+
+### ЮKassa
+- API /api/billing/create-payment готов
+- Ждёт одобрения магазина (юр. страницы созданы)

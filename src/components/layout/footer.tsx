@@ -47,9 +47,9 @@ export default async function GlobalFooter() {
               ))
             ) : (
               <>
-                <Link href="#" style={fl}>Политика конфиденциальности</Link>
-                <Link href="#" style={fl}>Условия использования</Link>
-                <Link href="#" style={fl}>Оферта</Link>
+                <Link href="/privacy" style={fl}>Политика конфиденциальности</Link>
+                <Link href="/terms" style={fl}>Условия использования</Link>
+                <Link href="/offer" style={fl}>Оферта</Link>
               </>
             )}
           </div>
