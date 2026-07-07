@@ -8,6 +8,7 @@ const nav = [
   { href: "/admin/stages", label: "Этапы", icon: Layers },
   { href: "/admin/decisions", label: "Решения", icon: GitBranch },
     { href: "/admin/skills", label: "Skills", icon: Puzzle },
+    { href: "/admin/ai-radar", label: "AI Radar", icon: Cpu },
   { href: "/admin/settings", label: "Настройки", icon: Settings },
     { href: "/admin/menu", label: "Меню", icon: Menu },
 ];

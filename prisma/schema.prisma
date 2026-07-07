@@ -251,8 +251,35 @@ model SiteSettings {
   proPrice  Int      @default(300)
   yookassaShopId    String   @default("")
   yookassaSecretKey String   @default("")
-  yookassaShopId String @default("")
-  yookassaSecretKey String @default("")
   updatedAt DateTime @updatedAt
   @@map("site_settings")
+}
+
+model AIModel {
+  id          String   @id @default(uuid())
+  name        String   @unique   // "Claude Opus 4.8"
+  provider    String             // "Anthropic", "OpenAI", "DeepSeek"...
+  category    String             // "coding", "reasoning", "vision"
+  
+  // Ratings (1-10)
+  codeRating      Int    @default(7)
+  siteRating      Int    @default(7)
+  agentRating     Int    @default(7)
+  speedRating     Int    @default(7)
+  
+  // Pricing
+  pricePerMillion  Int    @default(0)  // ₽ за 1M токенов
+  contextWindow    Int    @default(128000)
+  
+  // Recommendations
+  bestFor     String  @default("")  // "Лендинг, SaaS, Telegram Bot"
+  notFor      String  @default("")  // "Тяжёлая аналитика"
+  
+  isPublished Boolean @default(true)
+  sortOrder   Int     @default(0)
+  lastUpdated DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("ai_models")
 }
