@@ -122,7 +122,7 @@ export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprin
                     <X size={20} />
                   </button>
                 </div>
-                <SidebarContent stages={stages} activeStage={activeStage} setActiveStage={(slug) => { setActiveStage(slug); setSidebarOpen(false); }}
+                <SidebarContent stages={stages} activeStage={activeStage} setActiveStage={(slug: string) => { setActiveStage(slug); setSidebarOpen(false); }}
                   completed={completed} progress={progress} totalDone={totalDone} totalDecs={blueprint.totalDecisions} />
               </div>
             </>
