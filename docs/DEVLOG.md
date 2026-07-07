@@ -232,3 +232,45 @@
 - **Lucide иконки**: 6 категорий (Code, Rocket, Palette, Search, Shield, Sparkles)
 - **Админка /admin/prompt-cats**: CRUD категорий, 20 иконок на выбор
 - **Эмодзи заменены** на векторные иконки Lucide везде
+
+---
+
+## 📚 Этап: Библиотека промптов — завершён
+
+### Компоненты
+- **Модель Prompt** — 15 промптов, 6 категорий, теги, счётчик использований
+- **Модель PromptVariable** — 33 переменные с описаниями и примерами
+- **Модель PromptCategory** — 6 категорий, иконки Lucide, CRUD
+- **/prompts** — публичная страница с поиском, фильтрами, пагинацией
+- **PromptsBlock** — переиспользуемый компонент в каждом Blueprint
+- **TemplateHelp** — RenderTemplate (кликабельные `{{переменные}}`) + VariableLegend (справочник)
+- **Админка**: /admin/prompts, /admin/prompt-vars, /admin/prompt-cats
+
+### Технический стек
+- Форк vibe-coding-cn (22k ⭐), адаптация под РФ
+- Lucide иконки (Code, Rocket, Palette, Search, Shield, Sparkles)
+- Пагинация 30/page, URL-параметры
+- position:fixed + z-index:99999 для tooltip-подсказок
+
+### Файлы
+- `src/app/prompts/` — публичная страница + клиент
+- `src/components/blueprint/prompts-block.tsx` — компонент
+- `src/components/blueprint/template-help.tsx` — подсказки
+- `src/app/admin/prompts/` — CRUD промптов
+- `src/app/admin/prompt-vars/` — CRUD переменных
+- `src/app/admin/prompt-cats/` — CRUD категорий
+- `src/app/api/admin/prompts/` — API промптов
+- `src/app/api/admin/prompt-vars/` — API переменных
+- `src/app/api/admin/prompt-cats/` — API категорий
+- `prisma/schema.prisma` — Prompt, PromptVariable, PromptCategory
+
+### Расширяемость
+Админ может: добавлять промпты, переменные, категории, иконки через админку.
+Система готова к масштабированию до 10 000+ промптов.
+---
+## ✅ Blueprint «Корпоративный сайт» — ПОЛНОСТЬЮ ЗАВЕРШЁН
+
+- **10 этапов, 45 решений, 765 XP**
+- Полный путь: от AI-коммуникации до мониторинга
+- Библиотека промптов с подсказками для новичков
+- Админка: Blueprints, Stages, Decisions, Prompts, Variables, Categories, Menu, Skills, Referrals, AI Radar, Users, Settings
