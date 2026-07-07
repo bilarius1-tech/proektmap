@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Home, FileText, Layers, GitBranch, Settings, Users, Menu } from "lucide-react";
+import { Home, FileText, Layers, GitBranch, Settings, Users, Menu, Puzzle } from "lucide-react";
 
 const nav = [
   { href: "/admin", label: "Обзор", icon: Home },
@@ -7,6 +7,7 @@ const nav = [
   { href: "/admin/blueprints", label: "Blueprints", icon: FileText },
   { href: "/admin/stages", label: "Этапы", icon: Layers },
   { href: "/admin/decisions", label: "Решения", icon: GitBranch },
+    { href: "/admin/skills", label: "Skills", icon: Puzzle },
   { href: "/admin/settings", label: "Настройки", icon: Settings },
     { href: "/admin/menu", label: "Меню", icon: Menu },
 ];

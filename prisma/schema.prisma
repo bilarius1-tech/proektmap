@@ -95,6 +95,7 @@ model Decision {
   relationsFrom  DecisionRelation[] @relation("from")
   relationsTo    DecisionRelation[] @relation("to")
   progress       ProjectDecision[]
+  skills        DecisionSkill[]
   @@map("decisions")
 }
 
@@ -184,4 +185,49 @@ model MenuItem {
   children MenuItem[] @relation("MenuChildren")
 
   @@map("menu_items")
+}
+
+model Skill {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  description String   @default("")
+  
+  // SKILL.md — основной контент
+  skillMd     String   @default("")
+  
+  // Вспомогательные файлы (паттерн vibe-coding-cn)
+  assetsPath  String?  // путь к assets/
+  scriptsPath String?  // путь к scripts/
+  refsPath    String?  // путь к references/
+  
+  difficulty  String   @default("easy")
+  xpReward    Int      @default(15)
+  timeEstimate String  @default("15 мин")
+  isPublished Boolean  @default(false)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Промпты (как у Decision)
+  promptTitle    String?
+  promptTemplate String?
+
+  // Связи
+  decisions DecisionSkill[]
+  
+  @@map("skills")
+}
+
+model DecisionSkill {
+  id         String   @id @default(uuid())
+  decisionId String
+  skillId    String
+  sortOrder  Int      @default(0)
+  
+  decision Decision @relation(fields: [decisionId], references: [id], onDelete: Cascade)
+  skill    Skill    @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  
+  @@unique([decisionId, skillId])
+  @@map("decision_skills")
 }
