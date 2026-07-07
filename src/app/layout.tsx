@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "@/styles/tokens.css";
 import GlobalHeader from "@/components/layout/header";
 import GlobalFooter from "@/components/layout/footer";
+import StreakBanner from "@/components/layout/streak-banner";
 
 export const metadata: Metadata = {
   title: "ProektMap — Инженерный навигатор",
@@ -20,6 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body style={{ display: "flex", flexDirection: "column", minHeight: "100dvh" }}>
         <GlobalHeader />
+        <StreakBanner />
         <main style={{ flex: 1 }}>{children}</main>
         <GlobalFooter />
       </body>
