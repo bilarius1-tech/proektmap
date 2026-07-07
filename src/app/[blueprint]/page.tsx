@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import BlueprintPageClient from "./client";
 import type { Metadata } from "next";
 import { auth } from "@/lib/auth";
+import { getProjectContext, buildUserContext } from "@/lib/project-context";
 
 export async function generateMetadata({ params }: { params: Promise<{ blueprint: string }> }): Promise<Metadata> {
   const { blueprint: slug } = await params;
@@ -18,9 +19,17 @@ export async function generateMetadata({ params }: { params: Promise<{ blueprint
   } catch { return {}; }
 }
 
-export default async function BlueprintPage({ params }: { params: Promise<{ blueprint: string }> }) {
+export default async function BlueprintPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ blueprint: string }>;
+  searchParams: Promise<{ project?: string }>;
+}) {
   const { blueprint: slug } = await params;
+  const { project: projectId } = await searchParams;
   const db = await getDb();
+
   const bp = await db.blueprint.findUnique({
     where: { slug },
     include: { stages: { orderBy: { sortOrder: "asc" }, include: { stage: { include: { decisions: { orderBy: { sortOrder: "asc" } } } } } } },
@@ -31,11 +40,30 @@ export default async function BlueprintPage({ params }: { params: Promise<{ blue
   const isLoggedIn = !!session?.user;
   const isPro = isLoggedIn && ((session.user as any).subscription === "pro" || (session.user as any).role === "admin");
 
+  // Load user's project if specified
+  let projectContext = null;
+  let userProjects: any[] = [];
+  if (isLoggedIn && projectId) {
+    projectContext = await getProjectContext(projectId);
+  }
+  if (isLoggedIn) {
+    userProjects = await db.project.findMany({
+      where: { userId: (session.user as any).id, blueprintId: bp.id },
+      select: { id: true, name: true, progress: true, status: true },
+      orderBy: { createdAt: "desc" },
+    });
+  }
+
+  const userContext = buildUserContext(projectContext || { id: "", name: "", description: "", domain: "", stack: "", niche: "", colors: "", goals: "", blueprintTitle: "" });
+
   return (
     <BlueprintPageClient
       blueprint={JSON.parse(JSON.stringify(bp))}
       isLoggedIn={isLoggedIn}
       isPro={isPro}
+      projectContext={JSON.parse(JSON.stringify(projectContext))}
+      userProjects={JSON.parse(JSON.stringify(userProjects))}
+      userContext={userContext}
     />
   );
 }

@@ -150,6 +150,13 @@ model Project {
   userId      String
   blueprintId String
   progress    Int      @default(0)
+  name        String   @default("")
+  description String   @default("")
+  domain      String   @default("")
+  stack       String   @default("")
+  niche       String   @default("")
+  colors      String   @default("")
+  goals       String   @default("")
   status      String   @default("active")
   createdAt   DateTime @default(now())
   user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -327,19 +334,4 @@ model PromptCategory {
   updatedAt   DateTime @updatedAt
 
   @@map("prompt_categories")
-}
-
-model SkillEvolution {
-  id          String   @id @default(uuid())
-  skillId     String
-  skill       Skill    @relation(fields: [skillId], references: [id])
-  version     Int      @default(1)
-  changelog   String   @default("")
-  source      String   @default("manual")
-  authorId    String?
-  author      User?    @relation(fields: [authorId], references: [id])
-  metrics     String   @default("{}")
-  createdAt   DateTime @default(now())
-
-  @@map("skill_evolutions")
 }
