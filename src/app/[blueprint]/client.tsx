@@ -83,14 +83,13 @@ export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprin
   ];
 
   // Common styles
-  const headerH = 56;
   const sidebarW = isMobile ? "100%" : 280;
 
   return (
     <div style={{ fontFamily: "Inter, sans-serif", background: "var(--color-bg-secondary)", color: "var(--color-text-primary)", minHeight: "100dvh" }}>
       {/* Header */}
       <header style={{
-        height: headerH, background: "var(--color-bg-primary)", display: "flex", alignItems: "center",
+        height: 56, background: "var(--color-bg-primary)", display: "flex", alignItems: "center",
         justifyContent: "space-between", padding: "0 var(--space-m)", borderBottom: "1px solid var(--color-border-light)",
         position: "sticky", top: 0, zIndex: 100,
       }}>
@@ -115,7 +114,7 @@ export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprin
         <aside style={{
           width: isMobile ? (sidebarOpen ? "100%" : 0) : sidebarW,
           minWidth: isMobile ? (sidebarOpen ? "100%" : 0) : sidebarW,
-          height: isMobile ? "auto" : "calc(100dvh - " + headerH + "px)",
+          height: isMobile ? "auto" : "calc(100dvh - 56px)",
           background: "var(--color-bg-primary)", borderRight: "1px solid var(--color-border-light)",
           overflow: "auto", transition: "width 0.2s, min-width 0.2s",
           position: isMobile ? "absolute" : "relative",

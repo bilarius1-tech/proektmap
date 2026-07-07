@@ -21,12 +21,6 @@ export default async function DashboardPage() {
 
   return (
     <div style={{ fontFamily: "Inter, sans-serif", background: "var(--color-bg-secondary)", minHeight: "100dvh" }}>
-      <header style={{ height: 56, background: "var(--color-bg-primary)", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 var(--space-m)", borderBottom: "1px solid var(--color-border-light)" }}>
-        <a href="/" style={{ fontSize: 18, fontWeight: 800, textDecoration: "none", color: "inherit" }}>
-          Proekt<span style={{ color: "var(--color-accent)" }}>Map</span>
-        </a>
-        <div style={{ fontSize: "var(--text-s)", color: "var(--color-text-secondary)" }}>{session.user?.email}</div>
-      </header>
 
       <div style={{ maxWidth: 800, margin: "0 auto", padding: "var(--space-xl) var(--space-m)" }}>
         <h1 style={{ fontSize: "var(--text-xxl)", fontWeight: 800, marginBottom: "var(--space-xs)" }}>Личный кабинет</h1>

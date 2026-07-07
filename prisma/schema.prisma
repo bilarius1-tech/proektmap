@@ -167,3 +167,19 @@ model ProjectDecision {
   @@unique([projectId, decisionId])
   @@map("project_decisions")
 }
+
+model MenuItem {
+  id        String   @id @default(uuid())
+  label     String
+  href      String
+  parentId  String?
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  icon      String?
+  createdAt DateTime @default(now())
+  
+  parent   MenuItem?  @relation("MenuChildren", fields: [parentId], references: [id])
+  children MenuItem[] @relation("MenuChildren")
+
+  @@map("menu_items")
+}
