@@ -40,6 +40,7 @@ export default async function GlobalHeader() {
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: "var(--space-s)" }}>
+        <a href="/dashboard/favorites" title="Избранное" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 36, height: 36, borderRadius: "var(--radius-m)", border: "1px solid var(--color-border-light)", textDecoration: "none", fontSize: 16 }}>{"\u2764\uFE0F"}</a>
         <ThemeToggle />
         <AuthBlock />
       </div>
