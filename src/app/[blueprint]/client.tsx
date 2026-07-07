@@ -18,6 +18,10 @@ interface Stage {
   id: string; title: string; slug: string; icon: string; description: string | null;
   decisions: Decision[];
 }
+interface Variable {
+  name: string; label: string; description: string; example: string; category: string;
+}
+
 interface Prompt {
   id: string; title: string; category: string;
   description: string | null; content: string; tags: string;
@@ -44,7 +48,7 @@ function buildPrompt(dec: Decision, bp: Blueprint): string {
   return parts.join("\n\n");
 }
 
-export default function BlueprintPageClient({ blueprint, prompts }: { blueprint: Blueprint; prompts: Prompt[] }) {
+export default function BlueprintPageClient({ blueprint, prompts, variables }: { blueprint: Blueprint; prompts: Prompt[]; variables: Variable[] }) {
   const stages = blueprint.stages.map(bs => bs.stage);
   const [activeStage, setActiveStage] = useState(stages[0]?.slug || "");
   const [completed, setCompleted] = useState<Set<string>>(new Set());
@@ -179,7 +183,7 @@ export default function BlueprintPageClient({ blueprint, prompts }: { blueprint:
                     {curStep === 2 && <StepChoose dec={dec} />}
                     {curStep === 3 && <StepVerify dec={dec} builtPrompt={builtPrompt} promptCopied={promptCopied} copyPrompt={copyPrompt} />}
                     <AIRadar />
-      <PromptsBlock prompts={prompts || []} />
+      <PromptsBlock prompts={prompts || []} variables={variables || []} />
                     <VideoBlock videos={[]} />
                   </div>
                 )}

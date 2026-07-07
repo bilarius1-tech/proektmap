@@ -26,5 +26,6 @@ export default async function BlueprintPage({ params }: { params: Promise<{ blue
   });
   if (!bp) notFound();
   const prompts = await db.prompt.findMany({ where: { isActive: true }, orderBy: [{ category: "asc" }, { title: "asc" }] });
-  return <BlueprintPageClient blueprint={JSON.parse(JSON.stringify(bp))} prompts={JSON.parse(JSON.stringify(prompts))} />;
+  const variables = await db.promptVariable.findMany({ where: { isActive: true }, orderBy: { sortOrder: "asc" } });
+  return <BlueprintPageClient blueprint={JSON.parse(JSON.stringify(bp))} prompts={JSON.parse(JSON.stringify(prompts))} variables={JSON.parse(JSON.stringify(variables))} />;
 }

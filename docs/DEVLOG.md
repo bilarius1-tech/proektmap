@@ -193,3 +193,33 @@
 - `src/app/admin/prompts/` — админ-панель
 - `src/app/api/admin/prompts/` — API CRUD
 - `prisma/schema.prisma` — модель Prompt
+
+---
+
+## 🔤 Система подсказок для новичков — TemplateHelp
+
+### Что сделано
+- **Модель PromptVariable**: 33 переменные с описаниями, примерами, категориями
+- **TemplateHelp компонент**: RenderTemplate + VariableLegend
+- **RenderTemplate**: `{{переменные}}` в тексте промпта → кликабельные подсказки
+- **VariableLegend**: раскрывающийся справочник всех переменных с категориями
+- **Админка /admin/prompt-vars**: CRUD переменных, вкл/выкл
+- **Интегрировано**: /prompts + PromptsBlock в Blueprint'ах
+
+### Как работает для новичка
+1. Открыл промпт → видит `{{project}}` выделенным
+2. Нажал → всплывающее окно: «Название проекта. Подставьте своё. Пример: Сайт стоматологии»
+3. Не понял систему → кнопка «Как пользоваться шаблонами?» → полный справочник
+
+### Категории переменных
+- общее (3): project, context, task
+- код (10): path, source, stack, error, input, output...
+- деплой (4): domain, server, nodeVersion, token
+- дизайн (1): layout
+- seo (3): page, type, topic
+- право (4): company, email, inn, phone
+- ai (4): role, restrictions, style, format
+
+### Расширяемость
+Админ может добавлять/редактировать/отключать переменные через /admin/prompt-vars.
+Система автоматически подхватывает новые переменные во всех промптах.

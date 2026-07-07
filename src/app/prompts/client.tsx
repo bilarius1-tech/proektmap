@@ -2,11 +2,15 @@
 
 import { Copy, Search, ChevronDown } from "lucide-react";
 import { useState } from "react";
+import { RenderTemplate, VariableLegend } from "@/components/blueprint/template-help";
 
 interface Prompt {
   id: string; title: string; category: string;
   description: string | null; content: string; tags: string;
   useCount: number;
+}
+interface Variable {
+  name: string; label: string; description: string; example: string; category: string;
 }
 
 const CAT_ICONS: Record<string, string> = {
@@ -14,7 +18,7 @@ const CAT_ICONS: Record<string, string> = {
   "SEO": "🔍", "Право": "⚖️", "AI": "🤖",
 };
 
-export default function PromptsPageClient({ prompts }: { prompts: Prompt[] }) {
+export default function PromptsPageClient({ prompts, variables }: { prompts: Prompt[]; variables: Variable[] }) {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("Все");
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -34,12 +38,14 @@ export default function PromptsPageClient({ prompts }: { prompts: Prompt[] }) {
 
   return (
     <div style={{ maxWidth: 900, margin: "0 auto", padding: "var(--space-xl) var(--space-m)" }}>
-      <div style={{ marginBottom: "var(--space-xl)" }}>
+      <div style={{ marginBottom: "var(--space-l)" }}>
         <h1 style={{ fontSize: "var(--text-xxxl)", fontWeight: 800, marginBottom: "var(--space-xs)" }}>📚 Библиотека промптов</h1>
         <p style={{ color: "var(--color-text-secondary)", fontSize: "var(--text-s)", lineHeight: 1.7 }}>
-          Готовые промпты для AI-агентов. Форк из <a href="https://github.com/yourkeychen/vibe-coding-cn" target="_blank" rel="noopener" style={{ color: "var(--color-accent)" }}>vibe-coding-cn</a> (22k ⭐).
-          Адаптированы под русский рынок и российские сервисы.
+          Готовые промпты для AI-агентов. Форк из{" "}
+          <a href="https://github.com/yourkeychen/vibe-coding-cn" target="_blank" rel="noopener" style={{ color: "var(--color-accent)" }}>vibe-coding-cn</a>{" "}
+          (22k ⭐). Адаптированы под русский рынок и российские сервисы.
         </p>
+        <VariableLegend variables={variables} />
       </div>
 
       <div style={{ display: "flex", gap: 12, marginBottom: "var(--space-l)", flexWrap: "wrap" }}>
@@ -81,7 +87,9 @@ export default function PromptsPageClient({ prompts }: { prompts: Prompt[] }) {
             </div>
             {expanded === p.id && (
               <div style={{ padding: "var(--space-m)", borderTop: "1px solid var(--color-border-light)", background: "var(--color-bg-secondary)" }}>
-                <pre style={{ whiteSpace: "pre-wrap", fontSize: "var(--text-xs)", fontFamily: "var(--font-mono)", lineHeight: 1.8, margin: 0, padding: "var(--space-m)", background: "white", borderRadius: "var(--radius-m)", border: "1px solid var(--color-border-light)" }}>{p.content}</pre>
+                <div style={{ whiteSpace: "pre-wrap", fontSize: "var(--text-xs)", fontFamily: "var(--font-mono)", lineHeight: 1.8, padding: "var(--space-m)", background: "white", borderRadius: "var(--radius-m)", border: "1px solid var(--color-border-light)" }}>
+                  <RenderTemplate text={p.content} variables={variables} />
+                </div>
               </div>
             )}
           </div>

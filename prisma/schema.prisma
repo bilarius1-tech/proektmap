@@ -300,3 +300,18 @@ model Prompt {
 
   @@map("prompts")
 }
+
+model PromptVariable {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  label       String
+  description String
+  example     String   @default("")
+  category    String   @default("общее")
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("prompt_variables")
+}
