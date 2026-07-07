@@ -9,7 +9,6 @@ export default function StreakBanner() {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    // Check and claim streak
     fetch("/api/user/streak", { method: "POST" })
       .then(r => r.json())
       .then(d => {
@@ -27,12 +26,10 @@ export default function StreakBanner() {
   return (
     <div style={{
       background: "var(--color-accent)", color: "white", padding: "8px 16px",
-      textAlign: "center", fontSize: "var(--text-s)", fontWeight: 600,
-      display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-      animation: "slideDown 0.3s ease",
+      textAlign: "center", fontSize: "var(--text-xs)", fontWeight: 600,
     }}>
-      <Zap size={16} />
-      {streak && streak >= 7 ? "🔥" : "👍"} {streak} {streak === 1 ? "день" : streak! < 5 ? "дня" : "дней"} подряд! +{xpGained} XP
+      <Zap size={14} style={{ display: "inline", verticalAlign: "middle", marginRight: 6 }} />
+      {streak}-й день подряд! +{xpGained} XP 🎉
     </div>
   );
 }
