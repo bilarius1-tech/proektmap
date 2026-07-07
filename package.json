@@ -8,26 +8,26 @@
     "start": "next start --port 3030"
   },
   "dependencies": {
-    "next": "^16.2.9",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
-    "@prisma/client": "^7.8.0",
-    "prisma": "^7.8.0",
     "@prisma/adapter-pg": "^7.8.0",
-    "next-auth": "^4.24.14",
+    "@prisma/client": "^7.8.0",
+    "@tailwindcss/postcss": "^4.0.0",
     "bcryptjs": "^2.4.3",
+    "framer-motion": "^11.0.0",
+    "lucide-react": "^0.400.0",
+    "next": "^16.2.9",
+    "next-auth": "^4.24.14",
     "nodemailer": "^6.9.0",
     "openai": "^4.0.0",
-    "tailwindcss": "^4.0.0",
-    "@tailwindcss/postcss": "^4.0.0",
-    "framer-motion": "^11.0.0",
-    "lucide-react": "^0.400.0"
+    "prisma": "^7.8.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "tailwindcss": "^4.0.0"
   },
   "devDependencies": {
-    "@types/node": "^22.0.0",
-    "@types/react": "^19.0.0",
     "@types/bcryptjs": "^2.4.0",
+    "@types/node": "^22.0.0",
     "@types/nodemailer": "^6.4.0",
+    "@types/react": "^19.0.0",
     "typescript": "^5.7.0"
   }
 }
