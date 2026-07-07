@@ -125,3 +125,39 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
   transition: border-color var(--transition-fast);
 }
 .input:focus { border-color: var(--color-accent); }
+
+/* ═══════════════════════════════════════════
+   MOBILE — адаптивность
+   ═══════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+  :root {
+    --text-xl: 20px;
+    --text-xxl: 24px;
+  }
+
+  /* Sidebar скрыт на мобильных — показываем как выпадающее */
+  .sidebar-mobile {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --space-xl: 20px;
+    --space-l: 16px;
+    --space-m: 12px;
+  }
+
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+/* Touch-friendly: увеличиваем зону нажатия */
+@media (pointer: coarse) {
+  button, a, [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

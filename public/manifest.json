@@ -1,0 +1,10 @@
+{
+  "name": "ProektMap — Инженерный навигатор",
+  "short_name": "ProektMap",
+  "description": "Школа AI-инженеров",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0FB880",
+  "icons": []
+}
