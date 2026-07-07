@@ -244,3 +244,12 @@ model ReferralLink {
   updatedAt   DateTime @updatedAt
   @@map("referral_links")
 }
+
+model SiteSettings {
+  id        String   @id @default("main")
+  proPrice  Int      @default(300)
+  yookassaShopId String @default("")
+  yookassaSecretKey String @default("")
+  updatedAt DateTime @updatedAt
+  @@map("site_settings")
+}
