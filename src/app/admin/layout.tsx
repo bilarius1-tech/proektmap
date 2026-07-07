@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { Home, FileText, Layers, GitBranch, Settings } from "lucide-react";
+import { Home, FileText, Layers, GitBranch, Settings, Users } from "lucide-react";
 
 const nav = [
   { href: "/admin", label: "Обзор", icon: Home },
+    { href: "/admin/users", label: "Пользователи", icon: Users },
   { href: "/admin/blueprints", label: "Blueprints", icon: FileText },
   { href: "/admin/stages", label: "Этапы", icon: Layers },
   { href: "/admin/decisions", label: "Решения", icon: GitBranch },

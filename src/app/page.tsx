@@ -14,12 +14,6 @@ export default function Home() {
   return (
     <div style={{ fontFamily: "Inter, sans-serif", background: "var(--color-bg-secondary)", color: "var(--color-text-primary)", minHeight: "100vh" }}>
       {/* Header */}
-      <header style={{ height: 72, background: "var(--color-bg-primary)", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 40px", borderBottom: "1px solid var(--color-border-light)", position: "sticky", top: 0, zIndex: 100 }}>
-        <div style={{ fontSize: 22, fontWeight: 800 }}>
-          Proekt<span style={{ color: "var(--color-accent)" }}>Map</span>
-        </div>
-        <span style={{ fontSize: "var(--text-s)", color: "var(--color-text-tertiary)" }}>Школа AI-инженеров</span>
-      </header>
 
       {/* Hero */}
       <div style={{ background: "var(--color-bg-primary)", padding: "60px 20px 50px", textAlign: "center", borderBottom: "1px solid var(--color-border-light)" }}>
@@ -91,9 +85,6 @@ export default function Home() {
       </div>
 
       {/* Footer */}
-      <footer style={{ textAlign: "center", padding: "var(--space-l)", borderTop: "1px solid var(--color-border-light)", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>
-        ProektMap © 2026 · Школа AI-инженеров · Первый в России
-      </footer>
     </div>
   );
 }
