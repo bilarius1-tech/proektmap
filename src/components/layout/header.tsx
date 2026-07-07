@@ -1,15 +1,13 @@
 import { getDb } from "@/lib/db";
 import GlobalSearch from "./global-search";
+import FavoritesIndicator from "./favorites-indicator";
 import Link from "next/link";
 import MobileMenu from "./mobile-menu";
 import AuthBlock from "./auth-block";
 import ThemeToggle from "./theme-toggle";
-import { auth } from "@/lib/auth";
 
 export default async function GlobalHeader() {
   let menuItems: any[] = [];
-  let hasFavorites = false;
-  
   try {
     const db = await getDb();
     menuItems = await db.menuItem.findMany({
@@ -17,15 +15,6 @@ export default async function GlobalHeader() {
       orderBy: { sortOrder: "asc" },
       include: { children: { where: { isActive: true }, orderBy: { sortOrder: "asc" } } },
     });
-
-    // Check if logged-in user has favorites
-    const session = await auth();
-    if (session?.user) {
-      const count = await db.favorite.count({
-        where: { userId: (session.user as any).id },
-      });
-      hasFavorites = count > 0;
-    }
   } catch (e) {}
 
   return (
@@ -52,16 +41,7 @@ export default async function GlobalHeader() {
 
       <div style={{ display: "flex", alignItems: "center", gap: "var(--space-s)" }}>
         <GlobalSearch />
-        <a href="/dashboard/favorites" title="Избранное" style={{
-          display: "flex", alignItems: "center", justifyContent: "center",
-          width: 36, height: 36, borderRadius: "var(--radius-m)",
-          border: "1px solid var(--color-border-light)",
-          textDecoration: "none", fontSize: 14,
-          color: hasFavorites ? "var(--color-error)" : "var(--color-text-tertiary)",
-          fontWeight: hasFavorites ? 700 : 400,
-        }}>
-          {hasFavorites ? "♥" : "♡"}
-        </a>
+        <FavoritesIndicator initialCount={0} />
         <ThemeToggle />
         <AuthBlock />
       </div>

@@ -46,7 +46,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="alternate" href="https://proektmap.ru" hrefLang="ru" />
         <link rel="alternate" href="https://proektmap.ru" hrefLang="x-default" />
       </head>
-      <body style={{ display: "flex", flexDirection: "column", minHeight: "100dvh" }}>
+      <body suppressHydrationWarning style={{ display: "flex", flexDirection: "column", minHeight: "100dvh" }}>
         <GlobalHeader />
         <StreakBanner />
         <main style={{ flex: 1 }}>{children}</main>
