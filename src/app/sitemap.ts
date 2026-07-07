@@ -1,25 +1,25 @@
 import { getDb } from "@/lib/db";
-import type { MetadataRoute } from "next";
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = "https://proektmap.ru";
-  const entries: MetadataRoute.Sitemap = [
-    { url: baseUrl, lastModified: new Date(), changeFrequency: "weekly", priority: 1 },
-    { url: baseUrl + "/auth", lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
+export const dynamic = "force-dynamic";
+
+export default async function Sitemap() {
+  const base = "https://proektmap.ru";
+
+  const staticPages = [
+    { url: base, lastModified: new Date(), priority: 1 },
+    { url: `${base}/corporate-website`, lastModified: new Date(), priority: 0.9 },
+    { url: `${base}/prompts`, lastModified: new Date(), priority: 0.8 },
+    { url: `${base}/privacy`, lastModified: new Date(), priority: 0.3 },
+    { url: `${base}/terms`, lastModified: new Date(), priority: 0.3 },
+    { url: `${base}/offer`, lastModified: new Date(), priority: 0.3 },
+    { url: `${base}/refund`, lastModified: new Date(), priority: 0.3 },
+    { url: `${base}/contacts`, lastModified: new Date(), priority: 0.5 },
   ];
 
-  try {
-    const db = await getDb();
-    const blueprints = await db.blueprint.findMany({ where: { isPublished: true } });
-    for (const bp of blueprints) {
-      entries.push({
-        url: baseUrl + "/" + bp.slug,
-        lastModified: bp.createdAt,
-        changeFrequency: "weekly",
-        priority: 0.9,
-      });
-    }
-  } catch (e) {}
-
-  return entries;
+  return staticPages.map(p => ({
+    url: p.url,
+    lastModified: p.lastModified,
+    changeFrequency: "weekly" as const,
+    priority: p.priority,
+  }));
 }
