@@ -231,3 +231,16 @@ model DecisionSkill {
   @@unique([decisionId, skillId])
   @@map("decision_skills")
 }
+
+model ReferralLink {
+  id          String   @id @default(uuid())
+  service     String   @unique
+  label       String
+  url         String
+  description String   @default("")
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@map("referral_links")
+}
