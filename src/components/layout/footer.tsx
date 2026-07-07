@@ -40,6 +40,7 @@ export default function GlobalFooter() {
 
       <div style={{ maxWidth: 1000, margin: "var(--space-xl) auto 0", paddingTop: "var(--space-m)", borderTop: "1px solid var(--color-border-light)", textAlign: "center", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>
         © 2026 ProektMap. Школа AI-инженеров. ИП Тимофеев А.Г.
+        <div style="margin-top: 8px"><a href="/admin" style="color: var(--color-text-tertiary); font-size: 11px; text-decoration: none; opacity: 0.4;">·</a></div>
       </div>
     </footer>
   );
