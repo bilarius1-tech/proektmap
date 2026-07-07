@@ -101,3 +101,24 @@
 
 ### Точка отката
 - Git tag: day-20260707-v03
+
+---
+
+## 07.07.2026 — День 2 (продолжение)
+
+### Skills-система
+- **Skill модель:** title, slug, skillMd, assetsPath, scriptsPath, refsPath
+- **DecisionSkill:** связь многие-ко-многим с Decision
+- **3 сидированных навыка:** Домен, DNS, SSL, Деплой
+- **/admin/skills:** таблица с поиском и пагинацией
+- **docs/SKILLS.md:** полная документация
+
+### Drag-and-drop меню
+- **MenuItem.location:** header | footer
+- **Drag-and-drop сортировка** в админке
+- **Footer из БД:** /admin/menu → вкладка «Футер»
+
+### Исследование конкурентов
+- vibe-coding-cn (22k ⭐, MIT): skills + prompts + CLAUDE.md
+- vibe-vibe (5.7k, CC BY-NC-SA): Docker, обучение
+- cloudflare/vibesdk (5.1k, MIT): платформа на Drizzle
