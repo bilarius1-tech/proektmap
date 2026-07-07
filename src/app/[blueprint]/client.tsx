@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Eye, CheckCircle, RefreshCw, Copy, ChevronDown, ChevronUp } from "lucide-react";
 
 interface Decision {
   id: string; title: string; slug: string;
   problem: string; why: string; recommended: string; content: string;
   tradeoffs: string; whenNotUse: string; mistakes: string;
+  context: string; constraints: string; validation: string; iteration: string;
   xpReward: number; timeEstimate: string;
   promptTitle: string | null; promptTemplate: string | null;
 }
@@ -19,42 +21,37 @@ interface Blueprint {
   stages: Array<{ stage: Stage; sortOrder: number }>;
 }
 
-interface Constraints {
-  budget: "zero" | "low" | "unlimited";
-  time: "week" | "month" | "relaxed";
-  level: "novice" | "practitioner";
-}
-
-const BUDGET_LABELS: Record<string, string> = { zero: "0 ₽", low: "до 5 000 ₽", unlimited: "Безлимит" };
-const TIME_LABELS: Record<string, string> = { week: "За неделю", month: "За месяц", relaxed: "Без спешки" };
-const LEVEL_LABELS: Record<string, string> = { novice: "Новичок", practitioner: "Практик" };
-
-const ICON_MAP: Record<string, string> = {
-  Wrench: "🔧", Palette: "🎨", Layout: "📐", Code: "💻", Rocket: "🚀",
-  Search: "🔍", BarChart: "📊", Shield: "⚖️", Send: "✈️", Heart: "🔄",
-  Globe: "🌐", Zap: "⚡",
-};
-
-// Фильтр контента по ограничениям
-function filterRecommended(dec: Decision, c: Constraints): string {
-  let text = dec.recommended;
-  if (c.budget === "zero" && dec.slug === "choose-hosting") return "Бесплатный Vercel или Netlify. Для старта хватит.";
-  if (c.budget === "zero" && dec.slug === "buy-domain") return "Бесплатный .tk или .ml домен (фрином). Или github.io.";
-  if (c.budget === "zero" && dec.slug === "launch-site") return "Vercel (бесплатный) или GitHub Pages. Не нужен VPS.";
-  if (c.time === "week" && dec.slug === "build-pages") return "Только главная страница. Остальные — позже.";
-  if (c.level === "novice" && dec.slug === "create-next-app") return "Попроси AI: «Создай простой Next.js проект». Не настраивай вручную.";
-  return text;
-}
-
-// Сборка промпта из шаблона
-function buildPrompt(dec: Decision, c: Constraints, bp: Blueprint): string {
-  if (!dec.promptTemplate) return "";
-  return dec.promptTemplate
-    .replace(/{{project}}/g, bp.title)
-    .replace(/{{level}}/g, LEVEL_LABELS[c.level])
-    .replace(/{{budget}}/g, BUDGET_LABELS[c.budget])
-    .replace(/{{time}}/g, TIME_LABELS[c.time])
-    .replace(/{{currentStage}}/g, dec.title);
+function buildPrompt(dec: Decision, bp: Blueprint): string {
+  const parts = [];
+  
+  // Контекст
+  if (dec.context) parts.push(`## Контекст\n${dec.context}`);
+  
+  // Задача
+  parts.push(`## Задача\n${dec.problem}`);
+  
+  // Почему важно
+  if (dec.why) parts.push(`## Почему это важно\n${dec.why}`);
+  
+  // Ограничения
+  if (dec.constraints) parts.push(`## Ограничения\n❌ НЕ делай:\n${dec.constraints}`);
+  
+  // Рекомендация
+  if (dec.recommended) parts.push(`## Рекомендация\n${dec.recommended}`);
+  
+  // Проверка
+  if (dec.validation) parts.push(`## Как проверить\n${dec.validation}`);
+  
+  // Итерация
+  if (dec.iteration) parts.push(`## Как улучшить\n${dec.iteration}`);
+  
+  // Ошибки
+  if (dec.mistakes) parts.push(`## Частые ошибки\n${dec.mistakes}`);
+  
+  // Проект
+  parts.push(`---\nЯ прохожу Blueprint «${bp.title}» на ProektMap. Отвечай как AI-инженер: просто, без жаргона, только то что нужно на этом этапе.`);
+  
+  return parts.join("\n\n");
 }
 
 export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprint }) {
@@ -62,31 +59,16 @@ export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprin
   const [activeStage, setActiveStage] = useState(stages[0]?.slug || "");
   const [completed, setCompleted] = useState<Set<string>>(new Set());
   const [expandedDec, setExpandedDec] = useState<string | null>(null);
+  const [activeStep, setActiveStep] = useState<Record<string, number>>({});
   const [promptCopied, setPromptCopied] = useState<string | null>(null);
   const [totalXp, setTotalXp] = useState(0);
 
-  // Constraints — из localStorage
-  const [constraints, setConstraints] = useState<Constraints>({
-    budget: "zero",
-    time: "month",
-    level: "novice",
-  });
-
   useEffect(() => {
-    const saved = localStorage.getItem("proektmap-constraints");
-    if (saved) setConstraints(JSON.parse(saved));
-    
     fetch("/api/progress").then(r => r.json()).then(d => {
       setCompleted(new Set(d.completed));
       setTotalXp(d.totalXp);
     });
   }, []);
-
-  function updateConstraints(partial: Partial<Constraints>) {
-    const next = { ...constraints, ...partial };
-    setConstraints(next);
-    localStorage.setItem("proektmap-constraints", JSON.stringify(next));
-  }
 
   function toggle(id: string) {
     const newStatus = completed.has(id) ? "pending" : "done";
@@ -98,8 +80,7 @@ export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprin
   }
 
   function copyPrompt(dec: Decision) {
-    const prompt = buildPrompt(dec, constraints, blueprint);
-    navigator.clipboard.writeText(prompt);
+    navigator.clipboard.writeText(buildPrompt(dec, blueprint));
     setPromptCopied(dec.id);
     setTimeout(() => setPromptCopied(null), 2000);
   }
@@ -109,204 +90,199 @@ export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprin
   const totalDecs = blueprint.totalDecisions;
   const progress = Math.round((totalDone / totalDecs) * 100);
 
+  const steps = [
+    { key: 1, icon: <Eye size={14} />, label: "ПОНЯТЬ", desc: "Пойми проблему и контекст" },
+    { key: 2, icon: <CheckCircle size={14} />, label: "ВЫБРАТЬ", desc: "Сравни варианты и выбери" },
+    { key: 3, icon: <RefreshCw size={14} />, label: "ПРОВЕРИТЬ", desc: "Убедись что всё правильно" },
+  ];
+
   return (
-    <div style={{ fontFamily: "Inter, sans-serif", background: "#fafafa", color: "#222", minHeight: "100vh" }}>
-      {/* Header */}
-      <header style={{ height: 72, background: "white", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 40px", borderBottom: "1px solid #ececec", position: "sticky", top: 0, zIndex: 100 }}>
-        <a href="/" style={{ fontSize: 22, fontWeight: 800, textDecoration: "none", color: "#222" }}>
-          Engineering <span style={{ color: "#0FB880" }}>Blueprint</span>
+    <div style={{ fontFamily: "Inter, sans-serif", background: "var(--color-bg-secondary)", color: "var(--color-text-primary)", minHeight: "100vh" }}>
+      <header style={{ height: 72, background: "var(--color-bg-primary)", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 40px", borderBottom: "1px solid var(--color-border-light)", position: "sticky", top: 0, zIndex: 100 }}>
+        <a href="/" style={{ fontSize: 22, fontWeight: 800, textDecoration: "none", color: "inherit" }}>
+          Proekt<span style={{ color: "var(--color-accent)" }}>Map</span>
         </a>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <span style={{ fontSize: 13, fontWeight: 600, color: "#0FB880" }}>{totalXp} XP</span>
-          <div style={{ width: 38, height: 38, borderRadius: "50%", background: "#e5e7eb" }} />
+        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-s)" }}>
+          <span style={{ fontSize: "var(--text-s)", fontWeight: 600, color: "var(--color-accent)" }}>{totalXp} XP</span>
+          <div style={{ width: 38, height: 38, borderRadius: "50%", background: "var(--color-bg-tertiary)" }} />
         </div>
       </header>
 
-      {/* Constraints bar */}
-      <div style={{ background: "white", borderBottom: "1px solid #ececec", padding: "8px 40px", display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
-        <span style={{ fontSize: 12, fontWeight: 700, color: "#888", textTransform: "uppercase", letterSpacing: "0.06em" }}>Ограничения:</span>
-        {(["budget", "time", "level"] as const).map(key => {
-          const opts = key === "budget" ? ["zero", "low", "unlimited"] : key === "time" ? ["week", "month", "relaxed"] : ["novice", "practitioner"];
-          const labels = key === "budget" ? BUDGET_LABELS : key === "time" ? TIME_LABELS : LEVEL_LABELS;
-          return (
-            <select key={key} value={constraints[key]} onChange={e => updateConstraints({ [key]: e.target.value } as any)}
-              style={{ padding: "4px 10px", borderRadius: 8, border: "1px solid #e5e7eb", fontSize: 12, color: "#333", background: "#f9fafb", cursor: "pointer" }}>
-              {opts.map(o => <option key={o} value={o}>{key === "budget" ? "💰" : key === "time" ? "⏱" : "🎓"} {labels[o]}</option>)}
-            </select>
-          );
-        })}
-        <span style={{ marginLeft: "auto", fontSize: 11, color: "#aaa" }}>{blueprint.totalDecisions} решений · {blueprint.totalXp} XP</span>
-      </div>
-
       <div style={{ display: "flex" }}>
-        {/* Sidebar */}
-        <aside style={{ width: 310, background: "white", borderRight: "1px solid #ececec", minHeight: "calc(100vh - 144px)", padding: 35 }}>
-          <h3 style={{ marginBottom: 20, fontSize: 14, color: "#777", textTransform: "uppercase", letterSpacing: "0.08em" }}>Путь проекта</h3>
-          {stages.map((s, i) => {
+        <aside style={{ width: 280, background: "var(--color-bg-primary)", borderRight: "1px solid var(--color-border-light)", minHeight: "calc(100vh - 72px)", padding: "var(--space-l)" }}>
+          <h3 style={{ marginBottom: "var(--space-m)", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", textTransform: "uppercase", letterSpacing: "0.08em" }}>Путь проекта</h3>
+          {stages.map((s) => {
             const done = s.decisions.filter(d => completed.has(d.id)).length;
             return (
               <div key={s.slug} onClick={() => setActiveStage(s.slug)} style={{
-                padding: 15, borderRadius: 14, marginBottom: 10, cursor: "pointer",
-                background: activeStage === s.slug ? "#eef3ff" : "transparent",
-                border: activeStage === s.slug ? "1px solid #d8e2ff" : "1px solid transparent", transition: ".2s",
+                padding: "var(--space-s)", borderRadius: "var(--radius-m)", marginBottom: "var(--space-xs)", cursor: "pointer",
+                background: activeStage === s.slug ? "var(--color-accent-light)" : "transparent",
+                border: activeStage === s.slug ? "1px solid var(--color-accent)" : "1px solid transparent", transition: ".2s",
               }}>
-                <strong style={{ display: "block", marginBottom: 5, color: activeStage === s.slug ? "#0FB880" : "#222", fontSize: 14 }}>
-                  {ICON_MAP[s.icon] || "📋"} {s.title}
-                </strong>
-                <small style={{ color: "#888" }}>{done}/{s.decisions.length} решений</small>
+                <div style={{ fontWeight: 600, fontSize: "var(--text-s)", marginBottom: "var(--space-2xs)" }}>{s.title}</div>
+                <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>{done}/{s.decisions.length}</div>
               </div>
             );
           })}
-          <div style={{ marginTop: 30, padding: "16px", borderRadius: 14, background: "#f8f8f8" }}>
-            <strong style={{ display: "block", marginBottom: 8, fontSize: 13 }}>Прогресс</strong>
-            <div style={{ height: 6, background: "#ececec", borderRadius: 30, overflow: "hidden", marginBottom: 10 }}>
-              <div style={{ width: progress + "%", height: "100%", background: "#0FB880", borderRadius: 30, transition: "width 0.4s ease" }} />
+          <div style={{ marginTop: "var(--space-l)", padding: "var(--space-m)", borderRadius: "var(--radius-m)", background: "var(--color-bg-secondary)" }}>
+            <div style={{ fontWeight: 600, fontSize: "var(--text-xs)", marginBottom: "var(--space-xs)" }}>Прогресс</div>
+            <div style={{ height: 4, background: "var(--color-border)", borderRadius: 2, overflow: "hidden", marginBottom: "var(--space-xs)" }}>
+              <div style={{ width: progress + "%", height: "100%", background: "var(--color-accent)", borderRadius: 2 }} />
             </div>
-            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}>
-              <span style={{ color: "#666" }}>{totalDone} из {totalDecs}</span>
-              <span style={{ fontWeight: 700, color: "#0FB880" }}>{progress}%</span>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>
+              <span>{totalDone} / {totalDecs}</span><span>{progress}%</span>
             </div>
           </div>
         </aside>
 
-        {/* Main */}
-        <main style={{ flex: 1, padding: "60px", maxWidth: 1200 }}>
-          <div style={{ height: 8, background: "#ececec", borderRadius: 30, overflow: "hidden", marginBottom: 20 }}>
-            <div style={{ width: progress + "%", height: "100%", background: "#0FB880", borderRadius: 30, transition: "width 0.6s ease" }} />
+        <main style={{ flex: 1, padding: "var(--space-xl)", maxWidth: 1100 }}>
+          <div style={{ height: 4, background: "var(--color-border)", borderRadius: 2, overflow: "hidden", marginBottom: "var(--space-l)" }}>
+            <div style={{ width: progress + "%", height: "100%", background: "var(--color-accent)", borderRadius: 2 }} />
           </div>
 
-          <div style={{ display: "inline-block", padding: "8px 16px", borderRadius: 30, background: "#eef3ff", color: "#0FB880", fontSize: 13, marginBottom: 18 }}>
-            {ICON_MAP[currentStage?.icon] || "📋"} {currentStage?.title}
-          </div>
-
-          <h1 style={{ fontSize: 44, marginBottom: 10, fontWeight: 800, lineHeight: 1.15 }}>{currentStage?.title}</h1>
-          {currentStage?.description && (
-            <p style={{ fontSize: 18, lineHeight: 1.7, maxWidth: 900, color: "#555", marginBottom: 40 }}>{currentStage?.description}</p>
-          )}
+          <h1 style={{ fontSize: "var(--text-xxl)", fontWeight: 800, marginBottom: "var(--space-l)" }}>{currentStage?.title}</h1>
+          {currentStage?.description && <p style={{ color: "var(--color-text-secondary)", marginBottom: "var(--space-xl)", fontSize: "var(--text-m)" }}>{currentStage?.description}</p>}
 
           {/* Decisions */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: 35 }}>
-            <div>
-              <div style={{ background: "white", borderRadius: 22, padding: 35, border: "1px solid #ececec" }}>
-                <h2 style={{ fontSize: 26, marginBottom: 20 }}>Что нужно сделать</h2>
-                {currentStage?.decisions.map((dec, i) => {
-                  const done = completed.has(dec.id);
-                  const expanded = expandedDec === dec.id;
-                  const adaptedRecommended = filterRecommended(dec, constraints);
-                  const builtPrompt = buildPrompt(dec, constraints, blueprint);
-                  return (
-                    <div key={dec.id} style={{ padding: "16px 0", borderBottom: i < currentStage.decisions.length - 1 ? "1px solid #f2f2f2" : "none" }}>
-                      <div style={{ display: "flex", alignItems: "flex-start", gap: 14, cursor: "pointer", opacity: done ? 0.5 : 1 }}
-                        onClick={() => toggle(dec.id)}>
-                        <div style={{ width: 24, height: 24, borderRadius: "50%", flexShrink: 0, marginTop: 2, border: done ? "2px solid #0FB880" : "2px solid #d1d5db", background: done ? "#0FB880" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: 12, fontWeight: 700 }}>{done ? "✓" : ""}</div>
-                        <div style={{ flex: 1 }}>
-                          <div style={{ fontWeight: 600, fontSize: 16, marginBottom: 4, textDecoration: done ? "line-through" : "none" }}>{dec.title}</div>
-                          <div style={{ fontSize: 14, color: "#666", lineHeight: 1.5, marginBottom: 6 }}>{dec.problem}</div>
-                          <div style={{ display: "flex", gap: 16, fontSize: 12, color: "#999" }}>
-                            <span>+{dec.xpReward} XP</span>
-                            <span>⏱ {dec.timeEstimate}</span>
-                          </div>
-                        </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)" }}>
+            {currentStage?.decisions.map((dec) => {
+              const done = completed.has(dec.id);
+              const expanded = expandedDec === dec.id;
+              const curStep = activeStep[dec.id] || 1;
+              const builtPrompt = buildPrompt(dec, blueprint);
+
+              return (
+                <div key={dec.id} className="card" style={{ opacity: done ? 0.6 : 1, padding: 0, overflow: "hidden" }}>
+                  {/* Header */}
+                  <div onClick={() => toggle(dec.id)} style={{ display: "flex", alignItems: "center", gap: "var(--space-s)", padding: "var(--space-m) var(--space-l)", cursor: "pointer" }}>
+                    <div style={{ width: 22, height: 22, borderRadius: "50%", flexShrink: 0, border: done ? "2px solid var(--color-accent)" : "2px solid var(--color-border)", background: done ? "var(--color-accent)" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: 11, fontWeight: 700 }}>{done ? "✓" : ""}</div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontWeight: 700, fontSize: "var(--text-m)", textDecoration: done ? "line-through" : "none" }}>{dec.title}</div>
+                      {!done && <div style={{ fontSize: "var(--text-s)", color: "var(--color-text-secondary)", marginTop: 2 }}>{dec.problem}</div>}
+                    </div>
+                    <div style={{ display: "flex", gap: "var(--space-s)", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", flexShrink: 0 }}>
+                      <span>+{dec.xpReward} XP</span>
+                      <span>{dec.timeEstimate}</span>
+                    </div>
+                    <button onClick={(e) => { e.stopPropagation(); setExpandedDec(expanded ? null : dec.id); }}
+                      style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-tertiary)", padding: 4 }}>
+                      {expanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                    </button>
+                  </div>
+
+                  {/* 3-step methodology */}
+                  {expanded && !done && (
+                    <div style={{ borderTop: "1px solid var(--color-border-light)", padding: "var(--space-l)" }}>
+                      {/* Step tabs */}
+                      <div style={{ display: "flex", gap: 2, marginBottom: "var(--space-l)", borderBottom: "2px solid var(--color-border-light)" }}>
+                        {steps.map(s => (
+                          <button key={s.key} onClick={() => setActiveStep({ ...activeStep, [dec.id]: s.key })}
+                            style={{
+                              display: "flex", alignItems: "center", gap: "var(--space-xs)", padding: "var(--space-s) var(--space-m)",
+                              border: "none", background: "transparent", cursor: "pointer",
+                              color: curStep === s.key ? "var(--color-accent)" : "var(--color-text-tertiary)",
+                              borderBottom: curStep === s.key ? "2px solid var(--color-accent)" : "2px solid transparent",
+                              fontWeight: curStep === s.key ? 700 : 500, fontSize: "var(--text-xs)",
+                              marginBottom: -2, transition: "all var(--transition-fast)",
+                            }}>
+                            {s.icon} {s.label}
+                          </button>
+                        ))}
                       </div>
 
-                      {!done && (
-                        <div style={{ marginTop: 8, marginLeft: 38, display: "flex", gap: 8, flexWrap: "wrap" }}>
-                          <button onClick={(e) => { e.stopPropagation(); setExpandedDec(expanded ? null : dec.id); }}
-                            style={{ background: "none", border: "none", color: "#0FB880", fontSize: 13, cursor: "pointer", fontWeight: 500 }}>
-                            {expanded ? "Скрыть ▲" : "Подробнее ▼"}
-                          </button>
-                          {dec.promptTemplate && (
-                            <button onClick={(e) => { e.stopPropagation(); copyPrompt(dec); }}
-                              style={{ background: "none", border: "none", color: "#3b82f6", fontSize: 13, cursor: "pointer", fontWeight: 500 }}>
-                              {promptCopied === dec.id ? "✅ Скопировано!" : "📋 Скопировать промпт"}
-                            </button>
+                      {/* Step 1: ПОНЯТЬ */}
+                      {curStep === 1 && (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)" }}>
+                          {dec.why && (
+                            <div style={{ padding: "var(--space-m)", background: "var(--color-warning-light)", borderRadius: "var(--radius-m)" }}>
+                              <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: "var(--space-xs)", color: "var(--color-warning)" }}>⚠️ Почему это важно</div>
+                              <div style={{ fontSize: "var(--text-s)", lineHeight: 1.7, color: "var(--color-text-secondary)" }}>{dec.why}</div>
+                            </div>
+                          )}
+                          {dec.context && (
+                            <div style={{ padding: "var(--space-m)", background: "var(--color-bg-secondary)", borderRadius: "var(--radius-m)", border: "1px solid var(--color-border-light)" }}>
+                              <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: "var(--space-xs)" }}>🧠 Контекст</div>
+                              <div style={{ fontSize: "var(--text-s)", lineHeight: 1.7, color: "var(--color-text-secondary)", whiteSpace: "pre-wrap" }}>{dec.context}</div>
+                            </div>
+                          )}
+                          {dec.mistakes && (
+                            <div style={{ padding: "var(--space-m)", background: "var(--color-error-light)", borderRadius: "var(--radius-m)" }}>
+                              <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: "var(--space-xs)", color: "var(--color-error)" }}>❌ Типичные ошибки новичков</div>
+                              <div style={{ fontSize: "var(--text-s)", lineHeight: 1.7, color: "var(--color-text-secondary)" }}>{dec.mistakes}</div>
+                            </div>
                           )}
                         </div>
                       )}
 
-                      {expanded && !done && (
-                        <div style={{ marginTop: 12, marginLeft: 38, padding: "16px", background: "#f8f9fa", borderRadius: 14, border: "1px solid #ececec" }}>
-                          {dec.why && (
-                            <div style={{ marginBottom: 10 }}>
-                              <div style={{ fontWeight: 600, fontSize: 13, color: "#333", marginBottom: 4 }}>Почему это важно</div>
-                              <div style={{ fontSize: 13, color: "#666", lineHeight: 1.6 }}>{dec.why}</div>
-                            </div>
-                          )}
-                          <div style={{ marginBottom: 10, padding: "12px", background: "#f0fdf6", borderRadius: 10, border: "1px solid #d1fae5" }}>
-                            <div style={{ fontWeight: 600, fontSize: 13, color: "#0FB880", marginBottom: 4 }}>
-                              ✅ Рекомендуем
-                              <span style={{ marginLeft: 8, fontSize: 11, fontWeight: 400, color: "#999" }}>
-                                (с учётом: {BUDGET_LABELS[constraints.budget]} · {TIME_LABELS[constraints.time]} · {LEVEL_LABELS[constraints.level]})
-                              </span>
-                            </div>
-                            <div style={{ fontSize: 13, color: "#333" }}>{adaptedRecommended}</div>
+                      {/* Step 2: ВЫБРАТЬ */}
+                      {curStep === 2 && (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)" }}>
+                          <div style={{ padding: "var(--space-m)", background: "var(--color-accent-light)", borderRadius: "var(--radius-m)", border: "1px solid var(--color-accent)" }}>
+                            <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: "var(--space-xs)", color: "var(--color-accent)" }}>✅ Рекомендуемое решение</div>
+                            <div style={{ fontSize: "var(--text-s)", lineHeight: 1.7 }}>{dec.recommended}</div>
                           </div>
                           {dec.content && (
-                            <div style={{ marginBottom: 10 }}>
-                              <div style={{ fontWeight: 600, fontSize: 13, color: "#333", marginBottom: 4 }}>Как сделать</div>
-                              <div style={{ fontSize: 13, color: "#666", lineHeight: 1.6 }}>{dec.content}</div>
+                            <div style={{ padding: "var(--space-m)", background: "var(--color-bg-secondary)", borderRadius: "var(--radius-m)" }}>
+                              <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: "var(--space-xs)" }}>📋 Как сделать</div>
+                              <div style={{ fontSize: "var(--text-s)", lineHeight: 1.7, color: "var(--color-text-secondary)" }}>{dec.content}</div>
                             </div>
                           )}
                           {dec.tradeoffs && (
-                            <div style={{ marginBottom: 10, padding: "12px", background: "#fff9ea", borderRadius: 10, border: "1px solid #ffe29a" }}>
-                              <div style={{ fontWeight: 600, fontSize: 13, color: "#b45309", marginBottom: 4 }}>⚖️ Компромиссы</div>
-                              <div style={{ fontSize: 13, color: "#666" }}>{dec.tradeoffs}</div>
+                            <div style={{ padding: "var(--space-m)", background: "var(--color-warning-light)", borderRadius: "var(--radius-m)" }}>
+                              <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: "var(--space-xs)", color: "var(--color-warning)" }}>⚖️ Компромиссы</div>
+                              <div style={{ fontSize: "var(--text-s)", lineHeight: 1.7, color: "var(--color-text-secondary)" }}>{dec.tradeoffs}</div>
                             </div>
                           )}
-                          {dec.mistakes && (
-                            <div style={{ marginBottom: 10, padding: "12px", background: "#fef2f2", borderRadius: 10, border: "1px solid #fecaca" }}>
-                              <div style={{ fontWeight: 600, fontSize: 13, color: "#dc2626", marginBottom: 4 }}>❌ Частые ошибки</div>
-                              <div style={{ fontSize: 13, color: "#666" }}>{dec.mistakes}</div>
+                          {dec.constraints && (
+                            <div style={{ padding: "var(--space-m)", background: "var(--color-error-light)", borderRadius: "var(--radius-m)" }}>
+                              <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: "var(--space-xs)", color: "var(--color-error)" }}>🛑 Ограничения (что НЕ делать)</div>
+                              <div style={{ fontSize: "var(--text-s)", lineHeight: 1.7, color: "var(--color-text-secondary)", whiteSpace: "pre-wrap" }}>{dec.constraints}</div>
                             </div>
                           )}
+                          {dec.whenNotUse && (
+                            <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", fontStyle: "italic" }}>ℹ️ Когда не применять: {dec.whenNotUse}</div>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Step 3: ПРОВЕРИТЬ */}
+                      {curStep === 3 && (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)" }}>
+                          {dec.validation && (
+                            <div style={{ padding: "var(--space-m)", background: "var(--color-accent-light)", borderRadius: "var(--radius-m)", border: "1px solid var(--color-accent)" }}>
+                              <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: "var(--space-xs)", color: "var(--color-accent)" }}>✅ Как проверить что всё правильно</div>
+                              <div style={{ fontSize: "var(--text-s)", lineHeight: 1.7, color: "var(--color-text-secondary)", whiteSpace: "pre-wrap" }}>{dec.validation}</div>
+                            </div>
+                          )}
+                          {dec.iteration && (
+                            <div style={{ padding: "var(--space-m)", background: "var(--color-bg-secondary)", borderRadius: "var(--radius-m)", border: "1px solid var(--color-border-light)" }}>
+                              <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: "var(--space-xs)" }}>🔄 Как улучшить результат</div>
+                              <div style={{ fontSize: "var(--text-s)", lineHeight: 1.7, color: "var(--color-text-secondary)", whiteSpace: "pre-wrap" }}>{dec.iteration}</div>
+                            </div>
+                          )}
+                          
+                          {/* Assembled prompt */}
                           {builtPrompt && (
-                            <div style={{ marginTop: 10, padding: "12px", background: "#f0f0ff", borderRadius: 10, border: "1px solid #d4d4ff" }}>
-                              <div style={{ fontWeight: 600, fontSize: 13, color: "#6366f1", marginBottom: 6 }}>🤖 Готовый промпт</div>
-                              <div style={{ fontSize: 12, color: "#444", background: "#fafafe", padding: "10px", borderRadius: 8, fontFamily: "monospace", whiteSpace: "pre-wrap", lineHeight: 1.5 }}>{builtPrompt}</div>
-                              <button onClick={(e) => { e.stopPropagation(); copyPrompt(dec); }}
-                                style={{ marginTop: 8, padding: "6px 14px", borderRadius: 8, border: "1px solid #6366f1", background: "white", color: "#6366f1", fontSize: 12, fontWeight: 600, cursor: "pointer" }}>
-                                {promptCopied === dec.id ? "✅ Скопировано!" : "📋 Скопировать"}
-                              </button>
+                            <div style={{ padding: "var(--space-m)", background: "var(--color-bg-secondary)", borderRadius: "var(--radius-m)", border: "1px solid var(--color-accent)", marginTop: "var(--space-s)" }}>
+                              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-s)" }}>
+                                <div style={{ fontWeight: 700, fontSize: "var(--text-s)", color: "var(--color-accent)" }}>📋 Собранный промпт</div>
+                                <button onClick={() => copyPrompt(dec)}
+                                  style={{ display: "flex", alignItems: "center", gap: 4, padding: "4px 12px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-accent)", background: "white", color: "var(--color-accent)", fontSize: "var(--text-xs)", fontWeight: 600, cursor: "pointer" }}>
+                                  <Copy size={12} /> {promptCopied === dec.id ? "Скопировано!" : "Копировать"}
+                                </button>
+                              </div>
+                              <div style={{ fontSize: "var(--text-xs)", fontFamily: "var(--font-mono)", whiteSpace: "pre-wrap", lineHeight: 1.6, maxHeight: 300, overflow: "auto", color: "var(--color-text-secondary)", background: "white", padding: "var(--space-s)", borderRadius: "var(--radius-s)" }}>
+                                {builtPrompt}
+                              </div>
                             </div>
                           )}
                         </div>
                       )}
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Right panel */}
-            <div>
-              <div style={{ background: "white", padding: 28, borderRadius: 22, border: "1px solid #ececec", marginBottom: 20 }}>
-                <h3 style={{ marginBottom: 12 }}>⚙️ Контекст</h3>
-                <div style={{ lineHeight: 2, fontSize: 13, color: "#666" }}>
-                  <div>📦 Проект: <b>{blueprint.title}</b></div>
-                  <div>💰 Бюджет: <b>{BUDGET_LABELS[constraints.budget]}</b></div>
-                  <div>⏱ Срок: <b>{TIME_LABELS[constraints.time]}</b></div>
-                  <div>🎓 Уровень: <b>{LEVEL_LABELS[constraints.level]}</b></div>
-                  <div>⭐ XP: <b>{totalXp}</b></div>
+                  )}
                 </div>
-              </div>
-
-              <div style={{ background: "white", padding: 28, borderRadius: 22, border: "1px solid #ececec", marginBottom: 20 }}>
-                <h3 style={{ marginBottom: 12 }}>После этапа</h3>
-                <div style={{ lineHeight: 2.2, color: "#444", fontSize: 15 }}>
-                  {(currentStage?.decisions || []).slice(0, 3).map(d => (
-                    <div key={d.id}>• {d.title}</div>
-                  ))}
-                </div>
-              </div>
-
-              {stages[stages.findIndex(s => s.slug === activeStage) + 1] && (
-                <div onClick={() => setActiveStage(stages[stages.findIndex(s => s.slug === activeStage) + 1].slug)}
-                  style={{ padding: 18, background: "#eef3ff", borderRadius: 14, cursor: "pointer" }}>
-                  <strong style={{ display: "block", marginBottom: 4 }}>Следующий этап →</strong>
-                  <span style={{ color: "#666", fontSize: 14 }}>{stages[stages.findIndex(s => s.slug === activeStage) + 1].title}</span>
-                </div>
-              )}
-            </div>
+              );
+            })}
           </div>
         </main>
       </div>

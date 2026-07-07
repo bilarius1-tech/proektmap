@@ -8,7 +8,7 @@ import Link from "next/link";
 interface Decision {
   id?: string; stageId: string; title: string; slug: string;
   problem: string; why: string; recommended: string; content: string;
-  tradeoffs: string; whenNotUse: string; mistakes: string;
+  tradeoffs: string; whenNotUse: string; mistakes: string; context: string; constraints: string; validation: string; iteration: string;
   difficulty: string; xpReward: number; timeEstimate: string;
   promptTitle: string; promptTemplate: string; sortOrder: number;
 }
@@ -21,7 +21,7 @@ export default function DecisionForm({ stages, initial }: { stages: Stage[]; ini
     stageId: initial?.stageId || "", title: initial?.title || "", slug: initial?.slug || "",
     problem: initial?.problem || "", why: initial?.why || "", recommended: initial?.recommended || "",
     content: initial?.content || "", tradeoffs: initial?.tradeoffs || "",
-    whenNotUse: initial?.whenNotUse || "", mistakes: initial?.mistakes || "",
+    whenNotUse: initial?.whenNotUse || "", mistakes: initial?.mistakes || "", context: initial?.context || "", constraints: initial?.constraints || "", validation: initial?.validation || "", iteration: initial?.iteration || "",
     difficulty: initial?.difficulty || "easy", xpReward: initial?.xpReward || 15,
     timeEstimate: initial?.timeEstimate || "15 мин",
     promptTitle: initial?.promptTitle || "", promptTemplate: initial?.promptTemplate || "",
