@@ -328,3 +328,18 @@ model PromptCategory {
 
   @@map("prompt_categories")
 }
+
+model SkillEvolution {
+  id          String   @id @default(uuid())
+  skillId     String
+  skill       Skill    @relation(fields: [skillId], references: [id])
+  version     Int      @default(1)
+  changelog   String   @default("")
+  source      String   @default("manual")
+  authorId    String?
+  author      User?    @relation(fields: [authorId], references: [id])
+  metrics     String   @default("{}")
+  createdAt   DateTime @default(now())
+
+  @@map("skill_evolutions")
+}
