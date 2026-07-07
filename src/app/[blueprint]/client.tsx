@@ -158,7 +158,7 @@ export default function BlueprintPageClient({ blueprint, prompts, variables }: {
             const builtPrompt = buildPrompt(dec, blueprint);
 
             return (
-              <div key={dec.id} className="card" style={{ opacity: done ? 0.6 : 1, padding: 0, overflow: "hidden" }}>
+              <div key={dec.id} className="card" style={{ opacity: done ? 0.6 : 1, padding: 0 }}>
                 <div onClick={() => toggle(dec.id)} style={{ display: "flex", alignItems: "center", gap: "var(--space-s)", padding: isMobile ? "var(--space-m)" : "var(--space-m) var(--space-l)", cursor: "pointer" }}>
                   <div style={{ width: 24, height: 24, borderRadius: "50%", flexShrink: 0, border: done ? "2px solid var(--color-accent)" : "2px solid var(--color-border)", background: done ? "var(--color-accent)" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: 11, fontWeight: 700 }}>{done ? "✓" : ""}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>

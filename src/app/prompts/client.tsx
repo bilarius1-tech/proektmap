@@ -68,7 +68,7 @@ export default function PromptsPageClient({ prompts, variables }: { prompts: Pro
 
       <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)" }}>
         {filtered.map(p => (
-          <div key={p.id} style={{ background: "white", borderRadius: "var(--radius-m)", border: "1px solid var(--color-border-light)", overflow: "hidden" }}>
+          <div key={p.id} style={{ background: "white", borderRadius: "var(--radius-m)", border: "1px solid var(--color-border-light)" }}>
             <div onClick={() => setExpanded(expanded === p.id ? null : p.id)} style={{ display: "flex", alignItems: "center", gap: "var(--space-s)", padding: "var(--space-m)", cursor: "pointer" }}>
               <span style={{ fontSize: 20, flexShrink: 0 }}>{CAT_ICONS[p.category] || "📄"}</span>
               <div style={{ flex: 1, minWidth: 0 }}>

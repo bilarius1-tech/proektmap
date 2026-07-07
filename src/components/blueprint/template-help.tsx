@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { HelpCircle, Info, X } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { HelpCircle, X } from "lucide-react";
 
 interface Variable {
   name: string; label: string; description: string; example: string; category: string;
@@ -29,9 +29,46 @@ export function RenderTemplate({ text, variables }: { text: string; variables: V
 
 function VarTooltip({ variable }: { variable: Variable }) {
   const [open, setOpen] = useState(false);
+  const triggerRef = useRef<HTMLSpanElement>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open || !tooltipRef.current || !triggerRef.current) return;
+    const rect = triggerRef.current.getBoundingClientRect();
+    const tooltip = tooltipRef.current;
+
+    // Position above the trigger, centered
+    let left = rect.left + rect.width / 2 - 150; // 300px width / 2
+    let top = rect.top - tooltip.offsetHeight - 12;
+
+    // Fallback: show below if above goes off-screen
+    if (top < 10) top = rect.bottom + 12;
+
+    // Keep within viewport
+    if (left < 10) left = 10;
+    if (left + 300 > window.innerWidth - 10) left = window.innerWidth - 310;
+
+    tooltip.style.left = left + "px";
+    tooltip.style.top = top + "px";
+    tooltip.style.position = "fixed";
+  }, [open]);
+
+  // Close on outside click
+  useEffect(() => {
+    if (!open) return;
+    function handler(e: MouseEvent) {
+      if (tooltipRef.current && !tooltipRef.current.contains(e.target as Node) &&
+          triggerRef.current && !triggerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
   return (
     <span style={{ position: "relative", display: "inline" }}>
-      <span onClick={() => setOpen(!open)}
+      <span ref={triggerRef} onClick={() => setOpen(!open)}
         style={{
           display: "inline-block", background: "var(--color-accent-light)", color: "var(--color-accent)",
           padding: "1px 6px", borderRadius: 4, cursor: "pointer", fontWeight: 600, fontSize: "inherit",
@@ -40,12 +77,13 @@ function VarTooltip({ variable }: { variable: Variable }) {
         {"{{" + variable.name + "}}"}
       </span>
       {open && (
-        <div style={{
-          position: "absolute", bottom: "100%", left: "50%", transform: "translateX(-50%)",
-          zIndex: 100, width: 300, background: "white", borderRadius: "var(--radius-m)",
-          boxShadow: "0 8px 32px rgba(0,0,0,0.15)", border: "1px solid var(--color-border)",
-          padding: "var(--space-m)", marginBottom: 8,
-        }}>
+        <div ref={tooltipRef}
+          style={{
+            position: "fixed", zIndex: 99999,
+            width: 300, background: "white", borderRadius: "var(--radius-m)",
+            boxShadow: "0 12px 40px rgba(0,0,0,0.2)", border: "1px solid var(--color-border)",
+            padding: "var(--space-m)",
+          }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
             <div style={{ fontWeight: 700, fontSize: "var(--text-s)", color: "var(--color-accent)" }}>{variable.label}</div>
             <button onClick={() => setOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", padding: 2, color: "var(--color-text-tertiary)" }}><X size={14} /></button>
@@ -65,7 +103,6 @@ function VarTooltip({ variable }: { variable: Variable }) {
 // Variable legend/catalog for beginners
 export function VariableLegend({ variables, category }: { variables: Variable[]; category?: string }) {
   const [open, setOpen] = useState(false);
-  const filtered = category ? variables.filter(v => v.category === category) : variables;
   const categories = Array.from(new Set(variables.map(v => v.category)));
 
   return (
@@ -81,7 +118,11 @@ export function VariableLegend({ variables, category }: { variables: Variable[];
       </button>
 
       {open && (
-        <div style={{ marginTop: "var(--space-s)", padding: "var(--space-m)", background: "white", borderRadius: "var(--radius-m)", border: "1px solid var(--color-border)" }}>
+        <div style={{
+          marginTop: "var(--space-s)", padding: "var(--space-m)",
+          background: "white", borderRadius: "var(--radius-m)",
+          border: "1px solid var(--color-border)", position: "relative", zIndex: 10,
+        }}>
           <div style={{ marginBottom: "var(--space-m)" }}>
             <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: 4 }}>📖 Что такое {"{{переменные}}"}</div>
             <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.7 }}>
