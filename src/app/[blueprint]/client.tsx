@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Eye, CheckCircle, RefreshCw, Copy, ChevronDown, ChevronUp, Menu, X, ArrowRight } from "lucide-react";
+import { Eye, CheckCircle, RefreshCw, Copy, ChevronDown, ChevronUp, Menu, X } from "lucide-react";
 import AIRadar from "./ai-radar";
-import VideoBlock from "@/components/blueprint/video-block";
 import AIRules from "@/components/blueprint/ai-rules";
+import VideoBlock from "@/components/blueprint/video-block";
 
 interface Decision {
   id: string; title: string; slug: string;
@@ -75,58 +75,53 @@ export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprin
   const totalDone = completed.size;
   const progress = Math.round((totalDone / blueprint.totalDecisions) * 100);
 
-  const steps = [
-    { key: 1, label: "ПОНЯТЬ" },
-    { key: 2, label: "ВЫБРАТЬ" },
-    { key: 3, label: "ПРОВЕРИТЬ" },
-  ];
+  const steps = [{ key: 1, label: "ПОНЯТЬ" }, { key: 2, label: "ВЫБРАТЬ" }, { key: 3, label: "ПРОВЕРИТЬ" }];
 
   return (
     <div style={{ display: "flex", minHeight: "calc(100dvh - 56px)" }}>
-      {/* DESKTOP sidebar — always visible */}
+      {/* DESKTOP sidebar */}
       {!isMobile && (
         <aside style={{
           width: 260, minWidth: 260, background: "var(--color-bg-primary)",
-          borderRight: "1px solid var(--color-border-light)", padding: "var(--space-l)",
+          borderRight: "1px solid var(--color-border-light)",
           position: "sticky", top: 56, height: "calc(100dvh - 56px)", overflowY: "auto",
         }}>
-          <SidebarContent stages={stages} blueprint={blueprint} activeStage={activeStage} setActiveStage={setActiveStage}
-            completed={completed} progress={progress} totalDone={totalDone} totalDecs={blueprint.totalDecisions} />
+          <SidebarContent stages={stages} activeStage={activeStage} setActiveStage={setActiveStage}
+            completed={completed} progress={progress} totalDone={totalDone} totalDecs={blueprint.totalDecisions}
+            blueprint={blueprint} />
         </aside>
       )}
 
       {/* MOBILE: FAB + sliding panel */}
       {isMobile && (
         <>
-          {/* FAB — правая сторона, зелёный */}
           <button onClick={() => setSidebarOpen(true)} style={{
             position: "fixed", right: 16, bottom: 24, zIndex: 50,
-            width: 52, height: 52, borderRadius: "50%",
+            width: 48, height: 48, borderRadius: "50%",
             background: "var(--color-accent)", color: "white",
             border: "none", boxShadow: "0 4px 16px rgba(15,184,128,0.4)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            cursor: "pointer", fontSize: 20,
+            display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer",
           }}>
-            <Menu size={24} />
+            <Menu size={22} />
           </button>
 
-          {/* Sliding panel — справа */}
           {sidebarOpen && (
             <>
               <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 98 }} onClick={() => setSidebarOpen(false)} />
               <div style={{
-                position: "fixed", top: 0, right: 0, bottom: 0, width: 280, zIndex: 99,
+                position: "fixed", top: 0, right: 0, bottom: 0, width: "85%", maxWidth: 320, zIndex: 99,
                 background: "var(--color-bg-primary)", boxShadow: "var(--shadow-l)",
-                padding: "var(--space-l)", overflowY: "auto",
+                padding: "var(--space-m)", overflowY: "auto",
               }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-l)" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-m)" }}>
                   <div style={{ fontWeight: 700, fontSize: "var(--text-s)", color: "var(--color-accent)" }}>Путь проекта</div>
                   <button onClick={() => setSidebarOpen(false)} style={{ background: "none", border: "none", padding: 8, cursor: "pointer", color: "var(--color-text-tertiary)" }}>
                     <X size={20} />
                   </button>
                 </div>
-                <SidebarContent stages={stages} blueprint={blueprint} activeStage={activeStage} setActiveStage={(slug: string) => { setActiveStage(slug); setSidebarOpen(false); }}
-                  completed={completed} progress={progress} totalDone={totalDone} totalDecs={blueprint.totalDecisions} />
+                <SidebarContent stages={stages} activeStage={activeStage} setActiveStage={(slug: string) => { setActiveStage(slug); setSidebarOpen(false); }}
+                  completed={completed} progress={progress} totalDone={totalDone} totalDecs={blueprint.totalDecisions}
+                  blueprint={blueprint} />
               </div>
             </>
           )}
@@ -135,16 +130,15 @@ export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprin
 
       {/* Main content */}
       <main style={{ flex: 1, padding: isMobile ? "var(--space-m)" : "var(--space-xl)", maxWidth: 1100 }}>
-        {/* Progress bar */}
         <div style={{ height: 4, background: "var(--color-border)", borderRadius: 2, overflow: "hidden", marginBottom: "var(--space-m)" }}>
           <div style={{ width: progress + "%", height: "100%", background: "var(--color-accent)", borderRadius: 2, transition: "width 0.4s ease" }} />
         </div>
 
         <h1 style={{ fontSize: "var(--text-xxl)", fontWeight: 800, marginBottom: "var(--space-xs)" }}>{currentStage?.title}</h1>
-      {activeStage === "ai-philosophy" && <AIRules />}
         {currentStage?.description && <p style={{ color: "var(--color-text-secondary)", marginBottom: isMobile ? "var(--space-m)" : "var(--space-l)", fontSize: "var(--text-s)" }}>{currentStage?.description}</p>}
 
-        {/* Decisions */}
+        {activeStage === "ai-philosophy" && <AIRules />}
+
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)" }}>
           {currentStage?.decisions.map((dec) => {
             const done = completed.has(dec.id);
@@ -158,11 +152,10 @@ export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprin
                   <div style={{ width: 24, height: 24, borderRadius: "50%", flexShrink: 0, border: done ? "2px solid var(--color-accent)" : "2px solid var(--color-border)", background: done ? "var(--color-accent)" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: 11, fontWeight: 700 }}>{done ? "✓" : ""}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontWeight: 700, fontSize: "var(--text-s)", textDecoration: done ? "line-through" : "none" }}>{dec.title}</div>
-                    {!done && !isMobile && <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", marginTop: 2 }}>{dec.problem}</div>}
                   </div>
                   <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", flexShrink: 0, fontWeight: 600 }}>+{dec.xpReward}</div>
                   <button onClick={(e) => { e.stopPropagation(); setExpandedDec(expanded ? null : dec.id); }}
-                    style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-tertiary)", padding: 8 }}>
+                    style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-tertiary)", padding: 8, minWidth: 36, minHeight: 36 }}>
                     {expanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
                   </button>
                 </div>
@@ -172,20 +165,14 @@ export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprin
                     <div style={{ display: "flex", gap: 0, marginBottom: "var(--space-m)", borderBottom: "2px solid var(--color-border-light)", overflowX: "auto" }}>
                       {steps.map(s => (
                         <button key={s.key} onClick={() => setActiveStep({ ...activeStep, [dec.id]: s.key })}
-                          style={{
-                            display: "flex", alignItems: "center", gap: 4, padding: "8px 14px",
-                            border: "none", background: "transparent", cursor: "pointer",
-                            color: curStep === s.key ? "var(--color-accent)" : "var(--color-text-tertiary)",
-                            borderBottom: curStep === s.key ? "2px solid var(--color-accent)" : "2px solid transparent",
-                            fontWeight: curStep === s.key ? 700 : 500, fontSize: "var(--text-xs)",
-                            marginBottom: -2, whiteSpace: "nowrap",
-                          }}>{s.label}</button>
+                          style={{ padding: "8px 12px", border: "none", background: "transparent", cursor: "pointer", color: curStep === s.key ? "var(--color-accent)" : "var(--color-text-tertiary)", borderBottom: curStep === s.key ? "2px solid var(--color-accent)" : "2px solid transparent", fontWeight: curStep === s.key ? 700 : 500, fontSize: "var(--text-xs)", marginBottom: -2, whiteSpace: "nowrap" }}>{s.label}</button>
                       ))}
                     </div>
-
                     {curStep === 1 && <StepUnderstand dec={dec} />}
                     {curStep === 2 && <StepChoose dec={dec} />}
                     {curStep === 3 && <StepVerify dec={dec} builtPrompt={builtPrompt} promptCopied={promptCopied} copyPrompt={copyPrompt} />}
+                    <AIRadar />
+                    <VideoBlock videos={[]} />
                   </div>
                 )}
               </div>
@@ -197,24 +184,32 @@ export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprin
   );
 }
 
-/* ═══ Sidebar Content ═══ */
 function SidebarContent({ stages, activeStage, setActiveStage, completed, progress, totalDone, totalDecs, blueprint }: any) {
   return (
-    <>
+    <div>
       <h3 style={{ marginBottom: "var(--space-s)", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", textTransform: "uppercase", letterSpacing: "0.08em" }}>Путь проекта</h3>
-      {stages.map((s: Stage) => {
-        const done = s.decisions.filter((d: Decision) => completed.has(d.id)).length;
-        return (
-          <div key={s.slug} onClick={() => setActiveStage(s.slug)} style={{
-            padding: "var(--space-s)", borderRadius: "var(--radius-m)", marginBottom: 4, cursor: "pointer",
-            background: activeStage === s.slug ? "var(--color-accent-light)" : "transparent",
-            border: activeStage === s.slug ? "1px solid var(--color-accent)" : "1px solid transparent",
-          }}>
-            <div style={{ fontWeight: 600, fontSize: "var(--text-s)" }}>{s.title}</div>
-            <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>{done}/{s.decisions.length}</div>
-          </div>
-        );
-      })}
+      <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        {stages.map((s: Stage) => {
+          const done = s.decisions.filter((d: Decision) => completed.has(d.id)).length;
+          const isActive = activeStage === s.slug;
+          return (
+            <div key={s.slug} onClick={() => setActiveStage(s.slug)} style={{
+              padding: "10px 12px", borderRadius: "var(--radius-m)", cursor: "pointer",
+              background: isActive ? "var(--color-accent-light)" : "transparent",
+              border: isActive ? "1px solid var(--color-accent)" : "1px solid transparent",
+              display: "flex", justifyContent: "space-between", alignItems: "center",
+              transition: "background 0.15s",
+            }}>
+              <div style={{ fontWeight: isActive ? 700 : 500, fontSize: "var(--text-s)", color: isActive ? "var(--color-accent)" : "var(--color-text-primary)" }}>
+                {s.title}
+              </div>
+              <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", flexShrink: 0, marginLeft: 8 }}>
+                {done}/{s.decisions.length}
+              </div>
+            </div>
+          );
+        })}
+      </div>
       <div style={{ marginTop: "var(--space-m)", padding: "var(--space-s)", borderRadius: "var(--radius-m)", background: "var(--color-bg-secondary)" }}>
         <div style={{ fontWeight: 600, fontSize: "var(--text-xs)", marginBottom: 4 }}>Прогресс</div>
         <div style={{ height: 4, background: "var(--color-border)", borderRadius: 2, overflow: "hidden", marginBottom: 4 }}>
@@ -224,14 +219,10 @@ function SidebarContent({ stages, activeStage, setActiveStage, completed, progre
           <span>{totalDone}/{totalDecs}</span><span>{progress}%</span>
         </div>
       </div>
-      <div style={{ marginTop: "var(--space-m)", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", textAlign: "center" }}>
-        {blueprint.title} · {blueprint.totalXp} XP
-      </div>
-    </>
+    </div>
   );
 }
 
-/* ═══ Step Components ═══ */
 function StepUnderstand({ dec }: { dec: Decision }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)" }}>
@@ -270,26 +261,11 @@ function StepChoose({ dec }: { dec: Decision }) {
         <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: 4, color: "var(--color-error)" }}>🛑 Ограничения</div>
         <div style={{ fontSize: "var(--text-s)", lineHeight: 1.7, color: "var(--color-text-secondary)", whiteSpace: "pre-wrap" }}>{dec.constraints}</div>
       </div>}
-    
-      <AIRadar />
-      <VideoBlock videos={[]} />
     </div>
   );
 }
 
 function StepVerify({ dec, builtPrompt, promptCopied, copyPrompt }: { dec: Decision; builtPrompt: string; promptCopied: string | null; copyPrompt: (d: Decision) => void }) {
-  const [aiQuestion, setAiQuestion] = useState("");
-  const [aiAnswer, setAiAnswer] = useState("");
-  const [aiLoading, setAiLoading] = useState(false);
-  
-  async function askAI() {
-    if (!aiQuestion.trim()) return;
-    setAiLoading(true);
-    const res = await fetch("/api/ai/ask", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt: aiQuestion, cardTitle: dec.title, context: dec.context || dec.problem }) });
-    const d = await res.json();
-    setAiAnswer(d.advice || "AI не ответил");
-    setAiLoading(false);
-  }
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)" }}>
       {dec.validation && <div style={{ padding: "var(--space-m)", background: "var(--color-accent-light)", borderRadius: "var(--radius-m)" }}>
@@ -303,21 +279,6 @@ function StepVerify({ dec, builtPrompt, promptCopied, copyPrompt }: { dec: Decis
       {builtPrompt && (
         <div style={{ padding: "var(--space-m)", background: "var(--color-bg-secondary)", borderRadius: "var(--radius-m)", border: "1px solid var(--color-accent)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-s)", flexWrap: "wrap", gap: 8 }}>
-      {/* PRO: AI Chat */}
-      <div style={{ padding: "var(--space-m)", background: "var(--color-bg-secondary)", borderRadius: "var(--radius-m)", border: "1px solid var(--color-accent)", marginTop: "var(--space-s)" }}>
-        <div style={{ fontWeight: 700, fontSize: "var(--text-s)", color: "var(--color-accent)", marginBottom: "var(--space-xs)" }}>💬 Задать вопрос AI</div>
-        <div style={{ display: "flex", gap: 8 }}>
-          <input value={aiQuestion} onChange={e => setAiQuestion(e.target.value)}
-            placeholder="Спроси о чём-то непонятном..."
-            style={{ flex: 1, padding: "8px 12px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", fontSize: "var(--text-s)", outline: "none" }}
-            onKeyDown={e => { if (e.key === "Enter") askAI(); }} />
-          <button onClick={askAI} disabled={aiLoading}
-            style={{ padding: "8px 16px", borderRadius: "var(--radius-s)", border: "none", background: "var(--color-accent)", color: "white", fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", fontSize: "var(--text-s)" }}>
-            {aiLoading ? "..." : "Спросить"}
-          </button>
-        </div>
-        {aiAnswer && <div style={{ marginTop: "var(--space-s)", padding: "var(--space-s)", background: "white", borderRadius: "var(--radius-s)", fontSize: "var(--text-s)", lineHeight: 1.6, color: "var(--color-text-secondary)" }}>{aiAnswer}</div>}
-      </div>
             <div style={{ fontWeight: 700, fontSize: "var(--text-s)", color: "var(--color-accent)" }}>📋 Собранный промпт</div>
             <button onClick={() => copyPrompt(dec)}
               style={{ display: "flex", alignItems: "center", gap: 4, padding: "8px 14px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-accent)", background: "white", color: "var(--color-accent)", fontSize: "var(--text-xs)", fontWeight: 600, cursor: "pointer" }}>
