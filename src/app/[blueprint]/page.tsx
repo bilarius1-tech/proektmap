@@ -30,5 +30,5 @@ export default async function BlueprintPage({ params }: { params: Promise<{ blue
     db.promptVariable.findMany({ where: { isActive: true }, orderBy: { sortOrder: "asc" } }),
     db.promptCategory.findMany({ where: { isActive: true }, orderBy: { sortOrder: "asc" } }),
   ]);
-  return <BlueprintPageClient blueprint={JSON.parse(JSON.stringify(bp))} prompts={JSON.parse(JSON.stringify(prompts))} variables={JSON.parse(JSON.stringify(variables))} categories={JSON.parse(JSON.stringify(categories))} />;
+  return <BlueprintPageClient blueprint={JSON.parse(JSON.stringify(bp))} />;
 }
