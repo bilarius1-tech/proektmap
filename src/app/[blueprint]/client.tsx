@@ -267,6 +267,8 @@ function StepChoose({ dec }: { dec: Decision }) {
         <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: 4, color: "var(--color-error)" }}>🛑 Ограничения</div>
         <div style={{ fontSize: "var(--text-s)", lineHeight: 1.7, color: "var(--color-text-secondary)", whiteSpace: "pre-wrap" }}>{dec.constraints}</div>
       </div>}
+    
+      <AIRadar />
     </div>
   );
 }
