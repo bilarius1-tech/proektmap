@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import { notFound } from "next/navigation";
 import BlueprintPageClient from "./client";
 import type { Metadata } from "next";
+import { auth } from "@/lib/auth";
 
 export async function generateMetadata({ params }: { params: Promise<{ blueprint: string }> }): Promise<Metadata> {
   const { blueprint: slug } = await params;
@@ -11,8 +12,8 @@ export async function generateMetadata({ params }: { params: Promise<{ blueprint
     const bp = await db.blueprint.findUnique({ where: { slug }, select: { title: true, description: true } });
     if (!bp) return {};
     return {
-      title: `${bp.title} — ProektMap`,
-      description: bp.description || `Пройдите путь создания ${bp.title.toLowerCase()} с AI-консультантом. Готовые промпты, методология, пошаговые решения.`,
+      title: `${bp.title} — Карта роста`,
+      description: bp.description || `Пройдите путь создания ${bp.title.toLowerCase()} с AI-консультантом.`,
     };
   } catch { return {}; }
 }
@@ -25,10 +26,16 @@ export default async function BlueprintPage({ params }: { params: Promise<{ blue
     include: { stages: { orderBy: { sortOrder: "asc" }, include: { stage: { include: { decisions: { orderBy: { sortOrder: "asc" } } } } } } },
   });
   if (!bp) notFound();
-  const [prompts, variables, categories] = await Promise.all([
-    db.prompt.findMany({ where: { isActive: true }, orderBy: [{ category: "asc" }, { title: "asc" }], take: 30 }),
-    db.promptVariable.findMany({ where: { isActive: true }, orderBy: { sortOrder: "asc" } }),
-    db.promptCategory.findMany({ where: { isActive: true }, orderBy: { sortOrder: "asc" } }),
-  ]);
-  return <BlueprintPageClient blueprint={JSON.parse(JSON.stringify(bp))} />;
+
+  const session = await auth();
+  const isLoggedIn = !!session?.user;
+  const isPro = isLoggedIn && ((session.user as any).subscription === "pro" || (session.user as any).role === "admin");
+
+  return (
+    <BlueprintPageClient
+      blueprint={JSON.parse(JSON.stringify(bp))}
+      isLoggedIn={isLoggedIn}
+      isPro={isPro}
+    />
+  );
 }

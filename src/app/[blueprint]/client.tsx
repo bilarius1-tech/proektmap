@@ -1,14 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Eye, CheckCircle, RefreshCw, Copy, ChevronDown, ChevronUp, Menu, X } from "lucide-react";
-import AIRules from "@/components/blueprint/ai-rules";
-import VideoBlock from "@/components/blueprint/video-block";
+import { Eye, CheckCircle, RefreshCw, Copy, ChevronDown, ChevronUp, Menu, X, Lock, LogIn } from "lucide-react";
 
 interface Decision {
   id: string; title: string; slug: string;
   problem: string; why: string; recommended: string; content: string;
-  tradeoffs: string; whenNotUse: string; mistakes: string;
+  tradeoffs: string; mistakes: string;
   context: string; constraints: string; validation: string; iteration: string;
   xpReward: number; timeEstimate: string;
 }
@@ -16,8 +14,6 @@ interface Stage {
   id: string; title: string; slug: string; icon: string; description: string | null;
   decisions: Decision[];
 }
-
-
 interface Blueprint {
   id: string; title: string; slug: string; description: string | null;
   totalXp: number; totalDecisions: number;
@@ -29,16 +25,20 @@ function buildPrompt(dec: Decision, bp: Blueprint): string {
   if (dec.context) parts.push("## Контекст\n" + dec.context);
   parts.push("## Задача\n" + dec.problem);
   if (dec.why) parts.push("## Почему это важно\n" + dec.why);
-  if (dec.constraints) parts.push("## Ограничения\nНЕ делай:\n" + dec.constraints);
+  if (dec.constraints) parts.push("## Ограничения\n" + dec.constraints);
   if (dec.recommended) parts.push("## Рекомендация\n" + dec.recommended);
   if (dec.validation) parts.push("## Как проверить\n" + dec.validation);
   if (dec.iteration) parts.push("## Как улучшить\n" + dec.iteration);
   if (dec.mistakes) parts.push("## Частые ошибки\n" + dec.mistakes);
-  parts.push("---\nЯ прохожу Blueprint «" + bp.title + "» на ProektMap. Отвечай как AI-инженер.");
+  parts.push("Я прохожу Blueprint «" + bp.title + "» на Карте роста. Отвечай как AI-инженер.");
   return parts.join("\n\n");
 }
 
-export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprint }) {
+export default function BlueprintPageClient({
+  blueprint, isLoggedIn, isPro,
+}: {
+  blueprint: Blueprint; isLoggedIn: boolean; isPro: boolean;
+}) {
   const stages = blueprint.stages.map(bs => bs.stage);
   const [activeStage, setActiveStage] = useState(stages[0]?.slug || "");
   const [completed, setCompleted] = useState<Set<string>>(new Set());
@@ -51,13 +51,15 @@ export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprin
 
   useEffect(() => {
     setIsMobile(window.innerWidth < 768);
+    if (!isLoggedIn) return;
     fetch("/api/progress").then(r => r.json()).then(d => {
       setCompleted(new Set(d.completed));
       setTotalXp(d.totalXp);
     });
-  }, []);
+  }, [isLoggedIn]);
 
   function toggle(id: string) {
+    if (!isLoggedIn) return;
     const newStatus = completed.has(id) ? "pending" : "done";
     const next = new Set(completed);
     if (next.has(id)) next.delete(id); else next.add(id);
@@ -76,7 +78,11 @@ export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprin
   const totalDone = completed.size;
   const progress = Math.round((totalDone / blueprint.totalDecisions) * 100);
 
-  const steps = [{ key: 1, label: "ПОНЯТЬ" }, { key: 2, label: "ВЫБРАТЬ" }, { key: 3, label: "ПРОВЕРИТЬ" }];
+  const steps = [
+    { key: 1, label: "ПОНЯТЬ" },
+    { key: 2, label: "ВЫБРАТЬ" },
+    { key: 3, label: "ПРОВЕРИТЬ", locked: !isPro },
+  ];
 
   return (
     <div style={{ display: "flex", minHeight: "calc(100dvh - 56px)" }}>
@@ -88,12 +94,11 @@ export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprin
           position: "sticky", top: 56, height: "calc(100dvh - 56px)", overflowY: "auto",
         }}>
           <SidebarContent stages={stages} activeStage={activeStage} setActiveStage={setActiveStage}
-            completed={completed} progress={progress} totalDone={totalDone} totalDecs={blueprint.totalDecisions}
-            blueprint={blueprint} />
+            completed={completed} progress={progress} totalDone={totalDone} totalDecs={blueprint.totalDecisions} />
         </aside>
       )}
 
-      {/* MOBILE: FAB + sliding panel */}
+      {/* MOBILE */}
       {isMobile && (
         <>
           <button onClick={() => setSidebarOpen(true)} style={{
@@ -121,8 +126,7 @@ export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprin
                   </button>
                 </div>
                 <SidebarContent stages={stages} activeStage={activeStage} setActiveStage={(slug: string) => { setActiveStage(slug); setSidebarOpen(false); }}
-                  completed={completed} progress={progress} totalDone={totalDone} totalDecs={blueprint.totalDecisions}
-                  blueprint={blueprint} />
+                  completed={completed} progress={progress} totalDone={totalDone} totalDecs={blueprint.totalDecisions} />
               </div>
             </>
           )}
@@ -131,14 +135,52 @@ export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprin
 
       {/* Main content */}
       <main style={{ flex: 1, padding: isMobile ? "var(--space-m)" : "var(--space-xl)", maxWidth: 1100 }}>
+        {/* Registration banner for anonymous users */}
+        {!isLoggedIn && (
+          <div style={{
+            padding: "var(--space-m)", marginBottom: "var(--space-l)", borderRadius: "var(--radius-m)",
+            background: "var(--color-accent-light)", border: "1px solid var(--color-accent)",
+            display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap",
+          }}>
+            <div style={{ fontSize: "var(--text-s)", fontWeight: 600 }}>
+              🔓 Просмотр. <span style={{ fontWeight: 400, color: "var(--color-text-secondary)" }}>Войдите чтобы сохранять прогресс и получить AI-консультанта.</span>
+            </div>
+            <a href="/auth" style={{
+              display: "flex", alignItems: "center", gap: 6, padding: "8px 18px", borderRadius: "var(--radius-m)",
+              background: "var(--color-accent)", color: "white", textDecoration: "none",
+              fontSize: "var(--text-xs)", fontWeight: 600,
+            }}>
+              <LogIn size={14} /> Войти
+            </a>
+          </div>
+        )}
+
+        {/* Upgrade banner for free users */}
+        {isLoggedIn && !isPro && (
+          <div style={{
+            padding: "var(--space-m)", marginBottom: "var(--space-l)", borderRadius: "var(--radius-m)",
+            background: "var(--color-warning-light)", border: "1px solid var(--color-warning)",
+            display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap",
+          }}>
+            <div style={{ fontSize: "var(--text-s)", fontWeight: 600, color: "var(--color-warning)" }}>
+              ⚡ Pro подписка отключена. <span style={{ fontWeight: 400, color: "var(--color-text-secondary)" }}>AI-консультант и готовые промпты недоступны.</span>
+            </div>
+            <a href="/dashboard/billing" style={{
+              display: "flex", alignItems: "center", gap: 6, padding: "8px 18px", borderRadius: "var(--radius-m)",
+              background: "var(--color-accent)", color: "white", textDecoration: "none",
+              fontSize: "var(--text-xs)", fontWeight: 600,
+            }}>
+              Pro за 300 ₽/мес
+            </a>
+          </div>
+        )}
+
         <div style={{ height: 4, background: "var(--color-border)", borderRadius: 2, overflow: "hidden", marginBottom: "var(--space-m)" }}>
           <div style={{ width: progress + "%", height: "100%", background: "var(--color-accent)", borderRadius: 2, transition: "width 0.4s ease" }} />
         </div>
 
         <h1 style={{ fontSize: "var(--text-xxl)", fontWeight: 800, marginBottom: "var(--space-xs)" }}>{currentStage?.title}</h1>
         {currentStage?.description && <p style={{ color: "var(--color-text-secondary)", marginBottom: isMobile ? "var(--space-m)" : "var(--space-l)", fontSize: "var(--text-s)" }}>{currentStage?.description}</p>}
-
-        {activeStage === "ai-philosophy" && <AIRules />}
 
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)" }}>
           {currentStage?.decisions.map((dec) => {
@@ -148,9 +190,20 @@ export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprin
             const builtPrompt = buildPrompt(dec, blueprint);
 
             return (
-              <div key={dec.id} className="card" style={{ opacity: done ? 0.6 : 1, padding: 0 }}>
-                <div onClick={() => toggle(dec.id)} style={{ display: "flex", alignItems: "center", gap: "var(--space-s)", padding: isMobile ? "var(--space-m)" : "var(--space-m) var(--space-l)", cursor: "pointer" }}>
-                  <div style={{ width: 24, height: 24, borderRadius: "50%", flexShrink: 0, border: done ? "2px solid var(--color-accent)" : "2px solid var(--color-border)", background: done ? "var(--color-accent)" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: 11, fontWeight: 700 }}>{done ? "✓" : ""}</div>
+              <div key={dec.id} style={{
+                padding: 0, opacity: done ? 0.6 : 1,
+                background: "white", borderRadius: "var(--radius-m)", border: "1px solid var(--color-border-light)",
+              }}>
+                <div onClick={() => toggle(dec.id)} style={{
+                  display: "flex", alignItems: "center", gap: "var(--space-s)", padding: isMobile ? "var(--space-m)" : "var(--space-m) var(--space-l)", cursor: isLoggedIn ? "pointer" : "default",
+                }}>
+                  <div style={{
+                    width: 24, height: 24, borderRadius: "50%", flexShrink: 0,
+                    border: done ? "2px solid var(--color-accent)" : "2px solid var(--color-border)",
+                    background: done ? "var(--color-accent)" : "transparent",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    color: "white", fontSize: 11, fontWeight: 700,
+                  }}>{done ? "✓" : ""}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontWeight: 700, fontSize: "var(--text-s)", textDecoration: done ? "line-through" : "none" }}>{dec.title}</div>
                   </div>
@@ -165,14 +218,30 @@ export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprin
                   <div style={{ borderTop: "1px solid var(--color-border-light)", padding: isMobile ? "var(--space-m)" : "var(--space-l)" }}>
                     <div style={{ display: "flex", gap: 0, marginBottom: "var(--space-m)", borderBottom: "2px solid var(--color-border-light)", overflowX: "auto" }}>
                       {steps.map(s => (
-                        <button key={s.key} onClick={() => setActiveStep({ ...activeStep, [dec.id]: s.key })}
-                          style={{ padding: "8px 12px", border: "none", background: "transparent", cursor: "pointer", color: curStep === s.key ? "var(--color-accent)" : "var(--color-text-tertiary)", borderBottom: curStep === s.key ? "2px solid var(--color-accent)" : "2px solid transparent", fontWeight: curStep === s.key ? 700 : 500, fontSize: "var(--text-xs)", marginBottom: -2, whiteSpace: "nowrap" }}>{s.label}</button>
+                        <button key={s.key} onClick={() => {
+                          if (s.locked && !isPro) return;
+                          setActiveStep({ ...activeStep, [dec.id]: s.key });
+                        }}
+                        style={{
+                          padding: "8px 12px", border: "none", background: "transparent", cursor: s.locked && !isPro ? "default" : "pointer",
+                          color: curStep === s.key ? "var(--color-accent)" : "var(--color-text-tertiary)",
+                          borderBottom: curStep === s.key ? "2px solid var(--color-accent)" : "2px solid transparent",
+                          fontWeight: curStep === s.key ? 700 : 500, fontSize: "var(--text-xs)", marginBottom: -2, whiteSpace: "nowrap",
+                          display: "flex", alignItems: "center", gap: 4,
+                          opacity: s.locked && !isPro ? 0.4 : 1,
+                        }}>
+                          {s.locked && !isPro && <Lock size={10} />}
+                          {s.label}
+                        </button>
                       ))}
                     </div>
+
                     {curStep === 1 && <StepUnderstand dec={dec} />}
                     {curStep === 2 && <StepChoose dec={dec} />}
-                    {curStep === 3 && <StepVerify dec={dec} builtPrompt={builtPrompt} promptCopied={promptCopied} copyPrompt={copyPrompt} />}
-                    <VideoBlock videos={[]} />
+                    {curStep === 3 && (isPro
+                      ? <StepVerify dec={dec} builtPrompt={builtPrompt} promptCopied={promptCopied} copyPrompt={copyPrompt} />
+                      : <StepProRequired />
+                    )}
                   </div>
                 )}
               </div>
@@ -184,7 +253,7 @@ export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprin
   );
 }
 
-function SidebarContent({ stages, activeStage, setActiveStage, completed, progress, totalDone, totalDecs, blueprint }: any) {
+function SidebarContent({ stages, activeStage, setActiveStage, completed, progress, totalDone, totalDecs }: any) {
   return (
     <div>
       <h3 style={{ marginBottom: "var(--space-s)", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", textTransform: "uppercase", letterSpacing: "0.08em" }}>Путь проекта</h3>
@@ -200,12 +269,8 @@ function SidebarContent({ stages, activeStage, setActiveStage, completed, progre
               display: "flex", justifyContent: "space-between", alignItems: "center",
               transition: "background 0.15s",
             }}>
-              <div style={{ fontWeight: isActive ? 700 : 500, fontSize: "var(--text-s)", color: isActive ? "var(--color-accent)" : "var(--color-text-primary)" }}>
-                {s.title}
-              </div>
-              <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", flexShrink: 0, marginLeft: 8 }}>
-                {done}/{s.decisions.length}
-              </div>
+              <div style={{ fontWeight: isActive ? 700 : 500, fontSize: "var(--text-s)", color: isActive ? "var(--color-accent)" : "var(--color-text-primary)" }}>{s.title}</div>
+              <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", flexShrink: 0, marginLeft: 8 }}>{done}/{s.decisions.length}</div>
             </div>
           );
         })}
@@ -226,8 +291,12 @@ function SidebarContent({ stages, activeStage, setActiveStage, completed, progre
 function StepUnderstand({ dec }: { dec: Decision }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)" }}>
-      {dec.why && <div style={{ padding: "var(--space-m)", background: "var(--color-warning-light)", borderRadius: "var(--radius-m)" }}>
-        <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: 4, color: "var(--color-warning)" }}>⚠️ Почему важно</div>
+      {dec.problem && <div style={{ padding: "var(--space-m)", background: "var(--color-warning-light)", borderRadius: "var(--radius-m)" }}>
+        <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: 4, color: "var(--color-warning)" }}>⚠️ Проблема</div>
+        <div style={{ fontSize: "var(--text-s)", lineHeight: 1.7 }}>{dec.problem}</div>
+      </div>}
+      {dec.why && <div style={{ padding: "var(--space-m)", background: "var(--color-bg-secondary)", borderRadius: "var(--radius-m)", border: "1px solid var(--color-border-light)" }}>
+        <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: 4 }}>Почему это важно</div>
         <div style={{ fontSize: "var(--text-s)", lineHeight: 1.7, color: "var(--color-text-secondary)" }}>{dec.why}</div>
       </div>}
       {dec.context && <div style={{ padding: "var(--space-m)", background: "var(--color-bg-secondary)", borderRadius: "var(--radius-m)", border: "1px solid var(--color-border-light)" }}>
@@ -235,8 +304,8 @@ function StepUnderstand({ dec }: { dec: Decision }) {
         <div style={{ fontSize: "var(--text-s)", lineHeight: 1.7, color: "var(--color-text-secondary)", whiteSpace: "pre-wrap" }}>{dec.context}</div>
       </div>}
       {dec.mistakes && <div style={{ padding: "var(--space-m)", background: "var(--color-error-light)", borderRadius: "var(--radius-m)" }}>
-        <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: 4, color: "var(--color-error)" }}>❌ Ошибки новичков</div>
-        <div style={{ fontSize: "var(--text-s)", lineHeight: 1.7, color: "var(--color-text-secondary)" }}>{dec.mistakes}</div>
+        <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: 4, color: "var(--color-error)" }}>❌ Частые ошибки</div>
+        <div style={{ fontSize: "var(--text-s)", lineHeight: 1.7 }}>{dec.mistakes}</div>
       </div>}
     </div>
   );
@@ -254,12 +323,8 @@ function StepChoose({ dec }: { dec: Decision }) {
         <div style={{ fontSize: "var(--text-s)", lineHeight: 1.7, color: "var(--color-text-secondary)" }}>{dec.content}</div>
       </div>}
       {dec.tradeoffs && <div style={{ padding: "var(--space-m)", background: "var(--color-warning-light)", borderRadius: "var(--radius-m)" }}>
-        <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: 4, color: "var(--color-warning)" }}>⚖️ Компромиссы</div>
+        <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: 4, color: "var(--color-warning)" }}>⚖️ Что выбрать</div>
         <div style={{ fontSize: "var(--text-s)", lineHeight: 1.7, color: "var(--color-text-secondary)" }}>{dec.tradeoffs}</div>
-      </div>}
-      {dec.constraints && <div style={{ padding: "var(--space-m)", background: "var(--color-error-light)", borderRadius: "var(--radius-m)" }}>
-        <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: 4, color: "var(--color-error)" }}>🛑 Ограничения</div>
-        <div style={{ fontSize: "var(--text-s)", lineHeight: 1.7, color: "var(--color-text-secondary)", whiteSpace: "pre-wrap" }}>{dec.constraints}</div>
       </div>}
     </div>
   );
@@ -290,6 +355,30 @@ function StepVerify({ dec, builtPrompt, promptCopied, copyPrompt }: { dec: Decis
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function StepProRequired() {
+  return (
+    <div style={{
+      padding: "var(--space-xl)", textAlign: "center", borderRadius: "var(--radius-m)",
+      background: "var(--color-accent-light)", border: "1px solid var(--color-accent)",
+    }}>
+      <Lock size={32} style={{ color: "var(--color-accent)", marginBottom: "var(--space-m)", opacity: 0.5 }} />
+      <div style={{ fontWeight: 700, fontSize: "var(--text-s)", color: "var(--color-accent)", marginBottom: 8 }}>
+        Доступно с Pro подпиской
+      </div>
+      <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", marginBottom: "var(--space-m)", lineHeight: 1.6, maxWidth: 360, margin: "0 auto var(--space-m)" }}>
+        AI-консультант и готовые промпты для каждого этапа. Скопируйте промпт, вставьте в чат с AI и получите персонализированную помощь.
+      </p>
+      <a href="/dashboard/billing" style={{
+        display: "inline-flex", alignItems: "center", gap: 6, padding: "10px 24px", borderRadius: "var(--radius-m)",
+        background: "var(--color-accent)", color: "white", textDecoration: "none",
+        fontSize: "var(--text-s)", fontWeight: 700,
+      }}>
+        <Lock size={14} /> Pro за 300 ₽/мес
+      </a>
     </div>
   );
 }
