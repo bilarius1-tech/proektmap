@@ -174,3 +174,22 @@
 - tradeoffs, whenNotUse, mistakes
 - context, constraints, validation, iteration
 - promptTitle, promptTemplate (готовый для AI)
+
+---
+
+## 📚 Библиотека промптов — форк vibe-coding-cn (22k ⭐)
+
+### Что сделано
+- **Модель Prompt**: Prisma (prompts), 6 категорий: Код, Деплой, Дизайн, SEO, Право, AI
+- **15 промптов**: адаптированы с китайского на русский рынок (Яндекс, reg.ru, Beget, 152-ФЗ)
+- **Страница /prompts**: поиск, фильтр по категориям, раскрытие, копирование в 1 клик
+- **Админка /admin/prompts**: CRUD, включение/выключение, счётчик использований
+- **PromptsBlock**: переиспользуемый компонент (как AIRadar) — встроен в каждый Blueprint
+- **API**: /api/admin/prompts — POST/PUT/PATCH/DELETE
+
+### Технически
+- `src/components/blueprint/prompts-block.tsx` — компонент
+- `src/app/prompts/` — публичная страница
+- `src/app/admin/prompts/` — админ-панель
+- `src/app/api/admin/prompts/` — API CRUD
+- `prisma/schema.prisma` — модель Prompt

@@ -25,5 +25,6 @@ export default async function BlueprintPage({ params }: { params: Promise<{ blue
     include: { stages: { orderBy: { sortOrder: "asc" }, include: { stage: { include: { decisions: { orderBy: { sortOrder: "asc" } } } } } } },
   });
   if (!bp) notFound();
-  return <BlueprintPageClient blueprint={JSON.parse(JSON.stringify(bp))} />;
+  const prompts = await db.prompt.findMany({ where: { isActive: true }, orderBy: [{ category: "asc" }, { title: "asc" }] });
+  return <BlueprintPageClient blueprint={JSON.parse(JSON.stringify(bp))} prompts={JSON.parse(JSON.stringify(prompts))} />;
 }

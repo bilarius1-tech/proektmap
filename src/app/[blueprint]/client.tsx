@@ -5,6 +5,7 @@ import { Eye, CheckCircle, RefreshCw, Copy, ChevronDown, ChevronUp, Menu, X } fr
 import AIRadar from "./ai-radar";
 import AIRules from "@/components/blueprint/ai-rules";
 import VideoBlock from "@/components/blueprint/video-block";
+import PromptsBlock from "@/components/blueprint/prompts-block";
 
 interface Decision {
   id: string; title: string; slug: string;
@@ -17,6 +18,12 @@ interface Stage {
   id: string; title: string; slug: string; icon: string; description: string | null;
   decisions: Decision[];
 }
+interface Prompt {
+  id: string; title: string; category: string;
+  description: string | null; content: string; tags: string;
+  useCount: number;
+}
+
 interface Blueprint {
   id: string; title: string; slug: string; description: string | null;
   totalXp: number; totalDecisions: number;
@@ -37,7 +44,7 @@ function buildPrompt(dec: Decision, bp: Blueprint): string {
   return parts.join("\n\n");
 }
 
-export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprint }) {
+export default function BlueprintPageClient({ blueprint, prompts }: { blueprint: Blueprint; prompts: Prompt[] }) {
   const stages = blueprint.stages.map(bs => bs.stage);
   const [activeStage, setActiveStage] = useState(stages[0]?.slug || "");
   const [completed, setCompleted] = useState<Set<string>>(new Set());
@@ -172,6 +179,7 @@ export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprin
                     {curStep === 2 && <StepChoose dec={dec} />}
                     {curStep === 3 && <StepVerify dec={dec} builtPrompt={builtPrompt} promptCopied={promptCopied} copyPrompt={copyPrompt} />}
                     <AIRadar />
+      <PromptsBlock prompts={prompts || []} />
                     <VideoBlock videos={[]} />
                   </div>
                 )}

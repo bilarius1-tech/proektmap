@@ -284,3 +284,19 @@ model AIModel {
 
   @@map("ai_models")
 }
+
+model Prompt {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  category    String
+  description String?
+  content     String
+  tags        String   @default("")
+  useCount    Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("prompts")
+}
