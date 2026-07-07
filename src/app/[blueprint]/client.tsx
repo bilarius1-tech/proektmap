@@ -153,7 +153,7 @@ export default function BlueprintPageClient({
   ];
 
   return (
-    <div style={{ display: "flex", minHeight: "calc(100dvh - 56px)" }}>
+    <div style={{ display: "flex", minHeight: "calc(100dvh - 56px)" }} suppressHydrationWarning>
       {/* DESKTOP sidebar */}
       {!isMobile && (
         <aside style={{
@@ -209,7 +209,7 @@ export default function BlueprintPageClient({
       )}
 
       {/* Main content */}
-      <main style={{ flex: 1, padding: isMobile ? "var(--space-m)" : "var(--space-xl)", maxWidth: 1100 }}>
+      <main suppressHydrationWarning style={{ flex: 1, padding: isMobile ? "var(--space-m)" : "var(--space-xl)", maxWidth: 1100 }}>
         {/* Registration banner */}
         {!isLoggedIn && (
           <div style={{
