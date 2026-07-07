@@ -249,6 +249,8 @@ model ReferralLink {
 model SiteSettings {
   id        String   @id @default("main")
   proPrice  Int      @default(300)
+  yookassaShopId    String   @default("")
+  yookassaSecretKey String   @default("")
   yookassaShopId String @default("")
   yookassaSecretKey String @default("")
   updatedAt DateTime @updatedAt
