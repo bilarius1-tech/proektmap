@@ -4,11 +4,13 @@ import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 
 export default function CookieConsent() {
+  const [mounted, setMounted] = useState(false);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     const accepted = localStorage.getItem("cookie-consent");
     if (!accepted) setVisible(true);
+    setMounted(true);
   }, []);
 
   function accept() {
@@ -16,7 +18,8 @@ export default function CookieConsent() {
     setVisible(false);
   }
 
-  if (!visible) return null;
+  // Держим одинаковый рендер на сервере и клиенте — null
+  if (!mounted || !visible) return null;
 
   return (
     <div style={{
@@ -38,11 +41,6 @@ export default function CookieConsent() {
           color: "white", border: "none", fontSize: "var(--text-xs)", fontWeight: 600, cursor: "pointer",
         }}>
           Принять
-        </button>
-        <button onClick={() => setVisible(false)} style={{
-          background: "none", border: "none", cursor: "pointer", color: "var(--color-text-tertiary)", padding: 8,
-        }}>
-          <X size={16} />
         </button>
       </div>
     </div>
