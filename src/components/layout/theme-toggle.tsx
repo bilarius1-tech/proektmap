@@ -22,21 +22,16 @@ export default function ThemeToggle() {
     localStorage.setItem("proektmap-theme", next ? "dark" : "light");
   }
 
-  // Don't render until mounted to avoid hydration mismatch
-  if (!mounted) {
-    return <div style={{ width: 36, height: 36 }} />;
-  }
-
   return (
     <button onClick={toggle}
-      title={dark ? "Светлая тема" : "Тёмная тема"}
+      title="Тёмная тема"
       style={{
         background: "none", border: "1px solid var(--color-border-light)",
         borderRadius: "var(--radius-m)", padding: 6, cursor: "pointer",
         display: "flex", alignItems: "center", justifyContent: "center",
-        color: "var(--color-text-secondary)", width: 36, height: 36,
+        color: "var(--color-text-secondary)", width: 36, height: 36, fontSize: 16,
       }}>
-      {dark ? <Sun size={18} /> : <Moon size={18} />}
+      {mounted ? (dark ? <Sun size={18} /> : <Moon size={18} />) : <Moon size={18} />}
     </button>
   );
 }
