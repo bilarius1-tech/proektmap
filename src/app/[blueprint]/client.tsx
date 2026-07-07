@@ -271,6 +271,18 @@ function StepChoose({ dec }: { dec: Decision }) {
 }
 
 function StepVerify({ dec, builtPrompt, promptCopied, copyPrompt }: { dec: Decision; builtPrompt: string; promptCopied: string | null; copyPrompt: (d: Decision) => void }) {
+  const [aiQuestion, setAiQuestion] = useState("");
+  const [aiAnswer, setAiAnswer] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
+  
+  async function askAI() {
+    if (!aiQuestion.trim()) return;
+    setAiLoading(true);
+    const res = await fetch("/api/ai/ask", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt: aiQuestion, cardTitle: dec.title, context: dec.context || dec.problem }) });
+    const d = await res.json();
+    setAiAnswer(d.advice || "AI не ответил");
+    setAiLoading(false);
+  }
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)" }}>
       {dec.validation && <div style={{ padding: "var(--space-m)", background: "var(--color-accent-light)", borderRadius: "var(--radius-m)" }}>
@@ -284,6 +296,21 @@ function StepVerify({ dec, builtPrompt, promptCopied, copyPrompt }: { dec: Decis
       {builtPrompt && (
         <div style={{ padding: "var(--space-m)", background: "var(--color-bg-secondary)", borderRadius: "var(--radius-m)", border: "1px solid var(--color-accent)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-s)", flexWrap: "wrap", gap: 8 }}>
+      {/* PRO: AI Chat */}
+      <div style={{ padding: "var(--space-m)", background: "var(--color-bg-secondary)", borderRadius: "var(--radius-m)", border: "1px solid var(--color-accent)", marginTop: "var(--space-s)" }}>
+        <div style={{ fontWeight: 700, fontSize: "var(--text-s)", color: "var(--color-accent)", marginBottom: "var(--space-xs)" }}>💬 Задать вопрос AI</div>
+        <div style={{ display: "flex", gap: 8 }}>
+          <input value={aiQuestion} onChange={e => setAiQuestion(e.target.value)}
+            placeholder="Спроси о чём-то непонятном..."
+            style={{ flex: 1, padding: "8px 12px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", fontSize: "var(--text-s)", outline: "none" }}
+            onKeyDown={e => { if (e.key === "Enter") askAI(); }} />
+          <button onClick={askAI} disabled={aiLoading}
+            style={{ padding: "8px 16px", borderRadius: "var(--radius-s)", border: "none", background: "var(--color-accent)", color: "white", fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", fontSize: "var(--text-s)" }}>
+            {aiLoading ? "..." : "Спросить"}
+          </button>
+        </div>
+        {aiAnswer && <div style={{ marginTop: "var(--space-s)", padding: "var(--space-s)", background: "white", borderRadius: "var(--radius-s)", fontSize: "var(--text-s)", lineHeight: 1.6, color: "var(--color-text-secondary)" }}>{aiAnswer}</div>}
+      </div>
             <div style={{ fontWeight: 700, fontSize: "var(--text-s)", color: "var(--color-accent)" }}>📋 Собранный промпт</div>
             <button onClick={() => copyPrompt(dec)}
               style={{ display: "flex", alignItems: "center", gap: 4, padding: "8px 14px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-accent)", background: "white", color: "var(--color-accent)", fontSize: "var(--text-xs)", fontWeight: 600, cursor: "pointer" }}>
