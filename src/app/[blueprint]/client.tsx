@@ -87,7 +87,7 @@ export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprin
           borderRight: "1px solid var(--color-border-light)", padding: "var(--space-l)",
           position: "sticky", top: 56, height: "calc(100dvh - 56px)", overflowY: "auto",
         }}>
-          <SidebarContent stages={stages} activeStage={activeStage} setActiveStage={setActiveStage}
+          <SidebarContent stages={stages} blueprint={blueprint} activeStage={activeStage} setActiveStage={setActiveStage}
             completed={completed} progress={progress} totalDone={totalDone} totalDecs={blueprint.totalDecisions} />
         </aside>
       )}
@@ -122,7 +122,7 @@ export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprin
                     <X size={20} />
                   </button>
                 </div>
-                <SidebarContent stages={stages} activeStage={activeStage} setActiveStage={(slug: string) => { setActiveStage(slug); setSidebarOpen(false); }}
+                <SidebarContent stages={stages} blueprint={blueprint} activeStage={activeStage} setActiveStage={(slug: string) => { setActiveStage(slug); setSidebarOpen(false); }}
                   completed={completed} progress={progress} totalDone={totalDone} totalDecs={blueprint.totalDecisions} />
               </div>
             </>
@@ -194,7 +194,7 @@ export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprin
 }
 
 /* ═══ Sidebar Content ═══ */
-function SidebarContent({ stages, activeStage, setActiveStage, completed, progress, totalDone, totalDecs }: any) {
+function SidebarContent({ stages, activeStage, setActiveStage, completed, progress, totalDone, totalDecs, blueprint }: any) {
   return (
     <>
       <h3 style={{ marginBottom: "var(--space-s)", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", textTransform: "uppercase", letterSpacing: "0.08em" }}>Путь проекта</h3>
