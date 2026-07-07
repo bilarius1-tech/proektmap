@@ -1,5 +1,17 @@
 import { getDb } from "@/lib/db";
+import Link from "next/link";
 import { Plus, Edit, Trash2, Copy } from "lucide-react";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+
+async function deleteDecision(formData: FormData) {
+  "use server";
+  const id = formData.get("id") as string;
+  if (!id) return;
+  const db = await getDb();
+  await db.decision.delete({ where: { id } });
+  revalidatePath("/admin/decisions");
+}
 
 export default async function DecisionsAdmin() {
   const db = await getDb();
@@ -12,7 +24,7 @@ export default async function DecisionsAdmin() {
           <h1 style={{ fontSize: "var(--text-xl)", marginBottom: "var(--space-2xs)" }}>Решения</h1>
           <p style={{ color: "var(--color-text-secondary)", fontSize: "var(--text-s)" }}>{decisions.length} решений</p>
         </div>
-        <button className="btn btn-primary"><Plus size={16} /> Добавить</button>
+        <Link href="/admin/decisions/new" className="btn btn-primary" style={{ textDecoration: "none" }}><Plus size={16} /> Добавить</Link>
       </div>
 
       <div className="card" style={{ padding: 0, overflow: "hidden" }}>
@@ -31,19 +43,14 @@ export default async function DecisionsAdmin() {
                 <td style={{ padding: "12px 16px", fontWeight: 600 }}>{d.title}</td>
                 <td style={{ padding: "12px 16px", color: "var(--color-text-secondary)", fontSize: "var(--text-s)", fontFamily: "var(--font-mono)" }}>{d.slug}</td>
                 <td style={{ padding: "12px 16px" }}><span className="badge" style={{ background: "var(--color-accent-light)", color: "var(--color-accent)" }}>+{d.xpReward}</span></td>
-                <td style={{ padding: "12px 16px" }}>
-                  {d.promptTemplate ? (
-                    <span className="badge" style={{ background: "var(--color-accent-light)", color: "var(--color-accent)" }}>
-                      <Copy size={10} /> шаблон
-                    </span>
-                  ) : (
-                    <span style={{ color: "var(--color-text-tertiary)", fontSize: "var(--text-xs)" }}>—</span>
-                  )}
-                </td>
+                <td style={{ padding: "12px 16px" }}>{d.promptTemplate ? <span className="badge" style={{ background: "var(--color-accent-light)", color: "var(--color-accent)" }}><Copy size={10} /> шаблон</span> : <span style={{ color: "var(--color-text-tertiary)", fontSize: "var(--text-xs)" }}>—</span>}</td>
                 <td style={{ padding: "12px 16px" }}>
                   <div style={{ display: "flex", gap: 4 }}>
-                    <button className="btn btn-ghost" style={{ padding: "4px 8px" }}><Edit size={14} /></button>
-                    <button className="btn btn-ghost" style={{ padding: "4px 8px", color: "var(--color-error)" }}><Trash2 size={14} /></button>
+                    <Link href={`/admin/decisions/${d.id}`} className="btn btn-ghost" style={{ padding: "4px 8px" }}><Edit size={14} /></Link>
+                    <form action={deleteDecision} style={{ display: "inline" }}>
+                      <input type="hidden" name="id" value={d.id} />
+                      <button type="submit" className="btn btn-ghost" style={{ padding: "4px 8px", color: "var(--color-error)" }}><Trash2 size={14} /></button>
+                    </form>
                   </div>
                 </td>
               </tr>
