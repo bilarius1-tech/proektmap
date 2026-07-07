@@ -1,4 +1,5 @@
 import { getDb } from "@/lib/db";
+import GlobalSearch from "./global-search";
 import Link from "next/link";
 import MobileMenu from "./mobile-menu";
 import AuthBlock from "./auth-block";
@@ -23,6 +24,7 @@ export default async function GlobalHeader() {
       position: "sticky", top: 0, zIndex: 100,
     }}>
       <div style={{ display: "flex", alignItems: "center", gap: "var(--space-s)" }}>
+          <GlobalSearch />
         <MobileMenu items={menuItems} />
         <Link href="/" style={{ fontSize: 18, fontWeight: 800, textDecoration: "none", color: "inherit", whiteSpace: "nowrap" }}>
           Карта<span style={{ color: "var(--color-accent)" }}> роста</span>
@@ -38,6 +40,7 @@ export default async function GlobalHeader() {
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: "var(--space-s)" }}>
+          <GlobalSearch />
         <ThemeToggle />
         <AuthBlock />
       </div>

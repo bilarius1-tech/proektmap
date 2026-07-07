@@ -20,6 +20,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   projects  Project[]
+  favorites Favorite[]
   @@map("users")
 }
 
@@ -98,6 +99,7 @@ model Decision {
   relationsTo    DecisionRelation[] @relation("to")
   progress       ProjectDecision[]
   skills        DecisionSkill[]
+  favorites     Favorite[]
   @@map("decisions")
 }
 
@@ -176,6 +178,7 @@ model ProjectDecision {
   project  Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   decision Decision @relation(fields: [decisionId], references: [id], onDelete: Cascade)
   @@unique([projectId, decisionId])
+  userChoice  String   @default("")
   @@map("project_decisions")
 }
 
@@ -334,4 +337,15 @@ model PromptCategory {
   updatedAt   DateTime @updatedAt
 
   @@map("prompt_categories")
+}
+
+model Favorite {
+  id          String   @id @default(uuid())
+  userId      String
+  decisionId  String
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  decision    Decision @relation(fields: [decisionId], references: [id], onDelete: Cascade)
+  @@unique([userId, decisionId])
+  @@map("favorites")
 }
