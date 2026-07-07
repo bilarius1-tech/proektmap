@@ -141,7 +141,7 @@ export default function BlueprintPageClient({ blueprint }: { blueprint: Blueprin
         </div>
 
         <h1 style={{ fontSize: "var(--text-xxl)", fontWeight: 800, marginBottom: "var(--space-xs)" }}>{currentStage?.title}</h1>
-      <AIRules />
+      {activeStage === "ai-philosophy" && <AIRules />}
         {currentStage?.description && <p style={{ color: "var(--color-text-secondary)", marginBottom: isMobile ? "var(--space-m)" : "var(--space-l)", fontSize: "var(--text-s)" }}>{currentStage?.description}</p>}
 
         {/* Decisions */}
