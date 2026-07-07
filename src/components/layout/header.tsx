@@ -1,14 +1,10 @@
-import { auth } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import Link from "next/link";
 import MobileMenu from "./mobile-menu";
-import UserMenu from "./user-menu";
+import AuthBlock from "./auth-block";
 import ThemeToggle from "./theme-toggle";
 
 export default async function GlobalHeader() {
-  const session = await auth();
-  const user = session?.user;
-  
   let menuItems: any[] = [];
   try {
     const db = await getDb();
@@ -43,9 +39,7 @@ export default async function GlobalHeader() {
 
       <div style={{ display: "flex", alignItems: "center", gap: "var(--space-s)" }}>
         <ThemeToggle />
-        {user ? <UserMenu user={user} /> : (
-          <Link href="/auth" className="btn btn-primary" style={{ textDecoration: "none", fontSize: "var(--text-xs)", padding: "6px 14px" }}>Войти</Link>
-        )}
+        <AuthBlock />
       </div>
     </header>
   );
