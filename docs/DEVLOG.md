@@ -136,3 +136,18 @@
 - Конкретные примеры «плохо» / «хорошо»
 - Сколько времени экономит каждый ритуал
 - Готовые промпт-шаблоны для копирования
+
+---
+
+## Этап 2: Дизайн-система — контент заполнен
+
+### 3 решения на основе исследования:
+1. **Создать Design Tokens** — CSS-переменные, примеры из Stripe/shadcn
+2. **Выбрать шрифт** — Inter + JetBrains Mono через next/font
+3. **Создать DESIGN.md** — формат Google Stitch, awesome-design-md (96k ⭐)
+
+### Источники:
+- Doka.guide (CSS-переменные на русском)
+- awesome-design-md (75+ примеров от Stripe, Apple, Linear)
+- shadcn/ui theming (стандарт индустрии)
+- DESIGN.md формат (v0, Bolt.new, Cursor)
