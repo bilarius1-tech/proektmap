@@ -3,12 +3,13 @@ import "@/styles/tokens.css";
 import GlobalHeader from "@/components/layout/header";
 import GlobalFooter from "@/components/layout/footer";
 import StreakBanner from "@/components/layout/streak-banner";
+import CookieConsent from "@/components/cookie-consent";
 
 export const metadata: Metadata = {
-  title: "ProektMap — Инженерный навигатор",
+  title: "Карта роста — AI-инженерный навигатор",
   description: "Школа AI-инженеров. Научись создавать проекты с помощью AI.",
   viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
-  appleWebApp: { capable: true, statusBarStyle: "default", title: "ProektMap" },
+  appleWebApp: { capable: true, statusBarStyle: "default", title: "Карта роста" },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -24,6 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <StreakBanner />
         <main style={{ flex: 1 }}>{children}</main>
         <GlobalFooter />
+        <CookieConsent />
       </body>
     </html>
   );
