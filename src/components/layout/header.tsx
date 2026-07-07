@@ -40,7 +40,6 @@ export default async function GlobalHeader() {
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: "var(--space-s)" }}>
-          <GlobalSearch />
         <ThemeToggle />
         <AuthBlock />
       </div>
