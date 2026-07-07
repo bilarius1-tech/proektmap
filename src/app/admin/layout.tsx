@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Home, FileText, Layers, GitBranch, Settings, Users, Menu, Puzzle, Link as LinkIcon } from "lucide-react";
+import { Home, FileText, Layers, GitBranch, Settings, Users, Menu, Puzzle, Link as LinkIcon, Cpu } from "lucide-react";
 
 const nav = [
   { href: "/admin", label: "Обзор", icon: Home },
@@ -11,6 +11,7 @@ const nav = [
     { href: "/admin/ai-radar", label: "AI Radar", icon: Cpu },
   { href: "/admin/settings", label: "Настройки", icon: Settings },
     { href: "/admin/menu", label: "Меню", icon: Menu },
+    { href: "/admin/referrals", label: "Рефералы", icon: LinkIcon },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
