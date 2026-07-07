@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Plus, Edit, Trash2, ArrowUp, ArrowDown, GripVertical } from "lucide-react";
+import { Plus, Edit, Trash2, ArrowUp, ArrowDown } from "lucide-react";
 
 interface MenuItem {
   id: string; label: string; href: string; parentId: string | null;
