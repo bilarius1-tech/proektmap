@@ -18,6 +18,8 @@ interface Stage {
   id: string; title: string; slug: string; icon: string; description: string | null;
   decisions: Decision[];
 }
+interface Category { id: string; name: string; slug: string; icon: string; }
+
 interface Variable {
   name: string; label: string; description: string; example: string; category: string;
 }
@@ -48,7 +50,7 @@ function buildPrompt(dec: Decision, bp: Blueprint): string {
   return parts.join("\n\n");
 }
 
-export default function BlueprintPageClient({ blueprint, prompts, variables }: { blueprint: Blueprint; prompts: Prompt[]; variables: Variable[] }) {
+export default function BlueprintPageClient({ blueprint, prompts, variables, categories }: { blueprint: Blueprint; prompts: Prompt[]; variables: Variable[]; categories: Category[] }) {
   const stages = blueprint.stages.map(bs => bs.stage);
   const [activeStage, setActiveStage] = useState(stages[0]?.slug || "");
   const [completed, setCompleted] = useState<Set<string>>(new Set());
@@ -183,7 +185,7 @@ export default function BlueprintPageClient({ blueprint, prompts, variables }: {
                     {curStep === 2 && <StepChoose dec={dec} />}
                     {curStep === 3 && <StepVerify dec={dec} builtPrompt={builtPrompt} promptCopied={promptCopied} copyPrompt={copyPrompt} />}
                     <AIRadar />
-      <PromptsBlock prompts={prompts || []} variables={variables || []} />
+      <PromptsBlock prompts={prompts || []} variables={variables || []} categories={categories || []} />
                     <VideoBlock videos={[]} />
                   </div>
                 )}

@@ -25,7 +25,10 @@ export default async function BlueprintPage({ params }: { params: Promise<{ blue
     include: { stages: { orderBy: { sortOrder: "asc" }, include: { stage: { include: { decisions: { orderBy: { sortOrder: "asc" } } } } } } },
   });
   if (!bp) notFound();
-  const prompts = await db.prompt.findMany({ where: { isActive: true }, orderBy: [{ category: "asc" }, { title: "asc" }] });
-  const variables = await db.promptVariable.findMany({ where: { isActive: true }, orderBy: { sortOrder: "asc" } });
-  return <BlueprintPageClient blueprint={JSON.parse(JSON.stringify(bp))} prompts={JSON.parse(JSON.stringify(prompts))} variables={JSON.parse(JSON.stringify(variables))} />;
+  const [prompts, variables, categories] = await Promise.all([
+    db.prompt.findMany({ where: { isActive: true }, orderBy: [{ category: "asc" }, { title: "asc" }], take: 30 }),
+    db.promptVariable.findMany({ where: { isActive: true }, orderBy: { sortOrder: "asc" } }),
+    db.promptCategory.findMany({ where: { isActive: true }, orderBy: { sortOrder: "asc" } }),
+  ]);
+  return <BlueprintPageClient blueprint={JSON.parse(JSON.stringify(bp))} prompts={JSON.parse(JSON.stringify(prompts))} variables={JSON.parse(JSON.stringify(variables))} categories={JSON.parse(JSON.stringify(categories))} />;
 }

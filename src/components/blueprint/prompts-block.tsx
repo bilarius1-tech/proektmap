@@ -1,34 +1,37 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, Search, ChevronDown } from "lucide-react";
+import { Copy, Search, ChevronDown, Code, Rocket, Palette, Search as SearchIcon, Shield, Sparkles, Folder } from "lucide-react";
 import { RenderTemplate, VariableLegend } from "./template-help";
 
-interface Prompt {
-  id: string; title: string; category: string;
-  description: string | null; content: string; tags: string;
-  useCount: number;
-}
-interface Variable {
-  name: string; label: string; description: string; example: string; category: string;
-}
+interface Prompt { id: string; title: string; category: string; description: string | null; content: string; tags: string; useCount: number; }
+interface Variable { name: string; label: string; description: string; example: string; category: string; }
+interface Category { id: string; name: string; slug: string; icon: string; }
 
-const CAT_ICONS: Record<string, string> = {
-  "Код": "💻", "Деплой": "🚀", "Дизайн": "🎨",
-  "SEO": "🔍", "Право": "⚖️", "AI": "🤖",
+const ICON_MAP: Record<string, React.ReactNode> = {
+  code: <Code size={14} />, rocket: <Rocket size={14} />, palette: <Palette size={14} />,
+  search: <SearchIcon size={14} />, shield: <Shield size={14} />, sparkles: <Sparkles size={14} />,
 };
+const DEFAULT_ICON = <Folder size={14} />;
 
-export default function PromptsBlock({ prompts, variables }: { prompts: Prompt[]; variables?: Variable[] }) {
+function CatIcon({ category, categories }: { category: string; categories: Category[] }) {
+  const cat = categories.find(c => c.name === category);
+  if (cat) return <>{ICON_MAP[cat.icon] || DEFAULT_ICON}</>;
+  return <>{DEFAULT_ICON}</>;
+}
+
+export default function PromptsBlock({ prompts, variables, categories }: { prompts: Prompt[]; variables?: Variable[]; categories?: Category[] }) {
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("Все");
+  const [selectedCat, setSelectedCat] = useState("Все");
   const [expanded, setExpanded] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
   const vars = variables || [];
+  const cats = categories || [];
 
-  const categories = ["Все", ...Array.from(new Set(prompts.map(p => p.category)))];
+  const catNames = ["Все", ...Array.from(new Set(prompts.map(p => p.category)))];
   const filtered = prompts.filter(p => {
     const m = !search || p.title.toLowerCase().includes(search.toLowerCase()) || p.tags.includes(search) || (p.description?.toLowerCase().includes(search.toLowerCase()));
-    return m && (category === "Все" || p.category === category);
+    return m && (selectedCat === "Все" || p.category === selectedCat);
   });
 
   function copy(content: string, id: string) {
@@ -41,15 +44,15 @@ export default function PromptsBlock({ prompts, variables }: { prompts: Prompt[]
     <div style={{ marginTop: "var(--space-xl)", padding: "var(--space-l)", background: "var(--color-bg-secondary)", borderRadius: "var(--radius-l)", border: "1px solid var(--color-border-light)" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "var(--space-m)", flexWrap: "wrap", gap: 8 }}>
         <h3 style={{ fontSize: "var(--text-l)", fontWeight: 800, margin: 0 }}>📚 Библиотека промптов</h3>
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+        <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
           <div style={{ position: "relative" }}>
             <Search size={14} style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "var(--color-text-tertiary)" }} />
             <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Поиск..."
               style={{ padding: "6px 6px 6px 30px", fontSize: "var(--text-xs)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "white", outline: "none", width: 140 }} />
           </div>
-          <select value={category} onChange={e => setCategory(e.target.value)}
-            style={{ padding: "6px 10px", fontSize: "var(--text-xs)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "white", outline: "none" }}>
-            {categories.map(c => <option key={c} value={c}>{c}</option>)}
+          <select value={selectedCat} onChange={e => setSelectedCat(e.target.value)}
+            style={{ padding: "6px 8px", fontSize: "var(--text-xs)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "white", outline: "none" }}>
+            {catNames.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
         </div>
       </div>
@@ -60,7 +63,7 @@ export default function PromptsBlock({ prompts, variables }: { prompts: Prompt[]
         {filtered.map(p => (
           <div key={p.id} style={{ background: "white", borderRadius: "var(--radius-m)", border: "1px solid var(--color-border-light)" }}>
             <div onClick={() => setExpanded(expanded === p.id ? null : p.id)} style={{ display: "flex", alignItems: "center", gap: "var(--space-s)", padding: "var(--space-m)", cursor: "pointer" }}>
-              <span style={{ fontSize: 18 }}>{CAT_ICONS[p.category] || "📄"}</span>
+              <span style={{ color: "var(--color-accent)", flexShrink: 0 }}><CatIcon category={p.category} categories={cats} /></span>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontWeight: 700, fontSize: "var(--text-s)" }}>{p.title}</div>
                 <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>{p.description}</div>
@@ -83,7 +86,7 @@ export default function PromptsBlock({ prompts, variables }: { prompts: Prompt[]
         ))}
         {filtered.length === 0 && <div style={{ textAlign: "center", padding: "var(--space-xl)", color: "var(--color-text-tertiary)", fontSize: "var(--text-s)" }}>Ничего не найдено</div>}
       </div>
-      <div style={{ marginTop: "var(--space-s)", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>{filtered.length} промптов · форк vibe-coding-cn</div>
+      <div style={{ marginTop: "var(--space-s)", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>{filtered.length} промптов</div>
     </div>
   );
 }
