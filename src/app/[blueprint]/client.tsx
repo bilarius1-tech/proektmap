@@ -454,10 +454,28 @@ function ProjectModal({ form, setForm, onSave, onCancel, saving }: any) {
               style={{ width: "100%", padding: "10px 12px", fontSize: "var(--text-s)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none" }} />
           </div>
           <div>
-            <label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Цвета (основной, акцентный)</label>
-            <input value={form.colors} onChange={e => setForm({ ...form, colors: e.target.value })}
-              placeholder="#1a73e8, #0567b3"
-              style={{ width: "100%", padding: "10px 12px", fontSize: "var(--text-s)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none" }} />
+
+            <label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4, marginTop: "var(--space-s)" }}>Шрифтовая пара</label>
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+              {[
+                { label: "Inter + Mono", heading: "Inter 800", body: "Inter 400" },
+                { label: "Playfair + Inter", heading: "Playfair Display", body: "Inter 400" },
+                { label: "Manrope + Inter", heading: "Manrope 700", body: "Inter 400" },
+                { label: "Raleway + Open Sans", heading: "Raleway 600", body: "Open Sans" },
+              ].map(font => (
+                <div key={font.label} onClick={() => setForm({ ...form, stack: form.stack + (form.stack.includes("font:") ? "" : " | font:" + font.label) })}
+                  title={font.label}
+                  style={{
+                    display: "flex", flexDirection: "column", gap: 2, cursor: "pointer",
+                    padding: "8px 12px", borderRadius: "var(--radius-s)", border: form.stack.includes(font.label) ? "2px solid var(--color-accent)" : "1px solid var(--color-border)",
+                    background: form.stack.includes(font.label) ? "var(--color-accent-light)" : "white",
+                  }}>
+                  <div style={{ fontSize: "var(--text-s)", fontWeight: 800 }}>{font.heading}</div>
+                  <div style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>{font.body}</div>
+                  <div style={{ fontSize: 9, color: "var(--color-text-secondary)" }}>{font.label}</div>
+                </div>
+              ))}
+            </div>
           </div>
           <div>
             <label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Описание (что за проект)</label>
@@ -545,6 +563,8 @@ function StepVerify({ dec, builtPrompt, promptCopied, copyPrompt, projectContext
         <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: 4 }}>🔄 Как улучшить</div>
         <div style={{ fontSize: "var(--text-s)", lineHeight: 1.7, color: "var(--color-text-secondary)", whiteSpace: "pre-wrap" }}>{dec.iteration}</div>
       </div>}
+
+      {/* Prompt box */}
       {builtPrompt && (
         <div style={{ padding: "var(--space-m)", background: "var(--color-bg-secondary)", borderRadius: "var(--radius-m)", border: "1px solid var(--color-accent)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-s)", flexWrap: "wrap", gap: 8 }}>
@@ -557,32 +577,30 @@ function StepVerify({ dec, builtPrompt, promptCopied, copyPrompt, projectContext
               <Copy size={14} /> {promptCopied === dec.id ? "Скопировано!" : "Копировать"}
             </button>
           </div>
-          <div style={{ fontSize: "var(--text-xs)", fontFamily: "var(--font-mono)", whiteSpace: "pre-wrap", lineHeight: 1.6, maxHeight: 250, overflow: "auto", color: "var(--color-text-secondary)", background: "white", padding: "var(--space-s)", borderRadius: "var(--radius-s)" }}>
+          <div style={{ fontSize: "var(--text-xs)", fontFamily: "var(--font-mono)", whiteSpace: "pre-wrap", lineHeight: 1.6, maxHeight: 200, overflow: "auto", color: "var(--color-text-secondary)", background: "white", padding: "var(--space-s)", borderRadius: "var(--radius-s)" }}>
             {builtPrompt}
-
-      <div style={{ padding: "var(--space-m)", background: "white", borderRadius: "var(--radius-m)", border: "1px solid var(--color-accent)", marginTop: "var(--space-s)" }}>
-        <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: 8, color: "var(--color-accent)" }}>💬 Задайте вопрос AI</div>
-        <div style={{ display: "flex", gap: 8 }}>
-          <textarea
-            value={aiMessage}
-            onChange={e => setAiMessage(e.target.value)}
-            placeholder="Уточните задачу или задайте вопрос AI-консультанту..."
-            rows={3}
-            style={{ flex: 1, padding: "10px 12px", fontSize: "var(--text-xs)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none", resize: "vertical", fontFamily: "inherit" }}
-          />
+          </div>
         </div>
+      )}
+
+      {/* AI Chat — always visible, right after prompt */}
+      <div style={{ padding: "var(--space-m)", background: "white", borderRadius: "var(--radius-m)", border: "1px solid var(--color-accent)" }}>
+        <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: 8, color: "var(--color-accent)" }}>💬 Задайте вопрос AI</div>
+        <textarea
+          value={aiMessage}
+          onChange={e => setAiMessage(e.target.value)}
+          placeholder="Уточните задачу или задайте вопрос AI-консультанту..."
+          rows={3}
+          style={{ width: "100%", padding: "10px 12px", fontSize: "var(--text-xs)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none", resize: "vertical", fontFamily: "inherit", boxSizing: "border-box" }}
+        />
         <div style={{ display: "flex", gap: 8, marginTop: 8, alignItems: "center" }}>
-          <button
-            onClick={() => askAI(dec)}
+          <button onClick={() => askAI(dec)}
             disabled={!aiMessage.trim() || aiLoading}
-            style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 18px", borderRadius: "var(--radius-m)", background: aiMessage.trim() ? "var(--color-accent)" : "var(--color-border)", color: "white", border: "none", fontSize: "var(--text-xs)", fontWeight: 600, cursor: aiMessage.trim() ? "pointer" : "default" }}
-          >
+            style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 18px", borderRadius: "var(--radius-m)", background: aiMessage.trim() ? "var(--color-accent)" : "var(--color-border)", color: "white", border: "none", fontSize: "var(--text-xs)", fontWeight: 600, cursor: aiMessage.trim() ? "pointer" : "default" }}>
             {aiLoading ? "Думаю..." : "Спросить AI"}
           </button>
           {aiResponse && (
-            <button onClick={() => setAiResponse("")} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-tertiary)", fontSize: "var(--text-xs)" }}>
-              Очистить
-            </button>
+            <button onClick={() => setAiResponse("")} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-tertiary)", fontSize: "var(--text-xs)" }}>Очистить</button>
           )}
         </div>
         {aiResponse && (
@@ -591,12 +609,10 @@ function StepVerify({ dec, builtPrompt, promptCopied, copyPrompt, projectContext
           </div>
         )}
       </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
+
 
 function StepProRequired() {
   return (
