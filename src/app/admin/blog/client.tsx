@@ -1,4 +1,5 @@
 "use client";
+import ImagePicker from "@/components/media/image-picker";
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -131,10 +132,8 @@ export default function BlogAdminClient({ posts, categories, authors, pendingCom
           </div>
           <div style={{ marginBottom: "var(--space-m)" }}><label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Обложка (URL или /uploads/...)</label>
             <div style={{ display: "flex", gap: 8 }}>
-              <input value={form.coverImage} onChange={e => setForm({ ...form, coverImage: e.target.value })} placeholder="https://proektmap.ru/api/og?title=..." style={{ flex: 1, padding: "10px 12px", fontSize: "var(--text-s)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none" }} />
-              {form.coverImage && <img src={form.coverImage} alt="preview" style={{ width: 80, height: 50, borderRadius: "var(--radius-s)", objectFit: "cover", border: "1px solid var(--color-border)" }} />}
+              <ImagePicker value={form.coverImage} onChange={url => setForm({ ...form, coverImage: url })} />
             </div>
-            <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", marginTop: 4 }}>OG Image: /api/og?title=Заголовок&category=Категория</div>
           </div>
 
           <div style={{ marginBottom: "var(--space-m)" }}><label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Краткое описание</label>

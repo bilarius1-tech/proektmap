@@ -1,6 +1,6 @@
 "use client";
+import { useEffect, useState } from "react";
 
-import { useState } from "react";
 import { Calendar, User, Tag, Eye, MessageCircle, ArrowLeft, Send } from "lucide-react";
 import Link from "next/link";
 
@@ -8,7 +8,14 @@ function formatDate(d: string) {
   return new Date(d).toLocaleDateString("ru", { day: "numeric", month: "long", year: "numeric" });
 }
 
-export default function PostPageClient({ post, relatedPosts, readMore, isAdmin }: any) {
+export default function PostPageClient({ post, relatedPosts, readMore, isAdmin: serverIsAdmin }: any) {
+  const [isAdmin, setIsAdmin] = useState(false);
+  useEffect(() => {
+    if (serverIsAdmin) { setIsAdmin(true); return; }
+    fetch("/api/auth/check").then(r => r.json()).then(d => {
+      if (d.email === "bilariuss@yandex.ru" || d.role === "admin") setIsAdmin(true);
+    });
+  }, [serverIsAdmin]);
   const [showCommentForm, setShowCommentForm] = useState(false);
   const [commentForm, setCommentForm] = useState({ authorName: "", authorEmail: "", content: "" });
   const [submitting, setSubmitting] = useState(false);
