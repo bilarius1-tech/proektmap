@@ -63,7 +63,7 @@ export async function POST() {
         if (exists) continue;
 
         // Download image if available
-        let coverImage = "";
+        let coverImage = `https://proektmap.ru/api/og?title=${encodeURIComponent(item.title)}&category=${encodeURIComponent(feed.category)}`;
         if (item.image) {
           try {
             const imgRes = await fetch(item.image, { signal: AbortSignal.timeout(5000) });
@@ -111,7 +111,7 @@ export async function POST() {
         // Remove the title line from content and use the rest as content
         let content = fullResponse.replace(/ЗАГОЛОВОК:\s*.+(\n|$)/, "").trim();
 
-        const slug = (title.replace(/[^a-zа-я0-9]+/g, "-") + "-" + Date.now().toString(36)).toLowerCase().slice(0, 80);
+        const slug = title.replace(/[^a-zа-я0-9]+/g, "-").replace(/^-+|-+$/g, "").toLowerCase().slice(0, 70) + "-" + Date.now().toString(36).slice(-4);
         const excerpt = content.replace(/[#*\[\]()]/g, "").slice(0, 200).replace(/\n/g, " ");
 
         let cat = await db.blogCategory.findFirst({ where: { name: feed.category } });
