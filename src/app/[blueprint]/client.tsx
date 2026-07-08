@@ -36,18 +36,50 @@ interface MiniProject {
 }
 
 function buildPrompt(dec: Decision, bp: Blueprint, ctx: string): string {
-  const parts = [];
-  if (ctx) parts.push("## Мой проект\n" + ctx);
-  if (dec.context) parts.push("## Контекст\n" + dec.context);
-  parts.push("## Задача\n" + dec.problem);
-  if (dec.why) parts.push("## Почему это важно\n" + dec.why);
-  if (dec.constraints) parts.push("## Ограничения\n" + dec.constraints);
-  if (dec.recommended) parts.push("## Рекомендация\n" + dec.recommended);
-  if (dec.validation) parts.push("## Как проверить\n" + dec.validation);
-  if (dec.iteration) parts.push("## Как улучшить\n" + dec.iteration);
-  if (dec.mistakes) parts.push("## Частые ошибки\n" + dec.mistakes);
-  parts.push("Я прохожу Blueprint «" + bp.title + "» на Карте роста. Отвечай как AI-инженер.");
-  return parts.join("\n\n");
+  // Build a natural, conversational prompt that reads like a real person asking for help
+  let prompt = "";
+  
+  // Начинаем с контекста — кто я и что делаю
+  if (ctx) {
+    prompt += "Я работаю над проектом:\n" + ctx + "\n\n";
+  } else {
+    prompt += "Я строю «" + bp.title + "» с помощью AI.\n\n";
+  }
+  
+  // Суть задачи — естественным языком
+  if (dec.problem) {
+    prompt += "Сейчас я на этапе: " + dec.title + ".\n";
+    // Use the first sentence of problem — it's usually the most natural
+    const firstSentence = dec.problem.split(".")[0] + ".";
+    prompt += firstSentence + "\n\n";
+  }
+  
+  // Что я хочу сделать — на основе recommended
+  if (dec.recommended) {
+    prompt += "Я хочу сделать так:\n" + dec.recommended + "\n\n";
+  }
+  
+  // Что мне нужно от тебя
+  prompt += "Помоги мне с этим. ";
+  
+  // Добавляем контекст если есть
+  if (dec.context) {
+    prompt += dec.context + " ";
+  }
+  
+  // Что НЕ делать
+  if (dec.mistakes) {
+    prompt += "\n\nПожалуйста, не делай этих ошибок:\n" + dec.mistakes;
+  }
+  
+  // Как проверить результат
+  if (dec.validation) {
+    prompt += "\n\nКогда закончишь, проверь что:\n" + dec.validation;
+  }
+  
+  prompt += "\n\nОбъясняй свои решения — я учусь AI-инжинирингу.";
+  
+  return prompt;
 }
 
 export default function BlueprintPageClient({
