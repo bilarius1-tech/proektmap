@@ -449,6 +449,7 @@ model GlossaryTerm {
   simpleExplanation String   @default("")
   example           String   @default("")
   vibeUsage         String   @default("")
+  devSay            String   @default("")
   level             String   @default("survival")
   category          String   @default("general")
   relatedTerms      String   @default("")

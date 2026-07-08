@@ -45,6 +45,13 @@ export default function TermClient({ term, related }: any) {
         </div>
       )}
 
+      {term.devSay && (
+        <div style={{ padding: "var(--space-l)", background: "var(--color-bg-secondary)", borderRadius: "var(--radius-l)", border: "1px solid var(--color-border-light)", marginBottom: "var(--space-l)" }}>
+          <div style={{ fontWeight: 700, fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.05em" }}>Как говорят разработчики</div>
+          <div style={{ fontSize: "var(--text-s)", lineHeight: 1.8 }}>«{term.devSay}»</div>
+        </div>
+      )}
+
       {related.length > 0 && (
         <div style={{ padding: "var(--space-l)", background: "white", borderRadius: "var(--radius-l)", border: "1px solid var(--color-border-light)" }}>
           <div style={{ fontWeight: 700, fontSize: "var(--text-xs)", marginBottom: "var(--space-s)" }}>Связанные термины</div>
