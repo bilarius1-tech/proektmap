@@ -9,7 +9,7 @@ function formatDate(d: string) {
   return new Date(d).toLocaleDateString("ru", { day: "numeric", month: "long", year: "numeric" });
 }
 
-export default function PostPageClient({ post, relatedPosts }: any) {
+export default function PostPageClient({ post, relatedPosts, readMore }: any) {
   const router = useRouter();
   const [showCommentForm, setShowCommentForm] = useState(false);
   const [commentForm, setCommentForm] = useState({ authorName: "", authorEmail: "", content: "" });
@@ -113,6 +113,16 @@ export default function PostPageClient({ post, relatedPosts }: any) {
         ) : (
           <div style={{ padding: "var(--space-m)", background: "var(--color-accent-light)", borderRadius: "var(--radius-m)", fontSize: "var(--text-s)", fontWeight: 600, color: "var(--color-accent)", marginTop: "var(--space-l)" }}>
             ✅ Спасибо! Комментарий отправлен на модерацию.
+
+      {readMore && (
+        <div style={{ borderTop: "1px solid var(--color-border)", paddingTop: "var(--space-xl)", marginTop: "var(--space-xl)", textAlign: "center" }}>
+          <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", marginBottom: "var(--space-s)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Читать дальше</div>
+          <a href={`/blog/${readMore.slug}`} style={{ textDecoration: "none", color: "inherit" }}>
+            <div style={{ fontSize: "var(--text-l)", fontWeight: 700, marginBottom: 4, color: "var(--color-accent)" }}>{readMore.title}</div>
+            <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", maxWidth: 500, margin: "0 auto", lineHeight: 1.6 }}>{readMore.excerpt?.slice(0, 150)}</div>
+          </a>
+        </div>
+      )}
 
       {relatedPosts?.length > 0 && (
         <div style={{ borderTop: "1px solid var(--color-border)", paddingTop: "var(--space-xl)", marginTop: "var(--space-xl)" }}>
