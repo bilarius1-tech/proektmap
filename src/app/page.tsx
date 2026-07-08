@@ -91,7 +91,7 @@ export default function Home() {
           <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-xl)", fontWeight: 700, textAlign: "center", marginBottom: "var(--space-xl)", letterSpacing: "-0.01em" }}>Тарифы</h2>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "var(--space-l)", alignItems: "start" }}>
             {/* Бесплатный */}
-            <div style={{ padding: "var(--space-xl)", borderRadius: "var(--radius-xl)", border: "1px solid var(--color-border)", background: "var(--color-bg-primary)" }}>
+            <div style={{ padding: "var(--space-xl)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "var(--color-bg-primary)" }}>
               <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.05em" }}>Бесплатный</div>
               <div style={{ fontSize: 36, fontWeight: 800, marginBottom: "var(--space-s)" }}>0 ₽</div>
               <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: "var(--space-l)", fontSize: "var(--text-xs)" }}>
@@ -103,7 +103,7 @@ export default function Home() {
             </div>
 
             {/* Pro */}
-            <div style={{ padding: "var(--space-xl)", borderRadius: "var(--radius-xl)", border: "2px solid var(--color-accent)", background: "var(--color-accent-light)", position: "relative" }}>
+            <div style={{ padding: "var(--space-xl)", borderRadius: "var(--radius-s)", border: "2px solid var(--color-accent)", background: "var(--color-accent-light)", position: "relative" }}>
               <div style={{ position: "absolute", top: -12, left: "50%", transform: "translateX(-50%)", padding: "4px 14px", borderRadius: "var(--radius-full)", background: "var(--color-accent)", color: "white", fontSize: 10, fontWeight: 700 }}>РЕКОМЕНДУЕМ</div>
               <div style={{ display: "flex", alignItems: "flex-end", gap: 4, marginBottom: 4 }}>
                 <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Pro</div>
