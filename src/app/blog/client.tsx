@@ -1,10 +1,12 @@
 "use client";
+import { useState } from "react";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Calendar, User, Tag, ChevronLeft, ChevronRight, MessageCircle, FolderOpen } from "lucide-react";
 
 export default function BlogPageClient({ posts, categories, total, page, perPage, currentCat }: any) {
+  const [q, setQ] = useState("");
   const router = useRouter();
   const totalPages = Math.ceil(total / perPage);
 
