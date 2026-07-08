@@ -115,7 +115,7 @@ export async function POST() {
         if (!content) continue;
 
         const title = item.title.slice(0, 120);
-        const slug = title.toLowerCase().replace(/[^a-zа-я0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 80);
+        const slug = (title.replace(/[^a-zа-я0-9]+/g, "-") + "-" + Date.now().toString(36)).toLowerCase().slice(0, 80);
         const excerpt = content.slice(0, 200).replace(/\n/g, " ");
 
         let cat = await db.blogCategory.findFirst({ where: { name: feed.category } });
