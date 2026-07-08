@@ -103,9 +103,6 @@ export default function BlueprintPageClient({
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [projectForm, setProjectForm] = useState({ name: "", niche: "", domain: "", stack: "Next.js", colors: "", description: "", goals: "" });
   const [creating, setCreating] = useState(false);
-  const [aiMessage, setAiMessage] = useState("");
-  const [aiLoading, setAiLoading] = useState(false);
-  const [aiResponse, setAiResponse] = useState("");
 
   useEffect(() => {
     setIsMobile(window.innerWidth < 768);
@@ -143,18 +140,6 @@ export default function BlueprintPageClient({
   }
 
 
-  async function askAI(dec: Decision) {
-    setAiLoading(true); setAiResponse("");
-    try {
-      const fullPrompt = buildPrompt(dec, blueprint, userContext) + "\n\nВопрос: " + aiMessage;
-      const res = await fetch("/api/ai/ask", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt: fullPrompt }) });
-      const data = await res.json();
-      if (res.status === 402) setAiResponse("⚠️ Требуется Pro подписка.");
-      else if (data.error) setAiResponse("❌ " + data.error);
-      else setAiResponse(data.response || "Нет ответа");
-    } catch (e: any) { setAiResponse("❌ Ошибка: " + e.message); }
-    setAiLoading(false);
-  }
 
   function copyPrompt(dec: Decision) {
     navigator.clipboard.writeText(buildPrompt(dec, blueprint, userContext));
@@ -369,7 +354,7 @@ export default function BlueprintPageClient({
                     {curStep === 1 && <StepUnderstand dec={dec} />}
                     {curStep === 2 && <StepChoose dec={dec} />}
                     {curStep === 3 && (isPro
-                      ? <StepVerify dec={dec} builtPrompt={builtPrompt} promptCopied={promptCopied} copyPrompt={copyPrompt} projectContext={projectContext} aiMessage={aiMessage} setAiMessage={setAiMessage} aiLoading={aiLoading} aiResponse={aiResponse} setAiResponse={setAiResponse} askAI={askAI} />
+                      ? <StepVerify dec={dec} builtPrompt={builtPrompt} promptCopied={promptCopied} copyPrompt={copyPrompt} projectContext={projectContext} />
                       : <StepProRequired />
                     )}
                   </div>
@@ -585,7 +570,7 @@ function StepChoose({ dec }: { dec: Decision }) {
   );
 }
 
-function StepVerify({ dec, builtPrompt, promptCopied, copyPrompt, projectContext, aiMessage, setAiMessage, aiLoading, aiResponse, setAiResponse, askAI }: any) {
+function StepVerify({ dec, builtPrompt, promptCopied, copyPrompt, projectContext }: any) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)" }}>
       {dec.validation && <div style={{ padding: "var(--space-m)", background: "var(--color-accent-light)", borderRadius: "var(--radius-m)" }}>
@@ -616,32 +601,6 @@ function StepVerify({ dec, builtPrompt, promptCopied, copyPrompt, projectContext
         </div>
       )}
 
-      {/* AI Chat — always visible, right after prompt */}
-      <div style={{ padding: "var(--space-m)", background: "white", borderRadius: "var(--radius-m)", border: "1px solid var(--color-accent)" }}>
-        <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: 8, color: "var(--color-accent)" }}>💬 Задайте вопрос AI</div>
-        <textarea
-          value={aiMessage}
-          onChange={e => setAiMessage(e.target.value)}
-          placeholder="Уточните задачу или задайте вопрос AI-консультанту..."
-          rows={3}
-          style={{ width: "100%", padding: "10px 12px", fontSize: "var(--text-xs)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none", resize: "vertical", fontFamily: "inherit", boxSizing: "border-box" }}
-        />
-        <div style={{ display: "flex", gap: 8, marginTop: 8, alignItems: "center" }}>
-          <button onClick={() => askAI(dec)}
-            disabled={!aiMessage.trim() || aiLoading}
-            style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 18px", borderRadius: "var(--radius-m)", background: aiMessage.trim() ? "var(--color-accent)" : "var(--color-border)", color: "white", border: "none", fontSize: "var(--text-xs)", fontWeight: 600, cursor: aiMessage.trim() ? "pointer" : "default" }}>
-            {aiLoading ? "Думаю..." : "Спросить AI"}
-          </button>
-          {aiResponse && (
-            <button onClick={() => setAiResponse("")} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-tertiary)", fontSize: "var(--text-xs)" }}>Очистить</button>
-          )}
-        </div>
-        {aiResponse && (
-          <div style={{ marginTop: "var(--space-s)", padding: "var(--space-m)", background: "var(--color-bg-secondary)", borderRadius: "var(--radius-m)", fontSize: "var(--text-xs)", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>
-            {aiResponse}
-          </div>
-        )}
-      </div>
     </div>
   );
 }
