@@ -275,6 +275,16 @@ model SiteSettings {
   deepseekModel      String   @default("deepseek-chat")
   autoPublishEnabled Boolean  @default(false)
   autoPublishHour    Int      @default(9)
+  yandexMetrikaId    String   @default("")
+  yandexWebmasterId  String   @default("")
+  googleAnalyticsId  String   @default("")
+  seoTitle           String   @default("")
+  seoDescription     String   @default("")
+  seoKeywords        String   @default("")
+  headerCode         String   @default("")
+  footerCode         String   @default("")
+  siteName           String   @default("Карта роста")
+  siteUrl            String   @default("https://proektmap.ru")
   updatedAt DateTime @updatedAt
   @@map("site_settings")
 }

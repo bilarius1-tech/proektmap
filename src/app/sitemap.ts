@@ -9,6 +9,8 @@ export default async function Sitemap() {
     { url: base, lastModified: now, priority: 1 },
     { url: `${base}/corporate-website`, lastModified: now, priority: 0.9 },
     { url: `${base}/blog`, lastModified: now, priority: 0.9 },
+    { url: `${base}/specialists`, lastModified: now, priority: 0.8 },
+    { url: `${base}/glossary`, lastModified: now, priority: 0.8 },
     { url: `${base}/blog/tags`, lastModified: now, priority: 0.7 },
     { url: `${base}/prompts`, lastModified: now, priority: 0.8 },
     { url: `${base}/contacts`, lastModified: now, priority: 0.5 },
