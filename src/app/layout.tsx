@@ -4,6 +4,7 @@ import GlobalHeader from "@/components/layout/header";
 import GlobalFooter from "@/components/layout/footer";
 import StreakBanner from "@/components/layout/streak-banner";
 import AssistantWrapper from "@/components/assistant/assistant-wrapper";
+import DesignTokens from "@/components/design/design-tokens";
 import CookieConsent from "@/components/cookie-consent";
 
 export const metadata: Metadata = {
@@ -43,6 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet" />
         <meta name="theme-color" content="#0fb880" />
+        <DesignTokens />
         {/* Hreflang */}
         <link rel="alternate" href="https://proektmap.ru" hrefLang="ru" />
         <link rel="alternate" href="https://proektmap.ru" hrefLang="x-default" />

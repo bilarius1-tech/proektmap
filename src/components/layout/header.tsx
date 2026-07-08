@@ -24,7 +24,7 @@ export default async function GlobalHeader() {
     }}>
       <div style={{ display: "flex", alignItems: "center", gap: "var(--space-s)" }}>
         <MobileMenu items={menuItems} />
-        <Link href="/" style={{ fontSize: 18, fontWeight: 800, textDecoration: "none", color: "inherit", whiteSpace: "nowrap" }}>
+        <Link href="/" style={{ fontFamily: "var(--font-heading)", fontSize: 18, fontWeight: 700, textDecoration: "none", color: "inherit", whiteSpace: "nowrap" }}>
           Карта<span style={{ color: "var(--color-accent)" }}> роста</span>
         </Link>
         <nav style={{ display: "flex", gap: 4, alignItems: "center", marginLeft: "var(--space-l)" }} className="hide-mobile">

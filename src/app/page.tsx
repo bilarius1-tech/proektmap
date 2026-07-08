@@ -14,11 +14,11 @@ export default function Home() {
   return (
     <div style={{ fontFamily: "Inter, sans-serif", background: "var(--color-bg-secondary)", color: "var(--color-text-primary)", minHeight: "100vh" }}>
       {/* Hero */}
-      <div style={{ background: "var(--color-bg-primary)", padding: "60px 20px 50px", textAlign: "center", borderBottom: "1px solid var(--color-border-light)" }}>
+      <div style={{ background: "var(--color-bg-primary)", padding: "80px 20px 50px", textAlign: "center", borderBottom: "1px solid var(--color-border)" }}>
         <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 14px", borderRadius: "var(--radius-full)", background: "var(--color-accent-light)", color: "var(--color-accent)", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: "var(--space-m)" }}>
           🎓 AI Инженер
         </div>
-        <h1 style={{ fontSize: "clamp(28px, 5vw, 40px)", fontWeight: 800, lineHeight: 1.15, marginBottom: "var(--space-s)", letterSpacing: "-0.02em" }}>
+        <h1 style={{ fontFamily: "var(--font-heading)", fontSize: "clamp(28px, 5vw, 40px)", fontWeight: 800, lineHeight: 1.05, marginBottom: "var(--space-s)", letterSpacing: "-0.02em" }}>
           Научись создавать проекты<br />с помощью AI
         </h1>
         <p style={{ fontSize: "var(--text-l)", color: "var(--color-text-secondary)", maxWidth: 520, margin: "0 auto", lineHeight: 1.6 }}>
@@ -36,7 +36,7 @@ export default function Home() {
 
       {/* Как это работает */}
       <div style={{ maxWidth: 900, margin: "0 auto", padding: "var(--space-xl) var(--space-m)" }}>
-        <h2 style={{ fontSize: "var(--text-xl)", fontWeight: 800, textAlign: "center", marginBottom: "var(--space-xl)" }}>Как это работает</h2>
+        <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-xl)", fontWeight: 700, textAlign: "center", marginBottom: "var(--space-xl)", letterSpacing: "-0.01em" }}>Как это работает</h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "var(--space-l)" }}>
           {[
             { step: "1", title: "Выберите шаблон", desc: "Корпоративный сайт, SaaS, игра, мобильное приложение — выберите что создаёте." },
@@ -44,7 +44,7 @@ export default function Home() {
             { step: "3", title: "Пройдите этапы", desc: "11 этапов от покупки домена до мониторинга. Каждый с готовым промптом для AI." },
             { step: "4", title: "Запустите проект", desc: "К финалу у вас готовый сайт, SaaS или приложение — созданные с AI." },
           ].map(item => (
-            <div key={item.step} style={{ padding: "var(--space-l)", background: "var(--color-bg-primary)", borderRadius: "var(--radius-l)", border: "1px solid var(--color-border-light)" }}>
+            <div key={item.step} style={{ padding: "var(--space-l)", background: "var(--color-bg-primary)", borderRadius: "var(--radius-m)", border: "1px solid var(--color-border)" }}>
               <div style={{ width: 32, height: 32, borderRadius: "50%", background: "var(--color-accent)", color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: "var(--text-s)", marginBottom: "var(--space-s)" }}>{item.step}</div>
               <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: 4 }}>{item.title}</div>
               <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.6 }}>{item.desc}</div>
@@ -55,7 +55,7 @@ export default function Home() {
 
       {/* Шаблоны */}
       <div style={{ maxWidth: 900, margin: "0 auto", padding: "0 var(--space-m) var(--space-xl)" }}>
-        <h2 style={{ fontSize: "var(--text-xl)", fontWeight: 800, textAlign: "center", marginBottom: "var(--space-xl)" }}>Доступные шаблоны</h2>
+        <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-xl)", fontWeight: 700, textAlign: "center", marginBottom: "var(--space-xl)", letterSpacing: "-0.01em" }}>Доступные шаблоны</h2>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "var(--space-m)" }}>
           {blueprints.map((bp) => {
             const Icon = bp.icon;
@@ -63,7 +63,7 @@ export default function Home() {
               <Link key={bp.slug} href={bp.active ? `/${bp.slug}` : "#"}
                 style={{
                   display: "flex", flexDirection: "column", padding: "var(--space-l)", background: "var(--color-bg-primary)",
-                  borderRadius: "var(--radius-l)", border: "1px solid var(--color-border-light)", textDecoration: "none", color: "inherit",
+                  borderRadius: "var(--radius-m)", border: "1px solid var(--color-border)", textDecoration: "none", color: "inherit",
                   opacity: bp.active ? 1 : 0.5, cursor: bp.active ? "pointer" : "default",
                 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "var(--space-s)", marginBottom: "var(--space-s)" }}>
@@ -88,7 +88,7 @@ export default function Home() {
       {/* Тарифы */}
       <div style={{ background: "var(--color-bg-primary)", padding: "var(--space-xl) var(--space-m)", borderTop: "1px solid var(--color-border-light)" }}>
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
-          <h2 style={{ fontSize: "var(--text-xl)", fontWeight: 800, textAlign: "center", marginBottom: "var(--space-xl)" }}>Тарифы</h2>
+          <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-xl)", fontWeight: 700, textAlign: "center", marginBottom: "var(--space-xl)", letterSpacing: "-0.01em" }}>Тарифы</h2>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "var(--space-l)", alignItems: "start" }}>
             {/* Бесплатный */}
             <div style={{ padding: "var(--space-xl)", borderRadius: "var(--radius-xl)", border: "1px solid var(--color-border)", background: "var(--color-bg-primary)" }}>
