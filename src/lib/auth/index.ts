@@ -50,12 +50,13 @@ export const authOptions: NextAuthOptions = {
         if (!dbUser) {
           // Yandex users: free tier, 0 balance
           dbUser = await db.user.create({
-            data: { email, name: user.name || "", passwordHash: "", role: "user", subscription: "free" },
+            data: { email, name: user.name || "", passwordHash: "", role: "user", subscription: "free", avatar: (user as any).image || "" },
           });
         }
         (user as any).id = dbUser.id;
         (user as any).role = dbUser.role;
         (user as any).subscription = dbUser.subscription;
+        (user as any).image = dbUser.avatar || (user as any).image || "";
       }
       return true;
     },

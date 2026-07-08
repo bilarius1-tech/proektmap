@@ -10,6 +10,7 @@ export async function PATCH(req: NextRequest) {
   const db = await getDb();
   const email = (session.user as any).email?.toLowerCase();
 
-  await db.user.update({ where: { email }, data });
+  const { avatar, ...rest } = data;
+  await db.user.update({ where: { email }, data: { ...rest, avatar: avatar || "" } });
   return NextResponse.json({ ok: true });
 }
