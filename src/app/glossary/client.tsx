@@ -67,10 +67,10 @@ export default function GlossaryClient({ terms }: { terms: any[] }) {
           return (
             <Link key={t.id} href={`/glossary/${t.slug}`} style={{
               display: "flex", flexDirection: "column", padding: "var(--space-m)", background: "white",
-              borderRadius: "var(--radius-m)", border: "1px solid var(--color-border-light)", textDecoration: "none", color: "inherit",
+              borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", textDecoration: "none", color: "inherit",
             }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                <span style={{ fontWeight: 700, fontSize: "var(--text-s)", color: "var(--color-accent)" }}>{t.term}</span>
+                <span style={{ fontWeight: 700, fontSize: "var(--text-s)", fontFamily: "var(--font-heading)", fontWeight: 600, color: "var(--color-accent)" }}>{t.term}</span>
                 <span style={{ fontSize: 9, padding: "1px 7px", borderRadius: 99, background: info.bg, color: info.color, fontWeight: 600 }}>{info.label}</span>
               </div>
               <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.5 }}>

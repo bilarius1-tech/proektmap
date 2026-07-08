@@ -42,7 +42,7 @@ export default function PostPageClient({ post, relatedPosts, readMore, isAdmin: 
         </div>
       )}
 
-      <h1 style={{ fontSize: "var(--text-xxxl)", fontWeight: 800, lineHeight: 1.2, marginBottom: "var(--space-m)" }}>{post.title}</h1>
+      <h1 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-xxxl)", fontWeight: 800, lineHeight: 1.1, letterSpacing: "-0.02em", marginBottom: "var(--space-m)" }}>{post.title}</h1>
 
       <div style={{ display: "flex", alignItems: "center", gap: "var(--space-m)", flexWrap: "wrap", marginBottom: "var(--space-xl)", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>
         <span style={{ display: "flex", alignItems: "center", gap: 4 }}><User size={14} />{post.author ? <Link href={`/blog/author/${post.author.email}`} style={{ color: "inherit", textDecoration: "none" }}>{post.author.name}</Link> : "Аноним"}</span>
@@ -56,7 +56,7 @@ export default function PostPageClient({ post, relatedPosts, readMore, isAdmin: 
         ))}
       </div>
 
-      <div style={{ fontSize: "var(--text-s)", lineHeight: 1.9, color: "var(--color-text-primary)", whiteSpace: "pre-wrap", marginBottom: "var(--space-xl)" }}>
+      <div style={{ fontSize: "var(--text-s)", lineHeight: 1.8, color: "var(--color-text-primary)", whiteSpace: "pre-wrap", marginBottom: "var(--space-xl)" }}>
         {post.content}
       </div>
 
@@ -66,7 +66,7 @@ export default function PostPageClient({ post, relatedPosts, readMore, isAdmin: 
           <h2 style={{ fontSize: "var(--text-l)", fontWeight: 700, marginBottom: "var(--space-l)" }}>📖 Похожие статьи</h2>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "var(--space-m)" }}>
             {relatedPosts.map((rp: any) => (
-              <a key={rp.id} href={`/blog/${rp.slug}`} style={{ padding: "var(--space-m)", background: "white", borderRadius: "var(--radius-m)", border: "1px solid var(--color-border-light)", textDecoration: "none", color: "inherit" }}>
+              <a key={rp.id} href={`/blog/${rp.slug}`} style={{ padding: "var(--space-m)", background: "white", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", textDecoration: "none", color: "inherit" }}>
                 <div style={{ fontSize: 10, color: "var(--color-accent)", marginBottom: 4 }}>{rp.category?.name}</div>
                 <div style={{ fontWeight: 600, fontSize: "var(--text-s)", lineHeight: 1.4 }}>{rp.title}</div>
               </a>

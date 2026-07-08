@@ -267,11 +267,11 @@ export default function BlueprintPageClient({
           </div>
         )}
 
-        <div style={{ height: 4, background: "var(--color-border)", borderRadius: 2, overflow: "hidden", marginBottom: "var(--space-m)" }}>
+        <div style={{ height: 2, background: "var(--color-border)", borderRadius: 0, overflow: "hidden", marginBottom: "var(--space-m)" }}>
           <div style={{ width: progress + "%", height: "100%", background: "var(--color-accent)", borderRadius: 2, transition: "width 0.4s ease" }} />
         </div>
 
-        <h1 style={{ fontSize: "var(--text-xxl)", fontWeight: 800, marginBottom: "var(--space-xs)" }}>{currentStage?.title} {isStageLocked(stages.indexOf(currentStage)) && <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400, marginLeft: 8 }}>🔒 Pro</span>}</h1>
+        <h1 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-xl)", fontWeight: 700, marginBottom: "var(--space-xs)", letterSpacing: "-0.01em" }}>{currentStage?.title} {isStageLocked(stages.indexOf(currentStage)) && <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400, marginLeft: 8 }}>🔒 Pro</span>}</h1>
         {activeStage === "ai-philosophy" && <AIRules />}
         {currentStage?.description && (
           <p style={{ color: "var(--color-text-secondary)", marginBottom: isMobile ? "var(--space-m)" : "var(--space-l)", fontSize: "var(--text-s)" }}>
@@ -289,7 +289,7 @@ export default function BlueprintPageClient({
             return (
               <div key={dec.id} style={{
                 padding: 0, opacity: done ? 0.6 : 1,
-                background: "white", borderRadius: "var(--radius-m)", border: "1px solid var(--color-border-light)",
+                background: "white", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)",
               }}>
                 <div onClick={() => { if (canTrack) toggle(dec.id); }} style={{
                   display: "flex", alignItems: "center", gap: "var(--space-s)", padding: isMobile ? "var(--space-m)" : "var(--space-m) var(--space-l)", cursor: canTrack ? "pointer" : "default",
@@ -399,7 +399,7 @@ function SidebarContent({ stages, activeStage, setActiveStage, completed, progre
           const locked = stageLocked(idx);
           return (
             <div key={s.slug} onClick={() => { if (!locked) setActiveStage(s.slug); }} style={{
-              padding: "10px 12px", borderRadius: "var(--radius-m)",
+              padding: "10px 12px", borderRadius: "var(--radius-s)",
               background: isActive ? "var(--color-accent-light)" : "transparent",
               border: isActive ? "1px solid var(--color-accent)" : "1px solid transparent",
               display: "flex", justifyContent: "space-between", alignItems: "center", transition: "background 0.15s",
@@ -421,7 +421,7 @@ function SidebarContent({ stages, activeStage, setActiveStage, completed, progre
         </div>
       )}
       <div style={{ fontWeight: 600, fontSize: "var(--text-xs)", marginBottom: 4 }}>Прогресс</div>
-        <div style={{ height: 4, background: "var(--color-border)", borderRadius: 2, overflow: "hidden", marginBottom: 4 }}>
+        <div style={{ height: 2, background: "var(--color-border)", borderRadius: 0, overflow: "hidden", marginBottom: 4 }}>
           <div style={{ width: progress + "%", height: "100%", background: "var(--color-accent)", borderRadius: 2 }} />
         </div>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>

@@ -82,7 +82,7 @@ export default function SpecialistsClient({ specialists }: { specialists: any[] 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "var(--space-l)" }}>
         {specialists.map((s: any) => (
           <div key={s.id} style={{
-            background: "white", borderRadius: "var(--radius-xl)", border: "1px solid var(--color-border-light)",
+            background: "white", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)",
             overflow: "hidden", display: "flex", flexDirection: "column",
           }}>
             <div style={{ height: 80, background: STATUS_GRADIENT[s.status] || STATUS_GRADIENT.junior, position: "relative" }}>

@@ -107,7 +107,7 @@ export default function DashboardClient({ user, posts, blueprints, completedIds,
       {posts.length > 0 ? (
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)", marginBottom: "var(--space-xl)" }}>
           {posts.map((p: any) => (
-            <div key={p.id} style={{ display: "flex", alignItems: "center", gap: "var(--space-s)", padding: "var(--space-m)", background: "white", borderRadius: "var(--radius-m)", border: "1px solid var(--color-border-light)" }}>
+            <div key={p.id} style={{ display: "flex", alignItems: "center", gap: "var(--space-s)", padding: "var(--space-m)", background: "white", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)" }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <Link href={`/blog/${p.slug}`} style={{ fontWeight: 600, fontSize: "var(--text-s)", color: "inherit", textDecoration: "none" }}>{p.title}</Link>
                 <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", marginTop: 2 }}>
@@ -188,7 +188,7 @@ export default function DashboardClient({ user, posts, blueprints, completedIds,
 
 function StatCard({ icon, value, label }: { icon: any; value: any; label: string }) {
   return (
-    <div style={{ padding: "var(--space-m)", background: "white", borderRadius: "var(--radius-m)", border: "1px solid var(--color-border-light)", textAlign: "center" }}>
+    <div style={{ padding: "var(--space-m)", background: "white", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", textAlign: "center" }}>
       <div style={{ marginBottom: 4 }}>{icon}</div>
       <div style={{ fontSize: "var(--text-xl)", fontWeight: 800 }}>{value}</div>
       <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", marginTop: 2 }}>{label}</div>

@@ -57,7 +57,7 @@ export default function BlogPageClient({ posts, categories, total, page, perPage
           {posts.map((p: any) => (
             <Link key={p.id} href={`/blog/${p.slug}`} style={{
               display: "flex", gap: "var(--space-l)", padding: "var(--space-l)", background: "white",
-              borderRadius: "var(--radius-l)", border: "1px solid var(--color-border-light)", textDecoration: "none", color: "inherit",
+              borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", textDecoration: "none", color: "inherit",
             }}>
               {/* Cover image placeholder */}
               <div style={{
@@ -71,7 +71,7 @@ export default function BlogPageClient({ posts, categories, total, page, perPage
                 <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
                   <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 99, background: "var(--color-accent-light)", color: "var(--color-accent)", fontWeight: 600 }}>{p.category?.name || "Без категории"}</span>
                 </div>
-                <h2 style={{ fontSize: "var(--text-l)", fontWeight: 700, marginBottom: 6, lineHeight: 1.3 }}>{p.title}</h2>
+                <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-l)", fontWeight: 700, marginBottom: 4, lineHeight: 1.2, letterSpacing: "-0.01em" }}>{p.title}</h2>
                 <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.6, marginBottom: "var(--space-s)" }}>{p.excerpt}</p>
                 <div style={{ display: "flex", alignItems: "center", gap: "var(--space-m)", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>
                   <span style={{ display: "flex", alignItems: "center", gap: 4 }}><User size={12} />{<Link href={`/blog/author/${p.author?.email}`} style={{color:"inherit",textDecoration:"none"}}>{p.author?.name || "Аноним"}</Link>}</span>

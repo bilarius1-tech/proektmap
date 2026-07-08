@@ -93,7 +93,7 @@ export default function PromptsPageClient({ prompts, variables, categories, tota
 
       <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)" }}>
         {filtered.map(p => (
-          <div key={p.id} style={{ background: "white", borderRadius: "var(--radius-m)", border: "1px solid var(--color-border-light)" }}>
+          <div key={p.id} style={{ background: "white", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)" }}>
             <div onClick={() => setExpanded(expanded === p.id ? null : p.id)} style={{ display: "flex", alignItems: "center", gap: "var(--space-s)", padding: "var(--space-m)", cursor: "pointer" }}>
               <span style={{ color: "var(--color-accent)", flexShrink: 0 }}><CatIcon category={p.category} categories={categories} /></span>
               <div style={{ flex: 1, minWidth: 0 }}>
@@ -112,7 +112,7 @@ export default function PromptsPageClient({ prompts, variables, categories, tota
             </div>
             {expanded === p.id && (
               <div style={{ padding: "var(--space-m)", borderTop: "1px solid var(--color-border-light)", background: "var(--color-bg-secondary)" }}>
-                <div style={{ whiteSpace: "pre-wrap", fontSize: "var(--text-xs)", fontFamily: "var(--font-mono)", lineHeight: 1.8, padding: "var(--space-m)", background: "white", borderRadius: "var(--radius-m)", border: "1px solid var(--color-border-light)" }}>
+                <div style={{ whiteSpace: "pre-wrap", fontSize: "var(--text-xs)", fontFamily: "var(--font-mono)", lineHeight: 1.8, padding: "var(--space-m)", background: "white", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)" }}>
                   <RenderTemplate text={p.content} variables={variables} />
                 </div>
               </div>
