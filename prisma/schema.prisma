@@ -21,6 +21,7 @@ model User {
   updatedAt DateTime @updatedAt
   projects  Project[]
   favorites Favorite[]
+  posts       BlogPost[]
   @@map("users")
 }
 
@@ -348,4 +349,72 @@ model Favorite {
   decision    Decision @relation(fields: [decisionId], references: [id], onDelete: Cascade)
   @@unique([userId, decisionId])
   @@map("favorites")
+}
+
+model BlogCategory {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  slug        String    @unique
+  description String    @default("")
+  sortOrder   Int       @default(0)
+  isActive    Boolean   @default(true)
+  posts       BlogPost[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  @@map("blog_categories")
+}
+
+model BlogPost {
+  id            String    @id @default(uuid())
+  title         String
+  slug          String    @unique
+  content       String
+  excerpt       String    @default("")
+  coverImage    String    @default("")
+  status        String    @default("draft")
+  authorId      String
+  categoryId    String?
+  tags          String    @default("")
+  viewCount     Int       @default(0)
+  aiGenerated   Boolean   @default(false)
+  aiModel       String    @default("")
+  metaTitle     String    @default("")
+  metaDesc      String    @default("")
+  publishedAt   DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  author        User           @relation(fields: [authorId], references: [id])
+  category      BlogCategory?  @relation(fields: [categoryId], references: [id])
+  comments      BlogComment[]
+  @@map("blog_posts")
+}
+
+model BlogComment {
+  id          String    @id @default(uuid())
+  postId      String
+  authorName  String
+  authorEmail String    @default("")
+  content     String
+  status      String    @default("pending")
+  parentId    String?
+  rating      Int       @default(0)
+  createdAt   DateTime  @default(now())
+  post        BlogPost  @relation(fields: [postId], references: [id], onDelete: Cascade)
+  parent      BlogComment? @relation("CommentReplies", fields: [parentId], references: [id])
+  replies     BlogComment[] @relation("CommentReplies")
+  @@map("blog_comments")
+}
+
+model AutoPublish {
+  id          String    @id @default(uuid())
+  topic       String
+  category    String    @default("")
+  model       String    @default("openrouter")
+  schedule    String    @default("0 9 * * *")
+  isActive    Boolean   @default(true)
+  lastRunAt   DateTime?
+  nextRunAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  @@map("auto_publish")
 }

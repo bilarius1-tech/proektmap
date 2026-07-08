@@ -14,6 +14,7 @@ export default async function Sitemap() {
     { url: `${base}/offer`, lastModified: new Date(), priority: 0.3 },
     { url: `${base}/refund`, lastModified: new Date(), priority: 0.3 },
     { url: `${base}/contacts`, lastModified: new Date(), priority: 0.5 },
+    { url: `${base}/blog`, lastModified: new Date(), priority: 0.9 },
   ];
 
   return staticPages.map(p => ({
