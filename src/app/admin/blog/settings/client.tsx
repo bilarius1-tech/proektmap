@@ -11,7 +11,7 @@ export default function BlogSettingsClient({ settings, stats }: any) {
     deepseekKey: settings.deepseekApiKey || process.env.DEEPSEEK_API_KEY ? "••••••••" : "",
     openrouterModel: settings.openrouterModel || "openai/gpt-4o-mini",
     deepseekModel: settings.deepseekModel || "deepseek-chat",
-    autoPublishEnabled: settings.autoPublishEnabled !== false,
+    autoPublishEnabled: !!settings.autoPublishEnabled,
     autoPublishHour: settings.autoPublishHour || 9,
   });
   const [saving, setSaving] = useState(false);
