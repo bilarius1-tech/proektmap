@@ -128,7 +128,7 @@ export default function GearAssistant({
       )}
 
       <button ref={gearRef} onClick={toggleChat} onMouseEnter={() => { if (!showChat && !showBubble) { setMessage(isPro ? hints[0] || "Нажми чтобы спросить!" : "🔒 Pro — 300₽/мес"); setShowBubble(true); setTimeout(() => setShowBubble(false), 3000); } }}
-        style={{ width: 60, height: 60, borderRadius: "50%", border: "none", cursor: "pointer", background: state === "thinking" ? "var(--color-warning)" : "var(--color-accent)", boxShadow: "0 4px 20px rgba(15,184,128,0.4)", display: "flex", alignItems: "center", justifyContent: "center", transition: "transform 0.2s", animation: state === "thinking" ? "pulse 1.5s infinite" : "float 3s ease-in-out infinite" }}>
+        style={{ width: 60, height: 60, borderRadius: "50%", border: "none", cursor: "pointer", background: state === "thinking" ? "var(--color-warning)" : "var(--color-accent)", boxShadow: "0 4px 20px rgba(15,184,128,0.4)", display: "flex", alignItems: "center", justifyContent: "center", transition: "transform 0.2s", animation: state === "thinking" ? "pulse 1.5s infinite" : "none" }}>
         <GearIcon size={32} color="white" spinning={state === "thinking"} blinking={blinking} pupilOffset={pupilOffset} />
       </button>
 
@@ -136,7 +136,7 @@ export default function GearAssistant({
         .dot-blink { animation: dotBlink 1.4s infinite; }
         @keyframes dotBlink { 0%,100%{opacity:0.2} 50%{opacity:1} }
         @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
-        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+        
       `}</style>
     </div>
   );

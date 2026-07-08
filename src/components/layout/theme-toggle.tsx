@@ -23,15 +23,14 @@ export default function ThemeToggle() {
   }
 
   return (
-    <button onClick={toggle}
-      title="Тёмная тема"
+    <button onClick={toggle} title={dark ? "Светлая тема" : "Тёмная тема"}
       style={{
-        background: "none", border: "1px solid var(--color-border-light)",
-        borderRadius: "var(--radius-m)", padding: 6, cursor: "pointer",
+        background: "none", border: "1px solid var(--color-border)",
+        borderRadius: "var(--radius-s)", padding: 6, cursor: "pointer",
         display: "flex", alignItems: "center", justifyContent: "center",
-        color: "var(--color-text-secondary)", width: 36, height: 36, fontSize: 16,
+        color: "var(--color-text-secondary)", width: 36, height: 36,
       }}>
-      {mounted ? (dark ? <Sun size={18} /> : <Moon size={18} />) : <Moon size={18} />}
+      {mounted ? (dark ? <Sun size={16} /> : <Moon size={16} />) : <Moon size={16} />}
     </button>
   );
 }

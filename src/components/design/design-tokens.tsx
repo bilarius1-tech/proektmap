@@ -17,12 +17,8 @@ export default async function DesignTokens() {
     }
   } catch {}
 
-  // Map accent to light/dark variants
-  const accentLight = accent + "15";
-  const radiusS = radius > 0 ? radius + "px" : "0";
-  const radiusM = radius > 0 ? (radius + 4) + "px" : "0";
-  const radiusL = radius > 0 ? (radius + 8) + "px" : "0";
-  const radiusFull = radius > 0 ? "9999px" : "0";
+  const accentLight = accent + "20";
+  const r = (n: number) => radius > 0 ? (radius + n) + "px" : "0";
 
   const css = `
     :root {
@@ -43,10 +39,10 @@ export default async function DesignTokens() {
       --font-heading: "${headingFont}", "Inter", sans-serif;
       --font-body: "${bodyFont}", "Inter", sans-serif;
       --font-mono: "JetBrains Mono", "Fira Code", monospace;
-      --radius-s: ${radiusS};
-      --radius-m: ${radiusM};
-      --radius-l: ${radiusL};
-      --radius-full: ${radiusFull};
+      --radius-s: ${r(0)};
+      --radius-m: ${r(4)};
+      --radius-l: ${r(8)};
+      --radius-full: ${radius > 0 ? "9999px" : "0"};
       --shadow-s: ${radius > 4 ? "0 2px 8px rgba(0,0,0,0.06)" : "none"};
       --shadow-l: ${radius > 4 ? "0 4px 16px rgba(0,0,0,0.08)" : "none"};
       --text-xs: 12px;
@@ -61,6 +57,20 @@ export default async function DesignTokens() {
       --space-m: 16px;
       --space-l: 24px;
       --space-xl: 40px;
+    }
+
+    /* Dark theme — Swiss monochrome */
+    [data-theme="dark"] {
+      --color-bg-primary: #1a1a1a;
+      --color-bg-secondary: #242424;
+      --color-bg-tertiary: #2e2e2e;
+      --color-text-primary: #f5f5f3;
+      --color-text-secondary: #b0b0a4;
+      --color-text-tertiary: #6e6e64;
+      --color-border: #3e3e38;
+      --color-border-light: #2e2e2a;
+      --color-warning-light: #3d2e00;
+      --color-error-light: #3d1010;
     }
   `;
 

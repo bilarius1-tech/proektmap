@@ -475,27 +475,7 @@ function ProjectModal({ form, setForm, onSave, onCancel, saving }: any) {
           </div>
           <div>
 
-            <label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4, marginTop: "var(--space-s)" }}>Шрифтовая пара</label>
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-              {[
-                { label: "Inter + Mono", heading: "Inter 800", body: "Inter 400" },
-                { label: "Playfair + Inter", heading: "Playfair Display", body: "Inter 400" },
-                { label: "Manrope + Inter", heading: "Manrope 700", body: "Inter 400" },
-                { label: "Raleway + Open Sans", heading: "Raleway 600", body: "Open Sans" },
-              ].map(font => (
-                <div key={font.label} onClick={() => setForm({ ...form, stack: form.stack + (form.stack.includes("font:") ? "" : " | font:" + font.label) })}
-                  title={font.label}
-                  style={{
-                    display: "flex", flexDirection: "column", gap: 2, cursor: "pointer",
-                    padding: "8px 12px", borderRadius: "var(--radius-s)", border: form.stack.includes(font.label) ? "2px solid var(--color-accent)" : "1px solid var(--color-border)",
-                    background: form.stack.includes(font.label) ? "var(--color-accent-light)" : "white",
-                  }}>
-                  <div style={{ fontSize: "var(--text-s)", fontWeight: 800 }}>{font.heading}</div>
-                  <div style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>{font.body}</div>
-                  <div style={{ fontSize: 9, color: "var(--color-text-secondary)" }}>{font.label}</div>
-                </div>
-              ))}
-            </div>
+
           </div>
           <div>
             <label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Описание (что за проект)</label>
