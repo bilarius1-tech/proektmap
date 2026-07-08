@@ -7,9 +7,17 @@ import { Search } from "lucide-react";
 const LEVELS: Record<string, { label: string; color: string; bg: string }> = {
   survival: { label: "Выживание", color: "#e53e3e", bg: "#fff5f5" },
   vibe: { label: "Вайбкодинг", color: "#0fb880", bg: "#f0fff4" },
-  modern: { label: "Современный AI", color: "#6c63ff", bg: "#f5f0ff" },
+  modern: { label: "AI", color: "#6c63ff", bg: "#f5f0ff" },
   senior: { label: "Старший", color: "#ed8936", bg: "#fffaf0" },
   jargon: { label: "Жаргон", color: "#d53f8c", bg: "#fff0f7" },
+  coding: { label: "Программирование", color: "#2b6cb0", bg: "#ebf8ff" },
+  stack: { label: "Стек", color: "#2d3748", bg: "#f7fafc" },
+  db: { label: "БД", color: "#744210", bg: "#fffff0" },
+  git: { label: "Git", color: "#c05621", bg: "#fffaf0" },
+  deploy: { label: "Деплой", color: "#2f855a", bg: "#f0fff4" },
+  saas: { label: "SaaS", color: "#6b46c1", bg: "#faf5ff" },
+  seo: { label: "SEO", color: "#c53030", bg: "#fff5f5" },
+  translate: { label: "Переводчик", color: "#d69e2e", bg: "#fffff0" },
 };
 
 export default function GlossaryClient({ terms }: { terms: any[] }) {
@@ -28,7 +36,7 @@ export default function GlossaryClient({ terms }: { terms: any[] }) {
       <div style={{ marginBottom: "var(--space-xl)" }}>
         <h1 style={{ fontSize: "var(--text-xxxl)", fontWeight: 800, marginBottom: "var(--space-xs)" }}>📖 Глоссарий вайбкодера</h1>
         <p style={{ color: "var(--color-text-secondary)", fontSize: "var(--text-s)", lineHeight: 1.7 }}>
-          40 терминов, которые встречаются каждый день. От «Prompt» до «прокачать контекст».
+          94 терминов, которые встречаются каждый день. От «Prompt» до «прокачать контекст».
         </p>
       </div>
 

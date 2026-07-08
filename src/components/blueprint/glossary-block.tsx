@@ -8,6 +8,10 @@ const LEVELS: Record<string, { label: string; color: string; bg: string }> = {
   survival: { label: "Выживание", color: "#e53e3e", bg: "#fff5f5" },
   vibe: { label: "Вайбкодинг", color: "#0fb880", bg: "#f0fff4" },
   modern: { label: "AI", color: "#6c63ff", bg: "#f5f0ff" },
+  coding: { label: "Код", color: "#2b6cb0", bg: "#ebf8ff" },
+  stack: { label: "Стек", color: "#2d3748", bg: "#f7fafc" },
+  deploy: { label: "Деплой", color: "#2f855a", bg: "#f0fff4" },
+  seo: { label: "SEO", color: "#c53030", bg: "#fff5f5" },
   senior: { label: "Старший", color: "#ed8936", bg: "#fffaf0" },
   jargon: { label: "Жаргон", color: "#d53f8c", bg: "#fff0f7" },
 };
