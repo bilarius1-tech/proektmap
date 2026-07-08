@@ -11,7 +11,8 @@ const nav = [
     { href: "/admin/skills", label: "Skills", icon: Puzzle },
     { href: "/admin/blog", label: "Блог", icon: BookOpen },
     { href: "/admin/ai-radar", label: "AI Radar", icon: Cpu },
-  { href: "/admin/settings", label: "Настройки", icon: Settings },
+  { href: "/admin/design", label: "Дизайн", icon: Palette },
+    { href: "/admin/settings", label: "Настройки", icon: Settings },
     { href: "/admin/menu", label: "Меню", icon: Menu },
     { href: "/admin/referrals", label: "Рефералы", icon: LinkIcon },
 ];
