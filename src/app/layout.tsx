@@ -3,7 +3,7 @@ import "@/styles/tokens.css";
 import GlobalHeader from "@/components/layout/header";
 import GlobalFooter from "@/components/layout/footer";
 import StreakBanner from "@/components/layout/streak-banner";
-import GearAssistant from "@/components/assistant/gear-assistant";
+import AssistantWrapper from "@/components/assistant/assistant-wrapper";
 import CookieConsent from "@/components/cookie-consent";
 
 export const metadata: Metadata = {
@@ -52,7 +52,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <StreakBanner />
         <main style={{ flex: 1 }}>{children}</main>
         <GlobalFooter />
-        <GearAssistant />
+        <AssistantWrapper />
         <CookieConsent />
       </body>
     </html>

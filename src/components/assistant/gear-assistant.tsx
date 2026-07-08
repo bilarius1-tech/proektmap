@@ -7,7 +7,7 @@ type State = "idle" | "thinking" | "responding" | "hidden";
 
 interface Message { text: string; type: "assistant" | "user"; }
 
-export default function GearAssistant({ context = "" }: { context?: string }) {
+export default function GearAssistant({ context = "", isLoggedIn = false, isPro = false }: { context?: string; isLoggedIn?: boolean; isPro?: boolean }) {
   const [state, setState] = useState<State>("idle");
   const [showBubble, setShowBubble] = useState(false);
   const [message, setMessage] = useState("");
@@ -87,7 +87,15 @@ export default function GearAssistant({ context = "" }: { context?: string }) {
     }
   }
 
-  function toggleChat() { setShowChat(!showChat); setShowBubble(false); }
+  function toggleChat() {
+    if (!isPro) {
+      setMessage("🔒 AI-помощник доступен с Pro подпиской. Всего 300₽/мес — и шестерёнка ответит на любой вопрос!");
+      setShowBubble(true);
+      setTimeout(() => setShowBubble(false), 6000);
+      return;
+    }
+    setShowChat(!showChat); setShowBubble(false);
+  }
 
   if (state === "hidden") return null;
 
@@ -140,7 +148,7 @@ export default function GearAssistant({ context = "" }: { context?: string }) {
         </div>
       )}
 
-      <button ref={gearRef} onClick={toggleChat} onMouseEnter={() => { if (!showChat && !showBubble) { setMessage("Нажми чтобы спросить!"); setShowBubble(true); setTimeout(() => setShowBubble(false), 3000); } }}
+      <button ref={gearRef} onClick={toggleChat} onMouseEnter={() => { if (!showChat && !showBubble) { setMessage(isPro ? "Нажми чтобы спросить!" : "🔒 Pro подписка — 300₽/мес"); setShowBubble(true); setTimeout(() => setShowBubble(false), 3000); } }}
         style={{
           width: 60, height: 60, borderRadius: "50%", border: "none", cursor: "pointer",
           background: state === "thinking" ? "var(--color-warning)" : "var(--color-accent)",
