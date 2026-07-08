@@ -72,7 +72,7 @@ export default function BlogPageClient({ posts, categories, total, page, perPage
                 <h2 style={{ fontSize: "var(--text-l)", fontWeight: 700, marginBottom: 6, lineHeight: 1.3 }}>{p.title}</h2>
                 <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.6, marginBottom: "var(--space-s)" }}>{p.excerpt}</p>
                 <div style={{ display: "flex", alignItems: "center", gap: "var(--space-m)", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>
-                  <span style={{ display: "flex", alignItems: "center", gap: 4 }}><User size={12} />{p.author?.name || "Аноним"}</span>
+                  <span style={{ display: "flex", alignItems: "center", gap: 4 }}><User size={12} />{<Link href={`/blog/author/${p.author?.email}`} style={{color:"inherit",textDecoration:"none"}}>{p.author?.name || "Аноним"}</Link>}</span>
                   <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Calendar size={12} />{new Date(p.publishedAt).toLocaleDateString("ru")}</span>
                   <span style={{ display: "flex", alignItems: "center", gap: 4 }}><MessageCircle size={12} />{(p._count?.comments || 0)}</span>
                 </div>

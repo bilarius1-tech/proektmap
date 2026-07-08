@@ -45,7 +45,7 @@ export default function PostPageClient({ post }: any) {
       <h1 style={{ fontSize: "var(--text-xxxl)", fontWeight: 800, lineHeight: 1.2, marginBottom: "var(--space-m)" }}>{post.title}</h1>
 
       <div style={{ display: "flex", alignItems: "center", gap: "var(--space-m)", flexWrap: "wrap", marginBottom: "var(--space-xl)", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>
-        <span style={{ display: "flex", alignItems: "center", gap: 4 }}><User size={14} />{post.author?.name || "Аноним"}</span>
+        <span style={{ display: "flex", alignItems: "center", gap: 4 }}><User size={14} />{<Link href={`/blog/author/${post.author?.email}`} style={{color:"inherit",textDecoration:"none"}}>{post.author?.name || "Аноним"}</Link>}</span>
         <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Calendar size={14} />{formatDate(post.publishedAt)}</span>
         <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Eye size={14} />{post.viewCount}</span>
         <span style={{ display: "flex", alignItems: "center", gap: 4 }}><MessageCircle size={14} />{post.comments?.length || 0}</span>

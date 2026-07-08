@@ -19,6 +19,8 @@ model User {
   lastLogin DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  avatar     String   @default("")
+  bio        String   @default("")
   projects  Project[]
   favorites Favorite[]
   posts       BlogPost[]
