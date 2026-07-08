@@ -7,6 +7,7 @@ const nav = [
   { href: "/admin/blueprints", label: "Blueprints", icon: FileText },
   { href: "/admin/stages", label: "Этапы", icon: Layers },
   { href: "/admin/decisions", label: "Решения", icon: GitBranch },
+    { href: "/admin/glossary", label: "Глоссарий", icon: BookOpen },
     { href: "/admin/skills", label: "Skills", icon: Puzzle },
     { href: "/admin/blog", label: "Блог", icon: BookOpen },
     { href: "/admin/ai-radar", label: "AI Radar", icon: Cpu },

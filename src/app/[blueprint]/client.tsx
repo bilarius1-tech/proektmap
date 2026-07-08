@@ -1,6 +1,7 @@
 "use client";
 
 import AIRules from "./ai-rules";
+import GlossaryBlock from "@/components/blueprint/glossary-block";
 import AIRadar from "./ai-radar";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -50,10 +51,10 @@ function buildPrompt(dec: Decision, bp: Blueprint, ctx: string): string {
 }
 
 export default function BlueprintPageClient({
-  blueprint, isLoggedIn, isPro, projectContext, userProjects, userContext,
+  blueprint, isLoggedIn, isPro, projectContext, userProjects, userContext, glossaryTerms,
 }: {
   blueprint: Blueprint; isLoggedIn: boolean; isPro: boolean;
-  projectContext: ProjectContext | null; userProjects: MiniProject[]; userContext: string;
+  projectContext: ProjectContext | null; userProjects: MiniProject[]; userContext: string; glossaryTerms: any[];
 }) {
   const router = useRouter();
   const stages = blueprint.stages.map(bs => bs.stage);
@@ -363,6 +364,7 @@ export default function BlueprintPageClient({
             );
           })}
         </div>
+      <GlossaryBlock terms={glossaryTerms || []} />
       </main>
 
       {/* Project creation modal */}

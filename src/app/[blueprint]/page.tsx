@@ -56,9 +56,10 @@ export default async function BlueprintPage({
 
   const userContext = buildUserContext(projectContext || { id: "", name: "", description: "", domain: "", stack: "", niche: "", colors: "", goals: "", blueprintTitle: "" });
 
+  const glossaryTerms = await db.glossaryTerm.findMany({ where: { isPublished: true }, orderBy: { sortOrder: "asc" }, take: 12 });
   return (
     <BlueprintPageClient
-      blueprint={JSON.parse(JSON.stringify(bp))}
+      blueprint={JSON.parse(JSON.stringify(bp))} glossaryTerms={JSON.parse(JSON.stringify(glossaryTerms))}
       isLoggedIn={isLoggedIn}
       isPro={isPro}
       projectContext={JSON.parse(JSON.stringify(projectContext))}
