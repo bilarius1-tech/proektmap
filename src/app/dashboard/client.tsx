@@ -75,6 +75,11 @@ export default function DashboardClient({ user, isAdmin, isPro }: { user: User; 
         </div>
       </div>
 
+      {/* Профиль */}
+      <div style={{ padding: "var(--space-l)", borderRadius: "var(--radius-l)", border: "1px solid var(--color-border)", background: "white", marginBottom: "var(--space-xl)" }}>
+        <EditProfileForm user={user} />
+      </div>
+
       {/* Админка */}
       {isAdmin && (
         <div style={{ padding: "var(--space-l)", borderRadius: "var(--radius-l)", border: "2px solid var(--color-accent)", background: "var(--color-accent-light)", marginBottom: "var(--space-xl)" }}>

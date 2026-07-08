@@ -21,6 +21,10 @@ model User {
   updatedAt DateTime @updatedAt
   avatar     String   @default("")
   bio        String   @default("")
+  status     String   @default("junior")
+  skills     String   @default("")
+  website    String   @default("")
+  publicProfile Boolean @default(false)
   projects  Project[]
   favorites Favorite[]
   posts       BlogPost[]
