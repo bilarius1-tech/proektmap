@@ -1,5 +1,7 @@
 "use client";
 
+import AIRules from "./ai-rules";
+import AIRadar from "./ai-radar";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import {
@@ -283,6 +285,7 @@ export default function BlueprintPageClient({
         </div>
 
         <h1 style={{ fontSize: "var(--text-xxl)", fontWeight: 800, marginBottom: "var(--space-xs)" }}>{currentStage?.title}</h1>
+        {activeStage === "ai-philosophy" && <AIRules />}
         {currentStage?.description && (
           <p style={{ color: "var(--color-text-secondary)", marginBottom: isMobile ? "var(--space-m)" : "var(--space-l)", fontSize: "var(--text-s)" }}>
             {projectContext ? currentStage.description : currentStage.description}
@@ -568,6 +571,7 @@ function StepChoose({ dec }: { dec: Decision }) {
       {dec.tradeoffs && <div style={{ padding: "var(--space-m)", background: "var(--color-warning-light)", borderRadius: "var(--radius-m)" }}>
         <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: 4, color: "var(--color-warning)" }}>⚖️ Что выбрать</div>
         <div style={{ fontSize: "var(--text-s)", lineHeight: 1.7, color: "var(--color-text-secondary)" }}>{dec.tradeoffs}</div>
+      {dec.slug === "install-vscode" && <AIRadar />}
       </div>}
     </div>
   );
