@@ -8,7 +8,7 @@ function formatDate(d: string) {
   return new Date(d).toLocaleDateString("ru", { day: "numeric", month: "long", year: "numeric" });
 }
 
-export default function PostPageClient({ post, relatedPosts, readMore }: any) {
+export default function PostPageClient({ post, relatedPosts, readMore, isAdmin }: any) {
   const [showCommentForm, setShowCommentForm] = useState(false);
   const [commentForm, setCommentForm] = useState({ authorName: "", authorEmail: "", content: "" });
   const [submitting, setSubmitting] = useState(false);

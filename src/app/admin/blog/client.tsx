@@ -13,10 +13,15 @@ const STATUS_MAP: Record<string, { label: string; color: string; bg: string }> =
   archived: { label: "Архив", color: "var(--color-error)", bg: "var(--color-error-light)" },
 };
 
-export default function BlogAdminClient({ posts, categories, authors, pendingComments, total, page, perPage, currentAuthor }: any) {
+export default function BlogAdminClient({ posts, categories, authors, pendingComments, total, page, perPage, currentAuthor, editPostId }: any) {
   const router = useRouter();
   const [items, setItems] = useState(posts);
   const [editId, setEditId] = useState<string | null>(null);
+  // Auto-open editor if editPostId is provided
+  if (editPostId && !editId) {
+    const post = posts.find((p: any) => p.id === editPostId);
+    if (post) { startEdit(post); }
+  }
   const [search, setSearch] = useState("");
   const [saving, setSaving] = useState(false);
   const [tab, setTab] = useState<"posts" | "comments">("posts");
@@ -124,6 +129,14 @@ export default function BlogAdminClient({ posts, categories, authors, pendingCom
             <div><label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Теги</label>
               <input value={form.tags} onChange={e => setForm({ ...form, tags: e.target.value })} style={{ width: "100%", padding: "10px 12px", fontSize: "var(--text-s)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none" }} /></div>
           </div>
+          <div style={{ marginBottom: "var(--space-m)" }}><label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Обложка (URL или /uploads/...)</label>
+            <div style={{ display: "flex", gap: 8 }}>
+              <input value={form.coverImage} onChange={e => setForm({ ...form, coverImage: e.target.value })} placeholder="https://proektmap.ru/api/og?title=..." style={{ flex: 1, padding: "10px 12px", fontSize: "var(--text-s)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none" }} />
+              {form.coverImage && <img src={form.coverImage} alt="preview" style={{ width: 80, height: 50, borderRadius: "var(--radius-s)", objectFit: "cover", border: "1px solid var(--color-border)" }} />}
+            </div>
+            <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", marginTop: 4 }}>OG Image: /api/og?title=Заголовок&category=Категория</div>
+          </div>
+
           <div style={{ marginBottom: "var(--space-m)" }}><label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Краткое описание</label>
             <textarea value={form.excerpt} onChange={e => setForm({ ...form, excerpt: e.target.value })} rows={2} style={{ width: "100%", padding: "10px 12px", fontSize: "var(--text-s)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none", resize: "vertical" }} /></div>
           <div style={{ marginBottom: "var(--space-m)" }}><label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Содержание</label>

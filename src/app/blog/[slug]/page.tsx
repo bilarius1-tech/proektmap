@@ -1,4 +1,5 @@
 import { getDb } from "@/lib/db/index";
+import { auth } from "@/lib/auth";
 import PostPageClient from "./client";
 import { notFound } from "next/navigation";
 
@@ -7,6 +8,8 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const db = await getDb();
+  const session = await auth();
+  const isAdmin = (session?.user as any)?.role === "admin";
   const post = await db.blogPost.findUnique({ where: { slug }, include: { category: true, author: true } });
   if (!post || post.status !== "published") return {};
   const ogImage = `https://proektmap.ru/api/og?title=${encodeURIComponent(post.title)}&category=${encodeURIComponent(post.category?.name || "")}&author=${encodeURIComponent(post.author?.name || "")}`;
@@ -21,6 +24,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function PostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const db = await getDb();
+  const session = await auth();
+  const isAdmin = (session?.user as any)?.role === "admin";
   const post = await db.blogPost.findUnique({
     where: { slug },
     include: {
@@ -47,5 +52,5 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
   const relatedPosts = scored.length >= 2 ? scored : candidates.slice(0, 3);
   const readMore = candidates.find((p: any) => !relatedPosts.find((r: any) => r.id === p.id)) || candidates[0];
 
-  return <PostPageClient post={JSON.parse(JSON.stringify(post))} relatedPosts={JSON.parse(JSON.stringify(relatedPosts))} readMore={JSON.parse(JSON.stringify(readMore || null))} />;
+  return <PostPageClient post={JSON.parse(JSON.stringify(post))} relatedPosts={JSON.parse(JSON.stringify(relatedPosts))} readMore={JSON.parse(JSON.stringify(readMore || null))} isAdmin={isAdmin} />;
 }

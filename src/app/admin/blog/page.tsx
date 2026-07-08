@@ -3,8 +3,8 @@ import BlogAdminClient from "./client";
 
 export const dynamic = "force-dynamic";
 
-export default async function BlogAdminPage({ searchParams }: { searchParams: Promise<{ page?: string; author?: string }> }) {
-  const { page: pageStr, author } = await searchParams;
+export default async function BlogAdminPage({ searchParams }: { searchParams: Promise<{ page?: string; author?: string; edit?: string }> }) {
+  const { page: pageStr, author, edit } = await searchParams;
   const page = Math.max(1, parseInt(pageStr || "1"));
   const perPage = 20;
 
@@ -33,7 +33,8 @@ export default async function BlogAdminPage({ searchParams }: { searchParams: Pr
       total={total}
       page={page}
       perPage={perPage}
-      currentAuthor={author || ""}
+            currentAuthor={author || ""}
+            editPostId={edit || ""}
     />
   );
 }
