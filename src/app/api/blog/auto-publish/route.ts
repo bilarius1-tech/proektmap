@@ -21,31 +21,21 @@ export async function POST() {
       const raw = await res.text();
 
       let items: { title: string; link: string; description: string; image?: string }[] = [];
-      
+
       if (feed.type === "json") {
         try {
           const json = JSON.parse(raw);
-          
           if (json.hits) {
-            // Hacker News
-            items = json.hits.map((h: any) => ({
-              title: h.title || h.story_title || "",
-              link: h.url || `https://news.ycombinator.com/item?id=${h.objectID}`,
-              description: h.story_text || h.comment_text || "",
-              image: null,
-            }));
+            items = json.hits.map((h: any) => ({ title: h.title || h.story_title || "", link: h.url || `https://news.ycombinator.com/item?id=${h.objectID}`, description: h.story_text || h.comment_text || "" }));
           } else if (json.data?.children) {
-            // Reddit
             items = json.data.children.map((c: any) => {
               const d = c.data;
               let img: string | undefined;
               if (d.thumbnail && d.thumbnail.startsWith("http")) img = d.thumbnail;
               else if (d.preview?.images?.[0]?.source?.url) img = d.preview.images[0].source.url.replace(/&amp;/g, "&");
-              else if (d.url && /\.(jpg|jpeg|png|gif|webp)(\?|$)/i.test(d.url)) img = d.url;
               return { title: d.title, link: `https://reddit.com${d.permalink}`, description: d.selftext || "", image: img };
             });
           } else if (json.items) {
-            // GitHub
             items = json.items.slice(0, 5).map((i: any) => ({
               title: i.full_name || i.name,
               link: i.html_url || i.url,
@@ -55,7 +45,6 @@ export async function POST() {
           }
         } catch {}
       } else if (feed.type === "xml") {
-        // arXiv
         const entries = raw.match(/<entry>[\s\S]*?<\/entry>/g) || [];
         items = entries.slice(0, 3).map(e => {
           const title = (e.match(/<title>(.*?)<\/title>/)?.[1] || "").replace(/\s+/g, " ").trim();
@@ -70,11 +59,10 @@ export async function POST() {
       for (const item of items.slice(0, 2)) {
         if (!item.title || item.title.length < 15) continue;
 
-        // Check duplicate
         const exists = await db.blogPost.findFirst({ where: { metaDesc: { contains: item.link.slice(0, 50) } } });
         if (exists) continue;
 
-        // Try to download image to our server
+        // Download image if available
         let coverImage = "";
         if (item.image) {
           try {
@@ -82,54 +70,63 @@ export async function POST() {
             if (imgRes.ok && imgRes.headers.get("content-type")?.startsWith("image")) {
               const buffer = Buffer.from(await imgRes.arrayBuffer());
               const ext = item.image.split(".").pop()?.split("?")[0] || "jpg";
-              const filename = `blog-${Date.now()}-${Math.random().toString(36).slice(2,6)}.${ext}`;
+              const filename = `blog-${Date.now()}-${Math.random().toString(36).slice(2, 6)}.${ext}`;
               const { writeFile, mkdir } = await import("fs/promises");
               const { join } = await import("path");
-              const uploadDir = join(process.cwd(), "public", "uploads");
-              await mkdir(uploadDir, { recursive: true });
-              await writeFile(join(uploadDir, filename), buffer);
+              await mkdir(join(process.cwd(), "public", "uploads"), { recursive: true });
+              await writeFile(join(process.cwd(), "public", "uploads", filename), buffer);
               coverImage = `/uploads/${filename}`;
             }
           } catch {}
         }
 
-        // AI generates Russian summary
-        const prompt = `Ты — редактор блога об AI. Напиши краткую заметку на русском (250-350 слов) на основе этой новости:
+        // AI translates and writes in Russian
+        const prompt = `Ты — редактор блога об AI на русском языке. Переведи И заголовок И содержание на русский. Сделай пересказ на 250-350 слов живым языком.
 
-Заголовок: ${item.title}
+Заголовок оригинала: ${item.title}
 Источник: ${item.link}
 Описание: ${(item.description || "").slice(0, 500)}
 
-Формат: краткий пересказ сути новости + 1-2 предложения почему это важно для AI-инженеров + ссылка на источник.
-
-Пиши живым языком, как для коллеги. Без шаблонных фраз.`;
+ВАЖНО:
+1. СНАЧАЛА переведи заголовок на русский. Формат: "ЗАГОЛОВОК: <перевод>"
+2. Затем напиши саму заметку.
+3. В конце добавь: "📎 [Источник](${item.link})" — это ДОЛЖНО быть в markdown-формате с квадратными и круглыми скобками, чтобы получилась кликабельная ссылка.
+4. Если в тексте упоминаешь репозиторий на GitHub — вставляй его как ссылку в формате [название](url).`;
 
         const aiRes = await fetch("https://api.deepseek.com/v1/chat/completions", {
           method: "POST",
           headers: { "Content-Type": "application/json", "Authorization": `Bearer ${key}` },
-          body: JSON.stringify({ model: "deepseek-chat", messages: [{ role: "user", content: prompt }], max_tokens: 800 }),
+          body: JSON.stringify({ model: "deepseek-chat", messages: [{ role: "user", content: prompt }], max_tokens: 1000 }),
         });
 
         const aiData = await aiRes.json();
-        const content = aiData.choices?.[0]?.message?.content;
-        if (!content) continue;
+        const fullResponse = aiData.choices?.[0]?.message?.content;
+        if (!fullResponse) continue;
 
-        const title = item.title.slice(0, 120);
+        // Extract translated title from AI response
+        let title = item.title;
+        const titleMatch = fullResponse.match(/ЗАГОЛОВОК:\s*(.+)/);
+        if (titleMatch) title = titleMatch[1].trim();
+
+        // Remove the title line from content and use the rest as content
+        let content = fullResponse.replace(/ЗАГОЛОВОК:\s*.+(\n|$)/, "").trim();
+
         const slug = (title.replace(/[^a-zа-я0-9]+/g, "-") + "-" + Date.now().toString(36)).toLowerCase().slice(0, 80);
-        const excerpt = content.slice(0, 200).replace(/\n/g, " ");
+        const excerpt = content.replace(/[#*\[\]()]/g, "").slice(0, 200).replace(/\n/g, " ");
 
         let cat = await db.blogCategory.findFirst({ where: { name: feed.category } });
         if (!cat) cat = await db.blogCategory.create({ data: { name: feed.category, slug: feed.category.toLowerCase().replace(/[^a-zа-я0-9]+/g, "-") } });
 
+        // PUBLISH immediately, not draft
         await db.blogPost.create({
           data: {
-            title, slug, content, excerpt, coverImage, status: "draft", authorId: admin.id,
-            categoryId: cat.id, tags: `AI,${feed.category}`, aiGenerated: true, aiModel: "deepseek-chat",
-            metaTitle: title + " — Карта роста", metaDesc: excerpt,
+            title, slug, content, excerpt, coverImage, status: "published", authorId: admin.id,
+            categoryId: cat.id, tags: "AI,новости", aiGenerated: true, aiModel: "deepseek-chat",
+            metaTitle: title + " — Карта роста", metaDesc: excerpt, publishedAt: new Date(),
           },
         });
 
-        results.push({ feed: feed.name, title: title.slice(0, 60), image: coverImage ? "✅" : "—", status: "draft" });
+        results.push({ feed: feed.name, title: title.slice(0, 60), image: coverImage ? "✅" : "—", status: "published" });
       }
 
       await db.blogFeed.update({ where: { id: feed.id }, data: { lastFetched: new Date() } });
