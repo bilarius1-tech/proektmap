@@ -34,7 +34,7 @@ export default function PostPageClient({ post, relatedPosts, readMore, isAdmin: 
       <Link href="/blog" style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", textDecoration: "none", marginBottom: "var(--space-l)" }}>
         <ArrowLeft size={14} /> Назад к блогу
       </Link>
-      <a href={`/admin/blog?edit=${post.id}`} style={{ fontSize: "var(--text-xs)", color: "var(--color-accent)", textDecoration: "none", marginLeft: "var(--space-m)" }}>✏️</a>
+      <a href={`/admin/blog?edit=${post.id}`} style={{ fontSize: "var(--text-xs)", color: "var(--color-accent)", textDecoration: "none", marginLeft: "var(--space-m)" }} title="Редактировать в админке">✏️</a>
 
       {post.category && (
         <div style={{ marginBottom: "var(--space-s)" }}>
