@@ -93,6 +93,7 @@ export default function DashboardClient({ user, isAdmin, isPro }: { user: User; 
               { label: "Рефералы", href: "/admin/referrals" },
               { label: "AI Radar", href: "/admin/ai-radar" },
               { label: "Настройки", href: "/admin/settings" },
+                <button onClick={async () => { if (!confirm("Перезасеять БД? Все данные заменятся.")) return; const res = await fetch("/api/admin/reseed", { method: "POST" }); alert(res.ok ? "✅ БД перезасеяна!" : "❌ Ошибка: см. консоль"); }} style={{ padding: "6px 14px", borderRadius: "var(--radius-s)", background: "var(--color-error)", color: "white", border: "none", fontSize: "var(--text-xs)", fontWeight: 600, cursor: "pointer" }}>🔄 Перезасеять БД</button>
             ].map(item => (
               <a key={item.href} href={item.href}
                 style={{ padding: "6px 14px", borderRadius: "var(--radius-s)", background: "white", border: "1px solid var(--color-accent)", color: "var(--color-accent)", fontSize: "var(--text-xs)", fontWeight: 600, textDecoration: "none" }}>
