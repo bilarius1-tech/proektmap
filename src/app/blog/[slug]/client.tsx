@@ -9,7 +9,7 @@ function formatDate(d: string) {
   return new Date(d).toLocaleDateString("ru", { day: "numeric", month: "long", year: "numeric" });
 }
 
-export default function PostPageClient({ post }: any) {
+export default function PostPageClient({ post, relatedPosts }: any) {
   const router = useRouter();
   const [showCommentForm, setShowCommentForm] = useState(false);
   const [commentForm, setCommentForm] = useState({ authorName: "", authorEmail: "", content: "" });
@@ -113,6 +113,20 @@ export default function PostPageClient({ post }: any) {
         ) : (
           <div style={{ padding: "var(--space-m)", background: "var(--color-accent-light)", borderRadius: "var(--radius-m)", fontSize: "var(--text-s)", fontWeight: 600, color: "var(--color-accent)", marginTop: "var(--space-l)" }}>
             ✅ Спасибо! Комментарий отправлен на модерацию.
+
+      {relatedPosts?.length > 0 && (
+        <div style={{ borderTop: "1px solid var(--color-border)", paddingTop: "var(--space-xl)", marginTop: "var(--space-xl)" }}>
+          <h2 style={{ fontSize: "var(--text-l)", fontWeight: 700, marginBottom: "var(--space-l)" }}>📖 Похожие статьи</h2>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "var(--space-m)" }}>
+            {relatedPosts.map((rp: any) => (
+              <a key={rp.id} href={`/blog/${rp.slug}`} style={{ padding: "var(--space-m)", background: "white", borderRadius: "var(--radius-m)", border: "1px solid var(--color-border-light)", textDecoration: "none", color: "inherit" }}>
+                <div style={{ fontSize: 10, color: "var(--color-accent)", marginBottom: 4 }}>{rp.category?.name}</div>
+                <div style={{ fontWeight: 600, fontSize: "var(--text-s)", lineHeight: 1.4 }}>{rp.title}</div>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
           </div>
         )}
       </div>
