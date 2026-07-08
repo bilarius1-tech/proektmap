@@ -1,7 +1,7 @@
 "use client";
 import ImagePicker from "@/components/media/image-picker";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Plus, Edit, Trash2, Eye, Send, CheckCircle, XCircle, FileText, ChevronLeft, ChevronRight, User } from "lucide-react";
 import dynamic from "next/dynamic";
@@ -18,11 +18,13 @@ export default function BlogAdminClient({ posts, categories, authors, pendingCom
   const router = useRouter();
   const [items, setItems] = useState(posts);
   const [editId, setEditId] = useState<string | null>(null);
-  // Auto-open editor if editPostId is provided
-  if (editPostId && !editId) {
-    const post = posts.find((p: any) => p.id === editPostId);
-    if (post) { startEdit(post); }
-  }
+  // Auto-open editor if editPostId is provided (via useEffect)
+  useEffect(() => {
+    if (editPostId && !editId) {
+      const post = posts.find((p: any) => p.id === editPostId);
+      if (post) startEdit(post);
+    }
+  }, [editPostId]);
   const [search, setSearch] = useState("");
   const [saving, setSaving] = useState(false);
   const [tab, setTab] = useState<"posts" | "comments">("posts");
