@@ -12,7 +12,8 @@ export async function POST() {
   const admin = await db.user.findFirst({ where: { role: "admin" } });
   if (!admin) return NextResponse.json({ error: "Админ не найден" }, { status: 500 });
 
-  const key = process.env.DEEPSEEK_API_KEY;
+  let key = process.env.DEEPSEEK_API_KEY;
+  try { const s = await db.siteSettings.findUnique({ where: { id: "main" } }); if (s?.deepseekApiKey) key = s.deepseekApiKey; } catch {}
   if (!key) return NextResponse.json({ error: "Нет DEEPSEEK_API_KEY" }, { status: 500 });
 
   const results: any[] = [];
