@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Save, Key, Globe, ShoppingCart, Bot, Code } from "lucide-react";
+import { Save, Key, Globe, ShoppingCart, Bot, Code, MessageCircle } from "lucide-react";
 
 export default function SettingsClient({ settings }: any) {
   const router = useRouter();
@@ -24,6 +24,9 @@ export default function SettingsClient({ settings }: any) {
     seoKeywords: settings.seoKeywords || "",
     headerCode: settings.headerCode || "",
     footerCode: settings.footerCode || "",
+    assistantGreeting: settings.assistantGreeting || "Привет! Я твой AI-помощник — спроси меня о чём угодно.",
+    assistantHintInterval: settings.assistantHintInterval || 25,
+    assistantProOnly: settings.assistantProOnly !== false,
     siteName: settings.siteName || "Карта роста",
     siteUrl: settings.siteUrl || "https://proektmap.ru",
   });
@@ -43,6 +46,7 @@ export default function SettingsClient({ settings }: any) {
     { key: "payments", label: "Платежи", icon: <ShoppingCart size={14} /> },
     { key: "ai", label: "AI-модели", icon: <Bot size={14} /> },
     { key: "seo", label: "SEO", icon: <Code size={14} /> },
+    { key: "assistant", label: "Ассистент", icon: <MessageCircle size={14} /> },
   ];
 
   return (
