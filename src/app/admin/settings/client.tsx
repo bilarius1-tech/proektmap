@@ -149,6 +149,33 @@ export default function SettingsClient({ settings }: any) {
           </Section>
         </div>
       )}
+
+      {/* Ассистент */}
+      {tab === "assistant" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-l)" }}>
+          <Section title="🤖 AI-помощник (Шестерёнка)">
+            <Row label="Приветственное сообщение">
+              <textarea value={form.assistantGreeting} onChange={e => setForm({ ...form, assistantGreeting: e.target.value })} rows={2} className="input" placeholder="Привет! Я твой AI-помощник..." />
+            </Row>
+            <Row label="Интервал подсказок (секунд)">
+              <input type="number" min={10} max={120} value={form.assistantHintInterval} onChange={e => setForm({ ...form, assistantHintInterval: parseInt(e.target.value) || 25 })} className="input" />
+              <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", marginTop: 4 }}>От 10 до 120 секунд.</div>
+            </Row>
+            <Row label="Чат только для Pro">
+              <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer" }}>
+                <input type="checkbox" checked={form.assistantProOnly} onChange={e => setForm({ ...form, assistantProOnly: e.target.checked })} style={{ width: 18, height: 18 }} />
+                Бесплатные видят но не могут писать
+              </label>
+            </Row>
+          </Section>
+          <Section title="📋 Контекстные подсказки">
+            <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", lineHeight: 1.6 }}>
+              Шестерёнка определяет где пользователь и показывает подсказки: Главная, Blueprint, Глоссарий, Блог, Специалисты, Промпты.
+              Настраиваются в <code>assistant-wrapper.tsx</code>.
+            </div>
+          </Section>
+        </div>
+      )}
     </div>
   );
 }
