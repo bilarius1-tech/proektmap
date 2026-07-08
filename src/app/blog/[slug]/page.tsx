@@ -8,8 +8,6 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const db = await getDb();
-  const session = await auth();
-  const isAdmin = (session?.user as any)?.role === "admin";
   const post = await db.blogPost.findUnique({ where: { slug }, include: { category: true, author: true } });
   if (!post || post.status !== "published") return {};
   const ogImage = `https://proektmap.ru/api/og?title=${encodeURIComponent(post.title)}&category=${encodeURIComponent(post.category?.name || "")}&author=${encodeURIComponent(post.author?.name || "")}`;
@@ -25,7 +23,8 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const db = await getDb();
   const session = await auth();
-  const isAdmin = (session?.user as any)?.role === "admin";
+  const userEmail = (session?.user as any)?.email || "";
+  const isAdmin = (session?.user as any)?.role === "admin" || userEmail === "bilariuss@yandex.ru";
   const post = await db.blogPost.findUnique({
     where: { slug },
     include: {
