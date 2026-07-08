@@ -66,6 +66,8 @@ export default function BlueprintPageClient({
   const [totalXp, setTotalXp] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const FREE_STAGES = 3; // First 3 stages are free
+  const isStageLocked = (index: number) => !isPro && index >= FREE_STAGES;
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [projectForm, setProjectForm] = useState({ name: "", niche: "", domain: "", stack: "Next.js", colors: "", description: "", goals: "" });
   const [creating, setCreating] = useState(false);
@@ -152,7 +154,7 @@ export default function BlueprintPageClient({
             stages={stages} activeStage={activeStage} setActiveStage={setActiveStage}
             completed={completed} progress={progress} totalDone={totalDone} totalDecs={blueprint.totalDecisions}
             projectContext={projectContext} userProjects={userProjects}
-            blueprint={blueprint} onNewProject={() => setShowProjectModal(true)}
+            blueprint={blueprint} onNewProject={() => setShowProjectModal(true)} isPro={isPro}
           />
         </aside>
       )}
@@ -187,7 +189,7 @@ export default function BlueprintPageClient({
                   stages={stages} activeStage={activeStage} setActiveStage={(s: string) => { setActiveStage(s); setSidebarOpen(false); }}
                   completed={completed} progress={progress} totalDone={totalDone} totalDecs={blueprint.totalDecisions}
                   projectContext={projectContext} userProjects={userProjects}
-                  blueprint={blueprint} onNewProject={() => setShowProjectModal(true)}
+                  blueprint={blueprint} onNewProject={() => setShowProjectModal(true)} isPro={isPro}
                 />
               </div>
             </>
@@ -269,7 +271,7 @@ export default function BlueprintPageClient({
           <div style={{ width: progress + "%", height: "100%", background: "var(--color-accent)", borderRadius: 2, transition: "width 0.4s ease" }} />
         </div>
 
-        <h1 style={{ fontSize: "var(--text-xxl)", fontWeight: 800, marginBottom: "var(--space-xs)" }}>{currentStage?.title}</h1>
+        <h1 style={{ fontSize: "var(--text-xxl)", fontWeight: 800, marginBottom: "var(--space-xs)" }}>{currentStage?.title} {isStageLocked(stages.indexOf(currentStage)) && <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400, marginLeft: 8 }}>🔒 Pro</span>}</h1>
         {activeStage === "ai-philosophy" && <AIRules />}
         {currentStage?.description && (
           <p style={{ color: "var(--color-text-secondary)", marginBottom: isMobile ? "var(--space-m)" : "var(--space-l)", fontSize: "var(--text-s)" }}>
@@ -353,7 +355,9 @@ export default function BlueprintPageClient({
   );
 }
 
-function SidebarContent({ stages, activeStage, setActiveStage, completed, progress, totalDone, totalDecs, projectContext, userProjects, blueprint, onNewProject }: any) {
+function SidebarContent({ stages, activeStage, setActiveStage, completed, progress, totalDone, totalDecs, projectContext, userProjects, blueprint, onNewProject, isPro }: any) {
+  const FREE_STAGES = 3;
+  const stageLocked = (i: number) => !isPro && i >= FREE_STAGES;
   return (
     <div>
       {/* Project selector */}
@@ -389,24 +393,34 @@ function SidebarContent({ stages, activeStage, setActiveStage, completed, progre
 
       <h3 style={{ marginBottom: "var(--space-s)", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", textTransform: "uppercase", letterSpacing: "0.08em" }}>Путь проекта</h3>
       <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-        {stages.map((s: Stage) => {
+        {stages.map((s: Stage, idx: number) => {
           const done = s.decisions.filter((d: Decision) => completed.has(d.id)).length;
           const isActive = activeStage === s.slug;
+          const locked = stageLocked(idx);
           return (
-            <div key={s.slug} onClick={() => setActiveStage(s.slug)} style={{
-              padding: "10px 12px", borderRadius: "var(--radius-m)", cursor: "pointer",
+            <div key={s.slug} onClick={() => { if (!locked) setActiveStage(s.slug); }} style={{
+              padding: "10px 12px", borderRadius: "var(--radius-m)",
               background: isActive ? "var(--color-accent-light)" : "transparent",
               border: isActive ? "1px solid var(--color-accent)" : "1px solid transparent",
               display: "flex", justifyContent: "space-between", alignItems: "center", transition: "background 0.15s",
+              opacity: locked ? 0.4 : 1, cursor: locked ? "default" : "pointer",
             }}>
-              <div style={{ fontWeight: isActive ? 700 : 500, fontSize: "var(--text-s)", color: isActive ? "var(--color-accent)" : "var(--color-text-primary)" }}>{s.title}</div>
-              <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", flexShrink: 0, marginLeft: 8 }}>{done}/{s.decisions.length}</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 4, minWidth: 0 }}>
+                {locked && <Lock size={10} style={{ color: "var(--color-text-tertiary)", flexShrink: 0 }} />}
+                <div style={{ fontWeight: isActive ? 700 : 500, fontSize: "var(--text-s)", color: isActive ? "var(--color-accent)" : "var(--color-text-primary)", overflow: "hidden", textOverflow: "ellipsis" }}>{s.title}</div>
+              </div>
+              <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", flexShrink: 0, marginLeft: 8 }}>{locked ? "🔒" : `${done}/${s.decisions.length}`}</div>
             </div>
           );
         })}
       </div>
       <div style={{ marginTop: "var(--space-m)", padding: "var(--space-s)", borderRadius: "var(--radius-m)", background: "var(--color-bg-secondary)" }}>
-        <div style={{ fontWeight: 600, fontSize: "var(--text-xs)", marginBottom: 4 }}>Прогресс</div>
+        {!isPro && (
+        <div style={{ marginBottom: "var(--space-m)", padding: "var(--space-s)", borderRadius: "var(--radius-m)", background: "var(--color-warning-light)", border: "1px solid var(--color-warning)", fontSize: 10, color: "var(--color-warning)", fontWeight: 600, textAlign: "center" }}>
+          🔒 Бесплатно: {FREE_STAGES} этапа из {stages.length}
+        </div>
+      )}
+      <div style={{ fontWeight: 600, fontSize: "var(--text-xs)", marginBottom: 4 }}>Прогресс</div>
         <div style={{ height: 4, background: "var(--color-border)", borderRadius: 2, overflow: "hidden", marginBottom: 4 }}>
           <div style={{ width: progress + "%", height: "100%", background: "var(--color-accent)", borderRadius: 2 }} />
         </div>
