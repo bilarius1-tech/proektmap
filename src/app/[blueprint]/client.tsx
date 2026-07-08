@@ -99,12 +99,12 @@ export default function BlueprintPageClient({
   }
 
   function toggle(id: string) {
-    if (!isLoggedIn || !projectContext) return;
+    if (!isLoggedIn) return;
     const newStatus = completed.has(id) ? "pending" : "done";
     const next = new Set(completed);
     if (next.has(id)) next.delete(id); else next.add(id);
     setCompleted(next);
-    fetch("/api/progress", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ decisionId: id, status: newStatus, projectId: projectContext.id }) })
+    fetch("/api/progress", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ decisionId: id, status: newStatus, projectId: projectContext?.id || "demo" }) })
       .then(r => r.json()).then(d => { if (d.xpGained) setTotalXp(x => x + d.xpGained); });
   }
 
@@ -131,7 +131,7 @@ export default function BlueprintPageClient({
   const currentStage = stages.find(s => s.slug === activeStage) || stages[0];
   const totalDone = completed.size;
   const progress = Math.round((totalDone / blueprint.totalDecisions) * 100);
-  const canTrack = isLoggedIn && !!projectContext;
+  const canTrack = isLoggedIn;
 
   const steps = [
     { key: 1, label: "ПОНЯТЬ" },

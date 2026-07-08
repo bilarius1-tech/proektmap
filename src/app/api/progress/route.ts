@@ -5,7 +5,7 @@ async function ensureDemoProject(db: any) {
   let project = await db.project.findFirst({ where: { id: "demo" } });
   if (!project) {
     // Найти первый blueprint
-    const bp = await db.blueprint.findFirst({ where: { isPublished: true } });
+    const bp = await db.blueprint.findFirst();
     if (!bp) throw new Error("No published blueprint");
     
     // Найти или создать demo user
