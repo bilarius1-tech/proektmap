@@ -265,6 +265,12 @@ model SiteSettings {
   proPrice  Int      @default(300)
   yookassaShopId    String   @default("")
   yookassaSecretKey String   @default("")
+  deepseekApiKey     String   @default("")
+  openrouterApiKey   String   @default("")
+  openrouterModel    String   @default("openai/gpt-4o-mini")
+  deepseekModel      String   @default("deepseek-chat")
+  autoPublishEnabled Boolean  @default(false)
+  autoPublishHour    Int      @default(9)
   updatedAt DateTime @updatedAt
   @@map("site_settings")
 }
