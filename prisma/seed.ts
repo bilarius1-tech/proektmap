@@ -318,6 +318,22 @@ async function main() {
   for (const v of vars) await db.promptVariable.create({ data: v });
   console.log(`  ✅ ${vars.length} переменных`);
 
+  // 8. Skills
+  console.log("  🧩 Skills");
+  await db.skill.deleteMany();
+  const skillsData = [
+    { title: "Next.js App Router", slug: "nextjs-app-router", description: "Создание страниц и API в Next.js 16", skillMd: "# Next.js App Router\n\n## Как использовать\n1. Папка = маршрут\n2. page.tsx — страница\n3. layout.tsx — обёртка", isPublished: true },
+    { title: "Tailwind CSS", slug: "tailwind-css", description: "Утилитарный CSS без переключения файлов", skillMd: "# Tailwind CSS\n\n## Базовые классы\n- flex, grid, block\n- p-4, m-2, gap-4", isPublished: true },
+    { title: "Prisma ORM", slug: "prisma-orm", description: "Работа с БД через типобезопасный клиент", skillMd: "# Prisma\n\n## Основные команды\n- npx prisma db push\n- npx prisma generate", isPublished: true },
+    { title: "TypeScript", slug: "typescript", description: "Типизация для безопасного кода", skillMd: "# TypeScript\n\n## Правила\n1. Всегда типизируй props\n2. Используй interface\n3. Избегай any", isPublished: true },
+    { title: "PM2 + Nginx", slug: "pm2-nginx", description: "Деплой и продакшен-окружение", skillMd: "# PM2 + Nginx\n\n## Команды\n- pm2 start npm -- start\n- nginx -t && systemctl reload nginx", isPublished: true },
+    { title: "Git + GitHub", slug: "git-github", description: "Контроль версий и откат изменений", skillMd: "# Git\n\n## Ежедневный цикл\ngit add -A && git commit -m \"..\" && git push", isPublished: true },
+    { title: "AI-коммуникация", slug: "ai-communication", description: "Правила эффективного общения с AI", skillMd: "# AI-коммуникация\n\n## 4 правила\n1. Не поисковик\n2. Любит контекст\n3. Сотрудник\n4. Эксперт", isPublished: true },
+    { title: "SEO для сайта", slug: "seo-basics", description: "Метатеги, sitemap, Schema.org", skillMd: "# SEO\n\n## Чек-лист\n- Title 50-70\n- Description 150-160\n- H1 один\n- alt у картинок", isPublished: true },
+  ];
+  for (const s of skillsData) await db.skill.create({ data: s });
+  console.log(`  ✅ ${skillsData.length} навыков`);
+
   console.log("\n🎉 Посев завершён!");
   console.log(`   ${stagesData.length} этапов · ${totalDecs} решений · ${totalXp} XP`);
   console.log(`   ${prompts.length} промптов · ${cats.length} категорий · ${models.length} моделей · ${vars.length} переменных`);
