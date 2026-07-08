@@ -5,7 +5,7 @@ const blueprints = [
   { slug: "corporate-website", title: "Корпоративный сайт", desc: "От покупки домена до запуска рекламы", icon: Globe, xp: 710, decisions: 40, active: true },
   { slug: "saas-project", title: "SaaS-продукт", desc: "От идеи до первых платящих клиентов", icon: Server, xp: 445, decisions: 21, active: true },
   { slug: "mobile-app", title: "Мобильное приложение", desc: "React Native + AI: от макета до App Store", icon: Smartphone, xp: 0, decisions: 0 },
-  { slug: "game-dev", title: "Разработка игры", desc: "Unity/Godot + AI-ассистент", icon: Gamepad2, xp: 0, decisions: 0 },
+  { slug: "game-dev", title: "Разработка игры", desc: "Godot + AI: от идеи до Яндекс.Игр", icon: Gamepad2, xp: 350, decisions: 19, active: true },
   { slug: "photo-service", title: "Сервис обработки фото", desc: "AI API + загрузка + галерея", icon: Camera, xp: 0, decisions: 0 },
   { slug: "api-service", title: "Backend API", desc: "REST/GraphQL + БД + авторизация", icon: Package, xp: 0, decisions: 0 },
 ];
