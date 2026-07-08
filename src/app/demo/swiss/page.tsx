@@ -2,10 +2,10 @@ export const metadata = { title: "Swiss Editorial — демо стиля" };
 
 export default function SwissDemo() {
   return (
-    <div style={{ fontFamily: "Inter, sans-serif", background: "#fafaf9", color: "#1a1a1a", minHeight: "100vh" }}>
+    <div style={{ fontFamily: "Montserrat, Inter, sans-serif", background: "#fafaf9", color: "#1a1a1a", minHeight: "100vh" }}>
       {/* TOP BAR — minimal */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 24px", borderBottom: "1px solid #e5e5e0", background: "#fff", position: "sticky", top: 0, zIndex: 100 }}>
-        <div style={{ fontWeight: 800, fontSize: 14, letterSpacing: "0.02em" }}>PROEKTMAP</div>
+        <div style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 700, fontSize: 14, letterSpacing: "0.04em" }}>PROEKTMAP</div>
         <div style={{ display: "flex", gap: 24, fontSize: 11, textTransform: "uppercase", letterSpacing: "0.08em", color: "#8c8c80" }}>
           <span>Пути</span><span>Блог</span><span>Глоссарий</span><span>Вход</span>
         </div>
@@ -16,7 +16,7 @@ export default function SwissDemo() {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 60 }}>
           <div>
             <div style={{ fontSize: 11, textTransform: "uppercase", letterSpacing: "0.1em", color: "#8c8c80", marginBottom: 16 }}>Школа AI-инженеров</div>
-            <h1 style={{ fontSize: 48, fontWeight: 800, lineHeight: 1.05, letterSpacing: "-0.02em", marginBottom: 20, maxWidth: 450 }}>
+            <h1 style={{ fontFamily: "Montserrat, sans-serif", fontSize: 52, fontWeight: 800, lineHeight: 1.05, letterSpacing: "-0.02em", marginBottom: 20, maxWidth: 450 }}>
               Карта роста<span style={{ color: "#e5533c" }}>.</span>
             </h1>
             <p style={{ fontSize: 15, lineHeight: 1.7, color: "#5c5c50", maxWidth: 380, marginBottom: 32 }}>
@@ -51,7 +51,7 @@ export default function SwissDemo() {
             { title: "Разработка игры", desc: "Godot + AI → Яндекс.Игры", xp: 780, decs: 60 },
           ].map(bp => (
             <div key={bp.title} style={{ background: "#fff", padding: "32px 28px" }}>
-              <div style={{ fontWeight: 800, fontSize: 16, marginBottom: 6, letterSpacing: "-0.01em" }}>{bp.title}</div>
+              <div style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 700, fontSize: 16, marginBottom: 6, letterSpacing: "-0.01em" }}>{bp.title}</div>
               <div style={{ fontSize: 12, color: "#8c8c80", lineHeight: 1.5, marginBottom: 20 }}>{bp.desc}</div>
               <div style={{ display: "flex", gap: 28, fontSize: 10, color: "#b0b0a4" }}>
                 <span>{bp.decs} решений</span><span>{bp.xp} XP</span>
