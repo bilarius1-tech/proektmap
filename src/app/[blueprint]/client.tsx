@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import {
   Eye, CheckCircle, Copy, ChevronDown, ChevronUp, Menu, X,
-  Lock, LogIn, FolderOpen, Plus, Briefcase, Heart,
+  Lock, LogIn, FolderOpen, Plus, Briefcase,
 } from "lucide-react";
 
 interface Decision {
@@ -69,7 +69,6 @@ export default function BlueprintPageClient({
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [projectForm, setProjectForm] = useState({ name: "", niche: "", domain: "", stack: "Next.js", colors: "", description: "", goals: "" });
   const [creating, setCreating] = useState(false);
-  const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [aiMessage, setAiMessage] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
   const [aiResponse, setAiResponse] = useState("");
@@ -78,7 +77,6 @@ export default function BlueprintPageClient({
     setIsMobile(window.innerWidth < 768);
     if (!isLoggedIn) return;
     fetch("/api/progress").then(r => r.json()).then(d => {
-    fetch("/api/favorites").then(r => r.json()).then(d => setFavorites(new Set(d.map((f: any) => f.decisionId))));
       setCompleted(new Set(d.completed));
       setTotalXp(d.totalXp);
     });
@@ -110,20 +108,6 @@ export default function BlueprintPageClient({
       .then(r => r.json()).then(d => { if (d.xpGained) setTotalXp(x => x + d.xpGained); });
   }
 
-
-  async function toggleFavorite(decisionId: string) {
-    if (!isLoggedIn) return;
-    const isFav = favorites.has(decisionId);
-    const next = new Set(favorites);
-    if (isFav) {
-      next.delete(decisionId);
-      await fetch("/api/favorites", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ decisionId }) });
-    } else {
-      next.add(decisionId);
-      await fetch("/api/favorites", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ decisionId }) });
-    }
-    setFavorites(next);
-  }
 
   async function askAI(dec: Decision) {
     setAiLoading(true); setAiResponse("");
@@ -322,10 +306,6 @@ export default function BlueprintPageClient({
                   <button onClick={(e) => { e.stopPropagation(); setExpandedDec(expanded ? null : dec.id); }}
                     style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-tertiary)", padding: 8, minWidth: 36, minHeight: 36 }}>
                     {expanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-                  <button onClick={(e) => { e.stopPropagation(); toggleFavorite(dec.id); }}
-                    style={{ background: "none", border: "none", cursor: "pointer", color: favorites.has(dec.id) ? "var(--color-error)" : "var(--color-text-tertiary)", padding: 8, minWidth: 36, minHeight: 36 }}>
-                    <Heart size={16} fill={favorites.has(dec.id) ? "currentColor" : "none"} />
-                  </button>
                   </button>
                 </div>
 

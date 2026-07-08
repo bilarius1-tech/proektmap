@@ -1,6 +1,4 @@
 import { getDb } from "@/lib/db";
-import GlobalSearch from "./global-search";
-import FavoritesIndicator from "./favorites-indicator";
 import Link from "next/link";
 import MobileMenu from "./mobile-menu";
 import AuthBlock from "./auth-block";
@@ -40,8 +38,6 @@ export default async function GlobalHeader() {
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: "var(--space-s)" }}>
-        <GlobalSearch />
-        <FavoritesIndicator initialCount={0} />
         <ThemeToggle />
         <AuthBlock />
       </div>
