@@ -4,6 +4,7 @@ import AIRules from "./ai-rules";
 import GlossaryBlock from "@/components/blueprint/glossary-block";
 import AIRadar from "./ai-radar";
 import VibecraftGuide from "@/components/blueprint/vibecraft-guide";
+import AIToolsComparison from "@/components/blueprint/ai-tools-comparison";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import {
@@ -674,6 +675,7 @@ function StepChoose({ dec, isLoggedIn, saveDecision, decisionChoices, setDecisio
         <div style={{ fontSize: "var(--text-s)", lineHeight: 1.7, color: "var(--color-text-secondary)" }}>{dec.tradeoffs}</div>
       {dec.slug === "install-vscode" && <AIRadar />}
       {dec.slug === "vibecraft" && <VibecraftGuide />}
+      {dec.slug === "ai-tools-compare" && <AIToolsComparison />}
       </div>}
 
       {/* Decision Journal — clickable options */}

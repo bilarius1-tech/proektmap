@@ -253,6 +253,31 @@ model DecisionSkill {
   @@map("decision_skills")
 }
 
+
+model AITool {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  provider    String
+  type        String   @default("ide") // ide, no-code, agent, assistant
+  description String   @default("")
+  pros        String   @default("")  // JSON array of strings
+  cons        String   @default("")  // JSON array of strings
+  pricing     String   @default("")
+  url         String   @default("")
+  russianUi   Boolean  @default(false)
+  russianSupport Boolean @default(false)
+  requiresVpn Boolean  @default(false)
+  codeOwnership Boolean @default(true)
+  rating      Int      @default(7)  // 1-10
+  bestFor     String   @default("")
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("ai_tools")
+}
+
 model ReferralLink {
   id          String   @id @default(uuid())
   service     String   @unique
