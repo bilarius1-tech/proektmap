@@ -103,6 +103,7 @@ export default function BlueprintPageClient({
   const [showProjectModal, setShowProjectModal] = useState(false);
   const [projectForm, setProjectForm] = useState({ name: "", niche: "", domain: "", stack: "Next.js", colors: "", description: "", goals: "" });
   const [creating, setCreating] = useState(false);
+  const [decisionChoices, setDecisionChoices] = useState<Record<string,{choice:string;reason:string}>>({});
 
   useEffect(() => {
     setIsMobile(window.innerWidth < 768);
@@ -110,6 +111,7 @@ export default function BlueprintPageClient({
     fetch("/api/progress").then(r => r.json()).then(d => {
       setCompleted(new Set(d.completed));
       setTotalXp(d.totalXp);
+      if (d.decisions) { const ch: any = {}; d.decisions.forEach((pd:any) => { if (pd.userChoice) ch[pd.decisionId] = { choice: pd.userChoice, reason: pd.userReason||"" }; }); setDecisionChoices(ch); }
     });
   }, [isLoggedIn]);
 

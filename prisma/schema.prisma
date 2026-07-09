@@ -181,11 +181,12 @@ model ProjectDecision {
   status      String    @default("pending")
   notes       String?
   completedAt DateTime?
+  userChoice  String    @default("")
+  userReason  String    @default("")
   createdAt   DateTime  @default(now())
   project  Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   decision Decision @relation(fields: [decisionId], references: [id], onDelete: Cascade)
   @@unique([projectId, decisionId])
-  userChoice  String   @default("")
   @@map("project_decisions")
 }
 
