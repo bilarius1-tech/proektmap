@@ -578,31 +578,30 @@ function StepChoose({ dec, isLoggedIn, saveDecision, decisionChoices, setDecisio
       {dec.slug === "install-vscode" && <AIRadar />}
       </div>}
 
-      {/* Decision Journal */}
+      {/* Decision Journal — clickable options */}
       {isLoggedIn && (
         <div style={{ padding: "var(--space-m)", background: "var(--color-accent-light)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-accent)" }}>
           <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: 8, color: "var(--color-accent)" }}>📋 Моё решение</div>
           {decisionChoices[dec.id] ? (
             <div>
               <div style={{ fontSize: "var(--text-s)", fontWeight: 600, color: "var(--color-accent)", marginBottom: 4 }}>✅ {decisionChoices[dec.id].choice}</div>
-              {decisionChoices[dec.id].reason && <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.5 }}>{decisionChoices[dec.id].reason}</div>}
+              {decisionChoices[dec.id].reason && <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.5, marginBottom: 6 }}>{decisionChoices[dec.id].reason}</div>}
               <button onClick={() => { const next = {...decisionChoices}; delete next[dec.id]; setDecisionChoices(next); }}
-                style={{ marginTop: 6, padding: "2px 10px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "white", fontSize: 10, cursor: "pointer" }}>Изменить</button>
+                style={{ padding: "3px 12px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "white", fontSize: 10, cursor: "pointer" }}>Изменить</button>
             </div>
           ) : (
             <div>
-              <input id={`dj-choice-${dec.id}`} placeholder="Что ты решил? (например: Нужна админка)"
-                style={{ width: "100%", padding: "8px 12px", fontSize: "var(--text-xs)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none", boxSizing: "border-box", marginBottom: 6 }} />
-              <input id={`dj-reason-${dec.id}`} placeholder="Почему? (например: клиент будет менять услуги)"
-                style={{ width: "100%", padding: "8px 12px", fontSize: "var(--text-xs)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none", boxSizing: "border-box", marginBottom: 6 }} />
-              <button onClick={() => {
-                const cel = document.getElementById(`dj-choice-${dec.id}`) as HTMLInputElement;
-                const rel = document.getElementById(`dj-reason-${dec.id}`) as HTMLInputElement;
-                if (cel?.value.trim()) saveDecision(dec.id, cel.value.trim(), rel?.value.trim() || "");
-              }}
-                style={{ padding: "6px 14px", borderRadius: "var(--radius-s)", background: "var(--color-accent)", color: "white", border: "none", fontSize: "var(--text-xs)", fontWeight: 600, cursor: "pointer" }}>
-                💾 Сохранить
-              </button>
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
+                {[dec.recommended || "Да, нужно", "Нет, не нужно", "Не уверен"].map((opt, i) => (
+                  <button key={i} onClick={() => saveDecision(dec.id, opt, "")}
+                    style={{
+                      padding: "8px 16px", borderRadius: "var(--radius-s)", cursor: "pointer", fontSize: "var(--text-xs)", fontWeight: 600,
+                      border: "1px solid var(--color-accent)", background: i === 0 ? "var(--color-accent)" : "transparent",
+                      color: i === 0 ? "white" : "var(--color-accent)",
+                    }}>{opt}</button>
+                ))}
+              </div>
+              <input id={`dj-reason-${dec.id}`} placeholder="Почему? (необязательно)" style={{ width: "100%", padding: "8px 12px", fontSize: "var(--text-xs)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none", boxSizing: "border-box" }} />
             </div>
           )}
         </div>
