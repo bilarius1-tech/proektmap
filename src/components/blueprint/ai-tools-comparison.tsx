@@ -1,14 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Check, X, ExternalLink } from "lucide-react";
+import { Check, X, ExternalLink, ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 interface Tool {
   id: string; name: string; provider: string; type: string;
   pros: string; cons: string; pricing: string; url: string;
-  russianUi: boolean; russianSupport: boolean;
-  requiresVpn: boolean; codeOwnership: boolean;
-  rating: number; bestFor: string;
+  russianUi: boolean; requiresVpn: boolean; rating: number; bestFor: string;
 }
 
 export default function AIToolsComparison() {
@@ -27,17 +26,18 @@ export default function AIToolsComparison() {
 
   return (
     <div style={{ padding: "var(--space-l)", background: "var(--color-bg-secondary)", borderRadius: "var(--radius-l)", border: "1px solid var(--color-border-light)", marginTop: "var(--space-l)" }}>
-      <div style={{ fontWeight: 800, fontSize: "var(--text-l)", marginBottom: "var(--space-s)", color: "var(--color-text)" }}>
-        🛠️ AI-инструменты — сравнение
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-s)" }}>
+        <div style={{ fontWeight: 800, fontSize: "var(--text-l)", color: "var(--color-text)" }}>
+          🛠️ AI-инструменты — сравнение
+        </div>
+        <Link href="/ai-tools" style={{ fontSize: "var(--text-xs)", color: "var(--color-accent)", fontWeight: 600, textDecoration: "none", display: "flex", alignItems: "center", gap: 4 }}>
+          Все {tools.length} инструментов <ArrowRight size={14} />
+        </Link>
       </div>
-      <p style={{ fontSize: "var(--text-s)", color: "var(--color-text-secondary)", marginBottom: "var(--space-m)", lineHeight: 1.7 }}>
-        Что выбрать для AI-разработки? Сравнение IDE, no-code конструкторов и AI-агентов.
-        <a href="/ai-tools" style={{ color: "var(--color-accent)", marginLeft: 8, fontWeight: 600 }}>Открыть полную страницу →</a>
-      </p>
 
-      {/* Quick picks */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "var(--space-s)", marginBottom: "var(--space-m)" }}>
-        {tools.slice(0, 6).map((t: Tool) => (
+      {/* Quick picks grid — 3 columns */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "var(--space-s)" }}>
+        {tools.map((t: Tool) => (
           <div key={t.id} style={{ padding: "var(--space-m)", background: "white", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border-light)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
               <div style={{ fontWeight: 700, fontSize: "var(--text-s)" }}>{t.name}</div>
@@ -48,7 +48,7 @@ export default function AIToolsComparison() {
               </div>
             </div>
             <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", marginBottom: 6 }}>{t.provider} · {t.type === "ide" ? "IDE" : "No-code"}</div>
-            <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", marginBottom: 8, lineHeight: 1.5 }}>{t.bestFor}</div>
+            <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", marginBottom: 8, lineHeight: 1.4 }}>{t.bestFor}</div>
             <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
               {t.russianUi && <span style={{ padding: "1px 6px", borderRadius: "var(--radius-s)", background: "#ecfdf5", color: "#065f46", fontSize: 9, fontWeight: 600 }}>🇷🇺</span>}
               {t.requiresVpn && <span style={{ padding: "1px 6px", borderRadius: "var(--radius-s)", background: "#fef2f2", color: "#991b1b", fontSize: 9, fontWeight: 600 }}>VPN</span>}

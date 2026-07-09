@@ -270,6 +270,9 @@ model AITool {
   codeOwnership Boolean @default(true)
   rating      Int      @default(7)  // 1-10
   bestFor     String   @default("")
+  howToStart  String   @default("[]")   // JSON: [{title,desc}]
+  faqItems    String   @default("[]")   // JSON: [{q,a}]
+  detailDescription String @default("") // Markdown-like long description
   sortOrder   Int      @default(0)
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
