@@ -71,3 +71,6 @@ git add -A && git commit -m "описание" && git push
 - Предпочитает простые объяснения
 - Ценит надёжность и предсказуемость
 - Работает из России (Windows 11)
+
+## Философия проекта
+См. docs/PHILOSOPHY.md — Decision-Driven Development.
