@@ -105,6 +105,7 @@ export default function BlueprintPageClient({
   const [creating, setCreating] = useState(false);
   const [decisionChoices, setDecisionChoices] = useState<Record<string,{choice:string;reason:string}>>({});
   const [showDecisionMap, setShowDecisionMap] = useState(false);
+  const [flyAnim, setFlyAnim] = useState<{x:number;y:number;tx:number;ty:number;id:number} | null>(null);
 
   useEffect(() => {
     setIsMobile(window.innerWidth < 768);
@@ -420,6 +421,25 @@ export default function BlueprintPageClient({
         </div>
       )}
 
+      {/* Fly animation */}
+      {flyAnim && (() => {
+        const dx = flyAnim.tx - flyAnim.x;
+        const dy = flyAnim.ty - flyAnim.y;
+        return (
+          <div style={{
+            position: "fixed", zIndex: 9999, left: flyAnim.x, top: flyAnim.y,
+            width: 24, height: 24, borderRadius: "50%",
+            background: "var(--color-accent)", display: "flex", alignItems: "center", justifyContent: "center",
+            transform: "translate(-50%, -50%)",
+            animation: `flyToMap 0.65s cubic-bezier(0.2, 0.8, 0.3, 1) forwards`,
+            pointerEvents: "none",
+          }}>
+            <style>{`@keyframes flyToMap { 0%{opacity:1;transform:translate(-50%,-50%) scale(1)} 40%{opacity:1;transform:translate(calc(-50% + ${dx*0.3}px), calc(-50% + ${dy*0.1}px)) scale(1.3)} 100%{opacity:0;transform:translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.4)} }`}</style>
+            <span style={{ color: "white", fontSize: 12, fontWeight: 700 }}>✓</span>
+          </div>
+        );
+      })()}
+
       {/* Project creation modal */}
       {showProjectModal && <ProjectModal form={projectForm} setForm={setProjectForm} onSave={createProject} onCancel={() => setShowProjectModal(false)} saving={creating} />}
     </div>
@@ -502,7 +522,7 @@ function SidebarContent({ stages, activeStage, setActiveStage, completed, progre
 
       {/* Decision Journal buttons */}
       {decisionChoices && Object.keys(decisionChoices).length > 0 && <>
-        <button onClick={() => setShowDecisionMap(true)}
+        <button data-decision-map-btn="true" onClick={() => setShowDecisionMap(true)}
           style={{ marginTop: "var(--space-s)", width: "100%", padding: "8px 12px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-accent)", background: "var(--color-accent-light)", fontWeight: 600, fontSize: "var(--text-xs)", cursor: "pointer", color: "var(--color-accent)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <span>📋 Карта решений</span>
           <span style={{fontSize:9, color:"var(--color-accent)", opacity:0.7}}>{Object.keys(decisionChoices).length}</span>
@@ -622,7 +642,7 @@ function StepUnderstand({ dec }: { dec: Decision }) {
   );
 }
 
-function StepChoose({ dec, isLoggedIn, saveDecision, decisionChoices, setDecisionChoices }: { dec: Decision; isLoggedIn: boolean; saveDecision: (id:string, choice:string, reason:string) => void; decisionChoices: Record<string,{choice:string;reason:string}>; setDecisionChoices: any }) {
+function StepChoose({ dec, isLoggedIn, saveDecision, decisionChoices, setDecisionChoices }: { dec: Decision; isLoggedIn: boolean; saveDecision: (id:string, choice:string, reason:string, e?: any) => void; decisionChoices: Record<string,{choice:string;reason:string}>; setDecisionChoices: any }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)" }}>
       <div style={{ padding: "var(--space-m)", background: "var(--color-accent-light)", borderRadius: "var(--radius-m)", border: "1px solid var(--color-accent)" }}>
@@ -655,7 +675,7 @@ function StepChoose({ dec, isLoggedIn, saveDecision, decisionChoices, setDecisio
             <div>
               <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
                 {[dec.recommended || "Да, нужно", "Нет, не нужно", "Не уверен"].map((opt, i) => (
-                  <button key={i} onClick={() => saveDecision(dec.id, opt, "")}
+                  <button key={i} onClick={(e) => saveDecision(dec.id, opt, "", e)}
                     style={{
                       padding: "8px 16px", borderRadius: "var(--radius-s)", cursor: "pointer", fontSize: "var(--text-xs)", fontWeight: 600,
                       border: "1px solid var(--color-accent)", background: i === 0 ? "var(--color-accent)" : "transparent",
