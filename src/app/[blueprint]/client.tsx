@@ -184,6 +184,11 @@ export default function BlueprintPageClient({
             completed={completed} progress={progress} totalDone={totalDone} totalDecs={blueprint.totalDecisions}
             projectContext={projectContext} userProjects={userProjects}
             blueprint={blueprint} onNewProject={() => setShowProjectModal(true)} isPro={isPro}
+            decisions={stages.flatMap((s: any) => (s.decisions || []))}
+            decisionChoices={decisionChoices}
+            setDecisionChoices={setDecisionChoices}
+            showDecisionMap={showDecisionMap}
+            setShowDecisionMap={setShowDecisionMap}
           />
         </aside>
       )}
@@ -219,6 +224,11 @@ export default function BlueprintPageClient({
                   completed={completed} progress={progress} totalDone={totalDone} totalDecs={blueprint.totalDecisions}
                   projectContext={projectContext} userProjects={userProjects}
                   blueprint={blueprint} onNewProject={() => setShowProjectModal(true)} isPro={isPro}
+                  decisions={stages.flatMap((s: any) => (s.decisions || []))}
+                  decisionChoices={decisionChoices}
+                  setDecisionChoices={setDecisionChoices}
+                  showDecisionMap={showDecisionMap}
+                  setShowDecisionMap={setShowDecisionMap}
                 />
               </div>
             </>
