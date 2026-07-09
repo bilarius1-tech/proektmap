@@ -383,7 +383,7 @@ export default function BlueprintPageClient({
   );
 }
 
-function SidebarContent({ stages, activeStage, setActiveStage, completed, progress, totalDone, totalDecs, projectContext, userProjects, blueprint, onNewProject, isPro }: any) {
+function SidebarContent({ stages, activeStage, setActiveStage, completed, progress, totalDone, totalDecs, projectContext, userProjects, blueprint, onNewProject, isPro, decisions, decisionChoices, showDecisionMap, setShowDecisionMap, setDecisionChoices }: any) {
   const FREE_STAGES = 3;
   const stageLocked = (i: number) => !isPro && i >= FREE_STAGES;
   return (
@@ -456,6 +456,24 @@ function SidebarContent({ stages, activeStage, setActiveStage, completed, progre
           <span>{totalDone}/{totalDecs}</span><span>{progress}%</span>
         </div>
       </div>
+
+      {/* Decision Journal buttons */}
+      {decisionChoices && Object.keys(decisionChoices).length > 0 && <>
+        <button onClick={() => setShowDecisionMap(true)}
+          style={{ marginTop: "var(--space-s)", width: "100%", padding: "8px 12px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-accent)", background: "var(--color-accent-light)", fontWeight: 600, fontSize: "var(--text-xs)", cursor: "pointer", color: "var(--color-accent)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span>📋 Карта решений</span>
+          <span style={{fontSize:9, color:"var(--color-accent)", opacity:0.7}}>{Object.keys(decisionChoices).length}</span>
+        </button>
+        <button onClick={() => { 
+          const brief = decisions.filter((d:any) => decisionChoices[d.id]).map((d:any) => `⚡ ${d.title}: ${decisionChoices[d.id].choice}${decisionChoices[d.id].reason ? " — " + decisionChoices[d.id].reason : ""}`).join("\
+"); 
+          navigator.clipboard.writeText(brief); 
+          alert("✅ Бриф скопирован в буфер обмена!");
+        }}
+          style={{ marginTop: 4, width: "100%", padding: "8px 12px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-accent)", background: "white", fontWeight: 600, fontSize: "var(--text-xs)", cursor: "pointer", color: "var(--color-accent)" }}>
+          📋 Собрать бриф проекта
+        </button>
+      </>}
     </div>
   );
 }
