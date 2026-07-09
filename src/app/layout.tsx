@@ -6,6 +6,7 @@ import StreakBanner from "@/components/layout/streak-banner";
 import AssistantWrapper from "@/components/assistant/assistant-wrapper";
 import DesignTokens from "@/components/design/design-tokens";
 import CookieConsent from "@/components/cookie-consent";
+import AnalyticsScripts, { AnalyticsFooter } from "@/components/analytics";
 
 export const metadata: Metadata = {
   title: {
@@ -45,6 +46,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet" />
         <meta name="theme-color" content="#0fb880" />
         <DesignTokens />
+        <AnalyticsScripts />
         {/* Hreflang */}
         <link rel="alternate" href="https://proektmap.ru" hrefLang="ru" />
         <link rel="alternate" href="https://proektmap.ru" hrefLang="x-default" />
@@ -56,6 +58,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <GlobalFooter />
         <AssistantWrapper />
         <CookieConsent />
+        <AnalyticsFooter />
       </body>
     </html>
   );
