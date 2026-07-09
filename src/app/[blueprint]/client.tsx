@@ -141,6 +141,15 @@ export default function BlueprintPageClient({
       .then(r => r.json()).then(d => { if (d.xpGained) setTotalXp(x => x + d.xpGained); });
   }
 
+  async function saveDecision(decisionId: string, choice: string, reason: string) {
+    if (!isLoggedIn) return;
+    await fetch("/api/progress", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ decisionId, status: "done", userChoice: choice, userReason: reason }) });
+    setDecisionChoices(prev => ({ ...prev, [decisionId]: { choice, reason } }));
+    const next = new Set(completed); next.add(decisionId);
+    setCompleted(next);
+    fetch("/api/progress").then(r => r.json()).then(d => setTotalXp(d.totalXp));
+  }
+
 
 
   function copyPrompt(dec: Decision) {
@@ -354,7 +363,7 @@ export default function BlueprintPageClient({
                     </div>
 
                     {curStep === 1 && <StepUnderstand dec={dec} />}
-                    {curStep === 2 && <StepChoose dec={dec} />}
+                    {curStep === 2 && <StepChoose dec={dec} isLoggedIn={isLoggedIn} saveDecision={saveDecision} decisionChoices={decisionChoices} />}
                     {curStep === 3 && (isPro
                       ? <StepVerify dec={dec} builtPrompt={builtPrompt} promptCopied={promptCopied} copyPrompt={copyPrompt} projectContext={projectContext} />
                       : <StepProRequired />
@@ -552,7 +561,7 @@ function StepUnderstand({ dec }: { dec: Decision }) {
   );
 }
 
-function StepChoose({ dec }: { dec: Decision }) {
+function StepChoose({ dec, isLoggedIn, saveDecision, decisionChoices }: { dec: Decision; isLoggedIn: boolean; saveDecision: (id:string, choice:string, reason:string) => void; decisionChoices: Record<string,{choice:string;reason:string}> }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)" }}>
       <div style={{ padding: "var(--space-m)", background: "var(--color-accent-light)", borderRadius: "var(--radius-m)", border: "1px solid var(--color-accent)" }}>
