@@ -21,7 +21,7 @@ export async function POST() {
   for (const feed of feeds) {
     try {
       const res = await fetch(feed.url, {
-        headers: feed.type === "json" ? { "Accept": "application/json" } : { "User-Agent": "ProektMap/1.0" },
+        headers: { "Accept": "application/json", "User-Agent": "ProektMap/1.0" },
         signal: AbortSignal.timeout(15000),
       });
       const raw = await res.text();

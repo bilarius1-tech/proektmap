@@ -13,7 +13,7 @@ export default function BlogPageClient({ posts, categories, total, page, perPage
   return (
     <div style={{ display: "flex", minHeight: "calc(100dvh - 56px)", maxWidth: 1200, margin: "0 auto" }}>
       {/* LEFT SIDEBAR — categories */}
-      <aside style={{
+      <aside className="blog-sidebar" style={{
         width: 220, minWidth: 220, padding: "var(--space-xl) var(--space-m)",
         borderRight: "1px solid var(--color-border-light)", position: "sticky", top: 56, height: "calc(100dvh - 56px)", overflowY: "auto",
       }}>
@@ -55,13 +55,13 @@ export default function BlogPageClient({ posts, categories, total, page, perPage
 
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-l)" }}>
           {posts.map((p: any) => (
-            <Link key={p.id} href={`/blog/${p.slug}`} style={{
+            <Link key={p.id} href={`/blog/${p.slug}`} className="blog-card" style={{
               display: "flex", gap: "var(--space-l)", padding: "var(--space-l)", background: "white",
               borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", textDecoration: "none", color: "inherit",
             }}>
               {/* Cover image placeholder */}
-              <div style={{
-                width: 160, height: 120, borderRadius: "var(--radius-m)", flexShrink: 0,
+              <div className="blog-card-image" style={{
+                width: 160, height: 120, borderRadius: "var(--radius-s)", flexShrink: 0,
                 background: p.coverImage ? `url(${p.coverImage}) center/cover` : "linear-gradient(135deg, var(--color-accent-light), var(--color-accent))",
                 display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: 28, fontWeight: 800,
               }}>
@@ -99,7 +99,7 @@ export default function BlogPageClient({ posts, categories, total, page, perPage
       </main>
 
       {/* RIGHT SIDEBAR — recent comments + ad */}
-      <aside style={{
+      <aside className="blog-sidebar" style={{
         width: 260, minWidth: 260, padding: "var(--space-xl) var(--space-m)",
         borderLeft: "1px solid var(--color-border-light)", position: "sticky", top: 56, height: "calc(100dvh - 56px)", overflowY: "auto",
       }}>
