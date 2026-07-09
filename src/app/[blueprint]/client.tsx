@@ -15,7 +15,7 @@ interface Decision {
   problem: string; why: string; recommended: string; content: string;
   tradeoffs: string; mistakes: string;
   context: string; constraints: string; validation: string; iteration: string;
-  xpReward: number; timeEstimate: string;
+  xpReward: number; timeEstimate: string; impact: string;
 }
 interface Stage {
   id: string; title: string; slug: string; icon: string; description: string | null;
@@ -586,6 +586,7 @@ function StepChoose({ dec, isLoggedIn, saveDecision, decisionChoices, setDecisio
             <div>
               <div style={{ fontSize: "var(--text-s)", fontWeight: 600, color: "var(--color-accent)", marginBottom: 4 }}>✅ {decisionChoices[dec.id].choice}</div>
               {decisionChoices[dec.id].reason && <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.5, marginBottom: 6 }}>{decisionChoices[dec.id].reason}</div>}
+              {dec.impact && <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 6 }}>{dec.impact.split(",").map((tag:string) => <span key={tag} style={{ padding: "1px 8px", borderRadius: "var(--radius-s)", background: "var(--color-warning-light)", color: "var(--color-warning)", fontSize: 9, fontWeight: 600 }}>{tag.trim()}</span>)}</div>}
               <button onClick={() => { const next = {...decisionChoices}; delete next[dec.id]; setDecisionChoices(next); }}
                 style={{ padding: "3px 12px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "white", fontSize: 10, cursor: "pointer" }}>Изменить</button>
             </div>

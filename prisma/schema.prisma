@@ -91,6 +91,7 @@ model Decision {
   difficulty    String   @default("easy")
   xpReward      Int      @default(15)
   timeEstimate  String   @default("15 мин")
+  impact        String   @default("")
   promptTitle   String?
   promptTemplate String?
   promptContext  String?
