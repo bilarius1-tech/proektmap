@@ -673,10 +673,10 @@ function StepChoose({ dec, isLoggedIn, saveDecision, decisionChoices, setDecisio
       {dec.tradeoffs && <div style={{ padding: "var(--space-m)", background: "var(--color-warning-light)", borderRadius: "var(--radius-m)" }}>
         <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: 4, color: "var(--color-warning)" }}>⚖️ Что выбрать</div>
         <div style={{ fontSize: "var(--text-s)", lineHeight: 1.7, color: "var(--color-text-secondary)" }}>{dec.tradeoffs}</div>
+      </div>}
       {dec.slug === "install-vscode" && <AIRadar />}
       {dec.slug === "vibecraft" && <VibecraftGuide />}
       {dec.slug === "ai-tools-compare" && <AIToolsComparison />}
-      </div>}
 
       {/* Decision Journal — clickable options */}
       {isLoggedIn && (
