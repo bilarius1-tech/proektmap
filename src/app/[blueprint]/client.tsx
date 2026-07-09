@@ -180,7 +180,7 @@ export default function BlueprintPageClient({
       {isMobile && (
         <>
           <button onClick={() => setSidebarOpen(true)} style={{
-            position: "fixed", right: 16, bottom: 24, zIndex: 50,
+            position: "fixed", left: 16, bottom: 24, zIndex: 50,
             width: 48, height: 48, borderRadius: "50%",
             background: "var(--color-accent)", color: "white",
             border: "none", boxShadow: "0 4px 16px rgba(15,184,128,0.4)",
