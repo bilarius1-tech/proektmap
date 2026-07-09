@@ -205,7 +205,7 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
 /* Mobile responsive */
 @media (max-width: 768px) {
   .blog-layout { flex-direction: column !important; }
-  .blog-sidebar-left, .blog-sidebar-right { display: none !important; }
+  .blog-sidebar { display: none !important; }
   .blog-layout main { padding: var(--space-m) !important; max-width: 100% !important; }
   .blog-card { flex-direction: column !important; }
   .blog-card-image { width: 100% !important; height: 180px !important; }

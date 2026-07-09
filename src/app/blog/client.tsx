@@ -11,7 +11,7 @@ export default function BlogPageClient({ posts, categories, total, page, perPage
   const totalPages = Math.ceil(total / perPage);
 
   return (
-    <div className="blog-layout" style={{ display: "flex", minHeight: "calc(100dvh - 56px)", maxWidth: 1200, margin: "0 auto" }}>
+    <div className="blog-layout" suppressHydrationWarning style={{ display: "flex", minHeight: "calc(100dvh - 56px)", maxWidth: 1200, margin: "0 auto" }}>
       {/* LEFT SIDEBAR — categories */}
       <aside className="blog-sidebar" style={{
         width: 220, minWidth: 220, padding: "var(--space-xl) var(--space-m)",
