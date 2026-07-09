@@ -106,7 +106,7 @@ export default function BlueprintPageClient({
   const [decisionChoices, setDecisionChoices] = useState<Record<string,{choice:string;reason:string}>>({});
   const [showDecisionMap, setShowDecisionMap] = useState(false);
   const [sidebarPulse, setSidebarPulse] = useState(0);
-  const [saveToast, setSaveToast] = useState<string | null>(null);
+  const [notifications, setNotifications] = useState<Array<{id:number; msg:string; type:string}>>([]);
 
   useEffect(() => {
     setIsMobile(window.innerWidth < 768);
@@ -144,13 +144,18 @@ export default function BlueprintPageClient({
       .then(r => r.json()).then(d => { if (d.xpGained) setTotalXp(x => x + d.xpGained); });
   }
 
+  function addNotification(msg: string, type: string) {
+    const id = Date.now();
+    setNotifications(prev => [...prev, { id, msg, type }]);
+    setTimeout(() => setNotifications(prev => prev.filter(n => n.id !== id)), 3000);
+  }
+
   async function saveDecision(decisionId: string, choice: string, reason: string) {
     if (!isLoggedIn) return;
     
     await fetch("/api/progress", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ decisionId, status: "done", userChoice: choice, userReason: reason }) });
     setDecisionChoices(prev => ({ ...prev, [decisionId]: { choice, reason } }));
-    setSaveToast(choice);
-    setTimeout(() => setSaveToast(null), 2500);
+    addNotification(`✅ «${choice}» — добавлено в Карту решений`, "success");
     setSidebarPulse(c => c + 1);
     const next = new Set(completed); next.add(decisionId);
     setCompleted(next);
@@ -189,7 +194,7 @@ export default function BlueprintPageClient({
             stages={stages} activeStage={activeStage} setActiveStage={setActiveStage}
             completed={completed} progress={progress} totalDone={totalDone} totalDecs={blueprint.totalDecisions}
             projectContext={projectContext} userProjects={userProjects}
-            blueprint={blueprint} onNewProject={() => setShowProjectModal(true)} isPro={isPro} sidebarPulse={sidebarPulse} setSaveToast={setSaveToast}
+            blueprint={blueprint} onNewProject={() => setShowProjectModal(true)} isPro={isPro} sidebarPulse={sidebarPulse} addNotification={addNotification}
             decisions={stages.flatMap((s: any) => (s.decisions || []))}
             decisionChoices={decisionChoices}
             setDecisionChoices={setDecisionChoices}
@@ -229,7 +234,7 @@ export default function BlueprintPageClient({
                   stages={stages} activeStage={activeStage} setActiveStage={(s: string) => { setActiveStage(s); setSidebarOpen(false); }}
                   completed={completed} progress={progress} totalDone={totalDone} totalDecs={blueprint.totalDecisions}
                   projectContext={projectContext} userProjects={userProjects}
-                  blueprint={blueprint} onNewProject={() => setShowProjectModal(true)} isPro={isPro} sidebarPulse={sidebarPulse} setSaveToast={setSaveToast}
+                  blueprint={blueprint} onNewProject={() => setShowProjectModal(true)} isPro={isPro} sidebarPulse={sidebarPulse} addNotification={addNotification}
                   decisions={stages.flatMap((s: any) => (s.decisions || []))}
                   decisionChoices={decisionChoices}
                   setDecisionChoices={setDecisionChoices}
@@ -394,17 +399,22 @@ export default function BlueprintPageClient({
       <GlossaryBlock terms={glossaryTerms || []} />
       </main>
 
-      {/* Save toast */}
-      {saveToast && (
-        <div style={{
-          position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", zIndex: 300,
-          padding: "8px 20px", borderRadius: "var(--radius-s)", background: "var(--color-accent)", color: "white",
-          fontSize: "var(--text-s)", fontWeight: 600, boxShadow: "0 4px 16px rgba(15,184,128,0.4)",
-          animation: "toastIn 0.3s ease, toastOut 0.3s ease 2.2s forwards",
-        }}>
-          ✅ «{saveToast}» сохранено в Карту решений
-        </div>
-      )}
+      {/* Notifications — top-right stack */}
+      <div style={{ position: "fixed", top: 68, right: 16, zIndex: 300, display: "flex", flexDirection: "column", gap: 8, maxWidth: 360, pointerEvents: "none" }}>
+        {notifications.map(n => (
+          <div key={n.id} style={{
+            padding: "10px 16px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)",
+            background: n.type === "success" ? "#ecfdf5" : "#eff6ff",
+            color: n.type === "success" ? "#065f46" : "#1e40af",
+            fontSize: "var(--text-xs)", fontWeight: 600,
+            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+            display: "flex", alignItems: "center", gap: 8,
+            animation: "slideIn 0.25s ease",
+          }}>
+            {n.msg}
+          </div>
+        ))}
+      </div>
 
       {/* Decision Map Modal */}
       {showDecisionMap && (
@@ -445,7 +455,7 @@ export default function BlueprintPageClient({
   );
 }
 
-function SidebarContent({ stages, activeStage, setActiveStage, completed, progress, totalDone, totalDecs, projectContext, userProjects, blueprint, onNewProject, isPro, decisions, decisionChoices, showDecisionMap, setShowDecisionMap, setDecisionChoices, sidebarPulse, setSaveToast }: any) {
+function SidebarContent({ stages, activeStage, setActiveStage, completed, progress, totalDone, totalDecs, projectContext, userProjects, blueprint, onNewProject, isPro, decisions, decisionChoices, showDecisionMap, setShowDecisionMap, setDecisionChoices, sidebarPulse, addNotification }: any) {
   const FREE_STAGES = 3;
   const stageLocked = (i: number) => !isPro && i >= FREE_STAGES;
   return (
@@ -497,8 +507,7 @@ function SidebarContent({ stages, activeStage, setActiveStage, completed, progre
 "); 
             navigator.clipboard.writeText(brief);
             const toastMsg = "✅ Бриф скопирован! " + Object.keys(decisionChoices).length + " решений";
-            setSaveToast(toastMsg);
-            setTimeout(() => setSaveToast(null), 2500);
+            addNotification("📋 Бриф скопирован! " + Object.keys(decisionChoices).length + " решений", "info");
           }}
             style={{ width: "100%", padding: "8px 12px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "white", fontWeight: 600, fontSize: "var(--text-xs)", cursor: "pointer", color: "var(--color-accent)" }}>
             📋 Собрать бриф
