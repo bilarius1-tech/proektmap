@@ -144,35 +144,13 @@ export default function BlueprintPageClient({
       .then(r => r.json()).then(d => { if (d.xpGained) setTotalXp(x => x + d.xpGained); });
   }
 
-  async function saveDecision(decisionId: string, choice: string, reason: string, e?: React.MouseEvent) {
+  async function saveDecision(decisionId: string, choice: string, reason: string) {
     if (!isLoggedIn) return;
-    
-    // Micro-animation: fly from button to Карта решений
-    if (e) {
-      const btn = e.currentTarget as HTMLElement;
-      const btnRect = btn.getBoundingClientRect();
-      // Карта решений button appears AFTER state update, so find parent sidebar first
-      const sidebar = document.querySelector('[data-sidebar-container]');
-      const mapBtn = sidebar?.querySelector('[data-decision-map-btn]') as HTMLElement;
-      const target = mapBtn || sidebar;
-      if (target) {
-        const targetRect = target.getBoundingClientRect();
-        const dx = targetRect.left + targetRect.width/2 - (btnRect.left + btnRect.width/2);
-        const dy = targetRect.top + targetRect.height/2 - (btnRect.top + btnRect.height/2);
-        const flyEl = document.createElement('div');
-        flyEl.style.cssText = `position:fixed;z-index:9999;left:${btnRect.left + btnRect.width/2}px;top:${btnRect.top + btnRect.height/2}px;width:20px;height:20px;border-radius:50%;background:var(--color-accent);display:flex;align-items:center;justify-content:center;transform:translate(-50%,-50%);pointer-events:none;transition:all 0.6s cubic-bezier(0.2,0.8,0.3,1);`;
-        flyEl.innerHTML = '<span style="color:white;font-size:10px;font-weight:700">✓</span>';
-        document.body.appendChild(flyEl);
-        requestAnimationFrame(() => {
-          flyEl.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.3)`;
-          flyEl.style.opacity = '0';
-        });
-        setTimeout(() => flyEl.remove(), 650);
-      }
-    }
     
     await fetch("/api/progress", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ decisionId, status: "done", userChoice: choice, userReason: reason }) });
     setDecisionChoices(prev => ({ ...prev, [decisionId]: { choice, reason } }));
+    setSaveToast(choice);
+    setTimeout(() => setSaveToast(null), 2500);
     setSidebarPulse(c => c + 1);
     const next = new Set(completed); next.add(decisionId);
     setCompleted(next);
@@ -211,7 +189,7 @@ export default function BlueprintPageClient({
             stages={stages} activeStage={activeStage} setActiveStage={setActiveStage}
             completed={completed} progress={progress} totalDone={totalDone} totalDecs={blueprint.totalDecisions}
             projectContext={projectContext} userProjects={userProjects}
-            blueprint={blueprint} onNewProject={() => setShowProjectModal(true)} isPro={isPro} sidebarPulse={sidebarPulse}
+            blueprint={blueprint} onNewProject={() => setShowProjectModal(true)} isPro={isPro} sidebarPulse={sidebarPulse} setSaveToast={setSaveToast}
             decisions={stages.flatMap((s: any) => (s.decisions || []))}
             decisionChoices={decisionChoices}
             setDecisionChoices={setDecisionChoices}
@@ -251,7 +229,7 @@ export default function BlueprintPageClient({
                   stages={stages} activeStage={activeStage} setActiveStage={(s: string) => { setActiveStage(s); setSidebarOpen(false); }}
                   completed={completed} progress={progress} totalDone={totalDone} totalDecs={blueprint.totalDecisions}
                   projectContext={projectContext} userProjects={userProjects}
-                  blueprint={blueprint} onNewProject={() => setShowProjectModal(true)} isPro={isPro} sidebarPulse={sidebarPulse}
+                  blueprint={blueprint} onNewProject={() => setShowProjectModal(true)} isPro={isPro} sidebarPulse={sidebarPulse} setSaveToast={setSaveToast}
                   decisions={stages.flatMap((s: any) => (s.decisions || []))}
                   decisionChoices={decisionChoices}
                   setDecisionChoices={setDecisionChoices}
@@ -467,7 +445,7 @@ export default function BlueprintPageClient({
   );
 }
 
-function SidebarContent({ stages, activeStage, setActiveStage, completed, progress, totalDone, totalDecs, projectContext, userProjects, blueprint, onNewProject, isPro, decisions, decisionChoices, showDecisionMap, setShowDecisionMap, setDecisionChoices, sidebarPulse }: any) {
+function SidebarContent({ stages, activeStage, setActiveStage, completed, progress, totalDone, totalDecs, projectContext, userProjects, blueprint, onNewProject, isPro, decisions, decisionChoices, showDecisionMap, setShowDecisionMap, setDecisionChoices, sidebarPulse, setSaveToast }: any) {
   const FREE_STAGES = 3;
   const stageLocked = (i: number) => !isPro && i >= FREE_STAGES;
   return (
@@ -503,14 +481,27 @@ function SidebarContent({ stages, activeStage, setActiveStage, completed, progre
         )}
       </div>
 
-      {/* Карта решений — всегда на виду */}
+      {/* Карта решений + Бриф — всегда на виду */}
       {decisionChoices && Object.keys(decisionChoices).length > 0 && <>
-        <div style={{ marginTop: "var(--space-m)", marginBottom: "var(--space-s)" }}>
+        <div style={{ marginTop: "var(--space-m)", marginBottom: "var(--space-s)", display: "flex", flexDirection: "column", gap: 4 }}>
           <button data-decision-map-btn="true" onClick={() => setShowDecisionMap(true)}
             className={sidebarPulse > 0 ? "sidebar-pulse" : ""}
             style={{ width: "100%", padding: "8px 12px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-accent)", background: "var(--color-accent-light)", fontWeight: 600, fontSize: "var(--text-xs)", cursor: "pointer", color: "var(--color-accent)", display: "flex", justifyContent: "space-between", alignItems: "center", transition: "all 0.3s cubic-bezier(0.34,1.56,0.64,1)" }}>
             <span>📋 Карта решений</span>
             <span style={{fontSize:9, color:"var(--color-accent)", opacity:0.7}}>{Object.keys(decisionChoices).length}</span>
+          </button>
+          <button onClick={() => { 
+            const brief = stages.flatMap((s:any) => (s.decisions||[]).filter((d:any)=>decisionChoices[d.id])).map((d:any) => 
+              `⚡ ${d.title}: ${decisionChoices[d.id].choice}${decisionChoices[d.id].reason ? " — " + decisionChoices[d.id].reason : ""}`
+            ).join("\
+"); 
+            navigator.clipboard.writeText(brief);
+            const toastMsg = "✅ Бриф скопирован! " + Object.keys(decisionChoices).length + " решений";
+            setSaveToast(toastMsg);
+            setTimeout(() => setSaveToast(null), 2500);
+          }}
+            style={{ width: "100%", padding: "8px 12px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "white", fontWeight: 600, fontSize: "var(--text-xs)", cursor: "pointer", color: "var(--color-accent)" }}>
+            📋 Собрать бриф
           </button>
         </div>
       </>}
@@ -657,7 +648,7 @@ function StepUnderstand({ dec }: { dec: Decision }) {
   );
 }
 
-function StepChoose({ dec, isLoggedIn, saveDecision, decisionChoices, setDecisionChoices }: { dec: Decision; isLoggedIn: boolean; saveDecision: (id:string, choice:string, reason:string, e?: any) => void; decisionChoices: Record<string,{choice:string;reason:string}>; setDecisionChoices: any }) {
+function StepChoose({ dec, isLoggedIn, saveDecision, decisionChoices, setDecisionChoices }: { dec: Decision; isLoggedIn: boolean; saveDecision: (id:string, choice:string, reason:string) => void; decisionChoices: Record<string,{choice:string;reason:string}>; setDecisionChoices: any }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)" }}>
       <div style={{ padding: "var(--space-m)", background: "var(--color-accent-light)", borderRadius: "var(--radius-m)", border: "1px solid var(--color-accent)" }}>
@@ -690,7 +681,7 @@ function StepChoose({ dec, isLoggedIn, saveDecision, decisionChoices, setDecisio
             <div>
               <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
                 {[dec.recommended || "Да, нужно", "Нет, не нужно", "Не уверен"].map((opt, i) => (
-                  <button key={i} onClick={(e) => saveDecision(dec.id, opt, "", e)}
+                  <button key={i} onClick={() => saveDecision(dec.id, opt, "")}
                     style={{
                       padding: "8px 16px", borderRadius: "var(--radius-s)", cursor: "pointer", fontSize: "var(--text-xs)", fontWeight: 600,
                       border: "1px solid var(--color-accent)", background: i === 0 ? "var(--color-accent)" : "transparent",
