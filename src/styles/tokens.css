@@ -201,3 +201,14 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
   --shadow-m: 0 2px 8px rgba(0,0,0,0.4);
   --shadow-l: 0 4px 16px rgba(0,0,0,0.5);
 }
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .blog-layout { flex-direction: column !important; }
+  .blog-sidebar-left, .blog-sidebar-right { display: none !important; }
+  .blog-layout main { padding: var(--space-m) !important; max-width: 100% !important; }
+  .blog-card { flex-direction: column !important; }
+  .blog-card-image { width: 100% !important; height: 180px !important; }
+  .hide-mobile { display: none !important; }
+  .mobile-only { display: flex !important; }
+}

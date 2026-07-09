@@ -20,7 +20,7 @@ export default function MobileMenu({ items }: { items: MenuItem[] }) {
     <>
       {/* Hamburger button — visible only on mobile */}
       <button onClick={() => setOpen(!open)} className="mobile-only" style={{
-        display: "none", background: "none", border: "none", padding: 8, cursor: "pointer",
+        background: "none", border: "none", padding: 8, cursor: "pointer",
         color: "var(--color-text-primary)",
       }}>
         {open ? <X size={22} /> : <Menu size={22} />}
@@ -83,12 +83,7 @@ export default function MobileMenu({ items }: { items: MenuItem[] }) {
       )}
 
       {/* Show hamburger on mobile */}
-      <style>{`
-        @media (max-width: 768px) {
-          .mobile-only { display: flex !important; }
-          .hide-mobile { display: none !important; }
-        }
-      `}</style>
+
     </>
   );
 }

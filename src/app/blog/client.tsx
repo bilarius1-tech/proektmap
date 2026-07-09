@@ -12,7 +12,6 @@ export default function BlogPageClient({ posts, categories, total, page, perPage
 
   return (
     <div className="blog-layout" style={{ display: "flex", minHeight: "calc(100dvh - 56px)", maxWidth: 1200, margin: "0 auto" }}>
-      <style>{`@media(max-width:768px){.blog-layout{flex-direction:column!important}.blog-sidebar-left,.blog-sidebar-right{display:none!important}.blog-layout main{padding:var(--space-m)!important;max-width:100%!important}.blog-card{flex-direction:column!important}.blog-card-image{width:100%!important;height:180px!important}}`}</style>
       {/* LEFT SIDEBAR — categories */}
       <aside className="blog-sidebar" style={{
         width: 220, minWidth: 220, padding: "var(--space-xl) var(--space-m)",
