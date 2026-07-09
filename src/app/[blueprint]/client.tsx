@@ -105,7 +105,6 @@ export default function BlueprintPageClient({
   const [creating, setCreating] = useState(false);
   const [decisionChoices, setDecisionChoices] = useState<Record<string,{choice:string;reason:string}>>({});
   const [showDecisionMap, setShowDecisionMap] = useState(false);
-  const [flyAnim, setFlyAnim] = useState<{x:number;y:number;tx:number;ty:number;id:number} | null>(null);
 
   useEffect(() => {
     setIsMobile(window.innerWidth < 768);
@@ -143,8 +142,33 @@ export default function BlueprintPageClient({
       .then(r => r.json()).then(d => { if (d.xpGained) setTotalXp(x => x + d.xpGained); });
   }
 
-  async function saveDecision(decisionId: string, choice: string, reason: string) {
+  async function saveDecision(decisionId: string, choice: string, reason: string, e?: React.MouseEvent) {
     if (!isLoggedIn) return;
+    
+    // Micro-animation: fly from button to Карта решений
+    if (e) {
+      const btn = e.currentTarget as HTMLElement;
+      const btnRect = btn.getBoundingClientRect();
+      // Карта решений button appears AFTER state update, so find parent sidebar first
+      const sidebar = document.querySelector('[data-sidebar-container]');
+      const mapBtn = sidebar?.querySelector('[data-decision-map-btn]') as HTMLElement;
+      const target = mapBtn || sidebar;
+      if (target) {
+        const targetRect = target.getBoundingClientRect();
+        const dx = targetRect.left + targetRect.width/2 - (btnRect.left + btnRect.width/2);
+        const dy = targetRect.top + targetRect.height/2 - (btnRect.top + btnRect.height/2);
+        const flyEl = document.createElement('div');
+        flyEl.style.cssText = `position:fixed;z-index:9999;left:${btnRect.left + btnRect.width/2}px;top:${btnRect.top + btnRect.height/2}px;width:20px;height:20px;border-radius:50%;background:var(--color-accent);display:flex;align-items:center;justify-content:center;transform:translate(-50%,-50%);pointer-events:none;transition:all 0.6s cubic-bezier(0.2,0.8,0.3,1);`;
+        flyEl.innerHTML = '<span style="color:white;font-size:10px;font-weight:700">✓</span>';
+        document.body.appendChild(flyEl);
+        requestAnimationFrame(() => {
+          flyEl.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.3)`;
+          flyEl.style.opacity = '0';
+        });
+        setTimeout(() => flyEl.remove(), 650);
+      }
+    }
+    
     await fetch("/api/progress", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ decisionId, status: "done", userChoice: choice, userReason: reason }) });
     setDecisionChoices(prev => ({ ...prev, [decisionId]: { choice, reason } }));
     const next = new Set(completed); next.add(decisionId);
@@ -421,24 +445,6 @@ export default function BlueprintPageClient({
         </div>
       )}
 
-      {/* Fly animation */}
-      {flyAnim && (() => {
-        const dx = flyAnim.tx - flyAnim.x;
-        const dy = flyAnim.ty - flyAnim.y;
-        return (
-          <div style={{
-            position: "fixed", zIndex: 9999, left: flyAnim.x, top: flyAnim.y,
-            width: 24, height: 24, borderRadius: "50%",
-            background: "var(--color-accent)", display: "flex", alignItems: "center", justifyContent: "center",
-            transform: "translate(-50%, -50%)",
-            animation: `flyToMap 0.65s cubic-bezier(0.2, 0.8, 0.3, 1) forwards`,
-            pointerEvents: "none",
-          }}>
-            <style>{`@keyframes flyToMap { 0%{opacity:1;transform:translate(-50%,-50%) scale(1)} 40%{opacity:1;transform:translate(calc(-50% + ${dx*0.3}px), calc(-50% + ${dy*0.1}px)) scale(1.3)} 100%{opacity:0;transform:translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.4)} }`}</style>
-            <span style={{ color: "white", fontSize: 12, fontWeight: 700 }}>✓</span>
-          </div>
-        );
-      })()}
 
       {/* Project creation modal */}
       {showProjectModal && <ProjectModal form={projectForm} setForm={setProjectForm} onSave={createProject} onCancel={() => setShowProjectModal(false)} saving={creating} />}
