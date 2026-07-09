@@ -1,1 +1,21 @@
 @import "tailwindcss";
+
+/* Sidebar pulse when decision saved */
+.sidebar-pulse {
+  animation: mapPulse 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes mapPulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(15,184,128,0.4); }
+  50% { transform: scale(1.04); box-shadow: 0 0 0 8px rgba(15,184,128,0); background: #0fb88018; }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(15,184,128,0); }
+}
+
+/* Toast notification */
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(16px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+@keyframes toastOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}

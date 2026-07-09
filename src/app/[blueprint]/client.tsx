@@ -105,6 +105,8 @@ export default function BlueprintPageClient({
   const [creating, setCreating] = useState(false);
   const [decisionChoices, setDecisionChoices] = useState<Record<string,{choice:string;reason:string}>>({});
   const [showDecisionMap, setShowDecisionMap] = useState(false);
+  const [sidebarPulse, setSidebarPulse] = useState(0);
+  const [saveToast, setSaveToast] = useState<string | null>(null);
 
   useEffect(() => {
     setIsMobile(window.innerWidth < 768);
@@ -171,6 +173,7 @@ export default function BlueprintPageClient({
     
     await fetch("/api/progress", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ decisionId, status: "done", userChoice: choice, userReason: reason }) });
     setDecisionChoices(prev => ({ ...prev, [decisionId]: { choice, reason } }));
+    setSidebarPulse(c => c + 1);
     const next = new Set(completed); next.add(decisionId);
     setCompleted(next);
     fetch("/api/progress").then(r => r.json()).then(d => setTotalXp(d.totalXp));
@@ -208,7 +211,7 @@ export default function BlueprintPageClient({
             stages={stages} activeStage={activeStage} setActiveStage={setActiveStage}
             completed={completed} progress={progress} totalDone={totalDone} totalDecs={blueprint.totalDecisions}
             projectContext={projectContext} userProjects={userProjects}
-            blueprint={blueprint} onNewProject={() => setShowProjectModal(true)} isPro={isPro}
+            blueprint={blueprint} onNewProject={() => setShowProjectModal(true)} isPro={isPro} sidebarPulse={sidebarPulse}
             decisions={stages.flatMap((s: any) => (s.decisions || []))}
             decisionChoices={decisionChoices}
             setDecisionChoices={setDecisionChoices}
@@ -248,7 +251,7 @@ export default function BlueprintPageClient({
                   stages={stages} activeStage={activeStage} setActiveStage={(s: string) => { setActiveStage(s); setSidebarOpen(false); }}
                   completed={completed} progress={progress} totalDone={totalDone} totalDecs={blueprint.totalDecisions}
                   projectContext={projectContext} userProjects={userProjects}
-                  blueprint={blueprint} onNewProject={() => setShowProjectModal(true)} isPro={isPro}
+                  blueprint={blueprint} onNewProject={() => setShowProjectModal(true)} isPro={isPro} sidebarPulse={sidebarPulse}
                   decisions={stages.flatMap((s: any) => (s.decisions || []))}
                   decisionChoices={decisionChoices}
                   setDecisionChoices={setDecisionChoices}
@@ -413,6 +416,18 @@ export default function BlueprintPageClient({
       <GlossaryBlock terms={glossaryTerms || []} />
       </main>
 
+      {/* Save toast */}
+      {saveToast && (
+        <div style={{
+          position: "fixed", bottom: 24, left: "50%", transform: "translateX(-50%)", zIndex: 300,
+          padding: "8px 20px", borderRadius: "var(--radius-s)", background: "var(--color-accent)", color: "white",
+          fontSize: "var(--text-s)", fontWeight: 600, boxShadow: "0 4px 16px rgba(15,184,128,0.4)",
+          animation: "toastIn 0.3s ease, toastOut 0.3s ease 2.2s forwards",
+        }}>
+          ✅ «{saveToast}» сохранено в Карту решений
+        </div>
+      )}
+
       {/* Decision Map Modal */}
       {showDecisionMap && (
         <div onClick={() => setShowDecisionMap(false)} style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", justifyContent: "center", alignItems: "center", background: "rgba(0,0,0,0.4)" }}>
@@ -452,7 +467,7 @@ export default function BlueprintPageClient({
   );
 }
 
-function SidebarContent({ stages, activeStage, setActiveStage, completed, progress, totalDone, totalDecs, projectContext, userProjects, blueprint, onNewProject, isPro, decisions, decisionChoices, showDecisionMap, setShowDecisionMap, setDecisionChoices }: any) {
+function SidebarContent({ stages, activeStage, setActiveStage, completed, progress, totalDone, totalDecs, projectContext, userProjects, blueprint, onNewProject, isPro, decisions, decisionChoices, showDecisionMap, setShowDecisionMap, setDecisionChoices, sidebarPulse }: any) {
   const FREE_STAGES = 3;
   const stageLocked = (i: number) => !isPro && i >= FREE_STAGES;
   return (
@@ -487,6 +502,18 @@ function SidebarContent({ stages, activeStage, setActiveStage, completed, progre
           </div>
         )}
       </div>
+
+      {/* Карта решений — всегда на виду */}
+      {decisionChoices && Object.keys(decisionChoices).length > 0 && <>
+        <div style={{ marginTop: "var(--space-m)", marginBottom: "var(--space-s)" }}>
+          <button data-decision-map-btn="true" onClick={() => setShowDecisionMap(true)}
+            className={sidebarPulse > 0 ? "sidebar-pulse" : ""}
+            style={{ width: "100%", padding: "8px 12px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-accent)", background: "var(--color-accent-light)", fontWeight: 600, fontSize: "var(--text-xs)", cursor: "pointer", color: "var(--color-accent)", display: "flex", justifyContent: "space-between", alignItems: "center", transition: "all 0.3s cubic-bezier(0.34,1.56,0.64,1)" }}>
+            <span>📋 Карта решений</span>
+            <span style={{fontSize:9, color:"var(--color-accent)", opacity:0.7}}>{Object.keys(decisionChoices).length}</span>
+          </button>
+        </div>
+      </>}
 
       <h3 style={{ marginBottom: "var(--space-s)", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", textTransform: "uppercase", letterSpacing: "0.08em" }}>Путь проекта</h3>
       <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
@@ -525,24 +552,6 @@ function SidebarContent({ stages, activeStage, setActiveStage, completed, progre
           <span>{totalDone}/{totalDecs}</span><span>{progress}%</span>
         </div>
       </div>
-
-      {/* Decision Journal buttons */}
-      {decisionChoices && Object.keys(decisionChoices).length > 0 && <>
-        <button data-decision-map-btn="true" onClick={() => setShowDecisionMap(true)}
-          style={{ marginTop: "var(--space-s)", width: "100%", padding: "8px 12px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-accent)", background: "var(--color-accent-light)", fontWeight: 600, fontSize: "var(--text-xs)", cursor: "pointer", color: "var(--color-accent)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span>📋 Карта решений</span>
-          <span style={{fontSize:9, color:"var(--color-accent)", opacity:0.7}}>{Object.keys(decisionChoices).length}</span>
-        </button>
-        <button onClick={() => { 
-          const brief = stages.flatMap((s:any) => (s.decisions||[]).filter((d:any)=>decisionChoices[d.id])).map((d:any) => `⚡ ${d.title}: ${decisionChoices[d.id].choice}${decisionChoices[d.id].reason ? " — " + decisionChoices[d.id].reason : ""}`).join("\
-"); 
-          navigator.clipboard.writeText(brief); 
-          alert("✅ Бриф скопирован в буфер обмена!");
-        }}
-          style={{ marginTop: 4, width: "100%", padding: "8px 12px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-accent)", background: "white", fontWeight: 600, fontSize: "var(--text-xs)", cursor: "pointer", color: "var(--color-accent)" }}>
-          📋 Собрать бриф проекта
-        </button>
-      </>}
     </div>
   );
 }
