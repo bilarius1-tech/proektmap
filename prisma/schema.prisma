@@ -346,7 +346,7 @@ model SiteSettings {
   autoPublishEnabled Boolean  @default(false)
   autoPublishHour    Int      @default(9)
   mcpAutoScan        Boolean  @default(false)
-  mcpScanDay         String   @default(monday)
+  mcpScanDay         String   @default("monday")
   mcpScanHour        Int      @default(3)
   mcpTranslateRu     Boolean  @default(true)
   assistantGreeting  String   @default("")
