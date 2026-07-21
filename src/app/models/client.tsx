@@ -29,7 +29,7 @@ export default function ModelsClient() {
     return 0;
   });
 
-  const filtered = search ? sorted.filter(m => m.name.toLowerCase().includes(search.toLowerCase()) || m.provider.includes(search) || m.id.includes(search)) : sorted;
+  const filtered = search ? sorted.filter((m: any) => m.name.toLowerCase().includes(search.toLowerCase()) || m.provider.includes(search) || m.id.includes(search)) : sorted;
   const top10 = sorted.slice(0, 10);
 
   function formatPrice(p: number) { return p === 0 ? "FREE" : "$" + p.toFixed(2); }

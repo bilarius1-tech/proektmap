@@ -68,7 +68,7 @@ export default function AIRadar() {
             </tr>
           </thead>
           <tbody>
-            {models.map(m => (
+            {models.map((m: any) => (
               <tr key={m.id} style={{ borderBottom: "1px solid var(--color-border-light)" }}>
                 <td style={{ padding: "8px", fontWeight: 600 }}>{m.name}<div style={{ fontSize: "10px", color: "var(--color-text-tertiary)" }}>{m.provider}</div></td>
                 <td style={{ padding: "8px" }}><Bar value={m.codeRating} color={m.codeRating >= 9 ? "#22c55e" : m.codeRating >= 7 ? "#f59e0b" : "#ef4444"} /></td>

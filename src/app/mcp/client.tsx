@@ -43,6 +43,8 @@ export default function MCPPageClient({ servers }: any) {
   const [faqOpen, setFaqOpen] = useState<number | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
   const [showAllTags, setShowAllTags] = useState(false);
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(12);
 
   const categories = [...new Set(servers.map((s: any) => s.category))] as string[];
 
@@ -227,7 +229,9 @@ export default function MCPPageClient({ servers }: any) {
 
       {/* Grid */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "var(--space-m)" }}>
-        {sorted.map((s: any) => {
+        {(() => {
+            const paged = sorted.slice((page - 1) * perPage, page * perPage);
+            return paged.map((s: any) => {
           const compatTools = aiToolSlugs.filter(slug => TOOL_COMPAT[slug]?.includes(s.slug));
           return (
             <div key={s.id} style={{
@@ -294,8 +298,33 @@ export default function MCPPageClient({ servers }: any) {
               </div>
             </div>
           );
-        })}
+        })})()}
       </div>
+
+      {/* Pagination */}
+      {sorted.length > perPage && (
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 8, marginTop: "var(--space-xl)" }}>
+          <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
+            style={{ padding: "8px 16px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "white", cursor: page === 1 ? "default" : "pointer", opacity: page === 1 ? 0.4 : 1, fontWeight: 600, fontSize: "var(--text-xs)" }}>
+            ← Назад
+          </button>
+          <div style={{ display: "flex", gap: 4 }}>
+            {Array.from({ length: Math.ceil(sorted.length / perPage) }, (_, i) => (
+              <button key={i} onClick={() => setPage(i + 1)}
+                style={{ width: 36, height: 36, borderRadius: "var(--radius-s)", border: page === i + 1 ? "2px solid var(--color-accent)" : "1px solid var(--color-border)", background: page === i + 1 ? "var(--color-accent-light)" : "white", color: page === i + 1 ? "var(--color-accent)" : "var(--color-text-secondary)", fontWeight: 700, fontSize: "var(--text-xs)", cursor: "pointer" }}>
+                {i + 1}
+              </button>
+            ))}
+          </div>
+          <button onClick={() => setPage(p => Math.min(Math.ceil(sorted.length / perPage), p + 1))} disabled={page === Math.ceil(sorted.length / perPage)}
+            style={{ padding: "8px 16px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "white", cursor: page === Math.ceil(sorted.length / perPage) ? "default" : "pointer", opacity: page === Math.ceil(sorted.length / perPage) ? 0.4 : 1, fontWeight: 600, fontSize: "var(--text-xs)" }}>
+            Вперёд →
+          </button>
+          <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", marginLeft: 12 }}>
+            {page} из {Math.ceil(sorted.length / perPage)}
+          </span>
+        </div>
+      )}
     </div>
   );
 }

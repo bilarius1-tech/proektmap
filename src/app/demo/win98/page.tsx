@@ -28,7 +28,7 @@ export default function Win98Demo() {
 
           {/* Menu bar */}
           <div style={{ display: "flex", gap: 0, borderBottom: "1px solid #808080", padding: "1px 0", background: "#c0c0c0" }}>
-            {["Файл", "Правка", "Вид", "Путь", "Блог", "Справка"].map(m => (
+            {["Файл", "Правка", "Вид", "Путь", "Блог", "Справка"].map((m: any) => (
               <span key={m} style={{ padding: "2px 8px", fontSize: 12, cursor: "pointer" }}>{m}</span>
             ))}
           </div>

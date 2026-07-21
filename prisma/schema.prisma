@@ -255,6 +255,17 @@ model DecisionSkill {
 
 
 
+
+model MCPTrend {
+  id        String   @id @default(uuid())
+  serverId  String
+  stars     Int
+  forks     Int      @default(0)
+  recordedAt DateTime @default(now())
+  server    MCPServer @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  @@map("mcp_trends")
+}
+
 model MCPServer {
   id            String   @id @default(uuid())
   name          String   @unique
@@ -276,6 +287,7 @@ model MCPServer {
   sortOrder     Int      @default(0)
   isActive      Boolean  @default(true)
   isFeatured    Boolean  @default(false)
+  russianAlternative String @default("")
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   @@map("mcp_servers")

@@ -24,7 +24,7 @@ export default async function AIRadarAdmin() {
             </tr>
           </thead>
           <tbody>
-            {models.map(m => (
+            {models.map((m: any) => (
               <tr key={m.id} style={{ borderBottom: "1px solid var(--color-border-light)" }}>
                 <td style={{ padding: "10px 12px", fontWeight: 600 }}>{m.name}</td>
                 <td style={{ padding: "10px 12px", color: "var(--color-text-secondary)", fontSize: "var(--text-s)" }}>{m.provider}</td>
