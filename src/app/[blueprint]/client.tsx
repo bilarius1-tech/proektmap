@@ -5,6 +5,7 @@ import GlossaryBlock from "@/components/blueprint/glossary-block";
 import AIRadar from "./ai-radar";
 import VibecraftGuide from "@/components/blueprint/vibecraft-guide";
 import AIToolsComparison from "@/components/blueprint/ai-tools-comparison";
+import BlueprintFlow from "@/components/blueprint/flow-view";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import {
@@ -107,6 +108,7 @@ export default function BlueprintPageClient({
   const [creating, setCreating] = useState(false);
   const [decisionChoices, setDecisionChoices] = useState<Record<string,{choice:string;reason:string}>>({});
   const [showDecisionMap, setShowDecisionMap] = useState(false);
+  const [viewMode, setViewMode] = useState<"list"|"flow">("flow");
   const [sidebarPulse, setSidebarPulse] = useState(0);
   const [notifications, setNotifications] = useState<Array<{id:number; msg:string; type:string}>>([]);
 
@@ -250,7 +252,18 @@ export default function BlueprintPageClient({
       )}
 
       {/* Main content */}
-      <main suppressHydrationWarning style={{ flex: 1, padding: isMobile ? "var(--space-m)" : "var(--space-xl)", maxWidth: 1100 }}>
+      {viewMode === "flow" && (
+        <div style={{ padding: "var(--space-m)", flex: 1 }}>
+          <BlueprintFlow
+            stages={stages}
+            completed={completed}
+            activeStage={activeStage}
+            onStageClick={(slug: string) => { setActiveStage(slug); setViewMode("list"); }}
+          />
+        </div>
+      )}
+
+      {viewMode === "list" && <main suppressHydrationWarning style={{ flex: 1, padding: isMobile ? "var(--space-m)" : "var(--space-xl)", maxWidth: 1100 }}>
         {/* Registration banner */}
         {!isLoggedIn && (
           <div style={{
@@ -399,7 +412,7 @@ export default function BlueprintPageClient({
           })}
         </div>
       <GlossaryBlock terms={glossaryTerms || []} />
-      </main>
+      </main>}
 
       {/* Notifications — top-right stack */}
       <div style={{ position: "fixed", top: 68, right: 16, zIndex: 300, display: "flex", flexDirection: "column", gap: 8, maxWidth: 360, pointerEvents: "none" }}>
