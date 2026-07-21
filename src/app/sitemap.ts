@@ -1,36 +1,42 @@
-import { getDb } from "@/lib/db";
-export const dynamic = "force-dynamic";
+import { MetadataRoute } from "next";
+import { getDb } from "@/lib/db/index";
 
-export default async function Sitemap() {
-  const base = "https://proektmap.ru";
-  const now = new Date();
-
-  const items: { url: string; lastModified: Date; priority: number }[] = [
-    { url: base, lastModified: now, priority: 1 },
-    { url: `${base}/corporate-website`, lastModified: now, priority: 0.9 },
-    { url: `${base}/blog`, lastModified: now, priority: 0.9 },
-    { url: `${base}/specialists`, lastModified: now, priority: 0.8 },
-    { url: `${base}/glossary`, lastModified: now, priority: 0.8 },
-    { url: `${base}/blog/tags`, lastModified: now, priority: 0.7 },
-    { url: `${base}/prompts`, lastModified: now, priority: 0.8 },
-    { url: `${base}/contacts`, lastModified: now, priority: 0.5 },
-    { url: `${base}/privacy`, lastModified: now, priority: 0.3 },
-    { url: `${base}/terms`, lastModified: now, priority: 0.3 },
-    { url: `${base}/offer`, lastModified: now, priority: 0.3 },
-    { url: `${base}/refund`, lastModified: now, priority: 0.3 },
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const baseUrl = "https://proektmap.ru";
+  
+  const staticPages: MetadataRoute.Sitemap = [
+    { url: baseUrl, lastModified: new Date(), changeFrequency: "weekly", priority: 1 },
+    { url: `${baseUrl}/corporate-website`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.9 },
+    { url: `${baseUrl}/saas-project`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.9 },
+    { url: `${baseUrl}/game-dev`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.9 },
+    { url: `${baseUrl}/blog`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
+    { url: `${baseUrl}/ai-tools`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
+    { url: `${baseUrl}/prompts`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
+    { url: `${baseUrl}/models`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
+    { url: `${baseUrl}/specialists`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
+    { url: `${baseUrl}/terms`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.4 },
+    { url: `${baseUrl}/privacy`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.4 },
+    { url: `${baseUrl}/offer`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.4 },
+    { url: `${baseUrl}/auth`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.3 },
   ];
 
+  // Dynamic: blog posts
+  let blogUrls: MetadataRoute.Sitemap = [];
   try {
     const db = await getDb();
-    const posts = await db.blogPost.findMany({
+    const posts = await db.blogPost.findMany({ 
       where: { status: "published" },
       select: { slug: true, updatedAt: true },
-      orderBy: { publishedAt: "desc" }, take: 100,
+      orderBy: { updatedAt: "desc" },
+      take: 100,
     });
-    for (const p of posts) {
-      items.push({ url: `${base}/blog/${p.slug}`, lastModified: p.updatedAt, priority: 0.8 });
-    }
+    blogUrls = posts.map(p => ({
+      url: `${baseUrl}/blog/${p.slug}`,
+      lastModified: p.updatedAt,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    }));
   } catch {}
 
-  return items.map(p => ({ url: p.url, lastModified: p.lastModified, changeFrequency: "weekly" as const, priority: p.priority }));
+  return [...staticPages, ...blogUrls];
 }
