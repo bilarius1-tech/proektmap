@@ -99,6 +99,11 @@ export default function MCPPageClient({ servers }: any) {
         </p>
       </div>
 
+      {/* Stats */}
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:"var(--space-s)",marginBottom:"var(--space-xl)",padding:"var(--space-l)",background:"var(--color-bg-secondary)",borderRadius:"var(--radius-s)",border:"1px solid var(--color-border-light)"}}>
+        <div style={{textAlign:"center",padding:"var(--space-m)"}}><div style={{fontSize:"var(--text-xxl)",fontWeight:900,color:"var(--color-accent)",fontFamily:"var(--font-heading)"}}>0</div><div style={{fontSize:"var(--text-xs)",color:"var(--color-text-tertiary)",marginTop:4}}>Test</div></div>
+      </div>
+
       {/* FAQ — мини-урок */}
       <div style={{ marginBottom: "var(--space-xl)", background: "var(--color-bg-secondary)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border-light)", overflow: "hidden" }}>
         <div style={{ padding: "var(--space-m) var(--space-l)", background: "var(--color-accent-light)", display: "flex", alignItems: "center", gap: 8 }}>
