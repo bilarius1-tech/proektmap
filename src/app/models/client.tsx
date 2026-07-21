@@ -51,7 +51,7 @@ export default function ModelsClient() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "var(--space-m)", marginBottom: "var(--space-xl)" }}>
           {top10.slice(0,3).map((m, i) => (
             <div key={m.id} style={{
-              padding: "var(--space-l)", background: "white", borderRadius: "var(--radius-s)", border: "2px solid " + (i===0?"#f59e0b":i===1?"#94a3b8":"#d97706"),
+              padding: "var(--space-l)", background: "var(--color-bg-primary)", borderRadius: "var(--radius-s)", border: "2px solid " + (i===0?"#f59e0b":i===1?"#94a3b8":"#d97706"),
             }}>
               <div style={{ fontSize: 24, marginBottom: 4 }}>{["🥇","🥈","🥉"][i]}</div>
               <div style={{ fontFamily:"var(--font-heading)", fontWeight:700, fontSize:"var(--text-s)", marginBottom:2 }}>{m.name}</div>

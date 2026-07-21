@@ -182,7 +182,7 @@ export default function SettingsClient({ settings }: any) {
 
 function Section({ title, children }: { title: string; children: any }) {
   return (
-    <div style={{ padding: "var(--space-l)", background: "white", borderRadius: "var(--radius-l)", border: "1px solid var(--color-border)" }}>
+    <div style={{ padding: "var(--space-l)", background: "var(--color-bg-primary)", borderRadius: "var(--radius-l)", border: "1px solid var(--color-border)" }}>
       <h2 style={{ fontSize: "var(--text-l)", fontWeight: 700, marginBottom: "var(--space-m)" }}>{title}</h2>
       <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-m)" }}>{children}</div>
     </div>

@@ -93,7 +93,7 @@ export default function PromptsPageClient({ prompts, variables, categories, tota
 
       <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)" }}>
         {filtered.map(p => (
-          <div key={p.id} style={{ background: "white", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)" }}>
+          <div key={p.id} style={{ background: "var(--color-bg-primary)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)" }}>
             <div onClick={() => setExpanded(expanded === p.id ? null : p.id)} style={{ display: "flex", alignItems: "center", gap: "var(--space-s)", padding: "var(--space-m)", cursor: "pointer" }}>
               <span style={{ color: "var(--color-accent)", flexShrink: 0 }}><CatIcon category={p.category} categories={categories} /></span>
               <div style={{ flex: 1, minWidth: 0 }}>
@@ -112,7 +112,7 @@ export default function PromptsPageClient({ prompts, variables, categories, tota
             </div>
             {expanded === p.id && (
               <div style={{ padding: "var(--space-m)", borderTop: "1px solid var(--color-border-light)", background: "var(--color-bg-secondary)" }}>
-                <div style={{ whiteSpace: "pre-wrap", fontSize: "var(--text-xs)", fontFamily: "var(--font-mono)", lineHeight: 1.8, padding: "var(--space-m)", background: "white", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)" }}>
+                <div style={{ whiteSpace: "pre-wrap", fontSize: "var(--text-xs)", fontFamily: "var(--font-mono)", lineHeight: 1.8, padding: "var(--space-m)", background: "var(--color-bg-primary)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)" }}>
                   <RenderTemplate text={p.content} variables={variables} />
                 </div>
               </div>
@@ -125,7 +125,7 @@ export default function PromptsPageClient({ prompts, variables, categories, tota
       {totalPages > 1 && (
         <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 8, marginTop: "var(--space-xl)" }}>
           <button onClick={() => goPage(page - 1)} disabled={page <= 1}
-            style={{ display: "flex", alignItems: "center", gap: 4, padding: "8px 14px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "white", cursor: page <= 1 ? "default" : "pointer", opacity: page <= 1 ? 0.4 : 1, fontSize: "var(--text-xs)" }}>
+            style={{ display: "flex", alignItems: "center", gap: 4, padding: "8px 14px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "var(--color-bg-primary)", cursor: page <= 1 ? "default" : "pointer", opacity: page <= 1 ? 0.4 : 1, fontSize: "var(--text-xs)" }}>
             <ChevronLeft size={14} /> Назад
           </button>
           {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
@@ -141,7 +141,7 @@ export default function PromptsPageClient({ prompts, variables, categories, tota
             );
           })}
           <button onClick={() => goPage(page + 1)} disabled={page >= totalPages}
-            style={{ display: "flex", alignItems: "center", gap: 4, padding: "8px 14px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "white", cursor: page >= totalPages ? "default" : "pointer", opacity: page >= totalPages ? 0.4 : 1, fontSize: "var(--text-xs)" }}>
+            style={{ display: "flex", alignItems: "center", gap: 4, padding: "8px 14px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "var(--color-bg-primary)", cursor: page >= totalPages ? "default" : "pointer", opacity: page >= totalPages ? 0.4 : 1, fontSize: "var(--text-xs)" }}>
             Вперёд <ChevronRight size={14} />
           </button>
           <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>{page} / {totalPages}</span>

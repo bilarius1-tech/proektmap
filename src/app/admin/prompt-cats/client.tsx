@@ -124,7 +124,7 @@ export default function AdminCatsClient({ categories }: { categories: Category[]
 
       <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)" }}>
         {items.map(c => (
-          <div key={c.id} style={{ display: "flex", alignItems: "center", gap: "var(--space-s)", padding: "var(--space-m)", background: "white", borderRadius: "var(--radius-m)", border: "1px solid var(--color-border-light)", opacity: c.isActive ? 1 : 0.5 }}>
+          <div key={c.id} style={{ display: "flex", alignItems: "center", gap: "var(--space-s)", padding: "var(--space-m)", background: "var(--color-bg-primary)", borderRadius: "var(--radius-m)", border: "1px solid var(--color-border-light)", opacity: c.isActive ? 1 : 0.5 }}>
             <GripVertical size={14} style={{ color: "var(--color-text-tertiary)", flexShrink: 0 }} />
             <span style={{ color: "var(--color-accent)", flexShrink: 0 }}>{ICON_MAP[c.icon] || <Folder size={16} />}</span>
             <div style={{ flex: 1, minWidth: 0 }}>

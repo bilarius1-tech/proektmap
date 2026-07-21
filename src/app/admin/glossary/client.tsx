@@ -74,7 +74,7 @@ export default function AdminGlossaryClient({ terms }: any) {
 
       <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)" }}>
         {filtered.map((t: any) => (
-          <div key={t.id} style={{ display: "flex", alignItems: "center", gap: "var(--space-s)", padding: "var(--space-m)", background: "white", borderRadius: "var(--radius-m)", border: "1px solid var(--color-border-light)", opacity: t.isPublished ? 1 : 0.5 }}>
+          <div key={t.id} style={{ display: "flex", alignItems: "center", gap: "var(--space-s)", padding: "var(--space-m)", background: "var(--color-bg-primary)", borderRadius: "var(--radius-m)", border: "1px solid var(--color-border-light)", opacity: t.isPublished ? 1 : 0.5 }}>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontWeight: 700, fontSize: "var(--text-s)" }}>{t.term}</div>
               <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", marginTop: 2 }}>{t.simpleExplanation || t.definition.slice(0, 80)}</div>

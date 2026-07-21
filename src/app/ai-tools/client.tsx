@@ -76,19 +76,19 @@ export default function AIToolsPage({ tools }: { tools: Tool[] }) {
       <div style={{ display: "flex", gap: "var(--space-s)", flexWrap: "wrap", marginBottom: "var(--space-l)", alignItems: "center" }}>
         <Filter size={14} style={{ color: "var(--color-text-tertiary)" }} />
         <select value={filterType} onChange={e => setFilterType(e.target.value)}
-          style={{ padding: "6px 12px", fontSize: "var(--text-xs)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "white" }}>
+          style={{ padding: "6px 12px", fontSize: "var(--text-xs)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "var(--color-bg-primary)" }}>
           <option value="all">Все типы ({tools.length})</option>
           <option value="ide">💻 IDE / Редакторы</option>
           <option value="no-code">🧩 No-code конструкторы</option>
         </select>
         <select value={filterVpn} onChange={e => setFilterVpn(e.target.value)}
-          style={{ padding: "6px 12px", fontSize: "var(--text-xs)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "white" }}>
+          style={{ padding: "6px 12px", fontSize: "var(--text-xs)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "var(--color-bg-primary)" }}>
           <option value="all">VPN: не важно</option>
           <option value="no">🌐 Без VPN</option>
           <option value="yes">🔐 Нужен VPN</option>
         </select>
         <select value={filterRussian} onChange={e => setFilterRussian(e.target.value)}
-          style={{ padding: "6px 12px", fontSize: "var(--text-xs)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "white" }}>
+          style={{ padding: "6px 12px", fontSize: "var(--text-xs)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "var(--color-bg-primary)" }}>
           <option value="all">Язык: любой</option>
           <option value="yes">🇷🇺 Русский интерфейс</option>
         </select>
@@ -152,7 +152,7 @@ export default function AIToolsPage({ tools }: { tools: Tool[] }) {
                 const isCompared = compareIds.has(t.id);
                 return (
                   <div key={t.id} style={{
-                    padding: "var(--space-l)", background: "white", borderRadius: "var(--radius-s)",
+                    padding: "var(--space-l)", background: "var(--color-bg-primary)", borderRadius: "var(--radius-s)",
                     border: isCompared ? "2px solid var(--color-accent)" : "1px solid var(--color-border-light)",
                     display: "flex", flexDirection: "column",
                     position: "relative",
@@ -172,15 +172,15 @@ export default function AIToolsPage({ tools }: { tools: Tool[] }) {
 
                     {/* Badges */}
                     <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: "var(--space-s)" }}>
-                      {t.russianUi && <span style={{ padding: "2px 8px", borderRadius: "var(--radius-s)", background: "#ecfdf5", color: "#065f46", fontSize: 10, fontWeight: 600 }}>🇷🇺 UI</span>}
-                      {!t.requiresVpn && <span style={{ padding: "2px 8px", borderRadius: "var(--radius-s)", background: "#ecfdf5", color: "#065f46", fontSize: 10, fontWeight: 600 }}>🌐 Без VPN</span>}
-                      {t.requiresVpn && <span style={{ padding: "2px 8px", borderRadius: "var(--radius-s)", background: "#fef2f2", color: "#991b1b", fontSize: 10, fontWeight: 600 }}>🔐 VPN</span>}
+                      {t.russianUi && <span style={{ padding: "2px 8px", borderRadius: "var(--radius-s)", background: "#ecfdf5", color: "var(--color-accent)", fontSize: 10, fontWeight: 600 }}>🇷🇺 UI</span>}
+                      {!t.requiresVpn && <span style={{ padding: "2px 8px", borderRadius: "var(--radius-s)", background: "#ecfdf5", color: "var(--color-accent)", fontSize: 10, fontWeight: 600 }}>🌐 Без VPN</span>}
+                      {t.requiresVpn && <span style={{ padding: "2px 8px", borderRadius: "var(--radius-s)", background: "#fef2f2", color: "var(--color-error)", fontSize: 10, fontWeight: 600 }}>🔐 VPN</span>}
                     </div>
 
                     {/* Pros/Cons */}
                     <div style={{ display: "flex", gap: "var(--space-m)", marginBottom: "var(--space-s)" }}>
                       <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: "#065f46", marginBottom: 4 }}>✅ Плюсы</div>
+                        <div style={{ fontSize: 10, fontWeight: 700, color: "var(--color-accent)", marginBottom: 4 }}>✅ Плюсы</div>
                         {prosArr.slice(0, 3).map((p: string, i: number) => (
                           <div key={i} style={{ display: "flex", gap: 4, fontSize: 10, color: "var(--color-text-secondary)", marginBottom: 2, lineHeight: 1.4 }}>
                             <Check size={10} style={{ color: "#22c55e", marginTop: 2, flexShrink: 0 }} /> {p}
@@ -188,7 +188,7 @@ export default function AIToolsPage({ tools }: { tools: Tool[] }) {
                         ))}
                       </div>
                       <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: "#991b1b", marginBottom: 4 }}>❌ Минусы</div>
+                        <div style={{ fontSize: 10, fontWeight: 700, color: "var(--color-error)", marginBottom: 4 }}>❌ Минусы</div>
                         {consArr.slice(0, 3).map((c: string, i: number) => (
                           <div key={i} style={{ display: "flex", gap: 4, fontSize: 10, color: "var(--color-text-secondary)", marginBottom: 2, lineHeight: 1.4 }}>
                             <X size={10} style={{ color: "#ef4444", marginTop: 2, flexShrink: 0 }} /> {c}

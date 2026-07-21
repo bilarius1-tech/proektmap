@@ -78,7 +78,7 @@ export default function AdminPromptsClient({ prompts }: { prompts: Prompt[] }) {
 
       <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)" }}>
         {items.map(p => (
-          <div key={p.id} style={{ display: "flex", alignItems: "center", gap: "var(--space-s)", padding: "var(--space-m)", background: "white", borderRadius: "var(--radius-m)", border: "1px solid var(--color-border-light)", opacity: p.isActive ? 1 : 0.5 }}>
+          <div key={p.id} style={{ display: "flex", alignItems: "center", gap: "var(--space-s)", padding: "var(--space-m)", background: "var(--color-bg-primary)", borderRadius: "var(--radius-m)", border: "1px solid var(--color-border-light)", opacity: p.isActive ? 1 : 0.5 }}>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontWeight: 700, fontSize: "var(--text-s)" }}>{p.title}</div>
               <div style={{ display: "flex", gap: 8, marginTop: 4, alignItems: "center" }}>

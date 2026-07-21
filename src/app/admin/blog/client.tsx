@@ -111,7 +111,7 @@ export default function BlogAdminClient({ posts, categories, authors, pendingCom
 
       {/* Editor modal */}
       {editId && (
-        <div style={{ marginBottom: "var(--space-l)", padding: "var(--space-xl)", background: "white", borderRadius: "var(--radius-xl)", border: "1px solid var(--color-border)", boxShadow: "var(--shadow-l)" }}>
+        <div style={{ marginBottom: "var(--space-l)", padding: "var(--space-xl)", background: "var(--color-bg-primary)", borderRadius: "var(--radius-xl)", border: "1px solid var(--color-border)", boxShadow: "var(--shadow-l)" }}>
           <h2 style={{ fontSize: "var(--text-xl)", fontWeight: 800, marginBottom: "var(--space-l)" }}>{editId === "new" ? "Новый пост" : "Редактирование"}</h2>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-m)", marginBottom: "var(--space-m)" }}>
             <div><label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Заголовок *</label>
@@ -151,7 +151,7 @@ export default function BlogAdminClient({ posts, categories, authors, pendingCom
       )}
 
       {/* Posts table */}
-      <div style={{ background: "white", borderRadius: "var(--radius-l)", border: "1px solid var(--color-border)", overflow: "auto" }}>
+      <div style={{ background: "var(--color-bg-primary)", borderRadius: "var(--radius-l)", border: "1px solid var(--color-border)", overflow: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "var(--text-xs)" }}>
           <thead><tr style={{ background: "var(--color-bg-secondary)", borderBottom: "1px solid var(--color-border)" }}>
             {["Заголовок", "Автор", "Категория", "Статус", "Дата", ""].map(h => <th key={h} style={{ padding: "10px 14px", textAlign: "left", fontWeight: 600, color: "var(--color-text-secondary)", whiteSpace: "nowrap" }}>{h}</th>)}
@@ -184,11 +184,11 @@ export default function BlogAdminClient({ posts, categories, authors, pendingCom
       {totalPages > 1 && (
         <div style={{ display: "flex", justifyContent: "center", gap: 8, marginTop: "var(--space-xl)" }}>
           <button onClick={() => goPage(page - 1)} disabled={page <= 1}
-            style={{ display: "flex", alignItems: "center", gap: 4, padding: "8px 14px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "white", cursor: page <= 1 ? "default" : "pointer", opacity: page <= 1 ? 0.4 : 1, fontSize: "var(--text-xs)" }}>
+            style={{ display: "flex", alignItems: "center", gap: 4, padding: "8px 14px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "var(--color-bg-primary)", cursor: page <= 1 ? "default" : "pointer", opacity: page <= 1 ? 0.4 : 1, fontSize: "var(--text-xs)" }}>
             <ChevronLeft size={14} /> Назад</button>
           <span style={{ display: "flex", alignItems: "center", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>{page} / {totalPages}</span>
           <button onClick={() => goPage(page + 1)} disabled={page >= totalPages}
-            style={{ display: "flex", alignItems: "center", gap: 4, padding: "8px 14px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "white", cursor: page >= totalPages ? "default" : "pointer", opacity: page >= totalPages ? 0.4 : 1, fontSize: "var(--text-xs)" }}>
+            style={{ display: "flex", alignItems: "center", gap: 4, padding: "8px 14px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "var(--color-bg-primary)", cursor: page >= totalPages ? "default" : "pointer", opacity: page >= totalPages ? 0.4 : 1, fontSize: "var(--text-xs)" }}>
             Вперёд <ChevronRight size={14} /></button>
         </div>
       )}

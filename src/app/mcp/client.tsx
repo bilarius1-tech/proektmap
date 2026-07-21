@@ -175,15 +175,15 @@ export default function MCPPageClient({ servers }: any) {
         <div style={{ position: "relative", flex: "1 1 250px", maxWidth: 350 }}>
           <Search size={14} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "var(--color-text-tertiary)" }} />
           <input placeholder="Поиск..." value={search} onChange={e => setSearch(e.target.value)}
-            style={{ width: "100%", padding: "8px 12px 8px 34px", fontSize: "var(--text-xs)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none", background: "white", boxSizing: "border-box" }} />
+            style={{ width: "100%", padding: "8px 12px 8px 34px", fontSize: "var(--text-xs)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none", background: "var(--color-bg-primary)", boxSizing: "border-box" }} />
         </div>
         <select value={category} onChange={e => setCategory(e.target.value)}
-          style={{ padding: "8px 12px", fontSize: "var(--text-xs)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "white" }}>
+          style={{ padding: "8px 12px", fontSize: "var(--text-xs)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "var(--color-bg-primary)" }}>
           <option value="all">Все категории</option>
           {categories.map(c => <option key={c} value={c}>{c} ({servers.filter((s:any)=>s.category===c).length})</option>)}
         </select>
         <select value={difficulty} onChange={e => setDifficulty(e.target.value)}
-          style={{ padding: "8px 12px", fontSize: "var(--text-xs)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "white" }}>
+          style={{ padding: "8px 12px", fontSize: "var(--text-xs)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "var(--color-bg-primary)" }}>
           <option value="all">Любая сложность</option>
           <option value="easy">🟢 Новичок</option>
           <option value="medium">🟡 Средне</option>
@@ -235,7 +235,7 @@ export default function MCPPageClient({ servers }: any) {
           const compatTools = aiToolSlugs.filter(slug => TOOL_COMPAT[slug]?.includes(s.slug));
           return (
             <div key={s.id} style={{
-              padding: "var(--space-l)", background: "white", borderRadius: "var(--radius-s)",
+              padding: "var(--space-l)", background: "var(--color-bg-primary)", borderRadius: "var(--radius-s)",
               border: compareIds.has(s.id) ? "2px solid var(--color-accent)" : "1px solid var(--color-border-light)",
               display: "flex", flexDirection: "column", position: "relative",
             }}>
@@ -272,9 +272,9 @@ export default function MCPPageClient({ servers }: any) {
 
               {/* Badges */}
               <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: "var(--space-s)" }}>
-                {s.russianDocs && <span style={{ padding: "2px 6px", borderRadius: "var(--radius-s)", background: "#ecfdf5", color: "#065f46", fontSize: 9, fontWeight: 600 }}>🇷🇺</span>}
+                {s.russianDocs && <span style={{ padding: "2px 6px", borderRadius: "var(--radius-s)", background: "#ecfdf5", color: "var(--color-accent)", fontSize: 9, fontWeight: 600 }}>🇷🇺</span>}
                 {s.requiresApiKey && <span style={{ padding: "2px 6px", borderRadius: "var(--radius-s)", background: "#fffbeb", color: "#92400e", fontSize: 9, fontWeight: 600 }}>🔑 API</span>}
-                {!s.requiresApiKey && <span style={{ padding: "2px 6px", borderRadius: "var(--radius-s)", background: "#ecfdf5", color: "#065f46", fontSize: 9, fontWeight: 600 }}>🆓</span>}
+                {!s.requiresApiKey && <span style={{ padding: "2px 6px", borderRadius: "var(--radius-s)", background: "#ecfdf5", color: "var(--color-accent)", fontSize: 9, fontWeight: 600 }}>🆓</span>}
                 <span style={{ padding: "2px 6px", borderRadius: "var(--radius-s)", background: "var(--color-bg-secondary)", color: "var(--color-text-tertiary)", fontSize: 9, fontWeight: 600 }}>
                   {s.difficulty === "easy" ? "🟢" : s.difficulty === "medium" ? "🟡" : "🔴"}
                 </span>
@@ -305,7 +305,7 @@ export default function MCPPageClient({ servers }: any) {
       {sorted.length > perPage && (
         <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 8, marginTop: "var(--space-xl)" }}>
           <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
-            style={{ padding: "8px 16px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "white", cursor: page === 1 ? "default" : "pointer", opacity: page === 1 ? 0.4 : 1, fontWeight: 600, fontSize: "var(--text-xs)" }}>
+            style={{ padding: "8px 16px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "var(--color-bg-primary)", cursor: page === 1 ? "default" : "pointer", opacity: page === 1 ? 0.4 : 1, fontWeight: 600, fontSize: "var(--text-xs)" }}>
             ← Назад
           </button>
           <div style={{ display: "flex", gap: 4 }}>
@@ -317,7 +317,7 @@ export default function MCPPageClient({ servers }: any) {
             ))}
           </div>
           <button onClick={() => setPage(p => Math.min(Math.ceil(sorted.length / perPage), p + 1))} disabled={page === Math.ceil(sorted.length / perPage)}
-            style={{ padding: "8px 16px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "white", cursor: page === Math.ceil(sorted.length / perPage) ? "default" : "pointer", opacity: page === Math.ceil(sorted.length / perPage) ? 0.4 : 1, fontWeight: 600, fontSize: "var(--text-xs)" }}>
+            style={{ padding: "8px 16px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "var(--color-bg-primary)", cursor: page === Math.ceil(sorted.length / perPage) ? "default" : "pointer", opacity: page === Math.ceil(sorted.length / perPage) ? 0.4 : 1, fontWeight: 600, fontSize: "var(--text-xs)" }}>
             Вперёд →
           </button>
           <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", marginLeft: 12 }}>

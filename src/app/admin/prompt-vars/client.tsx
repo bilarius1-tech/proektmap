@@ -78,7 +78,7 @@ export default function AdminVarsClient({ variables }: { variables: Variable[] }
 
       <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)" }}>
         {items.map(v => (
-          <div key={v.id} style={{ display: "flex", alignItems: "center", gap: "var(--space-s)", padding: "var(--space-m)", background: "white", borderRadius: "var(--radius-m)", border: "1px solid var(--color-border-light)", opacity: v.isActive ? 1 : 0.5 }}>
+          <div key={v.id} style={{ display: "flex", alignItems: "center", gap: "var(--space-s)", padding: "var(--space-m)", background: "var(--color-bg-primary)", borderRadius: "var(--radius-m)", border: "1px solid var(--color-border-light)", opacity: v.isActive ? 1 : 0.5 }}>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                 <code style={{ background: "var(--color-accent-light)", padding: "1px 6px", borderRadius: 4, fontWeight: 700, color: "var(--color-accent)", fontSize: 11 }}>{"{{" + v.name + "}}"}</code>

@@ -94,7 +94,7 @@ export default function VibecraftGuide() {
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)" }}>
           {steps.map((s, i) => (
-            <div key={i} style={{ display: "flex", gap: 12, padding: "var(--space-s) var(--space-m)", background: "white", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border-light)", alignItems: "flex-start" }}>
+            <div key={i} style={{ display: "flex", gap: 12, padding: "var(--space-s) var(--space-m)", background: "var(--color-bg-primary)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border-light)", alignItems: "flex-start" }}>
               <div style={{ width: 28, height: 28, borderRadius: "50%", background: "var(--color-accent)", color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
                 {i + 1}
               </div>
@@ -154,7 +154,7 @@ export default function VibecraftGuide() {
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-xs)" }}>
           {faqs.map((faq, i) => (
-            <div key={i} style={{ background: "white", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border-light)" }}>
+            <div key={i} style={{ background: "var(--color-bg-primary)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border-light)" }}>
               <div
                 onClick={() => setExpandedFaq(expandedFaq === i ? null : i)}
                 style={{

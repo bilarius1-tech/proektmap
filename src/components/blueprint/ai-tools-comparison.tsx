@@ -38,7 +38,7 @@ export default function AIToolsComparison() {
       {/* Quick picks grid — 3 columns */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "var(--space-s)" }}>
         {tools.map((t: Tool) => (
-          <div key={t.id} style={{ padding: "var(--space-m)", background: "white", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border-light)" }}>
+          <div key={t.id} style={{ padding: "var(--space-m)", background: "var(--color-bg-primary)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border-light)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
               <div style={{ fontWeight: 700, fontSize: "var(--text-s)" }}>{t.name}</div>
               <div style={{ display: "flex", gap: 1 }}>

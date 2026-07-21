@@ -135,7 +135,7 @@ export default function DesignClient({ settings }: any) {
         <div style={{
           width: "100%", maxWidth: 700,
           fontFamily: previewBody + ", Inter, sans-serif",
-          background: "white", borderRadius: 4,
+          background: "var(--color-bg-primary)", borderRadius: 4,
           boxShadow: "0 2px 12px rgba(0,0,0,0.06)", overflow: "hidden",
         }}>
           {/* Preview header */}
@@ -164,7 +164,7 @@ export default function DesignClient({ settings }: any) {
             {/* Stats */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 1, background: "#d4d4cc", marginBottom: 28 }}>
               {["203 Решения", "2,795 XP", "94 Термина", "3 Пути"].map(s => (
-                <div key={s} style={{ background: "white", padding: "14px 12px", textAlign: "center" }}>
+                <div key={s} style={{ background: "var(--color-bg-primary)", padding: "14px 12px", textAlign: "center" }}>
                   <div style={{ fontFamily: previewHeading, fontWeight: 800, fontSize: 18 }}>{s.split(" ")[0]}</div>
                   <div style={{ fontSize: 9, color: "#8c8c80", marginTop: 2 }}>{s.split(" ")[1]}</div>
                 </div>
@@ -174,7 +174,7 @@ export default function DesignClient({ settings }: any) {
             {/* Cards grid */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 1, background: "#d4d4cc" }}>
               {["Корпоративный сайт", "SaaS-продукт", "Разработка игры"].map(title => (
-                <div key={title} style={{ background: "white", padding: "16px 14px" }}>
+                <div key={title} style={{ background: "var(--color-bg-primary)", padding: "16px 14px" }}>
                   <div style={{ fontFamily: previewHeading + ", sans-serif", fontWeight: 700, fontSize: 13, marginBottom: 3 }}>{title}</div>
                   <div style={{ fontSize: 10, color: "#8c8c80" }}>
                     {title === "Корпоративный сайт" ? "1140 XP · 81 реш." : title === "SaaS-продукт" ? "875 XP · 62 реш." : "780 XP · 60 реш."}

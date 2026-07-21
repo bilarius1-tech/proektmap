@@ -78,7 +78,7 @@ export default function AdminAIToolsClient({ tools: initialTools }: any) {
       {/* Edit Modal */}
       {editing && (
         <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", justifyContent: "center", alignItems: "center", background: "rgba(0,0,0,0.4)" }} onClick={() => setEditing(null)}>
-          <div style={{ background: "white", borderRadius: "var(--radius-s)", maxWidth: 600, width: "90%", maxHeight: "90vh", overflow: "auto", padding: "var(--space-l)", boxShadow: "0 8px 40px rgba(0,0,0,0.15)" }} onClick={e => e.stopPropagation()}>
+          <div style={{ background: "var(--color-bg-primary)", borderRadius: "var(--radius-s)", maxWidth: 600, width: "90%", maxHeight: "90vh", overflow: "auto", padding: "var(--space-l)", boxShadow: "0 8px 40px rgba(0,0,0,0.15)" }} onClick={e => e.stopPropagation()}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "var(--space-m)" }}>
               <h2 style={{ fontSize: "var(--text-l)", fontWeight: 700 }}>{editing.id ? "Редактировать" : "Новый инструмент"}</h2>
               <button onClick={() => setEditing(null)} style={{ background: "none", border: "none", cursor: "pointer" }}><X size={18} /></button>

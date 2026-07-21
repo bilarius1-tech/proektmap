@@ -106,7 +106,7 @@ export default function UsersClient({ users }: { users: any[] }) {
       )}
 
       {/* Users table */}
-      <div style={{ background: "white", borderRadius: "var(--radius-l)", border: "1px solid var(--color-border)", overflow: "auto" }}>
+      <div style={{ background: "var(--color-bg-primary)", borderRadius: "var(--radius-l)", border: "1px solid var(--color-border)", overflow: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "var(--text-xs)" }}>
           <thead>
             <tr style={{ background: "var(--color-bg-secondary)", borderBottom: "1px solid var(--color-border)" }}>
