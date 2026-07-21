@@ -83,6 +83,7 @@ export default function Home() {
             );
           })}
         </div>
+<a href="/mcp" style={{display:"flex",flexDirection:"column",padding:"var(--space-l)",background:"var(--color-bg-primary)",borderRadius:"var(--radius-m)",border:"1px solid var(--color-border)",textDecoration:"none",color:"inherit"}}>            <div style={{display:"flex",alignItems:"center",gap:"var(--space-s)",marginBottom:"var(--space-s)"}}>              <span style={{fontSize:22}}>🔌</span>              <div style={{fontWeight:700,fontSize:"var(--text-s)"}}>MCP-серверы</div>            </div>            <div style={{fontSize:"var(--text-xs)",color:"var(--color-text-secondary)",flex:1,marginBottom:"var(--space-s)"}}>Первый русскоязычный каталог — 34+ серверов</div>            <span style={{fontSize:"var(--text-xs)",color:"var(--color-accent)",fontWeight:600}}>Смотреть каталог</span>          </a>
       </div>
 
       {/* Тарифы */}
