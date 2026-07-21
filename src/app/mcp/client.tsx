@@ -47,10 +47,8 @@ export default function MCPPageClient({ servers }: any) {
   const categories = [...new Set(servers.map((s: any) => s.category))] as string[];
 
   // Collect all tags
-  const allTags = servers.reduce((acc: Record<string, number>, s: any) => {
-    (s.tags || "").split(",").filter(Boolean).forEach((t: string) => { acc[t.trim()] = (acc[t.trim()] || 0) + 1; });
-    return acc;
-  }, {});
+  const allTags: Record<string, number> = {};
+  servers.forEach((s: any) => { (s.tags || "").split(",").filter((t: string) => t.length > 0).forEach((t: string) => { allTags[t.trim()] = (allTags[t.trim()] || 0) + 1; }); });
   const sortedTags = Object.entries(allTags).sort((a, b) => b[1] - a[1]);
 
   const filtered = servers.filter((s: any) => {
@@ -214,20 +212,13 @@ export default function MCPPageClient({ servers }: any) {
                 </tr>
               </thead>
               <tbody>
-                {[
-                  ["Категория", (s:any) => s.category],
-                  ["Рейтинг", (s:any) => `${s.rating}/10`],
-                  ["Сложность", (s:any) => s.difficulty],
-                  ["API ключ", (s:any) => s.requiresApiKey ? "🔑 Нужен" : "🆓 Нет"],
-                  ["Русский", (s:any) => s.russianDocs ? "🇷🇺 Да" : "❌ Нет"],
-                  ["⭐ GitHub", (s:any) => s.stars],
-                  ["Совместимость", (s:any) => aiToolSlugs.filter(slug => TOOL_COMPAT[slug]?.includes(s.slug)).map(slug => aiToolNames[aiToolSlugs.indexOf(slug)]).join(", ") || "—"],
-                ].map(([label, fn]) => (
-                  <tr key={label as string} style={{ borderBottom: "1px solid var(--color-border-light)" }}>
-                    <td style={{ padding: "8px 12px", fontWeight: 600, color: "var(--color-text-secondary)" }}>{label}</td>
-                    {compareServers.map((s: any) => <td key={s.id} style={{ padding: "8px 12px" }}>{(fn as any)(s)}</td>)}
-                  </tr>
-                ))}
+                <tr style={{ borderBottom: "1px solid var(--color-border-light)" }}><td style={{ padding: "8px 12px", fontWeight: 600, color: "var(--color-text-secondary)" }}>Категория</td>{compareServers.map((s: any) => <td key={s.id} style={{ padding: "8px 12px" }}>{s.category}</td>)}</tr>
+                <tr style={{ borderBottom: "1px solid var(--color-border-light)" }}><td style={{ padding: "8px 12px", fontWeight: 600, color: "var(--color-text-secondary)" }}>Рейтинг</td>{compareServers.map((s: any) => <td key={s.id} style={{ padding: "8px 12px" }}>{s.rating}/10</td>)}</tr>
+                <tr style={{ borderBottom: "1px solid var(--color-border-light)" }}><td style={{ padding: "8px 12px", fontWeight: 600, color: "var(--color-text-secondary)" }}>Сложность</td>{compareServers.map((s: any) => <td key={s.id} style={{ padding: "8px 12px" }}>{s.difficulty}</td>)}</tr>
+                <tr style={{ borderBottom: "1px solid var(--color-border-light)" }}><td style={{ padding: "8px 12px", fontWeight: 600, color: "var(--color-text-secondary)" }}>API ключ</td>{compareServers.map((s: any) => <td key={s.id} style={{ padding: "8px 12px" }}>{s.requiresApiKey ? "🔑 Нужен" : "🆓 Нет"}</td>)}</tr>
+                <tr style={{ borderBottom: "1px solid var(--color-border-light)" }}><td style={{ padding: "8px 12px", fontWeight: 600, color: "var(--color-text-secondary)" }}>Русский</td>{compareServers.map((s: any) => <td key={s.id} style={{ padding: "8px 12px" }}>{s.russianDocs ? "🇷🇺 Да" : "❌ Нет"}</td>)}</tr>
+                <tr style={{ borderBottom: "1px solid var(--color-border-light)" }}><td style={{ padding: "8px 12px", fontWeight: 600, color: "var(--color-text-secondary)" }}>⭐ GitHub</td>{compareServers.map((s: any) => <td key={s.id} style={{ padding: "8px 12px" }}>{s.stars}</td>)}</tr>
+                <tr style={{ borderBottom: "1px solid var(--color-border-light)" }}><td style={{ padding: "8px 12px", fontWeight: 600, color: "var(--color-text-secondary)" }}>Совместимость</td>{compareServers.map((s: any) => <td key={s.id} style={{ padding: "8px 12px" }}>{aiToolSlugs.filter((slug: string) => TOOL_COMPAT[slug]?.includes(s.slug)).map((slug: string) => aiToolNames[aiToolSlugs.indexOf(slug)]).join(", ") || "—"}</td>)}</tr>
               </tbody>
             </table>
           </div>
