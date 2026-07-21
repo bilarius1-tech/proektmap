@@ -20,5 +20,15 @@ export default async function Page({ params }: any) {
   const db = await getDb();
   const server = await db.mCPServer.findUnique({ where: { slug } });
   if (!server) notFound();
-  return <MCPDetailClient server={JSON.parse(JSON.stringify(server))} />;
+  return <>
+    <script type="application/ld+json"
+      dangerouslySetInnerHTML={{__html: JSON.stringify({
+        "@context":"https://schema.org","@type":"SoftwareApplication",
+        "name":server.name,"description":(server.description||"").substring(0,200),
+        "applicationCategory":"DeveloperApplication",
+        "aggregateRating":{"@type":"AggregateRating","ratingValue":server.rating,"bestRating":"10","ratingCount":server.stars>0?server.stars:1}
+      })}}
+    />
+    <MCPDetailClient server={JSON.parse(JSON.stringify(server))} />
+  </>;
 }
