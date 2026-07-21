@@ -22,6 +22,19 @@ export default function AdminMCPClient({ servers: initial }: any) {
     setSaving(false);
   }
 
+  async function scanGitHub() {
+    if (!confirm("Сканировать GitHub (30 сек)?")) return;
+    setSaving(true);
+    try {
+      const res = await fetch("/api/admin/mcp/parse-github", { method: "POST" });
+      const data = await res.json();
+      if (data.log) alert(data.log.join(String.fromCharCode(10)));
+      else if (data.error) alert("Ошибка: " + data.error);
+      router.refresh();
+    } catch(e: any) { alert("Ошибка: " + e.message); }
+    setSaving(false);
+  }
+
   async function remove(id: string) {
     if (!confirm("Удалить?")) return;
     await fetch(`/api/admin/mcp?id=${id}`, { method: "DELETE" });
