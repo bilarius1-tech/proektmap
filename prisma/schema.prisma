@@ -254,6 +254,33 @@ model DecisionSkill {
 }
 
 
+
+model MCPServer {
+  id            String   @id @default(uuid())
+  name          String   @unique
+  slug          String   @unique
+  description   String   @default("")
+  longDescription String @default("")
+  category      String   @default("")
+  tags          String   @default("")
+  githubUrl     String   @default("")
+  websiteUrl    String   @default("")
+  stars         Int      @default(0)
+  rating        Int      @default(7)
+  russianDocs   Boolean  @default(false)
+  requiresApiKey Boolean @default(false)
+  difficulty    String   @default("easy")
+  howToUse      String   @default("[]")
+  pros          String   @default("[]")
+  cons          String   @default("[]")
+  sortOrder     Int      @default(0)
+  isActive      Boolean  @default(true)
+  isFeatured    Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  @@map("mcp_servers")
+}
+
 model AITool {
   id          String   @id @default(uuid())
   name        String   @unique
