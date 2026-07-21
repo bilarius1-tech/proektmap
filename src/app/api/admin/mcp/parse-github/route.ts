@@ -1,6 +1,34 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db/index";
 
+
+async function translateToRussian(text: string): Promise<string> {
+  if (!text || text.length < 10) return text;
+  try {
+    const db = await getDb();
+    const settings = await db.siteSettings.findUnique({ where: { id: "main" } });
+    const apiKey = settings?.deepseekApiKey || process.env.DEEPSEEK_API_KEY;
+    if (!apiKey) return text;
+
+    const res = await fetch("https://api.deepseek.com/v1/chat/completions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + apiKey },
+      body: JSON.stringify({
+        model: "deepseek-chat",
+        messages: [
+          { role: "system", content: "Ты переводчик технических текстов. Переведи описание MCP-сервера на русский язык кратко и точно. Верни ТОЛЬКО перевод, без пояснений." },
+          { role: "user", content: text.substring(0, 500) }
+        ],
+        max_tokens: 300,
+        temperature: 0.1,
+      }),
+    });
+    const data = await res.json();
+    return data.choices?.[0]?.message?.content?.trim() || text;
+  } catch { return text; }
+}
+
+
 export async function POST() {
   const db = await getDb();
   const log: string[] = [];
