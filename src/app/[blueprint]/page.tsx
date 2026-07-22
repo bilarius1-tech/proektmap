@@ -24,10 +24,10 @@ export default async function BlueprintPage({
   searchParams,
 }: {
   params: Promise<{ blueprint: string }>;
-  searchParams: Promise<{ project?: string; pattern?: string; from?: string }>;
+  searchParams: Promise<{ project?: string; pattern?: string; from?: string; demo?: string }>;
 }) {
   const { blueprint: slug } = await params;
-  const { project: projectId, pattern: patternSlug, from: fromPage } = await searchParams;
+  const { project: projectId, pattern: patternSlug, from: fromPage, demo: isDemo } = await searchParams;
   const db = await getDb();
 
   const bp = await db.blueprint.findUnique({
@@ -73,6 +73,7 @@ export default async function BlueprintPage({
       userContext={userContext}
       pattern={pattern ? JSON.parse(JSON.stringify(pattern)) : null}
       fromPage={fromPage || null}
+      isDemo={isDemo === "true"}
     />
   );
 }

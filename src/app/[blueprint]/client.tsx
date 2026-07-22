@@ -86,10 +86,10 @@ function buildPrompt(dec: Decision, bp: Blueprint, ctx: string): string {
 }
 
 export default function BlueprintPageClient({
-  blueprint, isLoggedIn, isPro, projectContext, userProjects, userContext, glossaryTerms, pattern,
+  blueprint, isLoggedIn, isPro, projectContext, userProjects, userContext, glossaryTerms, pattern, isDemo,
 }: {
   blueprint: Blueprint; isLoggedIn: boolean; isPro: boolean;
-  projectContext: ProjectContext | null; userProjects: MiniProject[]; userContext: string; glossaryTerms: any[]; pattern: any; fromPage: string | null;
+  projectContext: ProjectContext | null; userProjects: MiniProject[]; userContext: string; glossaryTerms: any[]; pattern: any; fromPage: string | null; isDemo: boolean;
 }) {
   const router = useRouter();
   const stages = blueprint.stages.map(bs => bs.stage);
@@ -108,7 +108,28 @@ export default function BlueprintPageClient({
   const [creating, setCreating] = useState(false);
   const [decisionChoices, setDecisionChoices] = useState<Record<string,{choice:string;reason:string}>>({});
   const [showDecisionMap, setShowDecisionMap] = useState(false);
-  const [viewMode, setViewMode] = useState<"list"|"flow">("flow");
+  const [viewMode, setViewMode] = useState<"list"|"flow">(isDemo ? "list" : "flow");
+  const [demoRunning, setDemoRunning] = useState(isDemo);
+  const [demoStep, setDemoStep] = useState(isDemo ? 0 : -1);
+
+  useEffect(() => {
+    if (!demoRunning) return;
+    const timer = setInterval(() => {
+      setDemoStep(prev => {
+        if (prev >= 2) { setDemoRunning(false); clearInterval(timer); return prev; }
+        return prev + 1;
+      });
+    }, 2500);
+    return () => clearInterval(timer);
+  }, [demoRunning]);
+
+  useEffect(() => {
+    if (demoStep >= 0 && demoRunning) {
+      const slugs = stages.map((s: any) => s.slug);
+      if (demoStep < slugs.length) setActiveStage(slugs[demoStep]);
+    }
+  }, [demoStep, demoRunning]);
+
   const [sidebarPulse, setSidebarPulse] = useState(0);
   const [notifications, setNotifications] = useState<Array<{id:number; msg:string; type:string}>>([]);
 
