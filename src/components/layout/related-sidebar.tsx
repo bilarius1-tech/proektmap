@@ -15,7 +15,7 @@ export default function RelatedSidebar({ type, slug }: { type: string; slug: str
   const [data, setData] = useState<RelatedData | null>(null);
 
   useEffect(() => {
-    fetch(`/api/related?type=${type}&slug=${slug}`)
+    fetch(`/api/graph/node?type=${type}&slug=${slug}`)
       .then(r => r.json())
       .then(setData)
       .catch(() => {});
