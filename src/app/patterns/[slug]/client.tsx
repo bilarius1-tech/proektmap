@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Term from "@/components/glossary/tooltip-term";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Star, Clock, DollarSign, Wrench, Check, X, ExternalLink, Play, Database, Layers, GitBranch, AlertTriangle, Lightbulb } from "lucide-react";
 
@@ -28,6 +29,7 @@ export default function PatternDetailClient({ pattern, blueprint, blueprints }: 
           </div>
           <h1 style={{ fontSize: "var(--text-xxl)", fontWeight: 800, margin: "var(--space-xs) 0" }}>{pattern.title}</h1>
           <p style={{ fontSize: "var(--text-m)", color: "var(--color-text-secondary)", lineHeight: 1.7, maxWidth: 600 }}>{pattern.description}</p>
+        <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", lineHeight: 1.7, marginTop: 4 }}>Наведи на термин чтобы узнать значение: <Term term="MCP" />, <Term term="API" />, <Term term="Next.js" /></p>
         </div>
         <Link href={`/${blueprint?.slug || blueprints[0]?.slug || "corporate-website"}`}
           style={{ display: "flex", alignItems: "center", gap: 8, padding: "14px 28px", borderRadius: 0, background: "var(--color-accent)", color: "white", textDecoration: "none", fontSize: "var(--text-m)", fontWeight: 700, whiteSpace: "nowrap", flexShrink: 0 }}>
