@@ -85,6 +85,7 @@ export default function PatternDetailClient({ pattern, blueprint, blueprints }: 
           <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: "var(--space-m)" }}>
             <Layers size={16} style={{ color: "var(--color-accent)" }} />
             <h2 style={{ fontSize: "var(--text-xl)", fontWeight: 700 }}>Почему этот стек</h2>
+          <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", marginBottom: "var(--space-m)" }}>Термины: <Term term="Frontend" />, <Term term="Backend" />, <Term term="API" />, <Term term="База данных" /></p>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)" }}>
             {stack.map((s: any, i: number) => (
