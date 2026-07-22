@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Search, ChevronDown, ExternalLink, MessageCircle, Zap, AlertTriangle, Lightbulb, BookOpen, Rocket, Wrench } from "lucide-react";
+import { Search, ChevronDown, ExternalLink, MessageCircle, Zap, AlertTriangle, Lightbulb, BookOpen, Rocket, Wrench, Send } from "lucide-react";
 
 // Curated FAQ from Telegram channels + official docs
 const FAQ_CATEGORIES = [
@@ -75,6 +75,29 @@ const FAQ_CATEGORIES = [
       { q: "Как сделать адаптивную мобильную версию?", a: "Напишите ИИ: «Сделай мобильную версию сайта». ИИ добавит media queries. Можно указать конкретные брейкпоинты: «адаптив под 375px и 768px»." },
       { q: "Как подключить базу данных?", a: "ИИ сам создаёт PostgreSQL в Yandex Cloud при необходимости. Вы можете явно попросить: «Нужна база данных для хранения заявок»." },
       { q: "Проект перестал открываться после правок. Что делать?", a: "SourceCraft хранит историю изменений (как Git). Откройте репозиторий → найдите последнюю работающую версию → откатитесь. Или создайте новый чат и попросите ИИ исправить конкретную ошибку." },
+    ],
+  },
+  {
+    category: "🔬 Технические детали (из Habr)",
+    icon: Wrench,
+    color: "#6366f1",
+    questions: [
+      { q: "Какое контекстное окно у Code Assistant?", a: "32K токенов (~50 страниц). Меньше чем GigaChat MAX (128K) и Claude (200K). Для больших проектов может не хватать. Источник: Habr." },
+      { q: "Сохраняется ли история чата?", a: "Нет. Каждый чат — с чистого листа. Копируйте контекст или используйте .codeassistant/ структуру с правилами. Источник: Habr." },
+      { q: "Можно ли свои модели вместо YandexGPT?", a: "Да. Code Assistant поддерживает custom провайдеров — Ollama локально или API сторонних моделей. Источник: Habr." },
+      { q: "Работает ли индексация кода как в Cursor?", a: "Частично. Эмбеддинги, а не графы как в Cursor. Требуется Ollama + Qdrant для векторного поиска. Источник: Habr." },
+      { q: "Code Assistant или GigaCode — что выбрать?", a: "SourceCraft — если в экосистеме Яндекса, лимиты: 3000 автодополнений + 1000 чат-запросов/нед. GigaCode — если нужно окно 128K и лучший русский язык. Источник: Habr." },
+    ],
+  },
+  {
+    category: "🗣️ Бизнес-сообщество (из Habr)",
+    icon: Rocket,
+    color: "#22c55e",
+    questions: [
+      { q: "Кто конкуренты VibeCraft в РФ?", a: "Прямых аналогов мало. Ближайшие: ААХ (React+TS, фронтенд), Lork (облачная IDE), HostAI. Конструкторы: Tilda (ИИ-блоки), uCoz, Битрикс24. Источник: Habr." },
+      { q: "Сколько стоит полностью в месяц?", a: "SourceCraft Pro: 250 ₽/чел + Code Assistant Pro: 700 ₽/место + Yandex Cloud (~150-500 ₽). Суммарно ~1100-1500 ₽/мес. Пробный период — 90 дней. Источник: SourceCraft." },
+      { q: "В чём главная боль пользователей?", a: "ИИ генерирует работающий код, но требующий правок профи. Заменяет «программиста на подхвате», но не архитектора. Источник: Habr." },
+      { q: "Можно ли выгрузить код и хостить не в Yandex Cloud?", a: "Технически да — код в SourceCraft-репозитории. Но VibeCraft заточен под Yandex Cloud, для внешнего хостинга нужна ручная доработка DevOps-части. Источник: VibeCraft docs." },
     ],
   },
 ];
@@ -230,6 +253,26 @@ export default function VibeCraftKBClient() {
           )}
         </div>
       ))}
+
+      {/* Question form */}
+      <div style={{
+        marginTop: "var(--space-xl)", padding: "var(--space-l)", background: "var(--color-bg-primary)",
+        border: "1px solid var(--color-border-light)", borderRadius: 0, textAlign: "center",
+      }}>
+        <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: 4 }}>Не нашли ответ?</div>
+        <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", marginBottom: "var(--space-m)" }}>
+          Задайте вопрос — мы добавим его в базу знаний
+        </p>
+        <form action="https://t.me/bilarius" target="_blank" style={{ display: "flex", gap: 0, maxWidth: 400, margin: "0 auto" }}>
+          <input placeholder="Ваш вопрос..." style={{ flex: 1, padding: "10px 14px", fontSize: "var(--text-xs)", borderRadius: 0, border: "1px solid var(--color-border)", borderRight: "none", background: "var(--color-bg-primary)", outline: "none" }} />
+          <button type="submit" style={{ display: "flex", alignItems: "center", gap: 4, padding: "10px 16px", borderRadius: 0, border: "none", background: "var(--color-accent)", color: "white", fontWeight: 700, fontSize: "var(--text-xs)", cursor: "pointer" }}>
+            <Send size={12} /> Спросить
+          </button>
+        </form>
+        <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", marginTop: 8 }}>
+          Вопросы принимаются через Telegram @bilarius
+        </div>
+      </div>
 
       {/* Resources */}
       <div style={{
