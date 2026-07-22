@@ -24,10 +24,10 @@ export default async function BlueprintPage({
   searchParams,
 }: {
   params: Promise<{ blueprint: string }>;
-  searchParams: Promise<{ project?: string }>;
+  searchParams: Promise<{ project?: string; pattern?: string }>;
 }) {
   const { blueprint: slug } = await params;
-  const { project: projectId } = await searchParams;
+  const { project: projectId, pattern: patternSlug } = await searchParams;
   const db = await getDb();
 
   const bp = await db.blueprint.findUnique({
@@ -56,6 +56,12 @@ export default async function BlueprintPage({
 
   const userContext = buildUserContext(projectContext || { id: "", name: "", description: "", domain: "", stack: "", niche: "", colors: "", goals: "", blueprintTitle: "" });
 
+  // Load pattern context if ?pattern=xxx
+  let pattern = null;
+  if (patternSlug) {
+    pattern = await db.buildPattern.findUnique({ where: { slug: patternSlug } });
+  }
+
   const glossaryTerms = await db.glossaryTerm.findMany({ where: { isPublished: true }, orderBy: { sortOrder: "asc" }, take: 12 });
   return (
     <BlueprintPageClient
@@ -65,6 +71,7 @@ export default async function BlueprintPage({
       projectContext={JSON.parse(JSON.stringify(projectContext))}
       userProjects={JSON.parse(JSON.stringify(userProjects))}
       userContext={userContext}
+      pattern={pattern ? JSON.parse(JSON.stringify(pattern)) : null}
     />
   );
 }
