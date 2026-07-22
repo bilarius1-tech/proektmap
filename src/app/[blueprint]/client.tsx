@@ -4,6 +4,7 @@ import AIRules from "./ai-rules";
 import GlossaryBlock from "@/components/blueprint/glossary-block";
 import AIRadar from "./ai-radar";
 import VibecraftGuide from "@/components/blueprint/vibecraft-guide";
+import TourOverlay from "@/components/blueprint/tour-overlay";
 import AIToolsComparison from "@/components/blueprint/ai-tools-comparison";
 import BlueprintFlow from "@/components/blueprint/flow-view";
 import { useRouter } from "next/navigation";
@@ -86,10 +87,10 @@ function buildPrompt(dec: Decision, bp: Blueprint, ctx: string): string {
 }
 
 export default function BlueprintPageClient({
-  blueprint, isLoggedIn, isPro, projectContext, userProjects, userContext, glossaryTerms, pattern,
+  blueprint, isLoggedIn, isPro, projectContext, userProjects, userContext, glossaryTerms, pattern, isDemo,
 }: {
   blueprint: Blueprint; isLoggedIn: boolean; isPro: boolean;
-  projectContext: ProjectContext | null; userProjects: MiniProject[]; userContext: string; glossaryTerms: any[]; pattern: any; fromPage: string | null;
+  projectContext: ProjectContext | null; userProjects: MiniProject[]; userContext: string; glossaryTerms: any[]; isDemo: boolean; pattern: any; fromPage: string | null;
 }) {
   const router = useRouter();
   const stages = blueprint.stages.map(bs => bs.stage);
@@ -186,7 +187,18 @@ export default function BlueprintPageClient({
   ];
 
   return (
-    <div style={{ display: "flex", minHeight: "calc(100dvh - 56px)" }} suppressHydrationWarning>
+    <>
+      {isDemo && (
+        <TourOverlay
+          steps={[
+            { target: "aside", title: "Навигация по этапам", description: "Слева — 21 этап от идеи до запуска. Зелёный = завершён. Кликай чтобы переключаться.", position: "right" },
+            { target: "button", title: "Вкладки решения", description: "ПОНЯТЬ (почему важно) → ВЫБРАТЬ (твой выбор) → ПРОВЕРИТЬ (готовый промпт для AI).", position: "bottom" },
+            { target: "h2", title: "Текущий этап", description: "Здесь описание этапа и карточки решений. Всё что нужно для сборки проекта.", position: "top" },
+          ]}
+          onComplete={() => {}}
+        />
+      )}
+      <div style={{ display: "flex", minHeight: "calc(100dvh - 56px)" }} suppressHydrationWarning>
       {/* DESKTOP sidebar */}
       {!isMobile && (
         <aside style={{
@@ -467,6 +479,7 @@ export default function BlueprintPageClient({
       {/* Project creation modal */}
       {showProjectModal && <ProjectModal form={projectForm} setForm={setProjectForm} onSave={createProject} onCancel={() => setShowProjectModal(false)} saving={creating} />}
     </div>
+    </>
   );
 }
 
