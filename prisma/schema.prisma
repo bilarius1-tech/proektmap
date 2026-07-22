@@ -596,6 +596,19 @@ model PromptBlueprint {
 }
 
 
+
+
+model UserCollection {
+  id         String   @id @default(uuid())
+  userId     String
+  entityType String   // glossary, prompt, pattern, mcp, tool
+  entitySlug String
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([userId, entityType, entitySlug])
+  @@map(user_collections)
+}
+
 model Relation {
   id         String   @id @default(uuid())
   sourceType String
