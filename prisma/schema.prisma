@@ -562,6 +562,39 @@ model GlossaryTerm {
 
 
 
+
+model PromptBlueprint {
+  id              String   @id @default(uuid())
+  title           String
+  slug            String   @unique
+  category        String   @default("System")
+  description     String   @default("")
+  whenToUse       String   @default("")
+  whenNotUse      String   @default("")
+  expectedResult  String   @default("")
+  systemPrompt    String   @default("")
+  userPrompt      String   @default("")
+  exampleOutput   String   @default("")
+  stats           String   @default("{}")
+  compatibility   String   @default("[]")
+  dependencies    String   @default("[]")
+  evolution       String   @default("[]")
+  patternIds      String   @default("[]")
+  mcpIds          String   @default("[]")
+  agentIds        String   @default("[]")
+  difficulty      Int      @default(3)
+  qualityScore    Int      @default(85)
+  timeSaved       String   @default("4 часа")
+  tokensEstimate  Int      @default(2000)
+  usageCount      Int      @default(0)
+  isPublished     Boolean  @default(false)
+  isFeatured      Boolean  @default(false)
+  sortOrder       Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  @@map("prompt_blueprints")
+}
+
 model BuildPattern {
   id              String   @id @default(uuid())
   title           String

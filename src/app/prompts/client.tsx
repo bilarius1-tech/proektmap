@@ -1,156 +1,180 @@
 "use client";
-
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Copy, Search, ChevronDown, ChevronLeft, ChevronRight, Code, Rocket, Palette, Search as SearchIcon, Shield, Sparkles, Folder } from "lucide-react";
-import { RenderTemplate, VariableLegend } from "@/components/blueprint/template-help";
+import Link from "next/link";
+import { Star, Clock, Zap, Copy, Check, ChevronDown, Layers, ExternalLink, BarChart3 } from "lucide-react";
 
-interface Prompt { id: string; title: string; category: string; description: string | null; content: string; tags: string; useCount: number; }
-interface Variable { name: string; label: string; description: string; example: string; category: string; }
-interface Category { id: string; name: string; slug: string; icon: string; isActive?: boolean; }
+const CATEGORIES = ["System","Агент","MCP","Cursor Rule","Windsurf Rule","Универсальный"];
 
-const ICON_MAP: Record<string, React.ReactNode> = {
-  code: <Code size={18} />, rocket: <Rocket size={18} />, palette: <Palette size={18} />,
-  search: <SearchIcon size={18} />, shield: <Shield size={18} />, sparkles: <Sparkles size={18} />,
-};
-const DEFAULT_ICON = <Folder size={18} />;
-
-function CatIcon({ category, categories }: { category: string; categories: Category[] }) {
-  const cat = categories.find(c => c.name === category);
-  if (cat) return <>{ICON_MAP[cat.icon] || DEFAULT_ICON}</>;
-  return <>{DEFAULT_ICON}</>;
-}
-
-export default function PromptsPageClient({ prompts, variables, categories, total, page, perPage, currentCat }: {
-  prompts: Prompt[]; variables: Variable[]; categories: Category[]; total: number; page: number; perPage: number; currentCat: string;
-}) {
-  const router = useRouter();
-  const [search, setSearch] = useState("");
+export default function PromptsPageClient({ prompts, total, variables, categories, page, perPage }: any) {
+  const [activeCat, setActiveCat] = useState("all");
   const [expanded, setExpanded] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
+
+  const filtered = activeCat === "all" ? prompts : prompts.filter((p: any) => p.category === activeCat);
   const totalPages = Math.ceil(total / perPage);
 
-  const catNames = categories.filter(c => c.isActive !== false).map(c => c.name);
-  const allCats = ["all", ...catNames];
-
-  function goCat(cat: string) {
-    const params = new URLSearchParams();
-    if (cat !== "all") params.set("cat", cat);
-    if (search) params.set("q", search);
-    router.push("/prompts?" + params.toString());
-  }
-
-  function goPage(p: number) {
-    const params = new URLSearchParams(window.location.search);
-    params.set("page", String(p));
-    router.push("/prompts?" + params.toString());
-  }
-
-  const filtered = search
-    ? prompts.filter(p => p.title.toLowerCase().includes(search.toLowerCase()) || p.tags.includes(search) || (p.description?.toLowerCase().includes(search.toLowerCase())))
-    : prompts;
-
-  function copy(content: string, id: string) {
-    navigator.clipboard.writeText(content);
+  function copyToClipboard(text: string, id: string) {
+    navigator.clipboard.writeText(text);
     setCopied(id);
-    setTimeout(() => setCopied(null), 2000);
+    setTimeout(() => setCopied(null), 1500);
   }
 
   return (
-    <div style={{ maxWidth: 960, margin: "0 auto", padding: "var(--space-xl) var(--space-m)" }}>
-      <div style={{ marginBottom: "var(--space-l)" }}>
-        <h1 style={{ fontSize: "var(--text-xxxl)", fontWeight: 800, marginBottom: "var(--space-xs)" }}>📚 Библиотека промптов</h1>
-        <p style={{ color: "var(--color-text-secondary)", fontSize: "var(--text-s)", lineHeight: 1.7 }}>
-          Готовые промпты для AI-агентов. Форк{" "}
-          <a href="https://github.com/yourkeychen/vibe-coding-cn" target="_blank" rel="noopener" style={{ color: "var(--color-accent)" }}>vibe-coding-cn</a>{" "}
-          (22k ⭐). Всего: <b>{total}</b>.
+    <div style={{ maxWidth: 1100, margin: "0 auto", padding: "var(--space-xl) var(--space-m)" }}>
+      <div style={{ marginBottom: "var(--space-xl)" }}>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 14px", borderRadius: "var(--radius-full)", background: "var(--color-accent-light)", color: "var(--color-accent)", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: "var(--space-s)" }}>
+          <Zap size={14} /> {total} инженерных решений
+        </div>
+        <h1 style={{ fontSize: "var(--text-xxl)", fontWeight: 800, marginBottom: "var(--space-xs)" }}>💬 Библиотека промптов</h1>
+        <p style={{ fontSize: "var(--text-m)", color: "var(--color-text-secondary)", lineHeight: 1.7, maxWidth: 700 }}>
+          Не просто тексты — инженерные решения. System Prompt, Agent Prompt, MCP, Cursor Rules.
+          Со статистикой эффективности, эволюцией и связями с паттернами.
         </p>
-        <VariableLegend variables={variables} />
       </div>
 
-      <div style={{ display: "flex", gap: 8, marginBottom: "var(--space-l)", flexWrap: "wrap", alignItems: "center" }}>
-        <div style={{ position: "relative", flex: 1, minWidth: 200 }}>
-          <Search size={16} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "var(--color-text-tertiary)" }} />
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Поиск..."
-            style={{ width: "100%", padding: "10px 10px 10px 38px", fontSize: "var(--text-s)", borderRadius: "var(--radius-m)", border: "1px solid var(--color-border)", outline: "none" }} />
-        </div>
-        <div style={{ display: "flex", gap: 4, overflowX: "auto", flexWrap: "wrap" }}>
-          {allCats.map(c => {
-            const catObj = categories.find(x => x.name === c);
-            const icon = catObj ? ICON_MAP[catObj.icon] : null;
-            const active = (c === "all" && currentCat === "all") || c === currentCat;
-            return (
-              <button key={c} onClick={() => goCat(c)} style={{
-                display: "flex", alignItems: "center", gap: 4, padding: "7px 12px", fontSize: "var(--text-xs)", fontWeight: active ? 700 : 500,
-                borderRadius: "var(--radius-s)", border: active ? "1px solid var(--color-accent)" : "1px solid var(--color-border)",
-                background: active ? "var(--color-accent)" : "white",
-                color: active ? "white" : "var(--color-text-secondary)", cursor: "pointer", whiteSpace: "nowrap",
-              }}>{icon}{c === "all" ? "Все" : c}</button>
-            );
-          })}
-        </div>
+      {/* Category filter */}
+      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: "var(--space-l)" }}>
+        <button onClick={() => setActiveCat("all")}
+          style={{ padding: "6px 16px", borderRadius: 0, border: activeCat === "all" ? "2px solid var(--color-accent)" : "1px solid var(--color-border)", background: activeCat === "all" ? "var(--color-accent-light)" : "var(--color-bg-primary)", color: activeCat === "all" ? "var(--color-accent)" : "var(--color-text-secondary)", fontWeight: 600, fontSize: "var(--text-xs)", cursor: "pointer" }}>
+          Все ({total})
+        </button>
+        {CATEGORIES.map(cat => {
+          const count = prompts.filter((p: any) => p.category === cat).length;
+          if (!count) return null;
+          return (
+            <button key={cat} onClick={() => setActiveCat(cat)}
+              style={{ padding: "6px 16px", borderRadius: 0, border: activeCat === cat ? "2px solid var(--color-accent)" : "1px solid var(--color-border)", background: activeCat === cat ? "var(--color-accent-light)" : "var(--color-bg-primary)", color: activeCat === cat ? "var(--color-accent)" : "var(--color-text-secondary)", fontWeight: 600, fontSize: "var(--text-xs)", cursor: "pointer" }}>
+              {cat} ({count})
+            </button>
+          );
+        })}
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)" }}>
-        {filtered.map(p => (
-          <div key={p.id} style={{ background: "var(--color-bg-primary)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)" }}>
-            <div onClick={() => setExpanded(expanded === p.id ? null : p.id)} style={{ display: "flex", alignItems: "center", gap: "var(--space-s)", padding: "var(--space-m)", cursor: "pointer" }}>
-              <span style={{ color: "var(--color-accent)", flexShrink: 0 }}><CatIcon category={p.category} categories={categories} /></span>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontWeight: 700, fontSize: "var(--text-s)" }}>{p.title}</div>
-                {p.description && <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", marginTop: 2 }}>{p.description}</div>}
-              </div>
-              <div style={{ display: "flex", gap: 4, flexWrap: "wrap", flexShrink: 0 }}>
-                {p.tags.split(",").filter(Boolean).slice(0, 3).map(t => (
-                  <span key={t} style={{ padding: "2px 8px", fontSize: 10, background: "var(--color-bg-secondary)", borderRadius: 99, color: "var(--color-text-tertiary)" }}>{t.trim()}</span>
-                ))}
-              </div>
-              <button onClick={(e) => { e.stopPropagation(); copy(p.content, p.id); }} style={{ background: "none", border: "none", cursor: "pointer", color: copied === p.id ? "var(--color-accent)" : "var(--color-text-tertiary)", padding: 8, minWidth: 36, minHeight: 36, flexShrink: 0 }}>
-                <Copy size={16} />
-              </button>
-              <ChevronDown size={16} style={{ color: "var(--color-text-tertiary)", transform: expanded === p.id ? "rotate(180deg)" : "", transition: "0.2s", flexShrink: 0 }} />
-            </div>
-            {expanded === p.id && (
-              <div style={{ padding: "var(--space-m)", borderTop: "1px solid var(--color-border-light)", background: "var(--color-bg-secondary)" }}>
-                <div style={{ whiteSpace: "pre-wrap", fontSize: "var(--text-xs)", fontFamily: "var(--font-mono)", lineHeight: 1.8, padding: "var(--space-m)", background: "var(--color-bg-primary)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)" }}>
-                  <RenderTemplate text={p.content} variables={variables} />
+      {/* Cards */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-m)" }}>
+        {filtered.map((p: any) => {
+          const stats = JSON.parse(p.stats || "{}");
+          const compatibility = JSON.parse(p.compatibility || "[]");
+          const evolution = JSON.parse(p.evolution || "[]");
+          const dependencies = JSON.parse(p.dependencies || "[]");
+          const isOpen = expanded === p.id;
+
+          return (
+            <div key={p.id} style={{
+              padding: "var(--space-l)", background: "var(--color-bg-primary)", borderRadius: 0,
+              border: p.isFeatured ? "2px solid var(--color-accent)" : "1px solid var(--color-border-light)",
+              position: "relative",
+            }}>
+              {p.isFeatured && <div style={{ position: "absolute", top: -1, right: 12, padding: "2px 10px", borderRadius: "0 0 0 0", background: "var(--color-accent)", color: "white", fontSize: 9, fontWeight: 700 }}>⭐ Выбор редакции</div>}
+
+              {/* Header */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "var(--space-s)", flexWrap: "wrap", gap: 12 }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                    <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: "var(--radius-full)", background: "var(--color-bg-secondary)", color: "var(--color-text-secondary)", fontWeight: 600 }}>{p.category}</span>
+                    <span style={{ fontWeight: 800, fontSize: "var(--text-m)", color: "var(--color-text-primary)" }}>{p.title}</span>
+                  </div>
+                  <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.5, marginBottom: 8 }}>{p.description}</p>
+                </div>
+
+                {/* RPG Stats */}
+                <div style={{ display: "flex", gap: 16, alignItems: "center", flexShrink: 0 }}>
+                  <div style={{ textAlign: "center" }}>
+                    <div style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>Сложность</div>
+                    <div style={{ display: "flex", gap: 1 }}>
+                      {[1,2,3,4,5].map(i => <div key={i} style={{ width: 8, height: 8, borderRadius: "50%", background: i <= Math.round((stats.complexity||3)/2) ? "var(--color-warning)" : "var(--color-border-light)" }} />)}
+                    </div>
+                  </div>
+                  <div style={{ textAlign: "center" }}>
+                    <div style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>Качество</div>
+                    <div style={{ fontWeight: 800, fontSize: "var(--text-s)", color: "var(--color-accent)" }}>{p.qualityScore || 85}/100</div>
+                  </div>
+                  <div style={{ textAlign: "center" }}>
+                    <div style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>Экономия</div>
+                    <div style={{ fontWeight: 700, fontSize: "var(--text-xs)", color: "var(--color-text-secondary)" }}>
+                      <Clock size={10} style={{ display: "inline" }} /> {p.timeSaved || "4ч"}
+                    </div>
+                  </div>
                 </div>
               </div>
-            )}
-          </div>
-        ))}
+
+              {/* Compatibility badges */}
+              <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: "var(--space-s)" }}>
+                {compatibility.map((c: string) => (
+                  <span key={c} style={{ padding: "2px 8px", borderRadius: "var(--radius-full)", background: "var(--color-bg-secondary)", fontSize: 9, color: "var(--color-text-secondary)" }}>{c}</span>
+                ))}
+                {dependencies.slice(0, 3).map((d: string) => (
+                  <span key={d} style={{ padding: "2px 8px", borderRadius: "var(--radius-full)", background: "var(--color-accent-light)", fontSize: 9, color: "var(--color-accent)", fontWeight: 600 }}>📦 {d}</span>
+                ))}
+              </div>
+
+              {/* Expand button */}
+              <div style={{ display: "flex", gap: 8 }}>
+                <button onClick={() => setExpanded(isOpen ? null : p.id)}
+                  style={{ display: "flex", alignItems: "center", gap: 4, padding: "6px 14px", borderRadius: 0, border: "1px solid var(--color-border)", background: "var(--color-bg-primary)", color: "var(--color-text-secondary)", fontWeight: 600, fontSize: "var(--text-xs)", cursor: "pointer" }}>
+                  <Layers size={12} /> {isOpen ? "Свернуть" : "System + User Prompt"}
+                </button>
+                <button onClick={() => copyToClipboard(p.systemPrompt + "\n\n" + p.userPrompt, p.id)}
+                  style={{ display: "flex", alignItems: "center", gap: 4, padding: "6px 14px", borderRadius: 0, border: "1px solid var(--color-accent)", background: copied === p.id ? "var(--color-accent)" : "var(--color-bg-primary)", color: copied === p.id ? "white" : "var(--color-accent)", fontWeight: 600, fontSize: "var(--text-xs)", cursor: "pointer" }}>
+                  {copied === p.id ? <><Check size={12} /> Скопировано!</> : <><Copy size={12} /> Скопировать стек</>}
+                </button>
+              </div>
+
+              {/* Expanded content */}
+              {isOpen && (
+                <div style={{ marginTop: "var(--space-m)", paddingTop: "var(--space-m)", borderTop: "1px solid var(--color-border-light)", animation: "expandIn 0.2s ease" }}>
+                  <div style={{ display: "flex", gap: "var(--space-m)", flexDirection: "row", flexWrap: "wrap" }}>
+                    <div style={{ flex: "1 1 300px" }}>
+                      <div style={{ fontSize: 10, fontWeight: 700, color: "var(--color-text-tertiary)", marginBottom: 4, textTransform: "uppercase" }}>System Prompt</div>
+                      <div style={{ padding: "var(--space-s)", background: "var(--color-bg-secondary)", borderRadius: 0, fontSize: "var(--text-xs)", fontFamily: "monospace", whiteSpace: "pre-wrap", lineHeight: 1.5, maxHeight: 200, overflow: "auto" }}>
+                        {p.systemPrompt}
+                      </div>
+                    </div>
+                    <div style={{ flex: "1 1 300px" }}>
+                      <div style={{ fontSize: 10, fontWeight: 700, color: "var(--color-text-tertiary)", marginBottom: 4, textTransform: "uppercase" }}>User Prompt</div>
+                      <div style={{ padding: "var(--space-s)", background: "var(--color-bg-secondary)", borderRadius: 0, fontSize: "var(--text-xs)", fontFamily: "monospace", whiteSpace: "pre-wrap", lineHeight: 1.5, maxHeight: 200, overflow: "auto" }}>
+                        {p.userPrompt}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Evolution */}
+                  {evolution.length > 0 && (
+                    <div style={{ marginTop: "var(--space-m)" }}>
+                      <div style={{ fontSize: 10, fontWeight: 700, color: "var(--color-text-tertiary)", marginBottom: 4, textTransform: "uppercase" }}>Эволюция</div>
+                      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                        {evolution.map((ev: any, i: number) => (
+                          <div key={i} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            <div style={{ textAlign: "center" }}>
+                              <div style={{ width: 28, height: 28, borderRadius: "50%", background: "var(--color-accent)", color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700 }}>{i + 1}</div>
+                              <div style={{ fontSize: 8, color: "var(--color-text-tertiary)", marginTop: 2 }}>{ev.version}</div>
+                            </div>
+                            {i < evolution.length - 1 && <div style={{ width: 20, height: 2, background: "var(--color-border)" }} />}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* When to / Not to use */}
+                  <div style={{ display: "flex", gap: "var(--space-m)", marginTop: "var(--space-m)", flexWrap: "wrap" }}>
+                    <div style={{ flex: "1 1 250px", padding: "var(--space-s)", background: "#ecfdf5", borderRadius: 0 }}>
+                      <div style={{ fontSize: 10, fontWeight: 700, color: "#065f46", marginBottom: 4 }}>✅ Когда использовать</div>
+                      <div style={{ fontSize: "var(--text-xs)", color: "#065f46", lineHeight: 1.5 }}>{p.whenToUse}</div>
+                    </div>
+                    <div style={{ flex: "1 1 250px", padding: "var(--space-s)", background: "#fef2f2", borderRadius: 0 }}>
+                      <div style={{ fontSize: 10, fontWeight: 700, color: "#991b1b", marginBottom: 4 }}>❌ Когда НЕ использовать</div>
+                      <div style={{ fontSize: "var(--text-xs)", color: "#991b1b", lineHeight: 1.5 }}>{p.whenNotUse}</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 8, marginTop: "var(--space-xl)" }}>
-          <button onClick={() => goPage(page - 1)} disabled={page <= 1}
-            style={{ display: "flex", alignItems: "center", gap: 4, padding: "8px 14px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "var(--color-bg-primary)", cursor: page <= 1 ? "default" : "pointer", opacity: page <= 1 ? 0.4 : 1, fontSize: "var(--text-xs)" }}>
-            <ChevronLeft size={14} /> Назад
-          </button>
-          {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
-            let pNum = i + 1;
-            if (totalPages > 7 && page > 4) pNum = page - 3 + i;
-            if (pNum > totalPages) return null;
-            return (
-              <button key={pNum} onClick={() => goPage(pNum)} style={{
-                width: 36, height: 36, borderRadius: "var(--radius-s)", border: pNum === page ? "1px solid var(--color-accent)" : "1px solid var(--color-border)",
-                background: pNum === page ? "var(--color-accent)" : "white", color: pNum === page ? "white" : "var(--color-text-secondary)",
-                fontWeight: pNum === page ? 700 : 500, fontSize: "var(--text-xs)", cursor: "pointer",
-              }}>{pNum}</button>
-            );
-          })}
-          <button onClick={() => goPage(page + 1)} disabled={page >= totalPages}
-            style={{ display: "flex", alignItems: "center", gap: 4, padding: "8px 14px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "var(--color-bg-primary)", cursor: page >= totalPages ? "default" : "pointer", opacity: page >= totalPages ? 0.4 : 1, fontSize: "var(--text-xs)" }}>
-            Вперёд <ChevronRight size={14} />
-          </button>
-          <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>{page} / {totalPages}</span>
-        </div>
-      )}
-
-      <div style={{ marginTop: "var(--space-m)", textAlign: "center", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>
-        {total === 0 ? "Ничего не найдено" : `${total} промптов`}
-      </div>
+      <style>{`@keyframes expandIn { from { opacity: 0; max-height: 0 } to { opacity: 1; max-height: 500px } }`}</style>
     </div>
   );
 }
