@@ -4,107 +4,85 @@ import { useState } from "react";
 import Link from "next/link";
 import { Search, ChevronDown, ExternalLink, MessageCircle, Zap, AlertTriangle, Lightbulb, BookOpen, Rocket, Wrench, Send } from "lucide-react";
 
-// Curated FAQ from Telegram channels + official docs
 const FAQ_CATEGORIES = [
   {
-    category: "🚀 Старт и доступ",
+    category: "Старт и доступ",
+    section: "01",
     icon: Rocket,
     color: "#0fb880",
     questions: [
-      { q: "Как получить доступ к VibeCraft?", a: "Нужен Yandex ID. Зайдите на vibe.sourcecraft.dev, нажмите «Запросить доступ». Ожидание — от нескольких часов до 2-3 дней. Доступ дают волнами." },
+      { q: "Как получить доступ к VibeCraft?", a: "Нужен Yandex ID. Зайдите на vibe.sourcecraft.dev, нажмите «Запросить доступ». Ожидание — от нескольких часов до 2-3 дней. Доступ дают волнами, проверяйте почту и папку spam." },
       { q: "Мне не дают доступ уже неделю. Что делать?", a: "Проверьте spam-папку почты. Убедитесь что Yandex ID активен. Попробуйте зайти на sourcecraft.dev — иногда доступ открывается там раньше. Напишите в поддержку через форму на сайте." },
-      { q: "Нужен ли VPN для VibeCraft?", a: "Нет. VibeCraft работает из России без VPN. Все серверы в Yandex Cloud на территории РФ." },
-      { q: "Какие браузеры поддерживаются?", a: "Яндекс.Браузер, Chrome, Firefox. Safari работает нестабильно (баги с WebSocket)." },
-      { q: "Можно ли пользоваться с телефона?", a: "Официально — только десктоп. Мобильная версия в разработке. Некоторые пользователи открывают через «Версию для ПК» в мобильном браузере, но это неудобно." },
+      { q: "Нужен ли VPN?", a: "Нет. VibeCraft работает из России без VPN. Все серверы размещены в Yandex Cloud на территории РФ." },
+      { q: "Какие браузеры поддерживаются?", a: "Яндекс.Браузер, Chrome, Firefox. Safari работает нестабильно — возможны баги с WebSocket. Мобильная версия пока в разработке." },
     ],
   },
   {
-    category: "⚙️ Возможности и ограничения",
+    category: "Возможности и ограничения",
+    section: "02",
     icon: Wrench,
     color: "#3b82f6",
     questions: [
-      { q: "Что можно создать в VibeCraft?", a: "Лендинги, корпоративные сайты, интернет-магазины, CRM, трекеры задач, мини-игры, квизы, опросы, дашборды. ИИ генерирует уникальный код под задачу, а не подставляет шаблон." },
-      { q: "Какие языки и фреймворки используются?", a: "Преимущественно TypeScript/JavaScript. Фронтенд — React/Next.js. Бэкенд — Node.js. База данных — PostgreSQL. Стили — CSS/Tailwind." },
-      { q: "Можно ли подключить свой домен?", a: "Да. После публикации в Yandex Cloud можно привязать свой домен через DNS. Инструкция в документации SourceCraft." },
-      { q: "Какие есть ограничения по размеру проекта?", a: "Официальных лимитов нет, но при очень больших проектах (100+ страниц) ИИ может терять контекст. Рекомендуют разбивать на модули." },
-      { q: "Можно ли подключить внешнее API?", a: "Да, через fetch/axios. Но некоторые API требуют серверной части — тогда нужен бэкенд в Yandex Cloud." },
-      { q: "Поддерживается ли работа с файлами?", a: "Загрузка изображений — да. Загрузка PDF, DOCX — через внешние сервисы. Файловая система — ограничена." },
+      { q: "Что можно создать?", a: "Лендинги, корпоративные сайты, интернет-магазины, CRM, трекеры задач, мини-игры, квизы, опросы, аналитические панели. ИИ генерирует уникальный код под задачу — это не шаблоны." },
+      { q: "Какие технологии используются?", a: "TypeScript/JavaScript. Фронтенд — React/Next.js. Бэкенд — Node.js. База данных — PostgreSQL. Стили — CSS/Tailwind." },
+      { q: "Можно ли подключить свой домен?", a: "Да. После публикации в Yandex Cloud — привязать через DNS. Инструкция — в документации SourceCraft." },
+      { q: "Поддерживается ли внешнее API?", a: "Да, через fetch/axios. Некоторые API требуют серверной части — тогда нужен бэкенд в Yandex Cloud." },
+      { q: "Можно ли работать вдвоём?", a: "Пока нет. Совместная работа в разработке — поддержка только одного пользователя на проект." },
     ],
   },
   {
-    category: "💰 Цены и нейрокредиты",
+    category: "Нейрокредиты и цены",
+    section: "03",
     icon: Zap,
     color: "#f59e0b",
     questions: [
-      { q: "Сколько стоит VibeCraft?", a: "При регистрации — 4000 нейрокредитов бесплатно. Тариф Free — 0₽ (ограничен). Pro — 250₽/мес. Плюс оплата ресурсов Yandex Cloud при публикации (~150-500₽/мес)." },
-      { q: "Что такое нейрокредиты и как они расходуются?", a: "Нейрокредит = одно действие ИИ (генерация кода, ответ на вопрос, исправление). Сложные задачи тратят больше кредитов. 4000 хватает примерно на 2-3 небольших проекта." },
-      { q: "Можно ли докупить нейрокредиты?", a: "Да, через тариф Pro. Пакеты: 10 000 кредитов / 100 000 кредитов. Цены уточняйте в личном кабинете." },
-      { q: "Yandex Cloud — это обязательно платить?", a: "Для разработки и превью — нет. Для публикации сайта в интернет — да, нужен аккаунт Yandex Cloud и оплата ресурсов." },
+      { q: "Сколько стоит?", a: "Регистрация — 4000 нейрокредитов бесплатно. Тариф Free — 0₽, Pro — 250₽/мес. Публикация — оплата Yandex Cloud (~150-500₽/мес)." },
+      { q: "Что такое нейрокредиты?", a: "Абстрактная единица потребления LLM. Одно действие ИИ = 1 кредит. Сложные задачи тратят больше. 4000 хватает на 2-3 небольших проекта. Источник: SourceCraft docs." },
+      { q: "Можно ли докупить?", a: "Да, через тариф Pro. Пакеты: 10 000 / 100 000 кредитов. Цены — в личном кабинете." },
+      { q: "Yandex Cloud — обязательно платить?", a: "Для разработки и превью — нет. Для публикации в интернет — да, нужен аккаунт Yandex Cloud." },
     ],
   },
   {
-    category: "🆚 Сравнение с аналогами",
+    category: "Сравнение с аналогами",
+    section: "04",
     icon: AlertTriangle,
     color: "#8b5cf6",
     questions: [
-      { q: "Чем VibeCraft отличается от Tilda?", a: "Tilda — конструктор с готовыми блоками. VibeCraft — ИИ генерирует уникальный код. Tilda: шаблоны. VibeCraft: индивидуальный проект. Tilda: визуальный редактор. VibeCraft: текстовые команды + превью." },
-      { q: "Чем отличается от Bolt.new или Lovable?", a: "Bolt/Lovable: английский язык, нужен VPN, зарубежная карта. VibeCraft: русский язык, без VPN, российские карты. Плюс VibeCraft даёт полный доступ к коду в SourceCraft-репозитории." },
-      { q: "Чем отличается от Cursor или Reasonix?", a: "Cursor/Reasonix — для разработчиков, которые пишут код. VibeCraft — для тех, кто НЕ пишет код. VibeCraft = no-code. Cursor = AI-IDE для профи." },
-      { q: "VibeCraft vs ChatGPT/Claude — что лучше для создания сайта?", a: "ChatGPT/Claude дадут код, но вам придётся самим его запускать, деплоить, настраивать хостинг. VibeCraft делает это за вас: написал идею → получил работающий сайт в интернете." },
+      { q: "VibeCraft vs Tilda", a: "Tilda — конструктор с готовыми блоками. VibeCraft — ИИ генерирует уникальный код под задачу. Tilda = шаблоны, VibeCraft = индивидуальная разработка." },
+      { q: "VibeCraft vs Bolt.new / Lovable", a: "Bolt/Lovable — английский, нужен VPN и зарубежная карта. VibeCraft — русский язык, без VPN, российские карты. Плюс полный доступ к коду в SourceCraft-репозитории." },
+      { q: "Code Assistant vs GigaCode", a: "SourceCraft — для экосистемы Яндекса. GigaCode — если нужно окно 128K и лучшая работа с русским языком (экосистема Сбера). Источник: Habr, сравнение." },
+      { q: "Кто конкуренты в РФ?", a: "ААХ (React+TS, только фронтенд), Lork (облачная IDE), HostAI. Конструкторы: Tilda (ИИ-блоки), uCoz, Битрикс24. Источник: Habr." },
     ],
   },
   {
-    category: "💡 Советы и лайфхаки",
+    category: "Лайфхаки и советы",
+    section: "05",
     icon: Lightbulb,
     color: "#ec4899",
     questions: [
-      { q: "Как правильно описать проект чтобы ИИ понял?", a: "Формула: Цель + Аудитория + Функционал + Дизайн. Пример: «Лендинг стоматологии для клиентов 30-50 лет. Нужна форма записи, галерея работ, отзывы. Сине-белая гамма, строгий стиль.»" },
-      { q: "Как экономить нейрокредиты?", a: "1) Думайте перед запросом — чёткая формулировка экономит 30% кредитов. 2) Исправляйте мелкие баги вручную в редакторе кода. 3) Не просите ИИ перегенерировать весь проект — просите исправить конкретный блок." },
-      { q: "Что делать если ИИ «зациклился»?", a: "Нажмите «Отменить» и начните заново с более конкретным запросом. Если не помогает — создайте новый чат. Старый чат можно удалить." },
-      { q: "Как забрать код и уйти с платформы?", a: "Код хранится в SourceCraft-репозитории. Вы можете клонировать его через Git: git clone https://git.sourcecraft.dev/your-project.git. Весь код ваш." },
-      { q: "Можно ли работать вдвоём над одним проектом?", a: "Пока нет. Совместная работа в разработке. Пока только один пользователь на проект." },
+      { q: "Как правильно описать проект?", a: "Формула: Цель + Аудитория + Функционал + Дизайн. Пример: «Лендинг стоматологии для клиентов 30-50 лет. Нужна форма записи, галерея работ, отзывы. Сине-белая гамма, строгий стиль.»" },
+      { q: "Как экономить нейрокредиты?", a: "Чёткая формулировка экономит 30%. Мелкие баги правьте руками в редакторе кода. Не просите перегенерировать весь проект — просите исправить конкретный блок." },
+      { q: "Как забрать код?", a: "Код в SourceCraft-репозитории. Клонируйте: git clone https://git.sourcecraft.dev/ваш-проект.git. Весь код — ваш." },
+      { q: "ИИ зациклился — что делать?", a: "Нажмите «Отменить», начните заново с более конкретным запросом. Если не помогает — создайте новый чат. Старый чат можно удалить." },
     ],
   },
   {
-    category: "🛠️ Технические вопросы",
-    icon: Wrench,
-    color: "#06b6d4",
-    questions: [
-      { q: "Почему сайт не открывается после публикации?", a: "1) Проверьте что проект опубликован (кнопка «Деплой»). 2) Проверьте DNS если привязали домен. 3) Подождите 5-10 минут — первый деплой дольше. 4) Проверьте логи в Yandex Cloud." },
-      { q: "Как добавить Яндекс.Метрику?", a: "Создайте счётчик в Метрике → скопируйте код → вставьте в <head> через настройки проекта в SourceCraft." },
-      { q: "Как сделать адаптивную мобильную версию?", a: "Напишите ИИ: «Сделай мобильную версию сайта». ИИ добавит media queries. Можно указать конкретные брейкпоинты: «адаптив под 375px и 768px»." },
-      { q: "Как подключить базу данных?", a: "ИИ сам создаёт PostgreSQL в Yandex Cloud при необходимости. Вы можете явно попросить: «Нужна база данных для хранения заявок»." },
-      { q: "Проект перестал открываться после правок. Что делать?", a: "SourceCraft хранит историю изменений (как Git). Откройте репозиторий → найдите последнюю работающую версию → откатитесь. Или создайте новый чат и попросите ИИ исправить конкретную ошибку." },
-    ],
-  },
-  {
-    category: "🔬 Технические детали (из Habr)",
+    category: "Технические детали",
+    section: "06",
     icon: Wrench,
     color: "#6366f1",
     questions: [
-      { q: "Какое контекстное окно у Code Assistant?", a: "32K токенов (~50 страниц). Меньше чем GigaChat MAX (128K) и Claude (200K). Для больших проектов может не хватать. Источник: Habr." },
-      { q: "Сохраняется ли история чата?", a: "Нет. Каждый чат — с чистого листа. Копируйте контекст или используйте .codeassistant/ структуру с правилами. Источник: Habr." },
-      { q: "Можно ли свои модели вместо YandexGPT?", a: "Да. Code Assistant поддерживает custom провайдеров — Ollama локально или API сторонних моделей. Источник: Habr." },
-      { q: "Работает ли индексация кода как в Cursor?", a: "Частично. Эмбеддинги, а не графы как в Cursor. Требуется Ollama + Qdrant для векторного поиска. Источник: Habr." },
-      { q: "Code Assistant или GigaCode — что выбрать?", a: "SourceCraft — если в экосистеме Яндекса, лимиты: 3000 автодополнений + 1000 чат-запросов/нед. GigaCode — если нужно окно 128K и лучший русский язык. Источник: Habr." },
-    ],
-  },
-  {
-    category: "🗣️ Бизнес-сообщество (из Habr)",
-    icon: Rocket,
-    color: "#22c55e",
-    questions: [
-      { q: "Кто конкуренты VibeCraft в РФ?", a: "Прямых аналогов мало. Ближайшие: ААХ (React+TS, фронтенд), Lork (облачная IDE), HostAI. Конструкторы: Tilda (ИИ-блоки), uCoz, Битрикс24. Источник: Habr." },
-      { q: "Сколько стоит полностью в месяц?", a: "SourceCraft Pro: 250 ₽/чел + Code Assistant Pro: 700 ₽/место + Yandex Cloud (~150-500 ₽). Суммарно ~1100-1500 ₽/мес. Пробный период — 90 дней. Источник: SourceCraft." },
-      { q: "В чём главная боль пользователей?", a: "ИИ генерирует работающий код, но требующий правок профи. Заменяет «программиста на подхвате», но не архитектора. Источник: Habr." },
-      { q: "Можно ли выгрузить код и хостить не в Yandex Cloud?", a: "Технически да — код в SourceCraft-репозитории. Но VibeCraft заточен под Yandex Cloud, для внешнего хостинга нужна ручная доработка DevOps-части. Источник: VibeCraft docs." },
+      { q: "Контекстное окно Code Assistant", a: "32K токенов (~50 страниц). Меньше чем GigaChat MAX (128K) и Claude (200K). Для больших проектов может не вместить весь код. Источник: Habr." },
+      { q: "Свои модели вместо YandexGPT", a: "Да. Code Assistant поддерживает custom провайдеров — локальная Ollama или API сторонних моделей. Рекомендуются только большие LLM. Источник: Habr." },
+      { q: "Индексация кода как в Cursor?", a: "Частично. Эмбеддинги, а не графы как в Cursor. Требуется Ollama локально + Qdrant для векторного поиска. Источник: Habr." },
+      { q: "Сохраняется ли история чата?", a: "Нет. Каждый чат — с чистого листа. Копируйте контекст или используйте файлы .codeassistant/ с правилами. Источник: Habr." },
+      { q: "Почему сайт не открывается после деплоя?", a: "Проверьте публикацию (кнопка «Деплой»), DNS для своего домена. Первый деплой — до 10 минут. Логи — в Yandex Cloud." },
     ],
   },
 ];
 
 export default function VibeCraftKBClient() {
   const [search, setSearch] = useState("");
-  const [expandedCategory, setExpandedCategory] = useState<string | null>("🚀 Старт и доступ");
   const [expandedQuestions, setExpandedQuestions] = useState<Set<string>>(new Set());
 
   const toggleQuestion = (q: string) => {
@@ -113,192 +91,237 @@ export default function VibeCraftKBClient() {
     setExpandedQuestions(next);
   };
 
-  // Search across all questions
   const searchResults = search.length >= 2
     ? FAQ_CATEGORIES.flatMap(cat =>
         cat.questions.filter(q =>
           q.q.toLowerCase().includes(search.toLowerCase()) ||
           q.a.toLowerCase().includes(search.toLowerCase())
-        ).map(q => ({ ...q, category: cat.category }))
+        ).map(q => ({ ...q, category: cat.category, section: cat.section }))
       )
     : [];
 
   return (
-    <div style={{ maxWidth: 900, margin: "0 auto", padding: "var(--space-xl) var(--space-m)", fontFamily: "var(--font-body)" }}>
-      {/* Hero */}
+    <div style={{ minHeight: "100vh", background: "var(--color-bg-primary)" }}>
+      {/* Hero — magazine style */}
       <div style={{
-        padding: "var(--space-xl)", marginBottom: "var(--space-xl)",
-        background: "linear-gradient(135deg, #0fb88008, #3b82f608)",
-        border: "1px solid var(--color-border-light)", borderRadius: 0,
+        maxWidth: 1100, margin: "0 auto",
+        padding: "100px var(--space-xl) 60px",
+        borderBottom: "1px solid var(--color-border-light)",
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: "var(--space-s)", flexWrap: "wrap" }}>
-          <div style={{ fontSize: 36 }}>🏗️</div>
-          <div>
-            <h1 style={{ fontSize: "var(--text-xxl)", fontWeight: 900, fontFamily: "var(--font-heading)", letterSpacing: "-0.02em", margin: 0 }}>
-              VibeCraft / SourceCraft — база знаний
-            </h1>
-            <p style={{ fontSize: "var(--text-s)", color: "var(--color-text-secondary)", marginTop: 4 }}>
-              Ответы на частые вопросы, собранные из Telegram-чатов и официальной документации
-            </p>
-          </div>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 16, marginBottom: 24, flexWrap: "wrap" }}>
+          <span style={{
+            fontSize: "var(--text-s)", fontWeight: 700, color: "var(--color-accent)",
+            textTransform: "uppercase", letterSpacing: "0.08em",
+            borderBottom: "2px solid var(--color-accent)", paddingBottom: 4,
+          }}>
+            База знаний
+          </span>
+          <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", fontWeight: 600 }}>
+            Источники: Хабр, SourceCraft Docs, Telegram-чаты
+          </span>
         </div>
 
-        <div style={{ display: "flex", gap: 8, marginTop: "var(--space-m)", flexWrap: "wrap", fontSize: "var(--text-xs)", color: "var(--color-text-secondary)" }}>
-          <MessageCircle size={14} />
-          <span>Источники: @sourcecraft_ru (12 000+ участников), @vibecraft_chat, официальная документация</span>
-        </div>
-      </div>
+        <h1 style={{
+          fontSize: "clamp(32px, 5vw, 56px)", fontWeight: 900,
+          fontFamily: "var(--font-heading)", letterSpacing: "-0.03em",
+          lineHeight: 1.05, marginBottom: 16, maxWidth: 800,
+        }}>
+          VibeCraft & SourceCraft
+        </h1>
+        <p style={{
+          fontSize: "var(--text-l)", color: "var(--color-text-secondary)",
+          lineHeight: 1.6, maxWidth: 560, fontWeight: 400,
+        }}>
+          Всё, что нужно знать о платформе от Яндекса. 30+ ответов на реальные вопросы разработчиков.
+        </p>
 
-      {/* Search */}
-      <div style={{ position: "relative", marginBottom: "var(--space-xl)", maxWidth: 500 }}>
-        <Search size={16} style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "var(--color-text-tertiary)" }} />
-        <input
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          placeholder="Найти ответ... Например: доступ, цены, VPN, домен"
-          style={{
-            width: "100%", padding: "14px 14px 14px 44px", fontSize: "var(--text-s)", borderRadius: 0,
-            border: "2px solid var(--color-border)", background: "var(--color-bg-primary)", outline: "none",
-            boxSizing: "border-box", color: "var(--color-text-primary)",
-          }}
-        />
+        {/* Search */}
+        <div style={{ position: "relative", maxWidth: 480, marginTop: 32 }}>
+          <Search size={16} style={{ position: "absolute", left: 16, top: "50%", transform: "translateY(-50%)", color: "var(--color-text-tertiary)" }} />
+          <input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Найти ответ..."
+            style={{
+              width: "100%", padding: "14px 14px 14px 44px", fontSize: "var(--text-s)", borderRadius: 0,
+              border: "1px solid var(--color-border)", background: "var(--color-bg-primary)", outline: "none",
+              boxSizing: "border-box", color: "var(--color-text-primary)",
+              transition: "border-color 0.15s",
+            }}
+          />
+        </div>
       </div>
 
       {/* Search results */}
       {search.length >= 2 && (
-        <div style={{ marginBottom: "var(--space-xl)" }}>
-          <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", marginBottom: "var(--space-s)" }}>
-            Найдено: {searchResults.length} ответов
+        <div style={{ maxWidth: 800, margin: "0 auto", padding: "var(--space-xl)" }}>
+          <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", marginBottom: 24, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+            Найдено {searchResults.length} ответов
           </div>
-          {searchResults.map((item, i) => (
-            <div key={i} style={{
-              padding: "var(--space-m)", marginBottom: "var(--space-xs)",
-              background: "var(--color-bg-primary)", border: "1px solid var(--color-border-light)", borderRadius: 0,
-            }}>
-              <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: 4, color: "var(--color-text-primary)" }}>
-                {highlightMatch(item.q, search)}
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            {searchResults.map((item, i) => (
+              <div key={i} style={{ paddingBottom: 16, borderBottom: "1px solid var(--color-border-light)" }}>
+                <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                  <span style={{ fontSize: 10, fontWeight: 700, color: "var(--color-text-tertiary)", minWidth: 24, marginTop: 2 }}>
+                    {item.section}
+                  </span>
+                  <div>
+                    <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: 4, color: "var(--color-text-primary)" }}>
+                      {highlightMatch(item.q, search)}
+                    </div>
+                    <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.7 }}>
+                      {highlightMatch(item.a, search)}
+                    </div>
+                    <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", marginTop: 6 }}>
+                      {item.category}
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.6 }}>
-                {highlightMatch(item.a, search)}
-              </div>
-              <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", marginTop: 4 }}>
-                {item.category}
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
 
-      {/* Categories */}
-      {!search && FAQ_CATEGORIES.map(cat => (
-        <div key={cat.category} style={{ marginBottom: "var(--space-s)" }}>
-          {/* Category header */}
-          <div
-            onClick={() => setExpandedCategory(expandedCategory === cat.category ? null : cat.category)}
-            style={{
-              display: "flex", alignItems: "center", gap: 10, padding: "var(--space-m)",
-              background: expandedCategory === cat.category ? `${cat.color}10` : "var(--color-bg-primary)",
-              border: `1px solid ${expandedCategory === cat.category ? cat.color : "var(--color-border-light)"}`,
-              borderLeft: `4px solid ${cat.color}`,
-              borderRadius: 0, cursor: "pointer", transition: "background 0.15s",
-            }}
-          >
-            <cat.icon size={18} style={{ color: cat.color }} />
-            <div style={{ flex: 1 }}>
-              <div style={{ fontWeight: 700, fontSize: "var(--text-s)" }}>{cat.category}</div>
-              <div style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>{cat.questions.length} вопросов</div>
-            </div>
-            <ChevronDown size={16} style={{
-              color: "var(--color-text-tertiary)", transition: "0.2s",
-              transform: expandedCategory === cat.category ? "rotate(180deg)" : "",
-            }} />
-          </div>
-
-          {/* Questions */}
-          {expandedCategory === cat.category && (
-            <div style={{ marginLeft: 24 }}>
-              {cat.questions.map((qa, i) => (
-                <div key={i} style={{
-                  borderBottom: i < cat.questions.length - 1 ? "1px solid var(--color-border-light)" : "none",
-                }}>
-                  <div
-                    onClick={() => toggleQuestion(qa.q)}
-                    style={{
-                      display: "flex", justifyContent: "space-between", alignItems: "flex-start",
-                      gap: 12, padding: "var(--space-s) var(--space-m)", cursor: "pointer",
-                    }}
-                  >
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 600, fontSize: "var(--text-xs)", color: "var(--color-text-primary)", lineHeight: 1.5 }}>
-                        {qa.q}
-                      </div>
-                    </div>
-                    <ChevronDown size={14} style={{
-                      color: "var(--color-text-tertiary)", marginTop: 2, flexShrink: 0, transition: "0.2s",
-                      transform: expandedQuestions.has(qa.q) ? "rotate(180deg)" : "",
-                    }} />
-                  </div>
-                  {expandedQuestions.has(qa.q) && (
-                    <div style={{
-                      padding: "0 var(--space-m) var(--space-m)", fontSize: "var(--text-xs)",
-                      color: "var(--color-text-secondary)", lineHeight: 1.7,
-                      animation: "expandIn 0.2s ease",
+      {/* Categories — journal grid */}
+      {!search && (
+        <div style={{ maxWidth: 1100, margin: "0 auto", padding: "60px var(--space-xl)" }}>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
+            gap: 0,
+          }}>
+            {FAQ_CATEGORIES.map((cat, catIndex) => (
+              <div key={cat.section} style={{
+                padding: "var(--space-xl)",
+                borderBottom: "1px solid var(--color-border-light)",
+                borderRight: catIndex % 2 === 0 ? "1px solid var(--color-border-light)" : "none",
+                borderLeft: catIndex > 1 ? "none" : "none",
+              }}>
+                {/* Category header */}
+                <div style={{ marginBottom: 20 }}>
+                  <div style={{
+                    display: "flex", alignItems: "center", gap: 10, marginBottom: 8,
+                  }}>
+                    <span style={{
+                      fontSize: "var(--text-xs)", fontWeight: 800, color: "var(--color-text-tertiary)",
+                      fontFamily: "var(--font-mono)", letterSpacing: "0.05em",
                     }}>
-                      {qa.a}
-                    </div>
-                  )}
+                      {cat.section}
+                    </span>
+                    <cat.icon size={16} style={{ color: cat.color }} />
+                  </div>
+                  <h3 style={{
+                    fontSize: "var(--text-xl)", fontWeight: 800,
+                    fontFamily: "var(--font-heading)", letterSpacing: "-0.01em",
+                    margin: 0, color: "var(--color-text-primary)",
+                  }}>
+                    {cat.category}
+                  </h3>
                 </div>
-              ))}
+
+                {/* Questions */}
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  {cat.questions.map((qa, i) => {
+                    const isOpen = expandedQuestions.has(qa.q);
+                    return (
+                      <div key={i} style={{
+                        borderBottom: i < cat.questions.length - 1 ? "1px solid var(--color-border-light)" : "none",
+                      }}>
+                        <div
+                          onClick={() => toggleQuestion(qa.q)}
+                          style={{
+                            display: "flex", justifyContent: "space-between", alignItems: "flex-start",
+                            gap: 12, padding: "14px 0", cursor: "pointer",
+                          }}
+                        >
+                          <span style={{
+                            fontWeight: 600, fontSize: "var(--text-s)", color: "var(--color-text-primary)",
+                            lineHeight: 1.5, flex: 1,
+                          }}>
+                            {qa.q}
+                          </span>
+                          <ChevronDown size={14} style={{
+                            color: "var(--color-text-tertiary)", marginTop: 4, flexShrink: 0,
+                            transition: "transform 0.2s", transform: isOpen ? "rotate(180deg)" : "",
+                          }} />
+                        </div>
+                        {isOpen && (
+                          <div style={{
+                            padding: "0 0 16px", fontSize: "var(--text-xs)",
+                            color: "var(--color-text-secondary)", lineHeight: 1.8,
+                          }}>
+                            {qa.a}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Question form — minimal */}
+      {!search && (
+        <div style={{
+          maxWidth: 500, margin: "0 auto", padding: "0 var(--space-xl) 80px",
+          textAlign: "center",
+        }}>
+          <div style={{
+            paddingTop: 32, borderTop: "2px solid var(--color-border)",
+          }}>
+            <div style={{
+              fontSize: "var(--text-xs)", fontWeight: 700, color: "var(--color-text-tertiary)",
+              textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 12,
+            }}>
+              Не нашли ответ?
             </div>
-          )}
+            <p style={{ fontSize: "var(--text-s)", color: "var(--color-text-secondary)", marginBottom: 20 }}>
+              Напишите вопрос — мы добавим его в базу знаний
+            </p>
+            <a
+              href="https://t.me/bilarius"
+              target="_blank"
+              rel="noopener"
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 8,
+                padding: "12px 28px", borderRadius: 0,
+                background: "var(--color-accent)", color: "white",
+                textDecoration: "none", fontWeight: 700, fontSize: "var(--text-s)",
+              }}
+            >
+              <Send size={14} /> Задать вопрос в Telegram
+            </a>
+            <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", marginTop: 12 }}>
+              @bilarius
+            </div>
+          </div>
         </div>
-      ))}
+      )}
 
-      {/* Question form */}
+      {/* Footer links */}
       <div style={{
-        marginTop: "var(--space-xl)", padding: "var(--space-l)", background: "var(--color-bg-primary)",
-        border: "1px solid var(--color-border-light)", borderRadius: 0, textAlign: "center",
+        maxWidth: 1100, margin: "0 auto",
+        padding: "var(--space-xl)", borderTop: "1px solid var(--color-border-light)",
+        display: "flex", gap: 32, flexWrap: "wrap", justifyContent: "center",
+        fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)",
       }}>
-        <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: 4 }}>Не нашли ответ?</div>
-        <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", marginBottom: "var(--space-m)" }}>
-          Задайте вопрос — мы добавим его в базу знаний
-        </p>
-        <form action="https://t.me/bilarius" target="_blank" style={{ display: "flex", gap: 0, maxWidth: 400, margin: "0 auto" }}>
-          <input placeholder="Ваш вопрос..." style={{ flex: 1, padding: "10px 14px", fontSize: "var(--text-xs)", borderRadius: 0, border: "1px solid var(--color-border)", borderRight: "none", background: "var(--color-bg-primary)", outline: "none" }} />
-          <button type="submit" style={{ display: "flex", alignItems: "center", gap: 4, padding: "10px 16px", borderRadius: 0, border: "none", background: "var(--color-accent)", color: "white", fontWeight: 700, fontSize: "var(--text-xs)", cursor: "pointer" }}>
-            <Send size={12} /> Спросить
-          </button>
-        </form>
-        <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", marginTop: 8 }}>
-          Вопросы принимаются через Telegram @bilarius
-        </div>
+        <a href="https://vibe.sourcecraft.dev" target="_blank" rel="noopener" style={{ color: "var(--color-accent)", textDecoration: "none", fontWeight: 600, display: "flex", alignItems: "center", gap: 4 }}>
+          <ExternalLink size={12} /> vibe.sourcecraft.dev
+        </a>
+        <a href="https://sourcecraft.dev" target="_blank" rel="noopener" style={{ color: "var(--color-accent)", textDecoration: "none", fontWeight: 600, display: "flex", alignItems: "center", gap: 4 }}>
+          <ExternalLink size={12} /> sourcecraft.dev
+        </a>
+        <a href="https://t.me/sourcecraft_ru" target="_blank" rel="noopener" style={{ color: "var(--color-accent)", textDecoration: "none", fontWeight: 600, display: "flex", alignItems: "center", gap: 4 }}>
+          <ExternalLink size={12} /> @sourcecraft_ru
+        </a>
+        <Link href="/ai-tools" style={{ color: "var(--color-accent)", textDecoration: "none", fontWeight: 600, display: "flex", alignItems: "center", gap: 4 }}>
+          <ExternalLink size={12} /> AI-инструменты
+        </Link>
       </div>
-
-      {/* Resources */}
-      <div style={{
-        marginTop: "var(--space-xl)", padding: "var(--space-l)", background: "var(--color-bg-primary)",
-        border: "1px solid var(--color-border-light)", borderRadius: 0,
-      }}>
-        <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: "var(--space-s)" }}>
-          📚 Полезные ссылки
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 6, fontSize: "var(--text-xs)" }}>
-          <a href="https://vibe.sourcecraft.dev" target="_blank" rel="noopener" style={{ color: "var(--color-accent)", textDecoration: "none", display: "flex", alignItems: "center", gap: 6 }}>
-            <ExternalLink size={12} /> vibe.sourcecraft.dev — платформа VibeCraft
-          </a>
-          <a href="https://sourcecraft.dev" target="_blank" rel="noopener" style={{ color: "var(--color-accent)", textDecoration: "none", display: "flex", alignItems: "center", gap: 6 }}>
-            <ExternalLink size={12} /> sourcecraft.dev — платформа SourceCraft
-          </a>
-          <a href="https://t.me/sourcecraft_ru" target="_blank" rel="noopener" style={{ color: "var(--color-accent)", textDecoration: "none", display: "flex", alignItems: "center", gap: 6 }}>
-            <ExternalLink size={12} /> @sourcecraft_ru — официальный Telegram-канал
-          </a>
-          <Link href="/ai-tools" style={{ color: "var(--color-accent)", textDecoration: "none", display: "flex", alignItems: "center", gap: 6 }}>
-            <ExternalLink size={12} /> Сравнение AI-инструментов на ProektMap
-          </Link>
-        </div>
-      </div>
-
-      <style>{`@keyframes expandIn { from { opacity: 0; max-height: 0 } to { opacity: 1; max-height: 300px } }`}</style>
     </div>
   );
 }
