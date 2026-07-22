@@ -49,6 +49,7 @@ export default async function GlobalFooter() {
               <>
                 <Link href="/privacy" style={fl}>Политика конфиденциальности</Link>
                 <Link href="/terms" style={fl}>Условия использования</Link>
+                <Link href="/sitemap" style={fl}>Карта сайта</Link>
                 <Link href="/offer" style={fl}>Оферта</Link>
               </>
             )}
