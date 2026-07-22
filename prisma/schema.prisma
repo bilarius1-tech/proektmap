@@ -558,6 +558,10 @@ model GlossaryTerm {
   @@map("glossary_terms")
 }
 
+
+
+
+
 model BuildPattern {
   id              String   @id @default(uuid())
   title           String
@@ -566,6 +570,7 @@ model BuildPattern {
   longDescription String   @default("")
   difficulty      String   @default("beginner")
   timeToBuild     String   @default("2 дня")
+  category        String   @default("")
   outcome         String   @default("{}")
   entities        String   @default("[]")
   stack           String   @default("[]")
