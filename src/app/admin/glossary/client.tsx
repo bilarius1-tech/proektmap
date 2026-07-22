@@ -1,91 +1,173 @@
 "use client";
-
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Edit, Trash2, CheckCircle, XCircle, Search } from "lucide-react";
+import { Plus, Trash2, Search, X, Save, Edit3 } from "lucide-react";
 
-const LEVELS = ["survival", "vibe", "modern", "senior", "jargon"];
-const LEVEL_LABELS: Record<string, string> = { survival: "Выживание", vibe: "Вайбкодинг", modern: "Современный AI", senior: "Старший", jargon: "Жаргон" };
+const LEVELS = ["beginner", "intermediate", "advanced"];
+const CATEGORIES = ["AI и LLM", "Разработка", "Базы данных", "Git", "Дизайн", "SEO", "SaaS", "Деплой"];
 
-export default function AdminGlossaryClient({ terms }: any) {
+export default function AdminGlossaryClient({ terms: initial }: any) {
   const router = useRouter();
-  const [items, setItems] = useState(terms);
-  const [editId, setEditId] = useState<string | null>(null);
+  const [terms] = useState(initial || []);
   const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [editing, setEditing] = useState<any>(null);
   const [saving, setSaving] = useState(false);
-  const empty = { term: "", slug: "", definition: "", simpleExplanation: "", example: "", vibeUsage: "", level: "survival", category: "general", relatedTerms: "" };
-  const [form, setForm] = useState(empty);
+  const [page, setPage] = useState(1);
+  const perPage = 20;
 
-  function startEdit(t: any) { setEditId(t.id); setForm({ term: t.term, slug: t.slug, definition: t.definition, simpleExplanation: t.simpleExplanation || "", example: t.example || "", vibeUsage: t.vibeUsage || "", level: t.level, category: t.category, relatedTerms: t.relatedTerms || "" }); }
-  function startNew() { setEditId("new"); setForm(empty); }
+  const filtered = terms.filter((t: any) => {
+    if (search && !t.term.toLowerCase().includes(search.toLowerCase()) && !t.definition.toLowerCase().includes(search.toLowerCase())) return false;
+    if (categoryFilter !== "all" && t.category !== categoryFilter) return false;
+    return true;
+  });
+
+  const paged = filtered.slice((page - 1) * perPage, page * perPage);
+  const totalPages = Math.ceil(filtered.length / perPage);
+
+  function startEdit(t?: any) {
+    setEditing(t ? { ...t } : { term: "", slug: "", definition: "", simpleExplanation: "", level: "beginner", category: "AI и LLM", relatedTerms: "", isPublished: true, sortOrder: (terms.length || 0) + 1 });
+  }
+
+  function updateField(field: string, value: any) {
+    setEditing((prev: any) => ({ ...prev, [field]: value }));
+  }
 
   async function save() {
+    if (!editing) return;
     setSaving(true);
-    const url = editId === "new" ? "/api/admin/glossary" : `/api/admin/glossary/${editId}`;
-    const method = editId === "new" ? "POST" : "PUT";
-    if (!form.slug) form.slug = form.term.toLowerCase().replace(/[^a-zа-я0-9]+/g, "-");
-    const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
-    if (res.ok) { router.refresh(); setEditId(null); }
+    const method = editing.id ? "PATCH" : "POST";
+    await fetch("/api/admin/glossary", { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(editing) });
+    router.refresh();
+    setEditing(null);
     setSaving(false);
   }
 
-  async function remove(id: string) { if (!confirm("Удалить?")) return; await fetch(`/api/admin/glossary/${id}`, { method: "DELETE" }); setItems(items.filter((i: any) => i.id !== id)); router.refresh(); }
-  async function toggle(id: string, pub: boolean) { await fetch(`/api/admin/glossary/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ isPublished: !pub }) }); setItems(items.map((i: any) => i.id === id ? { ...i, isPublished: !pub } : i)); router.refresh(); }
-
-  const filtered = search ? items.filter((i: any) => i.term.toLowerCase().includes(search.toLowerCase()) || i.definition.toLowerCase().includes(search.toLowerCase())) : items;
+  async function remove(id: string) {
+    if (!confirm("Удалить термин?")) return;
+    await fetch("/api/admin/glossary?id=" + id, { method: "DELETE" });
+    router.refresh();
+  }
 
   return (
-    <div style={{ padding: "var(--space-xl)" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-l)", flexWrap: "wrap", gap: 12 }}>
-        <div><h1 style={{ fontSize: "var(--text-xxl)", fontWeight: 800 }}>📖 Глоссарий</h1><p style={{ color: "var(--color-text-tertiary)", fontSize: "var(--text-s)" }}>{items.length} терминов</p></div>
-        <button onClick={startNew} style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 20px", borderRadius: "var(--radius-m)", background: "var(--color-accent)", color: "white", border: "none", fontSize: "var(--text-s)", fontWeight: 600, cursor: "pointer" }}><Plus size={16} /> Добавить</button>
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
+        <h1 style={{ fontSize: 36, fontWeight: 800 }}>📖 Глоссарий</h1>
+        <button onClick={() => startEdit()} style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 20px", borderRadius: 0, background: "var(--color-accent)", color: "white", border: "none", cursor: "pointer", fontWeight: 600 }}>
+          <Plus size={14} /> Добавить
+        </button>
       </div>
 
-      <div style={{ marginBottom: "var(--space-m)" }}>
-        <div style={{ position: "relative", width: 260 }}>
+      <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
+        <div style={{ position: "relative", flex: "1 1 200px", maxWidth: 300 }}>
           <Search size={14} style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "var(--color-text-tertiary)" }} />
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Поиск..."
-            style={{ width: "100%", padding: "8px 8px 8px 32px", fontSize: "var(--text-xs)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none" }} />
+          <input placeholder="Поиск..." value={search} onChange={e => setSearch(e.target.value)}
+            style={{ width: "100%", padding: "8px 8px 8px 32px", fontSize: 12, borderRadius: 0, border: "1px solid var(--color-border)", background: "var(--color-bg-primary)", outline: "none", boxSizing: "border-box" }} />
         </div>
+        <select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}
+          style={{ padding: "8px 12px", fontSize: 12, borderRadius: 0, border: "1px solid var(--color-border)", background: "var(--color-bg-primary)" }}>
+          <option value="all">Все категории</option>
+          {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+        </select>
+        <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", alignSelf: "center" }}>{filtered.length} терминов</span>
       </div>
 
-      {editId && (
-        <div style={{ marginBottom: "var(--space-l)", padding: "var(--space-l)", background: "var(--color-bg-secondary)", borderRadius: "var(--radius-l)", border: "1px solid var(--color-border)" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-m)", marginBottom: "var(--space-m)" }}>
-            <div><label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Термин *</label><input value={form.term} onChange={e => setForm({ ...form, term: e.target.value })} style={{ width: "100%", padding: "8px 12px", fontSize: "var(--text-s)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none" }} /></div>
-            <div><label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Slug</label><input value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })} style={{ width: "100%", padding: "8px 12px", fontSize: "var(--text-s)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none" }} /></div>
+      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
+        <thead><tr style={{ borderBottom: "2px solid var(--color-border)" }}>
+          {["#","Термин","Категория","Уровень","Опубликован",""].map(h => <th key={h} style={{ textAlign: "left", padding: "8px 10px", fontWeight: 600 }}>{h}</th>)}
+        </tr></thead>
+        <tbody>
+          {paged.map((t: any, i: number) => (
+            <tr key={t.id} style={{ borderBottom: "1px solid var(--color-border-light)", cursor: "pointer" }} onClick={() => startEdit(t)}>
+              <td style={{ padding: 8 }}>{(page - 1) * perPage + i + 1}</td>
+              <td style={{ padding: 8, fontWeight: 600, color: "var(--color-accent)" }}>{t.term}</td>
+              <td style={{ padding: 8, color: "var(--color-text-secondary)" }}>{t.category}</td>
+              <td style={{ padding: 8 }}>{t.level === "beginner" ? "🟢" : t.level === "intermediate" ? "🟡" : "🔴"}</td>
+              <td style={{ padding: 8 }}>{t.isPublished ? "✅" : "⏸️"}</td>
+              <td style={{ padding: 8 }} onClick={e => e.stopPropagation()}><button onClick={() => remove(t.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-error)" }}><Trash2 size={14} /></button></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 8, marginTop: 24 }}>
+          <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
+            style={{ padding: "8px 16px", borderRadius: 0, border: "1px solid var(--color-border)", background: "var(--color-bg-primary)", cursor: page === 1 ? "default" : "pointer", opacity: page === 1 ? 0.4 : 1, fontWeight: 600, fontSize: "var(--text-xs)" }}>← Назад</button>
+          <div style={{ display: "flex", gap: 4 }}>
+            {Array.from({ length: totalPages }, (_, i) => (
+              <button key={i} onClick={() => setPage(i + 1)}
+                style={{ width: 36, height: 36, borderRadius: 0, border: page === i + 1 ? "2px solid var(--color-accent)" : "1px solid var(--color-border)", background: page === i + 1 ? "var(--color-accent-light)" : "var(--color-bg-primary)", color: page === i + 1 ? "var(--color-accent)" : "var(--color-text-secondary)", fontWeight: 700, fontSize: "var(--text-xs)", cursor: "pointer" }}>{i + 1}</button>
+            ))}
           </div>
-          <div style={{ marginBottom: "var(--space-m)" }}><label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Определение *</label><textarea value={form.definition} onChange={e => setForm({ ...form, definition: e.target.value })} rows={2} style={{ width: "100%", padding: "8px 12px", fontSize: "var(--text-s)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none", resize: "vertical" }} /></div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-m)", marginBottom: "var(--space-m)" }}>
-            <div><label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Простое объяснение</label><input value={form.simpleExplanation} onChange={e => setForm({ ...form, simpleExplanation: e.target.value })} style={{ width: "100%", padding: "8px 12px", fontSize: "var(--text-s)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none" }} /></div>
-            <div><label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Пример</label><input value={form.example} onChange={e => setForm({ ...form, example: e.target.value })} style={{ width: "100%", padding: "8px 12px", fontSize: "var(--text-s)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none" }} /></div>
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "var(--space-m)", marginBottom: "var(--space-m)" }}>
-            <div><label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Уровень</label><select value={form.level} onChange={e => setForm({ ...form, level: e.target.value })} style={{ width: "100%", padding: "8px 12px", fontSize: "var(--text-s)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none" }}>{LEVELS.map(l => <option key={l} value={l}>{LEVEL_LABELS[l]}</option>)}</select></div>
-            <div><label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Как говорят</label><input value={form.vibeUsage} onChange={e => setForm({ ...form, vibeUsage: e.target.value })} style={{ width: "100%", padding: "8px 12px", fontSize: "var(--text-s)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none" }} /></div>
-            <div><label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Связанные (slug через запятую)</label><input value={form.relatedTerms} onChange={e => setForm({ ...form, relatedTerms: e.target.value })} style={{ width: "100%", padding: "8px 12px", fontSize: "var(--text-s)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none" }} /></div>
-          </div>
-          <div style={{ display: "flex", gap: 8 }}>
-            <button onClick={save} disabled={saving || !form.term} style={{ padding: "10px 20px", borderRadius: "var(--radius-m)", background: form.term ? "var(--color-accent)" : "var(--color-border)", color: "white", border: "none", fontSize: "var(--text-s)", fontWeight: 600, cursor: form.term ? "pointer" : "default" }}>{saving ? "Сохранение..." : "Сохранить"}</button>
-            <button onClick={() => setEditId(null)} style={{ padding: "10px 20px", borderRadius: "var(--radius-m)", background: "var(--color-bg-primary)", border: "1px solid var(--color-border)", cursor: "pointer" }}>Отмена</button>
-          </div>
+          <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
+            style={{ padding: "8px 16px", borderRadius: 0, border: "1px solid var(--color-border)", background: "var(--color-bg-primary)", cursor: page === totalPages ? "default" : "pointer", opacity: page === totalPages ? 0.4 : 1, fontWeight: 600, fontSize: "var(--text-xs)" }}>Вперёд →</button>
+          <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", marginLeft: 12 }}>{page} из {totalPages}</span>
         </div>
       )}
 
-      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)" }}>
-        {filtered.map((t: any) => (
-          <div key={t.id} style={{ display: "flex", alignItems: "center", gap: "var(--space-s)", padding: "var(--space-m)", background: "var(--color-bg-primary)", borderRadius: "var(--radius-m)", border: "1px solid var(--color-border-light)", opacity: t.isPublished ? 1 : 0.5 }}>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontWeight: 700, fontSize: "var(--text-s)" }}>{t.term}</div>
-              <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", marginTop: 2 }}>{t.simpleExplanation || t.definition.slice(0, 80)}</div>
+      {/* Edit Modal */}
+      {editing && (
+        <div onClick={() => setEditing(null)} style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", justifyContent: "center", alignItems: "center", background: "rgba(0,0,0,0.4)" }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: "var(--color-bg-primary)", borderRadius: 0, maxWidth: 600, width: "90%", maxHeight: "90vh", overflow: "auto", padding: 24, boxShadow: "0 8px 40px rgba(0,0,0,0.15)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
+              <h2 style={{ fontSize: 20, fontWeight: 700 }}>{editing.id ? "Редактировать" : "Новый термин"}</h2>
+              <button onClick={() => setEditing(null)} style={{ background: "none", border: "none", cursor: "pointer" }}><X size={18} /></button>
             </div>
-            <span style={{ fontSize: 9, padding: "2px 8px", borderRadius: 99, background: "var(--color-bg-secondary)", flexShrink: 0 }}>{LEVEL_LABELS[t.level]}</span>
-            <button onClick={() => toggle(t.id, t.isPublished)} style={{ background: "none", border: "none", cursor: "pointer", color: t.isPublished ? "var(--color-accent)" : "var(--color-text-tertiary)", padding: 4 }}>{t.isPublished ? <CheckCircle size={14} /> : <XCircle size={14} />}</button>
-            <button onClick={() => startEdit(t)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-secondary)", padding: 4 }}><Edit size={14} /></button>
-            <button onClick={() => remove(t.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-error)", padding: 4 }}><Trash2 size={14} /></button>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <div style={{ display: "flex", gap: 10 }}>
+                <div style={{ flex: 2 }}><Field label="Термин" value={editing.term} onChange={(v: string) => { updateField("term", v); updateField("slug", v.toLowerCase().replace(/[^a-zа-я0-9]+/g, "-").replace(/^-+|-+$/g, "")); }} /></div>
+                <div style={{ flex: 1 }}><Field label="Slug" value={editing.slug} onChange={(v: string) => updateField("slug", v)} /></div>
+              </div>
+              <Field label="Определение" value={editing.definition} onChange={(v: string) => updateField("definition", v)} textarea />
+              <Field label="Простое объяснение" value={editing.simpleExplanation} onChange={(v: string) => updateField("simpleExplanation", v)} textarea />
+              <div style={{ display: "flex", gap: 10 }}>
+                <div style={{ flex: 1 }}>
+                  <label style={{ fontSize: 10, color: "var(--color-text-tertiary)", display: "block", marginBottom: 2 }}>Категория</label>
+                  <select value={editing.category || "AI и LLM"} onChange={e => updateField("category", e.target.value)}
+                    style={{ width: "100%", padding: "8px 12px", fontSize: 12, borderRadius: 0, border: "1px solid var(--color-border)", background: "var(--color-bg-primary)" }}>
+                    {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label style={{ fontSize: 10, color: "var(--color-text-tertiary)", display: "block", marginBottom: 2 }}>Уровень</label>
+                  <select value={editing.level} onChange={e => updateField("level", e.target.value)}
+                    style={{ width: "100%", padding: "8px 12px", fontSize: 12, borderRadius: 0, border: "1px solid var(--color-border)", background: "var(--color-bg-primary)" }}>
+                    <option value="beginner">🟢 Новичок</option>
+                    <option value="intermediate">🟡 Практик</option>
+                    <option value="advanced">🔴 Продвинутый</option>
+                  </select>
+                </div>
+              </div>
+              <Field label="Связанные термины (через запятую)" value={editing.relatedTerms} onChange={(v: string) => updateField("relatedTerms", v)} />
+              <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+                <label style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12 }}>
+                  <input type="checkbox" checked={editing.isPublished} onChange={e => updateField("isPublished", e.target.checked)} />
+                  ✅ Опубликован
+                </label>
+              </div>
+              <button onClick={save} disabled={saving}
+                style={{ marginTop: 8, display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: 10, borderRadius: 0, background: "var(--color-accent)", color: "white", border: "none", cursor: "pointer", fontWeight: 600 }}>
+                <Save size={14} /> {saving ? "Сохранение..." : "Сохранить"}
+              </button>
+            </div>
           </div>
-        ))}
-      </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Field({ label, value, onChange, textarea, type = "text" }: any) {
+  const style: any = { width: "100%", padding: "8px 12px", fontSize: 12, borderRadius: 0, border: "1px solid var(--color-border)", background: "var(--color-bg-primary)", outline: "none", boxSizing: "border-box" };
+  return (
+    <div>
+      <label style={{ fontSize: 10, color: "var(--color-text-tertiary)", display: "block", marginBottom: 2 }}>{label}</label>
+      {textarea
+        ? <textarea value={value} onChange={e => onChange(e.target.value)} rows={3} style={{ ...style, resize: "vertical" }} />
+        : <input type={type} value={value} onChange={e => onChange(e.target.value)} style={style} />
+      }
     </div>
   );
 }
