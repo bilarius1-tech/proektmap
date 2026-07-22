@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { X, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
 
 interface TourStep {
-  target: string;      // CSS selector for element to highlight
-  title: string;       // Step title
-  description: string; // What to explain
-  position?: 'top' | 'bottom' | 'left' | 'right'; // Where to show tooltip
+  target: string;
+  title: string;
+  description: string;
+  position?: 'top' | 'bottom' | 'left' | 'right';
 }
 
 interface TourOverlayProps {
@@ -19,43 +19,69 @@ export default function TourOverlay({ steps, onComplete }: TourOverlayProps) {
   const [step, setStep] = useState(0);
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null);
   const [visible, setVisible] = useState(false);
+  const [closed, setClosed] = useState(false);
+
+  // Don't show if already seen this session
+  useEffect(() => {
+    if (typeof window !== 'undefined' && sessionStorage.getItem('tour-seen') === '1') {
+      setClosed(true);
+      onComplete();
+    }
+  }, []);
 
   const currentStep = steps[step];
   const progress = steps.length > 0 ? Math.round(((step + 1) / steps.length) * 100) : 0;
 
-  // Find and highlight target element
+  // Find target element
   useEffect(() => {
-    if (!currentStep) return;
-    // Delay to let React render the page first
+    if (!currentStep || closed) return;
+    setVisible(false);
     const timer = setTimeout(() => {
-      const el = document.querySelector(currentStep.target);
+      // Try first selector, fallback to generic
+      let el = document.querySelector(currentStep.target);
+      if (!el && currentStep.target === 'aside') {
+        // Find the sidebar by its style
+        el = document.querySelector('[style*="width: 280px"]') 
+          || document.querySelector('aside');
+      }
+      if (!el && currentStep.target === 'h2') {
+        el = document.querySelector('h2, h1, h3');
+      }
+      if (!el && currentStep.target === 'button') {
+        // Find the tab buttons (ПОНЯТЬ, ВЫБРАТЬ, ПРОВЕРИТЬ)
+        const buttons = document.querySelectorAll('button');
+        for (const btn of buttons) {
+          if (btn.textContent?.includes('ПОНЯТЬ') || btn.textContent?.includes('ВЫБРАТЬ')) {
+            el = btn;
+            break;
+          }
+        }
+        if (!el) el = document.querySelector('button');
+      }
       if (el) {
         const rect = el.getBoundingClientRect();
         setTargetRect(rect);
-        // Scroll element into view if needed
         el.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
       setVisible(true);
-    }, 300);
+    }, 400);
     return () => clearTimeout(timer);
-  }, [currentStep]);
+  }, [currentStep, closed]);
 
-  // Auto-advance after 6 seconds
-  useEffect(() => {
-    if (!visible) return;
-    const timer = setTimeout(() => {
-      if (step < steps.length - 1) setStep(prev => prev + 1);
-      else onComplete();
-    }, 6000);
-    return () => clearTimeout(timer);
-  }, [step, visible]);
+  // NO auto-advance — manual only
+
+  const handleClose = () => {
+    setClosed(true);
+    sessionStorage.setItem('tour-seen', '1');
+    onComplete();
+  };
 
   const next = () => {
     if (step < steps.length - 1) {
       setVisible(false);
       setTimeout(() => setStep(prev => prev + 1), 200);
     } else {
-      onComplete();
+      handleClose();
     }
   };
 
@@ -66,9 +92,9 @@ export default function TourOverlay({ steps, onComplete }: TourOverlayProps) {
     }
   };
 
-  if (!currentStep) return null;
+  if (closed || !currentStep) return null;
 
-  // Tooltip position
+  // Tooltip position — clamp to viewport
   const tooltipStyle: any = {
     position: 'fixed',
     zIndex: 1001,
@@ -82,23 +108,34 @@ export default function TourOverlay({ steps, onComplete }: TourOverlayProps) {
     fontSize: 'var(--text-s)',
   };
 
+  const gap = 16;
+  const tooltipW = 360;
+  const tooltipH = 200; // approximate
+
   if (targetRect) {
     const pos = currentStep.position || 'bottom';
-    const gap = 16;
-    if (pos === 'bottom') {
-      tooltipStyle.top = targetRect.bottom + gap;
-      tooltipStyle.left = Math.max(16, Math.min(targetRect.left, window.innerWidth - 380));
-    } else if (pos === 'top') {
-      tooltipStyle.bottom = window.innerHeight - targetRect.top + gap;
-      tooltipStyle.left = Math.max(16, Math.min(targetRect.left, window.innerWidth - 380));
+    // Default: below the target
+    let top = targetRect.bottom + gap;
+    let left = Math.max(16, targetRect.left);
+    
+    if (pos === 'top') {
+      top = targetRect.top - tooltipH - gap;
+      left = Math.max(16, targetRect.left);
     } else if (pos === 'right') {
-      tooltipStyle.left = targetRect.right + gap;
-      tooltipStyle.top = Math.max(16, targetRect.top);
-    } else {
-      tooltipStyle.right = window.innerWidth - targetRect.left + gap;
-      tooltipStyle.top = Math.max(16, targetRect.top);
+      top = Math.max(16, targetRect.top);
+      left = targetRect.right + gap;
+    } else if (pos === 'left') {
+      top = Math.max(16, targetRect.top);
+      left = targetRect.left - tooltipW - gap;
     }
+
+    // Clamp to viewport
+    const maxLeft = window.innerWidth - tooltipW - 16;
+    const maxTop = window.innerHeight - tooltipH - 16;
+    tooltipStyle.top = Math.max(16, Math.min(top, maxTop));
+    tooltipStyle.left = Math.max(16, Math.min(left, maxLeft));
   } else {
+    // Center if no target
     tooltipStyle.top = '50%';
     tooltipStyle.left = '50%';
     tooltipStyle.transform = 'translate(-50%, -50%)';
@@ -119,23 +156,18 @@ export default function TourOverlay({ steps, onComplete }: TourOverlayProps) {
         }} />
       </div>
 
-      {/* Overlay with spotlight cutout */}
+      {/* Overlay */}
       {visible && (
-        <div
-          style={{
-            position: 'fixed', inset: 0, zIndex: 999,
-            background: targetRect
-              ? createSpotlightClip(targetRect)
-              : 'rgba(0,0,0,0.4)',
-            pointerEvents: 'none',
-          }}
-        />
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 999,
+          background: 'rgba(0,0,0,0.45)',
+          pointerEvents: 'none',
+        }} />
       )}
 
       {/* Tooltip card */}
       {visible && (
         <div style={tooltipStyle}>
-          {/* Header */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-s)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <Sparkles size={16} style={{ color: 'var(--color-accent)' }} />
@@ -144,14 +176,13 @@ export default function TourOverlay({ steps, onComplete }: TourOverlayProps) {
               </span>
             </div>
             <button
-              onClick={onComplete}
+              onClick={handleClose}
               style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-tertiary)', padding: 2 }}
             >
               <X size={16} />
             </button>
           </div>
 
-          {/* Content */}
           <div style={{ fontWeight: 800, fontSize: 'var(--text-m)', marginBottom: 4, color: 'var(--color-text-primary)' }}>
             {currentStep.title}
           </div>
@@ -159,19 +190,15 @@ export default function TourOverlay({ steps, onComplete }: TourOverlayProps) {
             {currentStep.description}
           </p>
 
-          {/* Navigation */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <button
-              onClick={prev}
-              disabled={step === 0}
+            <button onClick={prev} disabled={step === 0}
               style={{
                 display: 'flex', alignItems: 'center', gap: 4, padding: '8px 16px',
                 borderRadius: 0, border: '1px solid var(--color-border)', background: 'var(--color-bg-primary)',
                 color: step === 0 ? 'var(--color-text-tertiary)' : 'var(--color-text-secondary)',
                 cursor: step === 0 ? 'default' : 'pointer', fontWeight: 600, fontSize: 'var(--text-xs)',
                 opacity: step === 0 ? 0.4 : 1,
-              }}
-            >
+              }}>
               <ChevronLeft size={14} /> Назад
             </button>
 
@@ -185,14 +212,12 @@ export default function TourOverlay({ steps, onComplete }: TourOverlayProps) {
               ))}
             </div>
 
-            <button
-              onClick={next}
+            <button onClick={next}
               style={{
                 display: 'flex', alignItems: 'center', gap: 4, padding: '8px 16px',
                 borderRadius: 0, border: 'none', background: 'var(--color-accent)', color: 'white',
                 cursor: 'pointer', fontWeight: 600, fontSize: 'var(--text-xs)',
-              }}
-            >
+              }}>
               {step === steps.length - 1 ? 'Готово' : 'Далее'} <ChevronRight size={14} />
             </button>
           </div>
@@ -207,18 +232,4 @@ export default function TourOverlay({ steps, onComplete }: TourOverlayProps) {
       `}</style>
     </>
   );
-}
-
-// Create a CSS clip-path that cuts a hole for the spotlight
-function createSpotlightClip(rect: DOMRect): string {
-  const pad = 8;
-  const top = Math.max(0, rect.top - pad);
-  const left = Math.max(0, rect.left - pad);
-  const bottom = Math.min(window.innerHeight, rect.bottom + pad);
-  const right = Math.min(window.innerWidth, rect.right + pad);
-
-  return `rgba(0,0,0,0.55)`;
-  // Note: full clip-path is complex. We use a simpler approach:
-  // Dark overlay + glowing border on the target via the tooltip position.
-  // The target element itself stays visible because it has higher z-index naturally.
 }
