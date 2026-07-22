@@ -124,6 +124,40 @@ export default function Home() {
         </div>
       </div>
 
+      
+      {/* Поисковая строка */}
+      <div style={{ maxWidth: 700, margin: "0 auto", padding: "var(--space-xl) var(--space-m)", textAlign: "center" }}>
+        <div style={{ fontSize: "var(--text-m)", fontWeight: 700, color: "var(--color-text-secondary)", marginBottom: "var(--space-m)" }}>
+          Найди термин, паттерн или инструмент
+        </div>
+        <form action="/search" method="GET" style={{ display: "flex", gap: 0, maxWidth: 500, margin: "0 auto", boxShadow: "0 2px 16px rgba(0,0,0,0.08)" }}>
+          <input
+            name="q"
+            placeholder="RAG, MCP, Prisma, SEO Аудитор..."
+            style={{
+              flex: 1, padding: "14px 20px", fontSize: "var(--text-m)", borderRadius: 0,
+              border: "2px solid var(--color-border)", borderRight: "none", background: "var(--color-bg-primary)",
+              outline: "none", color: "var(--color-text-primary)", boxSizing: "border-box",
+            }}
+          />
+          <button type="submit"
+            style={{
+              padding: "14px 24px", borderRadius: 0, border: "none", background: "var(--color-accent)",
+              color: "white", fontWeight: 700, fontSize: "var(--text-s)", cursor: "pointer",
+            }}>
+            🔍 Найти
+          </button>
+        </form>
+        <div style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: "var(--space-m)", flexWrap: "wrap", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>
+          Часто ищут:
+          <a href="/search?q=MCP" style={{ color: "var(--color-accent)", textDecoration: "none" }}>MCP</a>
+          <a href="/search?q=RAG" style={{ color: "var(--color-accent)", textDecoration: "none" }}>RAG</a>
+          <a href="/search?q=Prisma" style={{ color: "var(--color-accent)", textDecoration: "none" }}>Prisma</a>
+          <a href="/search?q=SEO" style={{ color: "var(--color-accent)", textDecoration: "none" }}>SEO</a>
+          <a href="/search?q=Next.js" style={{ color: "var(--color-accent)", textDecoration: "none" }}>Next.js</a>
+        </div>
+      </div>
+
       {/* Реквизиты */}
       <div style={{ padding: "var(--space-xl) var(--space-m)", background: "var(--color-bg-secondary)", borderTop: "1px solid var(--color-border-light)", textAlign: "center" }}>
         <div style={{ maxWidth: 700, margin: "0 auto", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", lineHeight: 1.8 }}>

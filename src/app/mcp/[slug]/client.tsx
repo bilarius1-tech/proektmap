@@ -1,6 +1,7 @@
 "use client";
 import { Star, ExternalLink, ArrowLeft, Check, X, AlertTriangle } from "lucide-react";
 import Link from "next/link";
+import Breadcrumbs from "@/components/nav/breadcrumbs";
 
 export default function MCPDetailClient({ server }: any) {
   const pros = JSON.parse(server.pros || "[]");
@@ -9,6 +10,7 @@ export default function MCPDetailClient({ server }: any) {
 
   return (
     <div style={{ maxWidth: 800, margin: "0 auto", padding: "var(--space-xl) var(--space-m)" }}>
+      <Breadcrumbs pathname={`/mcp/${server.slug}`} pageTitle={server.name} />
       <Link href="/mcp" style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: "var(--text-s)", color: "var(--color-text-secondary)", textDecoration: "none", marginBottom: "var(--space-l)" }}>
         <ArrowLeft size={14} /> Назад к каталогу
       </Link>

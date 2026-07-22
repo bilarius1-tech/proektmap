@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
+import Breadcrumbs from "@/components/nav/breadcrumbs";
 import { ExternalLink, Info, Train, ChevronRight, ArrowRight, X, Layers } from "lucide-react";
 
 const LINE_COLORS: Record<string, { line: string; bg: string }> = {
@@ -50,7 +51,8 @@ export default function ArchitectureClient({ blueprints, componentMap }: any) {
         <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 14px", borderRadius: "var(--radius-full)", background: "var(--color-accent-light)", color: "var(--color-accent)", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: "var(--space-s)" }}>
           <Train size={14} /> КАРТА МЕТРО
         </div>
-        <h1 style={{ fontSize: "var(--text-xxl)", fontWeight: 800, marginBottom: "var(--space-xs)" }}>
+        <Breadcrumbs pathname="/architecture" pageTitle="Карта метро" />
+      <h1 style={{ fontSize: "var(--text-xxl)", fontWeight: 800, marginBottom: "var(--space-xs)" }}>
           🚇 Карта метро AI-инжиниринга
         </h1>
         <p style={{ fontSize: "var(--text-m)", color: "var(--color-text-secondary)", lineHeight: 1.7, maxWidth: 700 }}>

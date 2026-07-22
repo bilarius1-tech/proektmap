@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Breadcrumbs from "@/components/nav/breadcrumbs";
 import Term from "@/components/glossary/tooltip-term";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Star, Clock, DollarSign, Wrench, Check, X, ExternalLink, Play, Database, Layers, GitBranch, AlertTriangle, Lightbulb } from "lucide-react";
@@ -17,6 +18,7 @@ export default function PatternDetailClient({ pattern, blueprint, blueprints }: 
 
   return (
     <div style={{ maxWidth: 900, margin: "0 auto", padding: "var(--space-xl) var(--space-m)" }}>
+      <Breadcrumbs pathname={`/patterns/${pattern.slug}`} pageTitle={pattern.title} />
       <Link href="/patterns" style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: "var(--text-s)", color: "var(--color-text-secondary)", textDecoration: "none", marginBottom: "var(--space-l)" }}>
         <ArrowLeft size={14} /> Назад к паттернам
       </Link>
