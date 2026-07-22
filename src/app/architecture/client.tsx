@@ -2,9 +2,8 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { ExternalLink, Info, Train, ChevronRight } from "lucide-react";
+import { ExternalLink, Info, Train, ChevronRight, ArrowRight, X, Layers } from "lucide-react";
 
-// Color scheme for metro lines
 const LINE_COLORS: Record<string, { line: string; bg: string }> = {
   "phase-0": { line: "#22c55e", bg: "#f0fdf4" },
   "phase-1": { line: "#f59e0b", bg: "#fffbeb" },
@@ -26,22 +25,18 @@ const PHASE_NAMES: Record<string, string> = {
 export default function ArchitectureClient({ blueprints, componentMap }: any) {
   const [hoveredStation, setHoveredStation] = useState<string | null>(null);
   const [selectedPhase, setSelectedPhase] = useState<string | null>(null);
+  const [infoCard, setInfoCard] = useState<any | null>(null);
 
-  // Get the first (primary) blueprint's stages
   const primaryBp = blueprints?.[0];
   const stages = primaryBp?.stages?.map((bs: any) => bs.stage) || [];
 
-  // Group stages by phase
   const phases = useMemo(() => {
     const groups: Record<string, any[]> = {};
     for (const s of stages) {
       const phasePrefix = s.slug?.split("-").slice(0, 2).join("-") || "other";
       if (!groups[phasePrefix]) groups[phasePrefix] = [];
       groups[phasePrefix].push(s);
-    }
-    // Sort by sortOrder
-    for (const key of Object.keys(groups)) {
-      groups[key].sort((a: any, b: any) => a.sortOrder - b.sortOrder);
+      groups[phasePrefix].sort((a: any, b: any) => a.sortOrder - b.sortOrder);
     }
     return groups;
   }, [stages]);
@@ -59,9 +54,7 @@ export default function ArchitectureClient({ blueprints, componentMap }: any) {
           🚇 Карта метро AI-инжиниринга
         </h1>
         <p style={{ fontSize: "var(--text-m)", color: "var(--color-text-secondary)", lineHeight: 1.7, maxWidth: 700 }}>
-          6 линий — от идеи до запуска. Каждая станция = этап Blueprint'а.
-          Справа — компоненты ProektMap, которые помогут на этом этапе.
-          Наведи на станцию — узнай что внутри.
+          6 линий — от идеи до запуска. Наведи — увидишь название. Кликни — узнаешь подробности.
         </p>
       </div>
 
@@ -75,7 +68,6 @@ export default function ArchitectureClient({ blueprints, componentMap }: any) {
 
           return (
             <div key={phase}>
-              {/* Line + Stations */}
               <div
                 style={{
                   display: "flex", alignItems: "stretch", gap: 0,
@@ -86,12 +78,10 @@ export default function ArchitectureClient({ blueprints, componentMap }: any) {
                   marginBottom: 0,
                   transition: "background 0.3s",
                   cursor: "pointer",
-                  position: "relative",
                   minHeight: 100,
                 }}
                 onClick={() => setSelectedPhase(isSelected ? null : phase)}
               >
-                {/* Phase label */}
                 <div style={{ width: 140, flexShrink: 0, display: "flex", flexDirection: "column", justifyContent: "center" }}>
                   <div style={{ fontSize: "var(--text-xs)", fontWeight: 800, color: lineColor.line, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>
                     Линия {phaseIndex + 1}
@@ -104,9 +94,7 @@ export default function ArchitectureClient({ blueprints, componentMap }: any) {
                   </div>
                 </div>
 
-                {/* Stations (circles connected by line) */}
                 <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 0, overflow: "auto", position: "relative" }}>
-                  {/* Horizontal line */}
                   <div style={{
                     position: "absolute", left: 0, right: 0, top: "50%", height: 3,
                     background: lineColor.line, borderRadius: 2, opacity: 0.4,
@@ -114,26 +102,22 @@ export default function ArchitectureClient({ blueprints, componentMap }: any) {
 
                   {stations.map((s: any, si: number) => {
                     const isHovered = hoveredStation === s.slug;
-                    const hasDecisions = s.decisions?.length > 0;
-
                     return (
                       <div
                         key={s.slug}
                         style={{
                           position: "relative", zIndex: 1,
                           display: "flex", flexDirection: "column", alignItems: "center",
-                          marginRight: si < stations.length - 1 ? 30 : 0,
-                          flexShrink: 0,
+                          marginRight: si < stations.length - 1 ? 30 : 0, flexShrink: 0,
                         }}
                         onMouseEnter={() => setHoveredStation(s.slug)}
                         onMouseLeave={() => setHoveredStation(null)}
                       >
-                        {/* Station circle */}
-                        <Link
-                          href={`/corporate-website?stage=${s.slug}`}
+                        {/* Click → show info card, NOT instant redirect */}
+                        <div
+                          onClick={(e) => { e.stopPropagation(); setInfoCard({ ...s, color: lineColor.line }); }}
                           style={{
-                            width: isHovered ? 44 : 36,
-                            height: isHovered ? 44 : 36,
+                            width: isHovered ? 44 : 36, height: isHovered ? 44 : 36,
                             borderRadius: "50%",
                             background: isHovered ? lineColor.line : "var(--color-bg-primary)",
                             border: `3px solid ${lineColor.line}`,
@@ -143,14 +127,12 @@ export default function ArchitectureClient({ blueprints, componentMap }: any) {
                             transition: "all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)",
                             animation: "pulseStation 3s infinite",
                             animationDelay: `${si * 0.3}s`,
-                            textDecoration: "none",
                             boxShadow: isHovered ? `0 0 16px ${lineColor.line}40` : "none",
                           }}
-                          title={`${s.title} — ${hasDecisions ? s.decisions.length + " решений" : "пересадка"}`}
+                          title={s.title}
                         >
                           {si + 1}
-                        </Link>
-                        {/* Station label */}
+                        </div>
                         {isHovered && (
                           <div style={{
                             position: "absolute", top: -48, left: "50%", transform: "translateX(-50%)",
@@ -167,10 +149,10 @@ export default function ArchitectureClient({ blueprints, componentMap }: any) {
                   })}
                 </div>
 
-                {/* Components (right side) — shown when phase selected */}
+                {/* Components (right side) */}
                 {isSelected && components.length > 0 && (
                   <div style={{
-                    width: 200, flexShrink: 0, marginLeft: "var(--space-l)",
+                    width: 220, flexShrink: 0, marginLeft: "var(--space-l)",
                     display: "flex", flexDirection: "column", gap: 6,
                     padding: "var(--space-s)", background: "var(--color-bg-primary)",
                     borderRadius: 0, border: `1px solid ${lineColor.line}`,
@@ -192,19 +174,14 @@ export default function ArchitectureClient({ blueprints, componentMap }: any) {
                           <div style={{ fontSize: 11, fontWeight: 700 }}>{c.name}</div>
                           <div style={{ fontSize: 9, color: "var(--color-text-tertiary)", lineHeight: 1.3 }}>{c.desc}</div>
                         </div>
-                        <ExternalLink size={10} style={{ opacity: 0.3, flexShrink: 0, marginTop: 2 }} />
                       </a>
                     ))}
                   </div>
                 )}
 
-                {/* Expand indicator */}
-                <div style={{ display: "flex", alignItems: "center", marginLeft: 8, color: lineColor.line, opacity: 0.5 }}>
-                  <ChevronRight size={16} style={{ transform: isSelected ? "rotate(90deg)" : "", transition: "0.2s" }} />
-                </div>
+                <ChevronRight size={16} style={{ opacity: 0.3, marginLeft: 4, marginTop: 4, transition: "0.2s", transform: isSelected ? "rotate(90deg)" : "" }} />
               </div>
 
-              {/* Vertical transfer line between phases */}
               {phaseIndex < phaseKeys.length - 1 && (
                 <div style={{ display: "flex", justifyContent: "center", padding: "4px 0 4px 140px" }}>
                   <div style={{ width: 2, height: 16, background: "var(--color-border)", opacity: 0.5 }} />
@@ -215,21 +192,72 @@ export default function ArchitectureClient({ blueprints, componentMap }: any) {
         })}
       </div>
 
-      {/* Help for beginners */}
+      {/* Info Card Modal */}
+      {infoCard && (
+        <div onClick={() => setInfoCard(null)} style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", justifyContent: "center", alignItems: "center", background: "rgba(0,0,0,0.3)" }}>
+          <div onClick={e => e.stopPropagation()} style={{
+            background: "var(--color-bg-primary)", borderRadius: 0, maxWidth: 420, width: "90%",
+            padding: "var(--space-l)", boxShadow: "0 8px 40px rgba(0,0,0,0.15)",
+            borderTop: `4px solid ${infoCard.color}`,
+          }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "var(--space-m)" }}>
+              <div>
+                <div style={{ fontSize: 10, fontWeight: 700, color: infoCard.color, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                  {PHASE_NAMES[infoCard.slug?.split("-").slice(0,2).join("-")] || "Этап"}
+                </div>
+                <div style={{ fontSize: "var(--text-l)", fontWeight: 800, marginTop: 4 }}>{infoCard.title}</div>
+                <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", marginTop: 4 }}>
+                  {infoCard.decisions?.length || 0} решений · ~{infoCard.decisions?.reduce((s: number, d: any) => s + (d.xpReward || 5), 0) || 0} XP
+                </div>
+              </div>
+              <button onClick={() => setInfoCard(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-tertiary)" }}>
+                <X size={18} />
+              </button>
+            </div>
+
+            <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.6, marginBottom: "var(--space-m)" }}>
+              {infoCard.description || "Этот этап содержит решения по ключевым вопросам разработки."}
+            </p>
+
+            <div style={{ display: "flex", gap: 8 }}>
+              <Link
+                href={`/corporate-website?stage=${infoCard.slug}&from=architecture`}
+                onClick={() => setInfoCard(null)}
+                style={{
+                  flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                  padding: "12px 20px", borderRadius: 0, background: infoCard.color, color: "white",
+                  textDecoration: "none", fontWeight: 700, fontSize: "var(--text-s)",
+                }}
+              >
+                <Layers size={14} /> Перейти в Blueprint
+              </Link>
+              <button onClick={() => setInfoCard(null)}
+                style={{
+                  padding: "12px 20px", borderRadius: 0, border: "1px solid var(--color-border)",
+                  background: "var(--color-bg-primary)", color: "var(--color-text-secondary)",
+                  cursor: "pointer", fontWeight: 600, fontSize: "var(--text-s)",
+                }}>
+                Закрыть
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Help */}
       <div style={{ padding: "var(--space-l)", background: "var(--color-accent-light)", borderRadius: 0, border: "1px solid var(--color-accent)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: "var(--space-s)" }}>
           <Info size={16} style={{ color: "var(--color-accent)" }} />
           <span style={{ fontWeight: 700, fontSize: "var(--text-s)", color: "var(--color-accent)" }}>Как пользоваться картой</span>
         </div>
         <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.8 }}>
-          <strong>1.</strong> Шесть линий = шесть фаз разработки. Идите слева направо.<br />
-          <strong>2.</strong> Кликните по линии — увидите компоненты ProektMap для этой фазы.<br />
-          <strong>3.</strong> Наведите курсор на станцию — откроется название этапа.<br />
-          <strong>4.</strong> Кликните по станции — перейдёте к этапу в Blueprint'е.
+          <strong>1.</strong> Шесть линий = шесть фаз. Идите слева направо.<br />
+          <strong>2.</strong> Наведите на круг — увидите название этапа.<br />
+          <strong>3.</strong> Кликните на круг — откроется карточка с описанием и кнопкой «Перейти в Blueprint».<br />
+          <strong>4.</strong> Кликните на линию — увидите связанные компоненты ProektMap.
         </div>
       </div>
 
-      {/* Animations */}
       <style>{`
         @keyframes pulseStation {
           0%, 100% { box-shadow: 0 0 0 0 currentColor; }

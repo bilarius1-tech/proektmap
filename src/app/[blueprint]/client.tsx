@@ -89,7 +89,7 @@ export default function BlueprintPageClient({
   blueprint, isLoggedIn, isPro, projectContext, userProjects, userContext, glossaryTerms, pattern,
 }: {
   blueprint: Blueprint; isLoggedIn: boolean; isPro: boolean;
-  projectContext: ProjectContext | null; userProjects: MiniProject[]; userContext: string; glossaryTerms: any[]; pattern: any;
+  projectContext: ProjectContext | null; userProjects: MiniProject[]; userContext: string; glossaryTerms: any[]; pattern: any; fromPage: string | null;
 }) {
   const router = useRouter();
   const stages = blueprint.stages.map(bs => bs.stage);
