@@ -45,6 +45,7 @@ model Blueprint {
   createdAt   DateTime @default(now())
   stages      BlueprintStage[]
   projects    Project[]
+  patterns    BuildPattern[]
   @@map("blueprints")
 }
 
@@ -555,4 +556,28 @@ model GlossaryTerm {
   updatedAt         DateTime @updatedAt
 
   @@map("glossary_terms")
+}
+
+model BuildPattern {
+  id              String   @id @default(uuid())
+  title           String
+  slug            String   @unique
+  description     String   @default("")
+  longDescription String   @default("")
+  difficulty      String   @default("beginner")
+  timeToBuild     String   @default("2 дня")
+  outcome         String   @default("{}")
+  entities        String   @default("[]")
+  stack           String   @default("[]")
+  architecture    String   @default("[]")
+  evolution       String   @default("[]")
+  mistakes        String   @default("[]")
+  blueprintId     String?
+  blueprint       Blueprint?  @relation(fields: [blueprintId], references: [id])
+  isPublished     Boolean  @default(false)
+  isFeatured      Boolean  @default(false)
+  sortOrder       Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  @@map("build_patterns")
 }
