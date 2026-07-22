@@ -209,6 +209,25 @@ export default function BlueprintPageClient({
   return (
     <div style={{ display: "flex", minHeight: "calc(100dvh - 56px)" }} suppressHydrationWarning>
       {/* DESKTOP sidebar */}
+      {/* Demo Banner */}
+      {isDemo && (
+        <div style={{ padding: "var(--space-m) var(--space-l)", background: "linear-gradient(135deg, #0fb880, #0a8c60)", color: "white", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <span style={{ fontSize: 28 }}>🚀</span>
+            <div>
+              <div style={{ fontWeight: 800, fontSize: "var(--text-s)" }}>Быстрый старт — демо-режим</div>
+              <div style={{ fontSize: "var(--text-xs)", opacity: 0.9 }}>
+                {demoRunning ? "Авто-прохождение " + (demoStep + 1) + "/3 этапов — смотри как работает" : "Демо завершено! Теперь попробуй сам"}
+              </div>
+            </div>
+          </div>
+          {!demoRunning && (
+            <a href="/corporate-website" style={{ padding: "8px 20px", borderRadius: 0, background: "white", color: "var(--color-accent)", textDecoration: "none", fontWeight: 700, fontSize: "var(--text-xs)" }}>
+              Начать заново
+            </a>
+          )}
+        </div>
+      )}
       {!isMobile && (
         <aside style={{
           width: 260, minWidth: 260, background: "var(--color-bg-primary)",
