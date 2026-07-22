@@ -100,6 +100,19 @@ export default function BlueprintPageClient({
   const [promptCopied, setPromptCopied] = useState<string | null>(null);
   const [totalXp, setTotalXp] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [demoStep, setDemoStep] = useState(isDemo ? 0 : -1);
+
+  // Demo: auto-advance through first 3 stages
+  useEffect(() => {
+    if (!isDemo || demoStep < 0) return;
+    if (demoStep >= 3) return;
+    const slugs = stages.map((s: any) => s.slug);
+    const timer = setTimeout(() => {
+      if (demoStep < slugs.length) setActiveStage(slugs[demoStep]);
+      setDemoStep(prev => prev + 1);
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [demoStep, isDemo]);
   const [isMobile, setIsMobile] = useState(false);
   const FREE_STAGES = 3; // First 3 stages are free
   const isStageLocked = (index: number) => !isPro && index >= FREE_STAGES;
@@ -108,28 +121,7 @@ export default function BlueprintPageClient({
   const [creating, setCreating] = useState(false);
   const [decisionChoices, setDecisionChoices] = useState<Record<string,{choice:string;reason:string}>>({});
   const [showDecisionMap, setShowDecisionMap] = useState(false);
-  const [viewMode, setViewMode] = useState<"list"|"flow">(isDemo ? "list" : "flow");
-  const [demoRunning, setDemoRunning] = useState(isDemo);
-  const [demoStep, setDemoStep] = useState(isDemo ? 0 : -1);
-
-  useEffect(() => {
-    if (!demoRunning) return;
-    const timer = setInterval(() => {
-      setDemoStep(prev => {
-        if (prev >= 2) { setDemoRunning(false); clearInterval(timer); return prev; }
-        return prev + 1;
-      });
-    }, 2500);
-    return () => clearInterval(timer);
-  }, [demoRunning]);
-
-  useEffect(() => {
-    if (demoStep >= 0 && demoRunning) {
-      const slugs = stages.map((s: any) => s.slug);
-      if (demoStep < slugs.length) setActiveStage(slugs[demoStep]);
-    }
-  }, [demoStep, demoRunning]);
-
+  const [viewMode, setViewMode] = useState<"list"|"flow">("flow");
   const [sidebarPulse, setSidebarPulse] = useState(0);
   const [notifications, setNotifications] = useState<Array<{id:number; msg:string; type:string}>>([]);
 
@@ -207,7 +199,18 @@ export default function BlueprintPageClient({
   ];
 
   return (
-    <div style={{ display: "flex", minHeight: "calc(100dvh - 56px)" }} suppressHydrationWarning>
+    <>
+      {isDemo && (
+        <div style={{ padding: "8px 24px", background: "linear-gradient(135deg, #0fb880, #0a8c60)", color: "white", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "var(--text-xs)", fontWeight: 600 }}>
+          <span>🚀 Демо-режим{demoStep >= 0 && demoStep < 3 ? " · авто-прохождение " + (demoStep + 1) + "/3 этапов" : demoStep >= 3 ? " · завершено! Попробуй сам" : ""}</span>
+          {demoStep >= 3 && (
+            <a href="/corporate-website" style={{ padding: "4px 14px", borderRadius: 0, background: "white", color: "var(--color-accent)", textDecoration: "none", fontWeight: 700, fontSize: 10 }}>
+              Заново
+            </a>
+          )}
+        </div>
+      )}
+      <div style={{ display: "flex", minHeight: "calc(100dvh - 56px)" }} suppressHydrationWarning>
       {/* DESKTOP sidebar */}
       {!isMobile && (
         <aside style={{
@@ -488,6 +491,7 @@ export default function BlueprintPageClient({
       {/* Project creation modal */}
       {showProjectModal && <ProjectModal form={projectForm} setForm={setProjectForm} onSave={createProject} onCancel={() => setShowProjectModal(false)} saving={creating} />}
     </div>
+    </>
   );
 }
 
