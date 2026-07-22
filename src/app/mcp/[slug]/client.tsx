@@ -1,6 +1,7 @@
 "use client";
 import { Star, ExternalLink, ArrowLeft, Check, X, AlertTriangle } from "lucide-react";
 import Link from "next/link";
+import RelatedSidebar from "@/components/layout/related-sidebar";
 import Breadcrumbs from "@/components/nav/breadcrumbs";
 
 export default function MCPDetailClient({ server }: any) {
@@ -9,7 +10,8 @@ export default function MCPDetailClient({ server }: any) {
   const steps = JSON.parse(server.howToUse || "[]");
 
   return (
-    <div style={{ maxWidth: 800, margin: "0 auto", padding: "var(--space-xl) var(--space-m)" }}>
+    <div style={{ maxWidth: 1100, margin: "0 auto", padding: "var(--space-xl) var(--space-m)", display: "flex", gap: "var(--space-xl)", alignItems: "flex-start" }}>
+      <div style={{ flex: 1, minWidth: 0 }}>
       <Breadcrumbs pathname={`/mcp/${server.slug}`} pageTitle={server.name} />
       <Link href="/mcp" style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: "var(--text-s)", color: "var(--color-text-secondary)", textDecoration: "none", marginBottom: "var(--space-l)" }}>
         <ArrowLeft size={14} /> Назад к каталогу
@@ -87,6 +89,10 @@ export default function MCPDetailClient({ server }: any) {
             <ExternalLink size={14} /> GitHub
           </a>
         )}
+      </div>
+      </div>
+      <div style={{ width: 260, flexShrink: 0 }}>
+        <RelatedSidebar type="mcp" slug={server.slug} />
       </div>
     </div>
   );

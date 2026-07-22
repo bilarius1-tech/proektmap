@@ -595,6 +595,20 @@ model PromptBlueprint {
   @@map("prompt_blueprints")
 }
 
+
+model Relation {
+  id         String   @id @default(uuid())
+  sourceType String
+  sourceSlug String
+  targetType String
+  targetSlug String
+  weight     Int      @default(1)
+  relType    String   @default("related")
+  createdAt  DateTime @default(now())
+  @@unique([sourceType, sourceSlug, targetType, targetSlug])
+  @@map("relations")
+}
+
 model BuildPattern {
   id              String   @id @default(uuid())
   title           String
