@@ -143,41 +143,36 @@ const STEPS = [
 ];
 
 
-// Rich text renderer: {{Term|word}} → Term component, [text](url) → link
-function RichText({ text }: { text: string }) {
-  const parts = React.useMemo(() => {
-    const result: any[] = [];
-    let remaining = text;
-    let key = 0;
-    while (remaining.length > 0) {
-      const termMatch = remaining.match(/\{\{Term\|([^}]+)\}\}/);
-      const linkMatch = remaining.match(/\[([^\]]+)\]\(([^)]+)\)/);
-      if (!termMatch && !linkMatch) {
-        result.push(React.createElement("span", { key: key++, style: { color: "var(--color-text-secondary)" } }, remaining));
-        break;
-      }
-      const ti = termMatch ? termMatch.index : Infinity;
-      const li = linkMatch ? linkMatch.index : Infinity;
-      if (ti !== undefined && ti <= li && termMatch) {
-        if (ti > 0) result.push(React.createElement("span", { key: key++ }, remaining.slice(0, ti)));
-        result.push(React.createElement(Term, { key: key++, term: termMatch[1] }));
-        remaining = remaining.slice(ti + termMatch[0].length);
-      } else if (linkMatch) {
-        if (linkMatch.index !== undefined && linkMatch.index > 0)
-          result.push(React.createElement("span", { key: key++ }, remaining.slice(0, linkMatch.index)));
-        result.push(React.createElement("a", { key: key++, href: linkMatch[2], target: "_blank",
-          rel: "noopener noreferrer",
-          style: { color: "var(--color-accent)", textDecoration: "underline", fontWeight: 500 }
-        }, linkMatch[1] + " ↗"));
-        remaining = remaining.slice(linkMatch.index + linkMatch[0].length);
-      }
-    }
-    return result;
-  }, [text]);
+// Renders {{Term|word}} as inline glossary tooltip, [text](url) as link
+const RichText = React.memo(function RichText({ text }: { text: string }) {
   return React.createElement("p", {
     style: { fontSize: "var(--text-s)", lineHeight: 1.7, color: "var(--color-text-secondary)", maxWidth: 700, marginBottom: "var(--space-xl)", whiteSpace: "pre-line" }
-  }, ...parts);
-}
+  }, ...[(() => {
+    const nodes = [];
+    let rest = text;
+    let k = 0;
+    while (rest.length > 0) {
+      const tm = rest.match(/\{\{Term\|([^}]+)\}\}/);
+      const lm = rest.match(/\[([^\]]+)\]\(([^)]+)\)/);
+      if (!tm && !lm) { nodes.push(React.createElement("span", { key: k++ }, rest)); break; }
+      const tIdx = tm ? tm.index : 999999;
+      const lIdx = lm ? lm.index : 999999;
+      if (tIdx < lIdx && tm) {
+        if (tIdx > 0) nodes.push(React.createElement("span", { key: k++ }, rest.slice(0, tIdx)));
+        nodes.push(React.createElement(Term, { key: k++, term: tm[1] }));
+        rest = rest.slice(tIdx + tm[0].length);
+      } else if (lm) {
+        if (lIdx > 0) nodes.push(React.createElement("span", { key: k++ }, rest.slice(0, lIdx)));
+        nodes.push(React.createElement("a", { key: k++, href: lm[2], target: "_blank",
+          rel: "noopener noreferrer",
+          style: { color: "var(--color-accent)", textDecoration: "underline", fontWeight: 500 }
+        }, lm[1] + " \u2197"));
+        rest = rest.slice(lIdx + lm[0].length);
+      }
+    }
+    return nodes;
+  })()]);
+});
 
 export default function BeginnerPathClient() {
   const [step, setStep] = useState(0);
