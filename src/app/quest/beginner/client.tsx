@@ -259,7 +259,7 @@ export default function BeginnerPathClient() {
           }}>
             {current.title}
           </h1>
-          <p style={{ fontSize: "var(--text-s)", lineHeight: 1.7, color: "var(--color-text-secondary)", maxWidth: 700, marginBottom: "var(--space-xl)" }}>
+          <p style={{ fontSize: "var(--text-s)", lineHeight: 1.7, color: "var(--color-text-secondary)", maxWidth: 700, marginBottom: "var(--space-xl)", whiteSpace: "pre-line" }}>
             {current.detail}
           </p>
 
