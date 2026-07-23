@@ -10,7 +10,7 @@ const STEPS = [
     subtitle: "Устанавливаем базу для работы",
     time: "10 мин",
     color: "var(--color-warning)",
-    detail: "Для AI-разработки нужен редактор кода со встроенным ИИ. Вот все топовые варианты.\n\n🇷🇺 Российские (без VPN, русский язык):\n• Vibecraft (vibe.sourcecraft.dev) — пишешь идею → сайт. No-code. Бесплатно.\n• SourceCraft (sourcecraft.dev) — GitHub + AI-ассистент. Yandex ID.\n• GigaCode (gigacode.ru) — Copilot от Сбера. VS Code + JetBrains.\n\n🌍 Международные (нужен VPN или карта):\n• Cursor (cursor.com) — лучший AI-редактор. $20/мес.\n• VS Code + Copilot — бесплатный редактор + AI ($10/мес).\n• Reasonix (reasonix.ai) — open-source, терминал. Бесплатно.\n\n⚡ Ещё нужно: Node.js (nodejs.org LTS) + GitHub (github.com).",
+    detail: "В 2026 программирование начинается не с синтаксиса. Ты описываешь идею на русском — ИИ создаёт код. Но чтобы получить результат, нужно правильно выбрать инструмент.\n\nРоссийские (без VPN, русский язык):\nVibecraft (vibe.sourcecraft.dev) — пишешь идею → сайт. No-code. Для первого знакомства.\nSourceCraft (sourcecraft.dev) — GitHub + AI-ассистент. Хранение кода.\nGigaCode (gigacode.ru) — AI-помощник от Сбера. VS Code + JetBrains.\n\nМеждународные (нужна карта или VPN):\nCursor (cursor.com) — лучший AI-редактор. 20 долл/мес, бесплатный тир.\nVS Code + Copilot — стандарт. Бесплатный редактор + AI (10 долл/мес).\nReasonix (reasonix.ai) — open-source агент. Бесплатно. Для продвинутых.\n\nДва инструмента нужны ВСЕМ:\nNode.js (nodejs.org, LTS) — среда для запуска кода.\nGitHub (github.com) — облачное хранилище. Бесплатно.\n\nГлавное правило: не пиши код руками. Описывай задачу словами — ИИ создаёт код.\n\n🇷🇺 Российские (без VPN, русский язык):\n• Vibecraft (vibe.sourcecraft.dev) — пишешь идею → сайт. No-code. Бесплатно.\n• SourceCraft (sourcecraft.dev) — GitHub + AI-ассистент. Yandex ID.\n• GigaCode (gigacode.ru) — Copilot от Сбера. VS Code + JetBrains.\n\n🌍 Международные (нужен VPN или карта):\n• Cursor (cursor.com) — лучший AI-редактор. $20/мес.\n• VS Code + Copilot — бесплатный редактор + AI ($10/мес).\n• Reasonix (reasonix.ai) — open-source, терминал. Бесплатно.\n\n⚡ Ещё нужно: Node.js (nodejs.org LTS) + GitHub (github.com).",
     checklist: [
       "Прочитай обзор и выбери инструмент",
       "Новичок — Vibecraft (русский, бесплатно, без VPN)",
@@ -18,7 +18,7 @@ const STEPS = [
       "Всем: Node.js (nodejs.org, LTS)",
       "Всем: GitHub (github.com)",
     ],
-    why: "Российские сервисы (Vibecraft, SourceCraft, GigaCode) работают без VPN и принимают российские карты. Международные (Cursor, Copilot) мощнее, но требуют зарубежную карту. Node.js нужен всем. GitHub — бесплатное облако для кода.",
+    why: "Российские сервисы работают без VPN и принимают российские карты. Международные мощнее, но требуют зарубежную карту. Node.js и GitHub нужны всем. Главное — не учить синтаксис, а учиться ставить задачи ИИ.",
     next: "Создаём первый сайт через AI-промпт",
     result: "Все инструменты установлены и готовы к работе",
   },
