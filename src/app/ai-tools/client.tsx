@@ -293,7 +293,7 @@ export default function AIToolsPage({ tools }: { tools: Tool[] }) {
       )}
 
       {/* Cards Grid */}
-      <div style={{ className: "tools-grid card-grid", display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "var(--space-m)" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "var(--space-m)" }}>
         {filtered.map((t: Tool) => {
           const isCompared = compareIds.has(t.id);
           const editorChoice = t.rating >= 9;
@@ -317,8 +317,8 @@ export default function AIToolsPage({ tools }: { tools: Tool[] }) {
                   <div style={{ fontWeight: 800, fontSize: "var(--text-m)", fontFamily: "var(--font-heading)", display: "flex", alignItems: "center", gap: 6 }}>
                     <img src={"/uploads/tools/" + t.slug + ".png"} alt="" style={{ width: 20, height: 20 }} onError={(e: any) => { e.target.style.display = "none" }} />
                     {t.name}
-                    {editorChoice && <span style={{ fontSize: 10 }} title="Выбор редакции — лучший в категории">⭐</span>}
-                    {newBadge && <span style={{ fontSize: 10 }} title="Новинка — добавлен недавно">🆕</span>}
+                    {editorChoice && <span style={{ fontSize: 10 }} title="Выбор редакции">⭐</span>}
+                    {newBadge && <span style={{ fontSize: 10 }} title="Новинка">🆕</span>}
                   </div>
                   <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>{t.provider}</div>
                 </div>
