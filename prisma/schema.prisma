@@ -309,6 +309,11 @@ model AITool {
   pricingAmount String @default("")  // "0/мес" or "Бесплатно"
   url         String   @default("")
   downloadUrl String   @default("")  // direct download link
+  creator     String   @default("")
+  foundedYear Int      @default(0)
+  lastUpdate  String   @default("")
+  headquarters String  @default("")
+  shortDescription String @default("")
   russianUi   Boolean  @default(false)
   russianSupport Boolean @default(false)
   requiresVpn Boolean  @default(false)

@@ -1,6 +1,6 @@
 "use client";
 
-import { Star, ExternalLink, ArrowLeft, Check, X, Download } from "lucide-react";
+import { Star, ExternalLink, ArrowLeft, Check, X, Download, User2, Calendar, RefreshCw, MapPin, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import Breadcrumbs from "@/components/nav/breadcrumbs";
 import SaveButton from "@/components/layout/save-button";
@@ -138,7 +138,37 @@ export default function AIToolDetailClient({ tool, related, isLoggedIn }: any) {
         </div>
       </div>
 
-      {/* Supported Models */}
+      {/* Info Card */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-s)", padding: "var(--space-l)", background: "var(--color-bg-secondary)", border: "1px solid var(--color-border-light)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <User2 size={14} style={{ color: "var(--color-text-tertiary)" }} />
+                <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)" }}><strong>Создатель:</strong> {tool.creator || "—"}</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <Calendar size={14} style={{ color: "var(--color-text-tertiary)" }} />
+                <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)" }}><strong>Год запуска:</strong> {tool.foundedYear || "—"}</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <RefreshCw size={14} style={{ color: "var(--color-text-tertiary)" }} />
+                <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)" }}><strong>Обновления:</strong> {tool.lastUpdate || "—"}</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <MapPin size={14} style={{ color: "var(--color-text-tertiary)" }} />
+                <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)" }}><strong>Штаб-квартира:</strong> {tool.headquarters || "—"}</span>
+              </div>
+            </div>
+
+            {/* Short description */}
+            {tool.shortDescription && (
+              <div style={{ padding: "var(--space-l)", background: "var(--color-accent-light)", border: "1px solid var(--color-accent)", borderLeft: "3px solid var(--color-accent)" }}>
+                <div style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                  <MessageCircle size={16} style={{ color: "var(--color-accent)", marginTop: 2, flexShrink: 0 }} />
+                  <span style={{ fontSize: "var(--text-s)", color: "var(--color-text-primary)", lineHeight: 1.6 }}>{tool.shortDescription}</span>
+                </div>
+              </div>
+            )}
+
+            {/* Supported Models */}
       {supportedModels.length > 0 && (
         <div style={{ marginBottom: "var(--space-l)", padding: "var(--space-l)", background: "var(--color-bg-secondary)", borderRadius: 0, border: "1px solid var(--color-border-light)" }}>
           <h2 style={{ fontSize: "var(--text-m)", fontWeight: 700, marginBottom: "var(--space-m)", fontFamily: "var(--font-heading)" }}>🤖 Поддерживаемые модели</h2>
