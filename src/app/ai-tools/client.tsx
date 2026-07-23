@@ -315,6 +315,7 @@ export default function AIToolsPage({ tools }: { tools: Tool[] }) {
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "var(--space-s)" }}>
                 <div>
                   <div style={{ fontWeight: 800, fontSize: "var(--text-m)", fontFamily: "var(--font-heading)", display: "flex", alignItems: "center", gap: 6 }}>
+                    <img src={"/uploads/tools/" + t.slug + ".png"} alt="" style={{ width: 20, height: 20 }} onError={(e: any) => { e.target.style.display = "none" }} />
                     {t.name}
                     {editorChoice && <span style={{ fontSize: 10 }} title="Выбор редакции">⭐</span>}
                     {newBadge && <span style={{ fontSize: 10 }} title="Новинка">🆕</span>}
