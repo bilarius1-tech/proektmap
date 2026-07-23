@@ -38,5 +38,37 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }));
   } catch {}
 
-  return [...staticPages, ...blogUrls];
+  // Dynamic: AI tools detail pages
+  let aiToolUrls: MetadataRoute.Sitemap = [];
+  try {
+    const db = await getDb();
+    const aiTools = await db.aITool.findMany({
+      where: { isActive: true },
+      select: { slug: true, updatedAt: true },
+    });
+    aiToolUrls = aiTools.map(t => ({
+      url: `${baseUrl}/ai-tools/${t.slug}`,
+      lastModified: t.updatedAt,
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
+    }));
+  } catch {}
+
+  // Dynamic: MCP server detail pages
+  let mcpUrls: MetadataRoute.Sitemap = [];
+  try {
+    const db = await getDb();
+    const mcps = await db.mCPServer.findMany({
+      where: { isActive: true },
+      select: { slug: true, updatedAt: true },
+    });
+    mcpUrls = mcps.map(s => ({
+      url: `${baseUrl}/mcp/${s.slug}`,
+      lastModified: s.updatedAt,
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
+    }));
+  } catch {}
+
+  return [...staticPages, ...blogUrls, ...aiToolUrls, ...mcpUrls];
 }

@@ -1,45 +1,70 @@
 "use client";
 
-import { useState } from "react";
-import { Check, X, ExternalLink, Filter, ArrowUpDown, Eye, ChevronRight } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Search, Filter, Star, ArrowUpDown, ExternalLink, X } from "lucide-react";
 import Link from "next/link";
 
 interface Tool {
-  id: string; name: string; provider: string; type: string;
+  id: string; name: string; slug: string; provider: string; type: string;
   description: string; pros: string; cons: string;
-  pricing: string; url: string;
+  pricing: string; pricingAmount: string; url: string;
   russianUi: boolean; russianSupport: boolean;
-  requiresVpn: boolean; codeOwnership: boolean;
-  rating: number; bestFor: string; sortOrder: number;
+  requiresVpn: boolean; requiresForeignCard: boolean;
+  codeOwnership: boolean; rating: number; bestFor: string; sortOrder: number;
   howToStart: string; faqItems: string; detailDescription: string;
+  hiddenFeatures: string; ourTake: string; detailComparison: string;
+  downloadUrl: string;
 }
 
 function StarRating({ rating }: { rating: number }) {
   return (
     <div style={{ display: "flex", gap: 2, alignItems: "center" }}>
       {[1,2,3,4,5].map(i => (
-        <div key={i} style={{ width: 8, height: 8, borderRadius: "50%", background: i <= Math.round(rating/2) ? "var(--color-accent)" : "var(--color-border-light)" }} />
+        <div key={i} style={{ width: 8, height: 8, borderRadius: 0, background: i <= Math.round(rating/2) ? "var(--color-accent)" : "var(--color-border-light)" }} />
       ))}
       <span style={{ fontSize: 11, fontWeight: 700, color: "var(--color-accent)", marginLeft: 4 }}>{rating}/10</span>
     </div>
   );
 }
 
+const typeLabels: Record<string, { icon: string; label: string }> = {
+  ide: { icon: "💻", label: "IDE" },
+  "no-code": { icon: "🧩", label: "No-code" },
+  agent: { icon: "🤖", label: "Агент" },
+  assistant: { icon: "💬", label: "Ассистент" },
+};
+
 export default function AIToolsPage({ tools }: { tools: Tool[] }) {
-  const [filterType, setFilterType] = useState<string>("all");
-  const [filterVpn, setFilterVpn] = useState<string>("all");
-  const [filterRussian, setFilterRussian] = useState<string>("all");
+  const [activeTab, setActiveTab] = useState<string>("all");
+  const [search, setSearch] = useState("");
   const [compareIds, setCompareIds] = useState<Set<string>>(new Set());
 
-  const filtered = tools.filter(t => {
-    if (filterType !== "all" && t.type !== filterType) return false;
-    if (filterVpn === "no" && t.requiresVpn) return false;
-    if (filterVpn === "yes" && !t.requiresVpn) return false;
-    if (filterRussian === "yes" && !t.russianUi) return false;
-    return true;
-  });
+  const tabs = [
+    { key: "all", label: "🌍 Все", count: tools.length },
+    { key: "russian", label: "🇷🇺 Российские", count: tools.filter(t => t.russianUi).length },
+    { key: "free", label: "🆓 Бесплатные", count: tools.filter(t => (t.pricingAmount || t.pricing || "").toLowerCase().includes("бесплатн") || (t.pricingAmount || t.pricing || "").toLowerCase().includes("free")).length },
+    { key: "ide", label: "💻 IDE", count: tools.filter(t => t.type === "ide").length },
+    { key: "no-code", label: "🧩 No-code", count: tools.filter(t => t.type === "no-code").length },
+  ];
 
-  const compareTools = tools.filter(t => compareIds.has(t.id));
+  const filtered = useMemo(() => {
+    let result = tools;
+    if (activeTab === "russian") result = result.filter(t => t.russianUi);
+    if (activeTab === "free") result = result.filter(t => (t.pricingAmount || t.pricing || "").toLowerCase().includes("бесплатн") || (t.pricingAmount || t.pricing || "").toLowerCase().includes("free"));
+    if (activeTab === "ide") result = result.filter(t => t.type === "ide");
+    if (activeTab === "no-code") result = result.filter(t => t.type === "no-code");
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      result = result.filter(t => t.name.toLowerCase().includes(q) || t.provider.toLowerCase().includes(q) || t.description.toLowerCase().includes(q));
+    }
+    // Sort: Russian first, then by rating desc
+    result = [...result].sort((a, b) => {
+      if (a.russianUi && !b.russianUi) return -1;
+      if (!a.russianUi && b.russianUi) return 1;
+      return b.rating - a.rating;
+    });
+    return result;
+  }, [tools, activeTab, search]);
 
   function toggleCompare(id: string) {
     const next = new Set(compareIds);
@@ -48,22 +73,13 @@ export default function AIToolsPage({ tools }: { tools: Tool[] }) {
     setCompareIds(next);
   }
 
-  const types = [
-    { key: "ide", label: "💻 IDE / Редакторы", count: tools.filter(t=>t.type==="ide").length },
-    { key: "no-code", label: "🧩 No-code конструкторы", count: tools.filter(t=>t.type==="no-code").length },
-  ];
-
-  // Sorting: Russian-first, then by rating descending
-  const sorted = [...filtered].sort((a, b) => {
-    if (a.russianUi && !b.russianUi) return -1;
-    if (!a.russianUi && b.russianUi) return 1;
-    return b.rating - a.rating;
-  });
+  const compareTools = tools.filter(t => compareIds.has(t.id));
 
   return (
     <div style={{ maxWidth: 1100, margin: "0 auto", padding: "var(--space-xl) var(--space-m)" }}>
+      {/* Header */}
       <div style={{ marginBottom: "var(--space-xl)" }}>
-        <h1 style={{ fontSize: "var(--text-xxl)", fontWeight: 800, marginBottom: "var(--space-xs)" }}>
+        <h1 style={{ fontSize: "var(--text-xxl)", fontWeight: 900, marginBottom: "var(--space-xs)", fontFamily: "var(--font-heading)", letterSpacing: "-0.02em" }}>
           🛠️ AI-инструменты для разработки
         </h1>
         <p style={{ fontSize: "var(--text-m)", color: "var(--color-text-secondary)", lineHeight: 1.7, maxWidth: 700 }}>
@@ -72,37 +88,44 @@ export default function AIToolsPage({ tools }: { tools: Tool[] }) {
         </p>
       </div>
 
-      {/* Filters */}
-      <div style={{ display: "flex", gap: "var(--space-s)", flexWrap: "wrap", marginBottom: "var(--space-l)", alignItems: "center" }}>
-        <Filter size={14} style={{ color: "var(--color-text-tertiary)" }} />
-        <select value={filterType} onChange={e => setFilterType(e.target.value)}
-          style={{ padding: "6px 12px", fontSize: "var(--text-xs)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "var(--color-bg-primary)" }}>
-          <option value="all">Все типы ({tools.length})</option>
-          <option value="ide">💻 IDE / Редакторы</option>
-          <option value="no-code">🧩 No-code конструкторы</option>
-        </select>
-        <select value={filterVpn} onChange={e => setFilterVpn(e.target.value)}
-          style={{ padding: "6px 12px", fontSize: "var(--text-xs)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "var(--color-bg-primary)" }}>
-          <option value="all">VPN: не важно</option>
-          <option value="no">🌐 Без VPN</option>
-          <option value="yes">🔐 Нужен VPN</option>
-        </select>
-        <select value={filterRussian} onChange={e => setFilterRussian(e.target.value)}
-          style={{ padding: "6px 12px", fontSize: "var(--text-xs)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "var(--color-bg-primary)" }}>
-          <option value="all">Язык: любой</option>
-          <option value="yes">🇷🇺 Русский интерфейс</option>
-        </select>
-        {compareIds.size > 0 && (
-          <button onClick={() => setCompareIds(new Set())} style={{ padding: "6px 12px", fontSize: "var(--text-xs)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-accent)", background: "var(--color-accent-light)", color: "var(--color-accent)", fontWeight: 600, cursor: "pointer" }}>
-            Сбросить сравнение ({compareIds.size})
-          </button>
-        )}
+      {/* Search + Tabs */}
+      <div style={{ display: "flex", gap: "var(--space-s)", flexWrap: "wrap", marginBottom: "var(--space-m)", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+          {tabs.map(tab => (
+            <button key={tab.key} onClick={() => setActiveTab(tab.key)}
+              style={{
+                padding: "7px 16px", borderRadius: 0, border: activeTab === tab.key ? "2px solid var(--color-accent)" : "1px solid var(--color-border)",
+                background: activeTab === tab.key ? "var(--color-accent-light)" : "var(--color-bg-primary)",
+                color: activeTab === tab.key ? "var(--color-accent)" : "var(--color-text-secondary)",
+                fontSize: "var(--text-xs)", fontWeight: 600, cursor: "pointer",
+              }}>
+              {tab.label} <span style={{ opacity: 0.5, marginLeft: 2 }}>({tab.count})</span>
+            </button>
+          ))}
+        </div>
+        <div style={{ position: "relative" }}>
+          <Search size={14} style={{ position: "absolute", left: 10, top: 10, color: "var(--color-text-tertiary)" }} />
+          <input type="text" placeholder="Поиск инструментов..." value={search} onChange={e => setSearch(e.target.value)}
+            style={{ padding: "8px 12px 8px 32px", borderRadius: 0, border: "1px solid var(--color-border)", fontSize: "var(--text-xs)", width: 200, outline: "none" }} />
+        </div>
       </div>
 
-      {/* Compare panel */}
+      {/* Compare bar */}
+      {compareIds.size > 0 && (
+        <div style={{ marginBottom: "var(--space-m)", padding: "var(--space-s) var(--space-m)", background: "var(--color-accent-light)", borderRadius: 0, border: "1px solid var(--color-accent)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span style={{ fontSize: "var(--text-xs)", fontWeight: 600, color: "var(--color-accent)" }}>
+            Сравнение: {compareTools.map(t => t.name).join(" vs ")} ({compareIds.size}/3)
+          </span>
+          <button onClick={() => setCompareIds(new Set())} style={{ padding: "4px 10px", borderRadius: 0, border: "1px solid var(--color-accent)", background: "transparent", color: "var(--color-accent)", fontSize: 10, cursor: "pointer", fontWeight: 600 }}>
+            Сбросить
+          </button>
+        </div>
+      )}
+
+      {/* Compare table */}
       {compareTools.length >= 2 && (
-        <div style={{ marginBottom: "var(--space-l)", padding: "var(--space-l)", background: "var(--color-accent-light)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-accent)" }}>
-          <h2 style={{ fontSize: "var(--text-l)", fontWeight: 700, marginBottom: "var(--space-m)" }}>📊 Сравнение: {compareTools.map(t=>t.name).join(" vs ")}</h2>
+        <div style={{ marginBottom: "var(--space-l)", padding: "var(--space-l)", background: "var(--color-accent-light)", borderRadius: 0, border: "1px solid var(--color-accent)" }}>
+          <h2 style={{ fontSize: "var(--text-l)", fontWeight: 700, marginBottom: "var(--space-m)" }}>📊 Сравнение</h2>
           <div style={{ overflowX: "auto" }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "var(--text-xs)" }}>
               <thead>
@@ -115,10 +138,10 @@ export default function AIToolsPage({ tools }: { tools: Tool[] }) {
               </thead>
               <tbody>
                 {([
-                  ["Тип", (t: Tool) => t.type === "ide" ? "💻 IDE" : "🧩 No-code"],
+                  ["Тип", (t: Tool) => (typeLabels[t.type] || {}).icon + " " + t.type],
                   ["Рейтинг", (t: Tool) => t.rating + "/10"],
-                  ["Цена", (t: Tool) => t.pricing],
-                  ["VPN", (t: Tool) => t.requiresVpn ? "🔐 Нужен" : "🌐 Не нужен"],
+                  ["Цена", (t: Tool) => t.pricingAmount || t.pricing],
+                  ["VPN", (t: Tool) => t.requiresVpn ? "🔐 Нужен" : "🌍 Не нужен"],
                   ["Русский UI", (t: Tool) => t.russianUi ? "✅ Да" : "❌ Нет"],
                   ["Код ваш", (t: Tool) => t.codeOwnership ? "✅ Да" : "❌ Нет"],
                   ["Для кого", (t: Tool) => t.bestFor],
@@ -136,92 +159,86 @@ export default function AIToolsPage({ tools }: { tools: Tool[] }) {
         </div>
       )}
 
-      {/* Tool cards */}
-      {types.map(tp => {
-        const groupTools = sorted.filter(t => t.type === tp.key);
-        if (!groupTools.length) return null;
-        return (
-          <div key={tp.key} style={{ marginBottom: "var(--space-xl)" }}>
-            <h2 style={{ fontSize: "var(--text-xl)", fontWeight: 700, marginBottom: "var(--space-m)" }}>
-              {tp.label} <span style={{ fontSize: "var(--text-s)", color: "var(--color-text-tertiary)", fontWeight: 400 }}>({groupTools.length})</span>
-            </h2>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "var(--space-m)" }}>
-              {groupTools.map((t: Tool) => {
-                const prosArr = JSON.parse(t.pros || "[]");
-                const consArr = JSON.parse(t.cons || "[]");
-                const isCompared = compareIds.has(t.id);
-                return (
-                  <div key={t.id} style={{
-                    padding: "var(--space-l)", background: "var(--color-bg-primary)", borderRadius: "var(--radius-s)",
-                    border: isCompared ? "2px solid var(--color-accent)" : "1px solid var(--color-border-light)",
-                    display: "flex", flexDirection: "column",
-                    position: "relative",
-                  }}>
-                    {/* Header */}
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "var(--space-s)" }}>
-                      <div>
-                        <div style={{ fontWeight: 800, fontSize: "var(--text-m)" }}>{t.name}</div>
-                        <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>{t.provider}</div>
-                      </div>
-                      <StarRating rating={t.rating} />
-                    </div>
+      {/* Cards Grid */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "var(--space-m)" }}>
+        {filtered.map((t: Tool) => {
+          const isCompared = compareIds.has(t.id);
+          return (
+            <Link key={t.id} href={"/ai-tools/" + t.slug}
+              style={{
+                padding: "var(--space-l)", background: "var(--color-bg-primary)", borderRadius: 0,
+                border: isCompared ? "2px solid var(--color-accent)" : "1px solid var(--color-border-light)",
+                display: "flex", flexDirection: "column", textDecoration: "none", color: "inherit",
+                transition: "border-color 0.15s, box-shadow 0.15s",
+                position: "relative",
+              }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--color-accent)"; e.currentTarget.style.boxShadow = "0 2px 16px rgba(0,0,0,0.06)"; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = isCompared ? "var(--color-accent)" : "var(--color-border-light)"; e.currentTarget.style.boxShadow = "none"; }}
+            >
+              {/* Header */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "var(--space-s)" }}>
+                <div>
+                  <div style={{ fontWeight: 800, fontSize: "var(--text-m)", fontFamily: "var(--font-heading)" }}>{t.name}</div>
+                  <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>{t.provider}</div>
+                </div>
+                <StarRating rating={t.rating} />
+              </div>
 
-                    <div style={{ fontSize: "var(--text-s)", fontWeight: 600, color: "var(--color-accent)", marginBottom: "var(--space-s)" }}>
-                      {t.bestFor}
-                    </div>
+              {/* Type + price */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-s)" }}>
+                <span style={{ padding: "2px 8px", borderRadius: 0, background: "var(--color-bg-secondary)", fontSize: 10, fontWeight: 600, color: "var(--color-text-secondary)" }}>
+                  {(typeLabels[t.type] || {}).icon} {(typeLabels[t.type] || {}).label || t.type}
+                </span>
+                <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, color: "var(--color-accent)" }}>{t.pricingAmount || t.pricing}</span>
+              </div>
 
-                    {/* Badges */}
-                    <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: "var(--space-s)" }}>
-                      {t.russianUi && <span style={{ padding: "2px 8px", borderRadius: "var(--radius-s)", background: "#ecfdf5", color: "var(--color-accent)", fontSize: 10, fontWeight: 600 }}>🇷🇺 UI</span>}
-                      {!t.requiresVpn && <span style={{ padding: "2px 8px", borderRadius: "var(--radius-s)", background: "#ecfdf5", color: "var(--color-accent)", fontSize: 10, fontWeight: 600 }}>🌐 Без VPN</span>}
-                      {t.requiresVpn && <span style={{ padding: "2px 8px", borderRadius: "var(--radius-s)", background: "#fef2f2", color: "var(--color-error)", fontSize: 10, fontWeight: 600 }}>🔐 VPN</span>}
-                    </div>
+              {/* Badges */}
+              <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: "var(--space-s)" }}>
+                {t.russianUi ? (
+                  <span style={{ padding: "2px 8px", borderRadius: 0, background: "#ecfdf5", color: "#065f46", fontSize: 10, fontWeight: 600 }}>🇷🇺 Русский</span>
+                ) : (
+                  <span style={{ padding: "2px 8px", borderRadius: 0, background: "#eff6ff", color: "#1e40af", fontSize: 10, fontWeight: 600 }}>🌍 Международный</span>
+                )}
+                {!t.requiresVpn && <span style={{ padding: "2px 8px", borderRadius: 0, background: "#ecfdf5", color: "#065f46", fontSize: 10, fontWeight: 600 }}>🌍 Без VPN</span>}
+                {t.requiresVpn && <span style={{ padding: "2px 8px", borderRadius: 0, background: "#fef2f2", color: "#991b1b", fontSize: 10, fontWeight: 600 }}>🔐 VPN</span>}
+                {t.requiresForeignCard && <span style={{ padding: "2px 8px", borderRadius: 0, background: "#fffbeb", color: "#92400e", fontSize: 10, fontWeight: 600 }}>💳 Карта</span>}
+              </div>
 
-                    {/* Pros/Cons */}
-                    <div style={{ display: "flex", gap: "var(--space-m)", marginBottom: "var(--space-s)" }}>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: "var(--color-accent)", marginBottom: 4 }}>✅ Плюсы</div>
-                        {prosArr.slice(0, 3).map((p: string, i: number) => (
-                          <div key={i} style={{ display: "flex", gap: 4, fontSize: 10, color: "var(--color-text-secondary)", marginBottom: 2, lineHeight: 1.4 }}>
-                            <Check size={10} style={{ color: "#22c55e", marginTop: 2, flexShrink: 0 }} /> {p}
-                          </div>
-                        ))}
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: "var(--color-error)", marginBottom: 4 }}>❌ Минусы</div>
-                        {consArr.slice(0, 3).map((c: string, i: number) => (
-                          <div key={i} style={{ display: "flex", gap: 4, fontSize: 10, color: "var(--color-text-secondary)", marginBottom: 2, lineHeight: 1.4 }}>
-                            <X size={10} style={{ color: "#ef4444", marginTop: 2, flexShrink: 0 }} /> {c}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+              {/* Short description */}
+              <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.5, marginBottom: "var(--space-s)", flex: 1 }}>
+                {t.description?.substring(0, 120)}{(t.description || "").length > 120 ? "..." : ""}
+              </div>
 
-                    {/* Bottom */}
-                    <div style={{ marginTop: "auto", paddingTop: "var(--space-s)", borderTop: "1px solid var(--color-border-light)", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-                      <span style={{ fontSize: "var(--text-xs)", fontWeight: 700, color: "var(--color-accent)" }}>{t.pricing}</span>
-                      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                        <button onClick={() => toggleCompare(t.id)}
-                          style={{ padding: "4px 10px", borderRadius: "var(--radius-s)", border: isCompared ? "1px solid var(--color-accent)" : "1px solid var(--color-border)", background: isCompared ? "var(--color-accent)" : "white", color: isCompared ? "white" : "var(--color-text-secondary)", fontSize: 10, cursor: "pointer", fontWeight: 600 }}>
-                          <ArrowUpDown size={10} style={{ display: "inline", marginRight: 2 }} />
-                          {isCompared ? "В сравнении" : "Сравнить"}
-                        </button>
-                        <a href={t.url} target="_blank" rel="noopener" style={{ color: "var(--color-text-secondary)", display: "flex", alignItems: "center" }}>
-                          <ExternalLink size={14} />
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        );
-      })}
+              {/* Best for hint */}
+              {t.bestFor && (
+                <div style={{ fontSize: 10, color: "var(--color-accent)", fontWeight: 600, marginBottom: "var(--space-s)" }}>
+                  🎯 {t.bestFor?.substring(0, 80)}
+                </div>
+              )}
+
+              {/* Bottom actions */}
+              <div style={{ marginTop: "auto", paddingTop: "var(--space-s)", borderTop: "1px solid var(--color-border-light)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span style={{ fontSize: 10, color: "var(--color-text-tertiary)", fontWeight: 600 }}>Подробнее →</span>
+                <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleCompare(t.id); }}
+                  style={{ padding: "4px 10px", borderRadius: 0, border: isCompared ? "1px solid var(--color-accent)" : "1px solid var(--color-border)", background: isCompared ? "var(--color-accent)" : "white", color: isCompared ? "white" : "var(--color-text-secondary)", fontSize: 10, cursor: "pointer", fontWeight: 600 }}>
+                  <ArrowUpDown size={10} style={{ display: "inline", marginRight: 2 }} />
+                  {isCompared ? "В сравнении" : "Сравнить"}
+                </button>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+
+      {filtered.length === 0 && (
+        <div style={{ textAlign: "center", padding: "var(--space-xl)", color: "var(--color-text-tertiary)" }}>
+          Инструменты не найдены. Попробуйте изменить фильтры.
+        </div>
+      )}
 
       {/* Summary table */}
       <div style={{ marginTop: "var(--space-xl)" }}>
-        <h2 style={{ fontSize: "var(--text-xl)", fontWeight: 700, marginBottom: "var(--space-m)" }}>📊 Сводная таблица</h2>
+        <h2 style={{ fontSize: "var(--text-xl)", fontWeight: 700, marginBottom: "var(--space-m)", fontFamily: "var(--font-heading)" }}>📊 Сводная таблица</h2>
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "var(--text-xs)" }}>
             <thead>
@@ -232,17 +249,17 @@ export default function AIToolsPage({ tools }: { tools: Tool[] }) {
               </tr>
             </thead>
             <tbody>
-              {sorted.map((t: Tool) => (
+              {filtered.map((t: Tool) => (
                 <tr key={t.id} style={{ borderBottom: "1px solid var(--color-border-light)" }}>
                   <td style={{ padding: "10px 12px", fontWeight: 700 }}>
-                    {t.name}
+                    <Link href={"/ai-tools/" + t.slug} style={{ color: "var(--color-accent)", textDecoration: "none" }}>{t.name}</Link>
                     <div style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>{t.provider}</div>
                   </td>
-                  <td style={{ padding: "10px 12px", color: "var(--color-text-secondary)" }}>{t.type === "ide" ? "💻 IDE" : "🧩 No-code"}</td>
+                  <td style={{ padding: "10px 12px", color: "var(--color-text-secondary)" }}>{(typeLabels[t.type] || {}).icon} {(typeLabels[t.type] || {}).label || t.type}</td>
                   <td style={{ padding: "10px 12px" }}><StarRating rating={t.rating} /></td>
                   <td style={{ padding: "10px 12px" }}>{t.russianUi ? "✅" : "—"}</td>
                   <td style={{ padding: "10px 12px" }}>{t.requiresVpn ? "⚠️ Нужен" : "✅ Нет"}</td>
-                  <td style={{ padding: "10px 12px", fontWeight: 700, color: "var(--color-accent)" }}>{t.pricing}</td>
+                  <td style={{ padding: "10px 12px", fontWeight: 700, color: "var(--color-accent)" }}>{t.pricingAmount || t.pricing}</td>
                   <td style={{ padding: "10px 12px", color: "var(--color-text-secondary)", fontSize: 10 }}>{t.bestFor}</td>
                 </tr>
               ))}
