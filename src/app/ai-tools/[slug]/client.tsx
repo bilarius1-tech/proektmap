@@ -4,6 +4,7 @@ import { Star, ExternalLink, ArrowLeft, Check, X, Download, User2, Calendar, Ref
 import Link from "next/link";
 import Breadcrumbs from "@/components/nav/breadcrumbs";
 import SaveButton from "@/components/layout/save-button";
+import RelatedSidebar from "@/components/layout/related-sidebar";
 
 function StarRating({ rating }: { rating: number }) {
   return (
@@ -65,7 +66,8 @@ export default function AIToolDetailClient({ tool, related, isLoggedIn }: any) {
   const showNew = isNew(tool.createdAt);
 
   return (
-    <div style={{ maxWidth: 1100, margin: "0 auto", padding: "var(--space-xl) var(--space-m)" }}>
+    <div style={{ maxWidth: 1100, margin: "0 auto", padding: "var(--space-xl) var(--space-m)", display: "flex", gap: "var(--space-xl)", alignItems: "flex-start" }}>
+      <div style={{ flex: 1, minWidth: 0 }}>
       <Breadcrumbs pathname={"/ai-tools/" + tool.slug} pageTitle={tool.name} />
       <Link href="/ai-tools" style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: "var(--text-s)", color: "var(--color-text-secondary)", textDecoration: "none", marginBottom: "var(--space-l)" }}>
         <ArrowLeft size={14} /> Назад к каталогу
@@ -338,6 +340,10 @@ export default function AIToolDetailClient({ tool, related, isLoggedIn }: any) {
           </div>
         </div>
       )}
+      </div>
+      <div style={{ width: 260, flexShrink: 0 }}>
+        <RelatedSidebar type="ai-tool" slug={tool.slug} />
+      </div>
     </div>
   );
 }

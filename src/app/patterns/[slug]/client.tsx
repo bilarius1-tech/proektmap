@@ -6,6 +6,7 @@ import Breadcrumbs from "@/components/nav/breadcrumbs";
 import Term from "@/components/glossary/tooltip-term";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Star, Clock, DollarSign, Wrench, Check, X, ExternalLink, Play, Database, Layers, GitBranch, AlertTriangle, Lightbulb } from "lucide-react";
+import RelatedSidebar from "@/components/layout/related-sidebar";
 
 export default function PatternDetailClient({ pattern, blueprint, blueprints }: any) {
   const router = useRouter();
@@ -17,7 +18,8 @@ export default function PatternDetailClient({ pattern, blueprint, blueprints }: 
   const mistakes = JSON.parse(pattern.mistakes || "[]");
 
   return (
-    <div style={{ maxWidth: 900, margin: "0 auto", padding: "var(--space-xl) var(--space-m)" }}>
+    <div style={{ maxWidth: 1100, margin: "0 auto", padding: "var(--space-xl) var(--space-m)", display: "flex", gap: "var(--space-xl)", alignItems: "flex-start" }}>
+      <div style={{ flex: 1, minWidth: 0 }}>
       <Breadcrumbs pathname={`/patterns/${pattern.slug}`} pageTitle={pattern.title} />
       <Link href="/patterns" style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: "var(--text-s)", color: "var(--color-text-secondary)", textDecoration: "none", marginBottom: "var(--space-l)" }}>
         <ArrowLeft size={14} /> Назад к паттернам
@@ -196,6 +198,10 @@ export default function PatternDetailClient({ pattern, blueprint, blueprints }: 
           style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "16px 32px", borderRadius: 0, background: "var(--color-accent)", color: "white", textDecoration: "none", fontSize: "var(--text-m)", fontWeight: 700 }}>
           <Play size={18} /> {blueprint ? `Открыть Blueprint «${blueprint.title}»` : "Начать сборку"}
         </Link>
+      </div>
+      </div>
+      <div style={{ width: 260, flexShrink: 0 }}>
+        <RelatedSidebar type="pattern" slug={pattern.slug} />
       </div>
     </div>
   );
