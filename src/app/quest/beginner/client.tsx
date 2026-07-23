@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowRight, Check, Sparkles, ChevronLeft, ChevronRight, Circle, ExternalLink, Hammer } from "lucide-react";
-import Term from "@/components/glossary/tooltip-term";
+import Term from "@/components/glossary/tooltip-term"
+import RichText from "@/components/quest/rich-text";
 import React from "react";
 
 const STEPS = [
@@ -142,37 +143,6 @@ const STEPS = [
   },
 ];
 
-
-// Renders {{Term|word}} as inline glossary tooltip, [text](url) as link
-const RichText = React.memo(function RichText({ text }: { text: string }) {
-  return React.createElement("p", {
-    style: { fontSize: "var(--text-s)", lineHeight: 1.7, color: "var(--color-text-secondary)", maxWidth: 700, marginBottom: "var(--space-xl)", whiteSpace: "pre-line" }
-  }, ...[(() => {
-    const nodes = [];
-    let rest = text;
-    let k = 0;
-    while (rest.length > 0) {
-      const tm = rest.match(/\{\{Term\|([^}]+)\}\}/);
-      const lm = rest.match(/\[([^\]]+)\]\(([^)]+)\)/);
-      if (!tm && !lm) { nodes.push(React.createElement("span", { key: k++ }, rest)); break; }
-      const tIdx = tm ? tm.index : 999999;
-      const lIdx = lm ? lm.index : 999999;
-      if (tIdx < lIdx && tm) {
-        if (tIdx > 0) nodes.push(React.createElement("span", { key: k++ }, rest.slice(0, tIdx)));
-        nodes.push(React.createElement(Term, { key: k++, term: tm[1] }));
-        rest = rest.slice(tIdx + tm[0].length);
-      } else if (lm) {
-        if (lIdx > 0) nodes.push(React.createElement("span", { key: k++ }, rest.slice(0, lIdx)));
-        nodes.push(React.createElement("a", { key: k++, href: lm[2], target: "_blank",
-          rel: "noopener noreferrer",
-          style: { color: "var(--color-accent)", textDecoration: "underline", fontWeight: 500 }
-        }, lm[1] + " \u2197"));
-        rest = rest.slice(lIdx + lm[0].length);
-      }
-    }
-    return nodes;
-  })()]);
-});
 
 export default function BeginnerPathClient() {
   const [step, setStep] = useState(0);
