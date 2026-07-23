@@ -5,7 +5,6 @@ import Link from "next/link";
 import { ArrowRight, Check, Sparkles, ChevronLeft, ChevronRight, Circle, ExternalLink, Hammer } from "lucide-react";
 import Term from "@/components/glossary/tooltip-term";
 import React from "react";
-import React from "react";
 
 const STEPS = [
   {
