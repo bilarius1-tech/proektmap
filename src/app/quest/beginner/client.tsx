@@ -274,9 +274,7 @@ const STEP_TERMS: Record<number, string[]> = {
           }}>
             {current.title}
           </h1>
-          <p style={{ fontSize: "var(--text-s)", lineHeight: 1.7, color: "var(--color-text-secondary)", maxWidth: 700, marginBottom: "var(--space-xl)", whiteSpace: "pre-line" }}>
-            {current.detail}
-          </p>
+          <RichText text={current.detail} />
 
           {/* Grid: content + right panel */}
           <div className="quest-grid" style={{ display: "grid", gridTemplateColumns: "1fr clamp(240px, 25%, 300px)", gap: "var(--space-xl)" }}>
