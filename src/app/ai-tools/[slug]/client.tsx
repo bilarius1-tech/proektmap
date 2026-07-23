@@ -138,7 +138,19 @@ export default function AIToolDetailClient({ tool, related, isLoggedIn }: any) {
         </div>
       </div>
 
-      {/* Info Card */}
+      {/* Guide Description */}
+            {tool.guideDescription && (
+              <div style={{ padding: "var(--space-l)", background: "var(--color-bg-primary)", border: "1px solid var(--color-border-light)" }}>
+                <h2 style={{ fontSize: "var(--text-l)", fontWeight: 700, fontFamily: "var(--font-heading)", marginBottom: "var(--space-m)" }}>
+                  Что это и зачем
+                </h2>
+                <div style={{ fontSize: "var(--text-s)", lineHeight: 1.7, color: "var(--color-text-secondary)", whiteSpace: "pre-line" }}>
+                  {tool.guideDescription}
+                </div>
+              </div>
+            )}
+
+            {/* Info Card */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-s)", padding: "var(--space-l)", background: "var(--color-bg-secondary)", border: "1px solid var(--color-border-light)" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                 <User2 size={14} style={{ color: "var(--color-text-tertiary)" }} />

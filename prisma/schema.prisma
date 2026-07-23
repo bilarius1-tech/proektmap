@@ -314,6 +314,7 @@ model AITool {
   lastUpdate  String   @default("")
   headquarters String  @default("")
   shortDescription String @default("")
+  guideDescription String @default("")
   russianUi   Boolean  @default(false)
   russianSupport Boolean @default(false)
   requiresVpn Boolean  @default(false)
