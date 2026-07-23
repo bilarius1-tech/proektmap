@@ -5,8 +5,6 @@ import Link from "next/link";
 import ReactFlow, { Node, Edge, Background, Controls, Handle, Position } from "reactflow";
 import "reactflow/dist/style.css";
 import { ArrowRight, Check, Copy, Lock, Unlock, Sparkles, X, ChevronRight, Zap, Shield, Database, Rocket, BookOpen } from "lucide-react";
-import Term from "@/components/glossary/tooltip-term";
-import Link from "next/link";
 
 const STAGE_LABELS: Record<number, string> = { 1: "Ограничения", 2: "Данные", 3: "Генерация", 4: "Запуск" };
 const STAGE_COLORS: Record<number, string> = { 1: "#f59e0b", 2: "#3b82f6", 3: "#8b5cf6", 4: "#22c55e" };
@@ -128,19 +126,6 @@ export default function QuestClient({ nodes: questNodes, edges: questEdges }: an
           </div>
         </div>
       </div>
-
-      {/* Compact progress */}
-        <div style={{ padding: "6px var(--space-m)", background: "var(--color-bg-secondary)", borderBottom: "1px solid var(--color-border-light)", display: "flex", alignItems: "center", gap: 12, justifyContent: "center" }}>
-          <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)" }}>
-            <Link href="/corporate-website?demo=true" style={{ color: "var(--color-accent)", fontWeight: 600 }}>Демо-тур</Link>
-            <span style={{ margin: "0 8px", color: "var(--color-text-tertiary)" }}>|</span>
-            <Link href="/quest/services-site" style={{ color: "var(--color-accent)", fontWeight: 600 }}>Маршрут «Сайт услуг»</Link>
-            <span style={{ margin: "0 8px", color: "var(--color-text-tertiary)" }}>|</span>
-            <Link href="/architecture" style={{ color: "var(--color-accent)", fontWeight: 600 }}>Карта метро</Link>
-            <span style={{ margin: "0 8px", color: "var(--color-text-tertiary)" }}>|</span>
-            <Link href="/patterns" style={{ color: "var(--color-accent)", fontWeight: 600 }}>Паттерны</Link>
-          </div>
-        </div>
 
       {/* React Flow */}
       <div style={{ height: 350, background: "var(--color-bg-primary)", borderBottom: "1px solid var(--color-border-light)" }}>
