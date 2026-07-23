@@ -2,6 +2,7 @@ import { getDb } from "@/lib/db";
 import Link from "next/link";
 import MobileMenu from "./mobile-menu";
 import AuthBlock from "./auth-block";
+import FavoritesIndicator from "./favorites-indicator";
 import ThemeToggle from "./theme-toggle";
 
 export default async function GlobalHeader() {
@@ -38,6 +39,7 @@ export default async function GlobalHeader() {
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: "var(--space-s)" }}>
+        <FavoritesIndicator initialCount={0} />
         <ThemeToggle />
         <AuthBlock />
       </div>

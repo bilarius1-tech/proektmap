@@ -7,13 +7,13 @@ export default function FavoritesIndicator({ initialCount }: { initialCount: num
 
   useEffect(() => {
     // Re-check on mount and periodically
-    fetch("/api/favorites").then(r => r.json()).then(d => {
+    fetch("/api/collection").then(r => r.json()).then(d => {
       if (Array.isArray(d)) setCount(d.length);
     });
   }, []);
 
   return (
-    <a href="/dashboard/favorites" title="Избранное" style={{
+    <a href="/dashboard/collection" title="Избранное" style={{
       display: "flex", alignItems: "center", justifyContent: "center",
       width: 36, height: 36, borderRadius: "var(--radius-m)",
       border: "1px solid var(--color-border-light)",

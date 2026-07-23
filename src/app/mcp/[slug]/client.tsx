@@ -14,9 +14,9 @@ export default function MCPDetailClient({ server, isLoggedIn }: any) {
     <div style={{ maxWidth: 1100, margin: "0 auto", padding: "var(--space-xl) var(--space-m)", display: "flex", gap: "var(--space-xl)", alignItems: "flex-start" }}>
       <div style={{ flex: 1, minWidth: 0 }}>
       <Breadcrumbs pathname={`/mcp/${server.slug}`} pageTitle={server.name} />
-      <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}><SaveButton entityType="mcp" entitySlug={server.slug} isLoggedIn={isLoggedIn} /><Link href="/mcp" style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: "var(--text-s)", color: "var(--color-text-secondary)", textDecoration: "none", marginBottom: "var(--space-l)" }}>
+      <Link href="/mcp" style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: "var(--text-s)", color: "var(--color-text-secondary)", textDecoration: "none", marginBottom: "var(--space-l)" }}>
         <ArrowLeft size={14} /> Назад к каталогу
-      </Link></div>
+      </Link>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "var(--space-m)" }}>
         <div>
@@ -83,7 +83,8 @@ export default function MCPDetailClient({ server, isLoggedIn }: any) {
       )}
 
       {/* Links */}
-      <div style={{ display: "flex", gap: "var(--space-m)" }}>
+      <div style={{ display: "flex", gap: "var(--space-m)", alignItems: "center", flexWrap: "wrap" }}>
+        <SaveButton entityType="mcp" entitySlug={server.slug} isLoggedIn={isLoggedIn} />
         {server.githubUrl && (
           <a href={server.githubUrl} target="_blank" rel="noopener"
             style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 20px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "white", color: "var(--color-text)", textDecoration: "none", fontSize: "var(--text-s)", fontWeight: 600 }}>
