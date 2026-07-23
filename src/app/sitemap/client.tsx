@@ -33,7 +33,7 @@ const FLOW = [
     modules: [
       { id: "prompts", title: "Промпты", href: "/prompts", icon: MessageSquare, desc: "8 инженерных решений с RPG-статами. System + User Prompt. Совместимость с GPT, Claude, Gemini.", links: ["mcp", "patterns"] },
       { id: "mcp", title: "MCP-серверы", href: "/mcp", icon: Plug, desc: "34 сервера Model Context Protocol. Парсер GitHub, DeepSeek-перевод, cron-обновление.", links: ["ai-tools", "prompts"] },
-      { id: "ai-tools", title: "AI-инструменты", href: "/ai-tools", icon: Wrench, desc: "16 инструментов: Cursor, Vibecraft, Reasonix. Фильтр по VPN, русскому, цене.", links: ["mcp", "models"] },
+      { id: "ai-tools", title: "AI-инструменты", href: "/ai-tools", icon: Wrench, desc: "31 инструмент: Cursor, Reasonix, Aider, DeepSeek Coder. Фильтр по РФ, VPN, цене. Закладки, модели, подбор.", links: ["mcp", "models"] },
       { id: "models", title: "Модели", href: "/models", icon: Cpu, desc: "Сравнение AI-моделей: GPT, Claude, Gemini, DeepSeek. Рекомендации под задачу.", links: ["ai-tools"] },
     ],
   },
