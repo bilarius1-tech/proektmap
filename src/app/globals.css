@@ -30,3 +30,123 @@
 [data-theme="dark"] textarea::placeholder {
   color: var(--color-text-tertiary);
 }
+
+
+/* === MOBILE RESPONSIVENESS === */
+@media (max-width: 768px) {
+  /* Sidebar becomes horizontal scroll */
+  .related-sidebar {
+    position: relative !important;
+    top: 0 !important;
+    margin-top: var(--space-l);
+    width: 100% !important;
+  }
+  
+  /* Detail pages: stack vertically */
+  .detail-layout {
+    flex-direction: column !important;
+  }
+  .detail-sidebar {
+    width: 100% !important;
+    position: relative !important;
+    top: 0 !important;
+  }
+  
+  /* AI Tools catalog: 1 column */
+  .tools-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* MCP catalog: 1 column */
+  .mcp-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Quest: stack panels */
+  .quest-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Admin sidebar: collapse */
+  .admin-sidebar {
+    width: 60px !important;
+    overflow: hidden;
+  }
+  .admin-sidebar .nav-label {
+    display: none;
+  }
+  
+  /* Typography */
+  h1 {
+    font-size: var(--text-xl) !important;
+  }
+  h2 {
+    font-size: var(--text-l) !important;
+  }
+  
+  /* Tables: horizontal scroll */
+  .admin-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Cards: full width */
+  .card-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Tabs: wrap */
+  .tabs-row {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tab-btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  
+  /* Compare mode: stack */
+  .compare-table {
+    display: block;
+    overflow-x: auto;
+  }
+  
+  /* Breadcrumbs: smaller */
+  .breadcrumbs {
+    font-size: var(--text-xs);
+  }
+  
+  /* Padding adjustments */
+  .page-padding {
+    padding: var(--space-m) var(--space-s) !important;
+  }
+}
+
+/* Small phones */
+@media (max-width: 480px) {
+  :root {
+    --text-xs: 12px;
+    --text-s: 13px;
+    --text-m: 14px;
+    --text-l: 16px;
+    --text-xl: 18px;
+    --text-xxl: 22px;
+    --space-xs: 4px;
+    --space-s: 8px;
+    --space-m: 12px;
+    --space-l: 16px;
+    --space-xl: 20px;
+  }
+  
+  /* Header: compact */
+  .global-header {
+    padding: 8px 12px !important;
+  }
+  
+  /* Footer: single column */
+  .footer-grid {
+    grid-template-columns: 1fr !important;
+  }
+}

@@ -23,7 +23,7 @@ const nav = [
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ display: "flex", minHeight: "100vh", background: "var(--color-bg-secondary)" }}>
-      <aside style={{ width: 220, background: "var(--color-bg-primary)", borderRight: "1px solid var(--color-border-light)", padding: "var(--space-m)" }}>
+      <aside className="admin-sidebar" style={{ width: 220, background: "var(--color-bg-primary)", borderRight: "1px solid var(--color-border-light)", padding: "var(--space-m)" }}>
         <div style={{ fontSize: "var(--text-l)", fontWeight: 800, marginBottom: "var(--space-l)", padding: "0 var(--space-s)" }}>
           Proekt<span style={{ color: "var(--color-accent)" }}>Map</span>
           <span style={{ display: "block", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", fontWeight: 400 }}>Админка</span>
@@ -33,7 +33,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <Link key={item.href} href={item.href}
               style={{ display: "flex", alignItems: "center", gap: "var(--space-xs)", padding: "8px 12px", borderRadius: "var(--radius-m)", color: "var(--color-text-primary)", fontSize: "var(--text-s)", fontWeight: 500, textDecoration: "none", transition: "background var(--transition-fast)" }}>
               <item.icon size={16} />
-              {item.label}
+              <span className="nav-label">{item.label}</span>
             </Link>
           ))}
         </nav>

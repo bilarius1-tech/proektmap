@@ -27,10 +27,9 @@ export default function RelatedSidebar({ type, slug }: { type: string; slug: str
   if (!hasContent) return null;
 
   return (
-    <div style={{
+    <div className="related-sidebar" style={{
       padding: "var(--space-l)", background: "var(--color-bg-primary)",
       border: "1px solid var(--color-border-light)", borderRadius: 0,
-      alignSelf: "flex-start", position: "sticky", top: 72,
     }}>
       <div style={{
         fontSize: "var(--text-xs)", fontWeight: 800, color: "var(--color-text-tertiary)",
@@ -46,7 +45,7 @@ export default function RelatedSidebar({ type, slug }: { type: string; slug: str
               <Link key={t.slug} href={`/glossary/${t.slug}`}
                 style={linkStyle}>
                 <span style={{ flex: 1 }}>{t.term}</span>
-                <span style={{ fontSize: 12 }}>{t.level === "beginner" ? "🟢" : t.level === "intermediate" ? "🟡" : "🔴"}</span>
+                <span title={t.level === "beginner" ? "Базовый уровень — для новичков" : t.level === "intermediate" ? "Средний уровень — нужен опыт" : "Продвинутый уровень — для профи"} style={{ fontSize: 10, cursor: "help" }}>{t.level === "beginner" ? "🟢" : t.level === "intermediate" ? "🟡" : "🔴"}</span>
               </Link>
             ))}
           </Section>
@@ -68,7 +67,7 @@ export default function RelatedSidebar({ type, slug }: { type: string; slug: str
             {data.patterns.map(p => (
               <Link key={p.slug} href={`/patterns/${p.slug}`} style={linkStyle}>
                 <span style={{ flex: 1 }}>{p.title}</span>
-                <span style={{ fontSize: 12 }}>{p.difficulty === "beginner" ? "🟢" : p.difficulty === "intermediate" ? "🟡" : "🔴"}</span>
+                <span title={p.difficulty === "beginner" ? "Для начинающих" : p.difficulty === "intermediate" ? "Средняя сложность" : "Продвинутый"} style={{ fontSize: 10, cursor: "help" }}>{p.difficulty === "beginner" ? "🟢" : p.difficulty === "intermediate" ? "🟡" : "🔴"}</span>
               </Link>
             ))}
           </Section>
