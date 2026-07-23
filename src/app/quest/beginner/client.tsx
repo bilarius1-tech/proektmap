@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowRight, Check, Sparkles, ChevronLeft, ChevronRight, Circle, ExternalLink, Hammer } from "lucide-react";
+import Term from "@/components/glossary/tooltip-term";
 
 const STEPS = [
   {
@@ -144,6 +145,17 @@ export default function BeginnerPathClient() {
   const [step, setStep] = useState(0);
   const [completed, setCompleted] = useState<Set<number>>(new Set());
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+const STEP_TERMS: Record<number, string[]> = {
+  1: ["Cursor", "Vibecraft", "Node.js", "GitHub", "SourceCraft", "GigaCode", "Reasonix", "VS Code"],
+  2: ["Next.js", "Tailwind", "localhost", "npm", "Frontend", "Backend", "Prompt"],
+  3: ["Итерация", "Hover-эффект", "Валидация", "React"],
+  4: ["Git", "Репозиторий", "Commit", "Push", "Ветка", "Pull Request"],
+  5: ["Деплой", "Vercel", "HTTPS", "Домен", "Сервер", "Хостинг"],
+  6: ["package.json", "Модули", "Зависимости", "Фреймворк", "Структура"],
+  7: ["Безопасность", "Токен", "API", "Аутентификация", "Шифрование"],
+  8: ["SEO", "Sitemap", "Метатеги", "Аналитика", "Индексация", "Робот"],
+};
+
 
   useEffect(() => {
     try {
@@ -375,6 +387,21 @@ export default function BeginnerPathClient() {
                 }}>
                   <div style={{ fontWeight: 700, fontSize: "var(--text-xs)", marginBottom: 4, color: "var(--color-success)" }}>Следующий этап</div>
                   {STEPS[step + 1]?.title} — {STEPS[step + 1]?.subtitle}
+                </div>
+              )}
+
+              {/* Key terms */}
+              {STEP_TERMS[step + 1] && (
+                <div style={{
+                  padding: "var(--space-m)", background: "var(--color-bg-primary)", borderRadius: 0,
+                  border: "1px solid var(--color-border-light)", marginBottom: "var(--space-m)",
+                }}>
+                  <div style={{ fontWeight: 700, fontSize: "var(--text-xs)", marginBottom: 6, fontFamily: "var(--font-heading)" }}>Новые термины</div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                    {STEP_TERMS[step + 1].map(term => (
+                      <Term key={term} term={term} />
+                    ))}
+                  </div>
                 </div>
               )}
 
