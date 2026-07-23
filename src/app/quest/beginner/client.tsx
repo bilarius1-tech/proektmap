@@ -142,6 +142,43 @@ const STEPS = [
   },
 ];
 
+
+// Rich text renderer: {{Term|word}} → Term component, [text](url) → link
+function RichText({ text }: { text: string }) {
+  const parts = React.useMemo(() => {
+    const result: any[] = [];
+    let remaining = text;
+    let key = 0;
+    while (remaining.length > 0) {
+      const termMatch = remaining.match(/\{\{Term\|([^}]+)\}\}/);
+      const linkMatch = remaining.match(/\[([^\]]+)\]\(([^)]+)\)/);
+      if (!termMatch && !linkMatch) {
+        result.push(React.createElement("span", { key: key++, style: { color: "var(--color-text-secondary)" } }, remaining));
+        break;
+      }
+      const ti = termMatch ? termMatch.index : Infinity;
+      const li = linkMatch ? linkMatch.index : Infinity;
+      if (ti !== undefined && ti <= li && termMatch) {
+        if (ti > 0) result.push(React.createElement("span", { key: key++ }, remaining.slice(0, ti)));
+        result.push(React.createElement(Term, { key: key++, term: termMatch[1] }));
+        remaining = remaining.slice(ti + termMatch[0].length);
+      } else if (linkMatch) {
+        if (linkMatch.index !== undefined && linkMatch.index > 0)
+          result.push(React.createElement("span", { key: key++ }, remaining.slice(0, linkMatch.index)));
+        result.push(React.createElement("a", { key: key++, href: linkMatch[2], target: "_blank",
+          rel: "noopener noreferrer",
+          style: { color: "var(--color-accent)", textDecoration: "underline", fontWeight: 500 }
+        }, linkMatch[1] + " ↗"));
+        remaining = remaining.slice(linkMatch.index + linkMatch[0].length);
+      }
+    }
+    return result;
+  }, [text]);
+  return React.createElement("p", {
+    style: { fontSize: "var(--text-s)", lineHeight: 1.7, color: "var(--color-text-secondary)", maxWidth: 700, marginBottom: "var(--space-xl)", whiteSpace: "pre-line" }
+  }, ...parts);
+}
+
 export default function BeginnerPathClient() {
   const [step, setStep] = useState(0);
   const [completed, setCompleted] = useState<Set<number>>(new Set());
