@@ -276,7 +276,7 @@ const STEP_TERMS: Record<number, string[]> = {
           }}>
             {current.title}
           </h1>
-          <RichText text={current.detail} />
+          
 
           {/* Grid: content + right panel */}
           <div className="quest-grid" style={{ display: "grid", gridTemplateColumns: "1fr clamp(240px, 25%, 300px)", gap: "var(--space-xl)" }}>
@@ -286,7 +286,8 @@ const STEP_TERMS: Record<number, string[]> = {
                 background: "var(--color-bg-primary)", borderRadius: 0, padding: "var(--space-xl)",
                 border: "1px solid var(--color-border-light)", marginBottom: "var(--space-l)",
               }}>
-                <h2 style={{ fontSize: "var(--text-l)", fontWeight: 700, marginBottom: "var(--space-m)", fontFamily: "var(--font-heading)" }}>Что нужно сделать</h2>
+                <RichText text={current.detail} />
+              <h2 style={{ fontSize: "var(--text-l)", fontWeight: 700, marginBottom: "var(--space-m)", fontFamily: "var(--font-heading)" }}>Что нужно сделать</h2>
                 <div style={{ display: "flex", flexDirection: "column" }}>
                   {current.checklist.map((item, i) => (
                     <div key={i} style={{
