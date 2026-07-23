@@ -322,6 +322,7 @@ model AITool {
   hiddenFeatures  String @default("")  // text: "Скрытые возможности"
   ourTake         String @default("")  // text: "Наша рекомендация"
   detailComparison String @default("") // text: "Чем отличается от других"
+  supportedModels String   @default("[]")
   sortOrder   Int      @default(0)
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
