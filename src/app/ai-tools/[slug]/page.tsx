@@ -1,5 +1,6 @@
 import { getDb } from "@/lib/db/index";
 import { notFound } from "next/navigation";
+import { auth } from "@/lib/auth";
 import AIToolDetailClient from "./client";
 
 export const dynamic = "force-dynamic";
@@ -26,7 +27,10 @@ export default async function Page({ params }: any) {
   const tool = await db.aITool.findUnique({ where: { slug } });
   if (!tool) notFound();
 
-  let related: any = { terms: [], patterns: [], mcp: [] };
+  const session = await auth();
+  const isLoggedIn = !!session?.user;
+
+  let related: any = { terms: [], patterns: [], mcp: [], prompts: [] };
   try {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://proektmap.ru";
     const relatedRes = await fetch(siteUrl + "/api/graph/node?type=aitool&slug=" + slug);
@@ -61,6 +65,7 @@ export default async function Page({ params }: any) {
       <AIToolDetailClient
         tool={JSON.parse(JSON.stringify(tool))}
         related={related}
+        isLoggedIn={isLoggedIn}
       />
     </>
   );

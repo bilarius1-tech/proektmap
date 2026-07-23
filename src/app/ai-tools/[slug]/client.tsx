@@ -3,6 +3,7 @@
 import { Star, ExternalLink, ArrowLeft, Check, X, Download } from "lucide-react";
 import Link from "next/link";
 import Breadcrumbs from "@/components/nav/breadcrumbs";
+import SaveButton from "@/components/layout/save-button";
 
 function StarRating({ rating }: { rating: number }) {
   return (
@@ -22,11 +23,46 @@ const typeLabels: Record<string, string> = {
   assistant: "💬 AI-ассистент",
 };
 
-export default function AIToolDetailClient({ tool, related }: any) {
+// Friendly names for model slugs
+const modelNames: Record<string, string> = {
+  "gpt-5.5": "GPT-5.5",
+  "claude-opus-4.8": "Claude Opus 4.8",
+  "claude-sonnet-4.5": "Claude Sonnet 4.5",
+  "gemini-2.5-pro": "Gemini 2.5 Pro",
+  "deepseek-v3": "DeepSeek V3",
+  "qwen3": "Qwen 3",
+  "llama-4": "Llama 4",
+  "gigachat": "GigaChat",
+  "yandexgpt": "YandexGPT",
+};
+
+// Model badge colors
+const modelColors: Record<string, { bg: string; text: string; border: string }> = {
+  "gpt-5.5": { bg: "#f0fdf4", text: "#166534", border: "#bbf7d0" },
+  "claude-opus-4.8": { bg: "#faf5ff", text: "#6b21a8", border: "#e9d5ff" },
+  "claude-sonnet-4.5": { bg: "#faf5ff", text: "#7c3aed", border: "#e9d5ff" },
+  "gemini-2.5-pro": { bg: "#eff6ff", text: "#1e40af", border: "#bfdbfe" },
+  "deepseek-v3": { bg: "#ecfdf5", text: "#065f46", border: "#a7f3d0" },
+  "qwen3": { bg: "#fff7ed", text: "#9a3412", border: "#fed7aa" },
+  "llama-4": { bg: "#fef2f2", text: "#991b1b", border: "#fecaca" },
+  "gigachat": { bg: "#eff6ff", text: "#1e40af", border: "#bfdbfe" },
+  "yandexgpt": { bg: "#fffbeb", text: "#92400e", border: "#fcd34d" },
+};
+
+function isNew(createdAt: string): boolean {
+  const created = new Date(createdAt);
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  return created > thirtyDaysAgo;
+}
+
+export default function AIToolDetailClient({ tool, related, isLoggedIn }: any) {
   const prosArr = JSON.parse(tool.pros || "[]");
   const consArr = JSON.parse(tool.cons || "[]");
   const steps = JSON.parse(tool.howToStart || "[]");
   const faq = JSON.parse(tool.faqItems || "[]");
+  const supportedModels = JSON.parse(tool.supportedModels || "[]");
+  const showEditorChoice = tool.rating >= 9;
+  const showNew = isNew(tool.createdAt);
 
   return (
     <div style={{ maxWidth: 1100, margin: "0 auto", padding: "var(--space-xl) var(--space-m)" }}>
@@ -53,9 +89,18 @@ export default function AIToolDetailClient({ tool, related }: any) {
             {tool.requiresForeignCard && (
               <span style={{ padding: "3px 10px", borderRadius: 0, background: "#fffbeb", color: "#92400e", fontSize: 10, fontWeight: 700 }}>💳 Иностранная карта</span>
             )}
+            {showEditorChoice && (
+              <span style={{ padding: "3px 10px", borderRadius: 0, background: "#fef3c7", color: "#92400e", fontSize: 10, fontWeight: 700 }}>⭐ Выбор редакции</span>
+            )}
+            {showNew && (
+              <span style={{ padding: "3px 10px", borderRadius: 0, background: "#dbeafe", color: "#1e40af", fontSize: 10, fontWeight: 700 }}>🆕 Новинка</span>
+            )}
           </div>
           <h1 style={{ fontSize: "var(--text-xxl)", fontWeight: 900, margin: "var(--space-xs) 0", fontFamily: "var(--font-heading)", letterSpacing: "-0.02em" }}>{tool.name}</h1>
-          <div style={{ fontSize: "var(--text-s)", color: "var(--color-text-tertiary)" }}>{tool.provider}</div>
+          <div style={{ fontSize: "var(--text-s)", color: "var(--color-text-tertiary)", display: "flex", gap: "var(--space-m)", alignItems: "center" }}>
+            <span>{tool.provider}</span>
+            <SaveButton entityType="ai-tool" entitySlug={tool.slug} isLoggedIn={isLoggedIn} />
+          </div>
         </div>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "12px 20px", background: "var(--color-bg-secondary)", borderRadius: 0 }}>
           <StarRating rating={tool.rating} />
@@ -92,6 +137,37 @@ export default function AIToolDetailClient({ tool, related }: any) {
           </div>
         </div>
       </div>
+
+      {/* Supported Models */}
+      {supportedModels.length > 0 && (
+        <div style={{ marginBottom: "var(--space-l)", padding: "var(--space-l)", background: "var(--color-bg-secondary)", borderRadius: 0, border: "1px solid var(--color-border-light)" }}>
+          <h2 style={{ fontSize: "var(--text-m)", fontWeight: 700, marginBottom: "var(--space-m)", fontFamily: "var(--font-heading)" }}>🤖 Поддерживаемые модели</h2>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {supportedModels.map((slug: string) => {
+              const colors = modelColors[slug] || { bg: "#f8fafc", text: "#475569", border: "#e2e8f0" };
+              return (
+                <Link key={slug} href={"/models?q=" + slug}
+                  style={{
+                    padding: "8px 16px",
+                    borderRadius: 0,
+                    background: colors.bg,
+                    color: colors.text,
+                    border: "1px solid " + colors.border,
+                    fontSize: "var(--text-xs)",
+                    fontWeight: 600,
+                    textDecoration: "none",
+                    transition: "all 0.15s",
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.08)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "none"; }}
+                >
+                  {modelNames[slug] || slug}
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Pros / Cons */}
       {(prosArr.length > 0 || consArr.length > 0) && (
@@ -188,8 +264,8 @@ export default function AIToolDetailClient({ tool, related }: any) {
         )}
       </div>
 
-      {/* Related Terms */}
-      {(related?.terms?.length > 0 || related?.patterns?.length > 0 || related?.mcp?.length > 0) && (
+      {/* Related Content */}
+      {(related?.terms?.length > 0 || related?.patterns?.length > 0 || related?.mcp?.length > 0 || related?.prompts?.length > 0) && (
         <div style={{ padding: "var(--space-l)", background: "var(--color-bg-secondary)", borderRadius: 0, border: "1px solid var(--color-border-light)" }}>
           <h2 style={{ fontSize: "var(--text-m)", fontWeight: 700, marginBottom: "var(--space-m)", fontFamily: "var(--font-heading)" }}>🔗 Связанные материалы</h2>
           <div style={{ display: "flex", gap: "var(--space-m)", flexWrap: "wrap" }}>
@@ -203,6 +279,12 @@ export default function AIToolDetailClient({ tool, related }: any) {
               <Link key={p.slug} href={"/patterns/" + p.slug}
                 style={{ padding: "6px 14px", borderRadius: 0, background: "var(--color-bg-primary)", border: "1px solid var(--color-border)", fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", textDecoration: "none", fontWeight: 600 }}>
                 📦 {p.title}
+              </Link>
+            ))}
+            {related.prompts?.map((p: any) => (
+              <Link key={p.slug} href={"/prompts"}
+                style={{ padding: "6px 14px", borderRadius: 0, background: "var(--color-bg-primary)", border: "1px solid var(--color-border)", fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", textDecoration: "none", fontWeight: 600 }}>
+                💬 {p.title}
               </Link>
             ))}
             {related.mcp?.map((m: any) => (
