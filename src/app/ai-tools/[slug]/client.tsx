@@ -96,16 +96,7 @@ export default function AIToolDetailClient({ tool, related, isLoggedIn }: any) {
               <span style={{ padding: "3px 10px", borderRadius: 0, background: "#dbeafe", color: "#1e40af", fontSize: 10, fontWeight: 700 }}>🆕 Новинка</span>
             )}
           </div>
-          <h1 style={{
-            fontSize: "var(--text-xxl)", fontWeight: 900, margin: "var(--space-xs)" 0,
-            fontFamily: "var(--font-heading)", letterSpacing: "-0.02em",
-            display: "flex", alignItems: "center", gap: 12
-          }}>
-            <img src={"/uploads/tools/" + tool.slug + ".png"} alt={tool.name}
-              style={{ width: 40, height: 40 }}
-              onError={(e: any) => { e.target.style.display = "none" }} />
-            {tool.name}
-          </h1>
+          <h1 style={{ fontSize: "var(--text-xxl)", fontWeight: 900, margin: "var(--space-xs) 0", fontFamily: "var(--font-heading)", letterSpacing: "-0.02em" }}><img src={"/uploads/tools/" + tool.slug + ".png"} alt={tool.name} style={{ width: 40, height: 40 }} onError={(e: any) => { e.target.style.display = "none" }} /> {tool.name}</h1>
           <div style={{ fontSize: "var(--text-s)", color: "var(--color-text-tertiary)", display: "flex", gap: "var(--space-m)", alignItems: "center" }}>
             <span>{tool.provider}</span>
             <SaveButton entityType="ai-tool" entitySlug={tool.slug} isLoggedIn={isLoggedIn} />
