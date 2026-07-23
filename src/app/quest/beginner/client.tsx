@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ArrowRight, Check, Sparkles, ChevronLeft, ChevronRight, Circle, ExternalLink, Hammer } from "lucide-react";
 import Term from "@/components/glossary/tooltip-term";
+import React from "react";
 
 const STEPS = [
   {
@@ -387,21 +388,6 @@ const STEP_TERMS: Record<number, string[]> = {
                 }}>
                   <div style={{ fontWeight: 700, fontSize: "var(--text-xs)", marginBottom: 4, color: "var(--color-success)" }}>Следующий этап</div>
                   {STEPS[step + 1]?.title} — {STEPS[step + 1]?.subtitle}
-                </div>
-              )}
-
-              {/* Key terms */}
-              {STEP_TERMS[step + 1] && (
-                <div style={{
-                  padding: "var(--space-m)", background: "var(--color-bg-primary)", borderRadius: 0,
-                  border: "1px solid var(--color-border-light)", marginBottom: "var(--space-m)",
-                }}>
-                  <div style={{ fontWeight: 700, fontSize: "var(--text-xs)", marginBottom: 6, fontFamily: "var(--font-heading)" }}>Новые термины</div>
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-                    {STEP_TERMS[step + 1].map(term => (
-                      <Term key={term} term={term} />
-                    ))}
-                  </div>
                 </div>
               )}
 
