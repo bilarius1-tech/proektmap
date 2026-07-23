@@ -622,6 +622,35 @@ model Relation {
   @@map("relations")
 }
 
+
+model QuestNode {
+  id              String   @id @default(uuid())
+  questId         String
+  stage           Int
+  title           String
+  description     String
+  context         String   @default("")
+  question        String   @default("")
+  nodeType        String   @default("decision")
+  options         String   @default("[]")
+  aiModeratorPrompt String @default("")
+  sortOrder       Int      @default(0)
+  isPublished     Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  @@unique([questId, sortOrder])
+  @@map("quest_nodes")
+}
+
+model QuestEdge {
+  id          String   @id @default(uuid())
+  questId     String
+  sourceId    String
+  targetId    String
+  condition   String   @default("")
+  @@map("quest_edges")
+}
+
 model BuildPattern {
   id              String   @id @default(uuid())
   title           String
