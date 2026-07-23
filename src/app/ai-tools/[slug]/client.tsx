@@ -103,7 +103,7 @@ export default function AIToolDetailClient({ tool, related, isLoggedIn }: any) {
           }}>
             <img src={"/uploads/tools/" + tool.slug + ".png"} alt={tool.name}
               style={{ width: 40, height: 40 }}
-              onError={(e: any) => { e.target.style.display = "none" } }} />
+              onError={(e: any) => { e.target.style.display = "none" }} />
             {tool.name}
           </h1>
           <div style={{ fontSize: "var(--text-s)", color: "var(--color-text-tertiary)", display: "flex", gap: "var(--space-m)", alignItems: "center" }}>
