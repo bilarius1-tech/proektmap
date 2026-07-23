@@ -7,158 +7,125 @@ import Term from "@/components/glossary/tooltip-term"
 import RichText from "@/components/quest/rich-text";
 import React from "react";
 
-const STEPS = [
+// Fallback hardcoded data if API fails
+const FALLBACK_STEPS = [
   {
+    id: "fallback-1", step: 1,
     title: "Подготовка инструментов",
-    subtitle: "Устанавливаем базу для работы",
-    time: "10 мин",
-    color: "var(--color-warning)",
     detail: "В 2026 программирование начинается не с синтаксиса. Ты описываешь идею на русском — {{Term|LLM|ИИ}} создаёт код. Но чтобы получить результат, нужно правильно выбрать инструмент.\n\n🇷🇺 Российские (без VPN, русский язык):\n• [Vibecraft](https://vibe.sourcecraft.dev) — пишешь идею → сайт. No-code. Бесплатно. Идеально для первого знакомства.\n• [SourceCraft](https://sourcecraft.dev) — {{Term|GitHub}} + AI-ассистент. Yandex ID. Профессиональная среда.\n• [GigaCode](https://gigacode.ru) — AI-помощник от Сбера. VS Code + JetBrains.\n\n🌍 Международные (нужен VPN или зарубежная карта):\n• {{Term|Cursor}} ([Cursor](https://cursor.com)) — лучший AI-редактор в мире. $20/мес, есть бесплатный тир.\n• VS Code + Copilot — стандарт индустрии. Бесплатный редактор + AI за $10/мес.\n• [Reasonix](https://reasonix.ai) — open-source AI-агент. Бесплатно. Для продвинутых.\n\n⚡ Два инструмента, которые нужны ВСЕМ:\n• {{Term|Node.js}} ([Node.js](https://nodejs.org), версия LTS) — среда для запуска JavaScript на компьютере.\n• [GitHub](https://github.com) — облачное хранилище кода. Бесплатно. Твой код не пропадёт.\n\nГлавное правило вайбкодинга: ты не пишешь код руками. Ты описываешь задачу словами — ИИ создаёт решение.",
-    checklist: [
-      "Прочитай обзор и выбери инструмент",
-      "Новичок — Vibecraft (русский, бесплатно, без VPN)",
-      "Есть опыт — Cursor или VS Code Copilot",
-      "Всем: Node.js (nodejs.org, LTS)",
-      "Всем: GitHub (github.com)",
-    ],
+    checklist: '["Прочитай обзор и выбери инструмент","Новичок — Vibecraft (русский, бесплатно, без VPN)","Есть опыт — Cursor или VS Code Copilot","Всем: Node.js (nodejs.org, LTS)","Всем: GitHub (github.com)"]',
     why: "Российские сервисы работают без VPN и принимают российские карты. Международные мощнее, но требуют зарубежную карту. Node.js и GitHub нужны всем. Главное — не учить синтаксис, а учиться ставить задачи ИИ.",
-    next: "Создаём первый сайт через AI-промпт",
-    result: "Все инструменты установлены и готовы к работе",
+    prompt: "",
+    sortOrder: 1,
   },
   {
+    id: "fallback-2", step: 2,
     title: "Первый сайт через AI",
-    subtitle: "Пишем не код, а промпт",
-    time: "15 мин",
-    color: "var(--color-accent)",
     detail: "Сейчас произойдёт магия. Ты напишешь обычный текст — и через 5 минут увидишь работающий сайт. Не веришь? Давай проверим.\n\nПредставь: ты фрилансер. Клиент — мастерская по ремонту телефонов. Ему нужен сайт. Бюджет небольшой, срок — вчера. Раньше ты бы потратил неделю на вёрстку. Сейчас — 5 минут и один {{Term|Prompt}}.\n\nОткрой {{Term|Cursor}} → Ctrl+I → вставь промпт ниже → смотри как рождается сайт.",
-    checklist: [
-      "Открыть Cursor → Ctrl+I (Mac: Cmd+I)",
-      "Скопировать готовый промпт (ниже) и вставить в чат",
-      "Выполнить команды из терминала: npm install, npm run dev",
-      "Открыть http://localhost:3000 — сайт работает!",
-    ],
-    prompt: "Действуй как frontend-разработчик. Создай проект Next.js с Tailwind. Сделай сайт-визитку для Мастерской по ремонту телефонов. Шапка с названием и телефоном, 3 карточки услуг с ценами, форма заявки (Имя, Телефон), подвал. Тёмный дизайн. Напиши ВСЕ команды для терминала.",
+    checklist: '["Открыть Cursor → Ctrl+I (Mac: Cmd+I)","Скопировать готовый промпт (ниже) и вставить в чат","Выполнить команды из терминала: npm install, npm run dev","Открыть http://localhost:3000 — сайт работает!"]',
     why: "Правильный промпт = 90% успеха. Мы даём ИИ роль, стек, структуру и пример. Он создаёт код, ты — запускаешь. Через 5 минут у тебя работающий сайт.",
-    next: "Учимся менять сайт через ИИ",
-    result: "Сайт открывается в браузере на localhost:3000",
+    prompt: "Действуй как frontend-разработчик. Создай проект Next.js с Tailwind. Сделай сайт-визитку для Мастерской по ремонту телефонов. Шапка с названием и телефоном, 3 карточки услуг с ценами, форма заявки (Имя, Телефон), подвал. Тёмный дизайн. Напиши ВСЕ команды для терминала.",
+    sortOrder: 2,
   },
   {
+    id: "fallback-3", step: 3,
     title: "Правки через ИИ",
-    subtitle: "Не пишем код — описываем изменения",
-    time: "10 мин",
-    color: "var(--color-info)",
     detail: "Сайт работает! Но выглядит как все — серый фон, чёрный текст, никакой души. Сейчас мы превратим его в профессиональный продукт за 2 минуты.\n\nГлавный секрет {{Term|Vibe Coding|вайбкодинга}}: ты не правишь код. Ты описываешь проблему — {{Term|LLM|ИИ}} решает её. Это как работать с джуниор-разработчиком, который никогда не устаёт и не ошибается в синтаксисе.\n\nПравило трёх И: {{Term|Iteration|Итерация}} → Инспекция → Исправление. Повторяй этот цикл пока результат не устроит. Хочешь другой цвет? Скажи. Нужна анимация? Опиши. Не нравится шрифт? Попроси подобрать.\n\nЗапомни: AI делает 80% работы. Твоя задача — оценить результат и сказать что улучшить.",
-    checklist: [
-      "В том же чате Cursor написать промпт для правок",
-      "Дождаться пока ИИ изменит файлы",
-      "Обновить страницу в браузере (F5)",
-      "Проверить: карточки увеличиваются при наведении? Валидация работает?",
-    ],
-    prompt: "Сайт работает. Улучши его: 1) В карточках услуг — hover-эффект (увеличение + тень). 2) В форме — поле Телефон обязательно. Покажи какие файлы изменил и объясни простыми словами.",
+    checklist: '["В том же чате Cursor написать промпт для правок","Дождаться пока ИИ изменит файлы","Обновить страницу в браузере (F5)","Проверить: карточки увеличиваются при наведении? Валидация работает?"]',
     why: "Итеративная разработка — это цикл: написал → проверил → попросил улучшить. Не бойся просить ИИ переделать — он не устаёт. Каждая итерация занимает 2-3 минуты.",
-    next: "Сохраняем код в облако",
-    result: "Карточки анимируются, форма проверяет телефон",
+    prompt: "Сайт работает. Улучши его: 1) В карточках услуг — hover-эффект (увеличение + тень). 2) В форме — поле Телефон обязательно. Покажи какие файлы изменил и объясни простыми словами.",
+    sortOrder: 3,
   },
   {
+    id: "fallback-4", step: 4,
     title: "Сохранить на GitHub",
-    subtitle: "Код в безопасности",
-    time: "10 мин",
-    color: "var(--color-success)",
     detail: "Представь: ты работал над сайтом 3 дня. Компьютер сгорел. Всё пропало. Больно? А теперь представь что такого никогда не случится.\n\n{{Term|Git}} — это страховка от катастрофы. Три команды — и твой код сохранён навсегда. [GitHub](https://github.com) — облако, где код живёт даже если компьютер упадёт с 10 этажа.\n\nКоманды, которые спасут твою работу:\n• git init — создать историю проекта\n• git add — выбрать файлы для сохранения\n• {{Term|Commit|git commit}} — сделать снимок текущего состояния\n• git push — отправить в облако\n\nЧетыре команды. Миллион спасённых проектов. Выучи их как «раз-два-три-четыре».",
-    checklist: [
-      "Создать репозиторий на GitHub (кнопка New)",
-      "Спросить ИИ: «Дай 4 команды для git init, add, commit, push»",
-      "Выполнить команды в терминале Cursor (Ctrl+`)",
-      "Проверить: файлы видны на github.com",
-    ],
+    checklist: '["Создать репозиторий на GitHub (кнопка New)","Спросить ИИ: «Дай 4 команды для git init, add, commit, push»","Выполнить команды в терминале Cursor (Ctrl+`)","Проверить: файлы видны на github.com"]',
     why: "Без Git ты потеряешь код при первой ошибке. С Git ты можешь откатиться на любую версию. GitHub хранит копию в облаке — доступно с любого компьютера.",
-    next: "Публикуем сайт в интернет",
-    result: "Код в репозитории на GitHub",
+    prompt: "",
+    sortOrder: 4,
   },
   {
+    id: "fallback-5", step: 5,
     title: "Сайт в интернете",
-    subtitle: "Деплой на Vercel",
-    time: "10 мин",
-    color: "var(--color-error)",
     detail: "Твой сайт живёт только на твоём компьютере. Никто кроме тебя его не видит. Сейчас он выйдет в большой мир.\n\n[Vercel](https://vercel.com) — это как выставить картину в галерее. Был файл на компьютере — стал сайтом в интернете. Бесплатно. Автоматически. С {{Term|SSL|защищённым соединением}}.\n\nТы привязываешь свой [GitHub](https://github.com)-репозиторий → Vercel сам собирает и публикует сайт → ты получаешь ссылку. Всё. Три шага.\n\nЧерез 2 минуты ты отправишь ссылку другу и скажешь: «Смотри, я сделал сайт». И он откроется. На телефоне. У друга. В другом городе. Это магия {{Term|Deploy|деплоя}}.",
-    checklist: [
-      "Зайти на vercel.com → войти через GitHub",
-      "Import Repository → выбрать проект → Deploy",
-      "Подождать 1-2 минуты сборки",
-      "Открыть ссылку вида проект.vercel.app — сайт в интернете!",
-    ],
+    checklist: '["Зайти на vercel.com → войти через GitHub","Import Repository → выбрать проект → Deploy","Подождать 1-2 минуты сборки","Открыть ссылку вида проект.vercel.app — сайт в интернете!"]',
     why: "Vercel автоматически собирает и публикует проект. Никаких серверов, никаких настроек. Ты просто подключаешь репозиторий — и сайт в интернете.",
-    next: "Ты прошёл весь путь!",
-    result: "Сайт доступен по ссылке в интернете",
+    prompt: "",
+    sortOrder: 5,
   },
   {
+    id: "fallback-6", step: 6,
     title: "Структура проекта",
-    subtitle: "Понимаем что внутри папок",
-    time: "10 мин",
-    color: "var(--color-warning)",
     detail: "Ты создал сайт, но что внутри? Как машина: ты умеешь ездить, но ничего не знаешь о двигателе. Открываем капот.\n\n{{Term|package.json}} — это паспорт проекта. Имя, версия, список библиотек (зависимостей). Если проект — ресторан, то package.json — это меню: что заказано и каких поставщиков.\n\nnode_modules — это склад запчастей. Тысячи файлов от других разработчиков. Ты их не писал, но без них ничего не работает. Их не нужно трогать и не нужно заливать на [GitHub](https://github.com).\n\napp/ — это витрина. Здесь лежат страницы твоего сайта. components/ — кубики интерфейса: кнопки, карточки, формы.\n\nПонимание структуры — переход от «я скопировал и заработало» к «я знаю где что лежит и могу изменить». Это как из пассажира стать водителем.",
-    checklist: [
-      "Открыть папку проекта в Cursor",
-      "Найти файл package.json — прочитать что внутри",
-      "Понять: dependencies = библиотеки, scripts = команды",
-      "Найти папку src/app — здесь живут страницы",
-    ],
+    checklist: '["Открыть папку проекта в Cursor","Найти файл package.json — прочитать что внутри","Понять: dependencies = библиотеки, scripts = команды","Найти папку src/app — здесь живут страницы"]',
     why: "Понимание структуры проекта = контроль над ним. Ты не просто копируешь команды — ты знаешь ЗАЧЕМ они нужны. Это отличает инженера от копипастера.",
-    next: "Учимся хранить секреты",
-    result: "Понимаешь структуру Next.js проекта",
+    prompt: "",
+    sortOrder: 6,
   },
   {
+    id: "fallback-7", step: 7,
     title: "Переменные окружения",
-    subtitle: "Секреты и безопасность",
-    time: "10 мин",
-    color: "var(--color-info)",
     detail: "Один программист забыл убрать {{Term|API}}-ключ из кода и залил на {{Term|GitHub}}. Через час пришёл счёт на 5000 долларов — кто-то использовал его ключ для майнинга крипты.\n\n.env — это сейф для секретов. Здесь лежат: пароли, ключи API, {{Term|Token}}ы. Этот файл НИКОГДА не попадает в GitHub. .gitignore — это охранник, который не пускает .env в репозиторий.\n\n5 минут настройки сейчас = тысячи долларов экономии потом.",
-    checklist: [
-      "Создать файл .env в корне проекта",
-      "Добавить .env в .gitignore (чтобы не утёк в GitHub)",
-      "Создать .env.example — шаблон без реальных данных",
-      "Понять разницу: локальные ключи vs продакшен",
-    ],
-    prompt: "Объясни что такое .env файл, .gitignore и почему секреты нельзя хранить в коде. Покажи как создать .env.example для моего Next.js проекта. Я новичок.",
+    checklist: '["Создать файл .env в корне проекта","Добавить .env в .gitignore (чтобы не утёк в GitHub)","Создать .env.example — шаблон без реальных данных","Понять разницу: локальные ключи vs продакшен"]',
     why: "Утечка API-ключа в GitHub = взлом за 5 минут + счёт на тысячи долларов. Это самая частая ошибка новичков. 5 минут настройки сейчас — тысячи долларов экономии потом.",
-    next: "Настройка SEO и аналитики",
-    result: ".env настроен, секреты в безопасности",
+    prompt: "Объясни что такое .env файл, .gitignore и почему секреты нельзя хранить в коде. Покажи как создать .env.example для моего Next.js проекта. Я новичок.",
+    sortOrder: 7,
   },
   {
+    id: "fallback-8", step: 8,
     title: "SEO и аналитика",
-    subtitle: "Сайт находят в поиске",
-    time: "15 мин",
-    color: "var(--color-success)",
-    detail: "Ты сделал сайт. Он прекрасен. Но Яндекс о нём не знает. Это как открыть магазин в подвале без вывески — никто не найдёт.\n\n{{Term|SEO}} — это вывеска для поисковиков. [Яндекс.Вебмастер](https://webmaster.yandex.ru) — твой главный инструмент. Добавь сайт, подтверди права, загрузи {{Term|Sitemap}} — и роботы начнут обход.\n\n{{Term|Title (SEO)|Title}} и Description — это то, что люди видят в搜索结果. Они должны быть на русском, с ключевыми словами, 50-70 символов.\n\n[Яндекс.Метрика](https://metrika.yandex.ru) — это камера наблюдения: сколько человек зашло, откуда, что делали, на какой странице ушли. Без этого ты не знаешь работает сайт или просто висит в пустоте.\n\nSEO не делает сайт красивым. SEO делает сайт видимым.",
-    checklist: [
-      "Добавить title и description на главную страницу",
-      "Создать sitemap.xml и robots.txt",
-      "Зарегистрироваться в Яндекс.Метрике",
-      "Добавить код Метрики в layout.tsx",
-    ],
-    prompt: "Добавь SEO для моего Next.js проекта: 1) Динамические meta-теги (title, description, OG) 2) sitemap.ts 3) Интеграцию Яндекс.Метрики через next/script. Объясни каждое изменение простыми словами.",
+    detail: "Ты сделал сайт. Он прекрасен. Но Яндекс о нём не знает. Это как открыть магазин в подвале без вывески — никто не найдёт.\n\n{{Term|SEO}} — это вывеска для поисковиков. Правильные метатеги, sitemap, robots.txt — и твой сайт начинает появляться в поиске. А Яндекс.Метрика — это счётчик посетителей: кто заходит, откуда, что смотрит.\n\nSEO делает сайт видимым.",
+    checklist: '["Добавить title и description на главную страницу","Создать sitemap.xml и robots.txt","Зарегистрироваться в Яндекс.Метрике","Добавить код Метрики в layout.tsx"]',
     why: "Без SEO сайт не найдёт ни один поисковик. Ты можешь сделать лучший сайт в мире, но без метатегов его никто не увидит. Это последний шаг перед реальными пользователями.",
-    next: "Ты прошёл полный путь AI-разработчика!",
-    result: "SEO настроено, Метрика подключена",
+    prompt: "Добавь SEO для моего Next.js проекта: 1) Динамические meta-теги (title, description, OG) 2) sitemap.ts 3) Интеграцию Яндекс.Метрики через next/script. Объясни каждое изменение простыми словами.",
+    sortOrder: 8,
   },
 ];
 
+const STEP_TIMES: Record<number, string> = {
+  1: "10 мин", 2: "15 мин", 3: "10 мин", 4: "10 мин",
+  5: "10 мин", 6: "10 мин", 7: "10 мин", 8: "15 мин",
+};
+
+const STEP_COLORS: Record<number, string> = {
+  1: "var(--color-warning)", 2: "var(--color-accent)", 3: "var(--color-info)",
+  4: "var(--color-success)", 5: "var(--color-error)", 6: "var(--color-warning)",
+  7: "var(--color-info)", 8: "var(--color-success)",
+};
+
+const STEP_SUBTITLES: Record<number, string> = {
+  1: "Устанавливаем базу для работы",
+  2: "Пишем не код, а промпт",
+  3: "Не пишем код — описываем изменения",
+  4: "Код в безопасности",
+  5: "Деплой на Vercel",
+  6: "Понимаем что внутри папок",
+  7: "Секреты и безопасность",
+  8: "Сайт находят в поиске",
+};
 
 export default function BeginnerPathClient() {
+  const [steps, setSteps] = useState<any[]>(FALLBACK_STEPS);
+  const [loading, setLoading] = useState(true);
   const [step, setStep] = useState(0);
   const [completed, setCompleted] = useState<Set<number>>(new Set());
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-const STEP_TERMS: Record<number, string[]> = {
-  1: ["Cursor", "Vibecraft", "Node.js", "GitHub", "SourceCraft", "GigaCode", "Reasonix", "VS Code"],
-  2: ["Next.js", "Tailwind", "localhost", "npm", "Frontend", "Backend", "Prompt"],
-  3: ["Итерация", "Hover-эффект", "Валидация", "React"],
-  4: ["Git", "Репозиторий", "Commit", "Push", "Ветка", "Pull Request"],
-  5: ["Деплой", "Vercel", "HTTPS", "Домен", "Сервер", "Хостинг"],
-  6: ["package.json", "Модули", "Зависимости", "Фреймворк", "Структура"],
-  7: ["Безопасность", "Токен", "API", "Аутентификация", "Шифрование"],
-  8: ["SEO", "Sitemap", "Метатеги", "Аналитика", "Индексация", "Робот"],
-};
 
+  // Fetch from API, fallback to hardcoded
+  useEffect(() => {
+    fetch("/api/quest/beginner")
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          setSteps(data);
+        }
+      })
+      .catch(() => {
+        // Use fallback
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
   useEffect(() => {
     try {
@@ -170,9 +137,55 @@ const STEP_TERMS: Record<number, string[]> = {
     localStorage.setItem("beginner-path-v5", JSON.stringify({ step, completed: [...completed] }));
   }, [step, completed]);
 
-  const current = STEPS[step];
-  const isLast = step >= STEPS.length - 1;
-  const progress = Math.round(((completed.size) / STEPS.length) * 100);
+  if (loading) {
+    return (
+      <div style={{ minHeight: "100vh", background: "var(--color-bg-secondary)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ fontSize: "var(--text-m)", color: "var(--color-text-tertiary)" }}>Загрузка...</div>
+      </div>
+    );
+  }
+
+  const raw = steps[step];
+  if (!raw) {
+    return (
+      <div style={{ minHeight: "100vh", background: "var(--color-bg-secondary)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 40, textAlign: "center" }}>
+        <div style={{ fontSize: 64, marginBottom: 16 }}>🎉</div>
+        <h1 style={{ fontSize: "var(--text-xxl)", fontWeight: 900, fontFamily: "var(--font-heading)", marginBottom: 8 }}>Ты прошёл весь путь!</h1>
+        <p style={{ fontSize: "var(--text-m)", color: "var(--color-text-secondary)", maxWidth: 500, lineHeight: 1.7, marginBottom: 24 }}>
+          От идеи до сайта в интернете. Теперь ты знаешь базовый цикл AI-разработки: установить → создать → запустить → сохранить → опубликовать.
+        </p>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button onClick={() => { setStep(0); setCompleted(new Set()); localStorage.removeItem("beginner-path-v5"); }}
+            style={{ padding: "12px 24px", borderRadius: 0, border: "1px solid var(--color-border)", background: "white", cursor: "pointer", fontWeight: 600 }}>
+            Пройти заново
+          </button>
+          <Link href="/quest/services-site"
+            style={{ display: "flex", alignItems: "center", gap: 6, padding: "12px 24px", borderRadius: 0, background: "var(--color-accent)", color: "white", textDecoration: "none", fontWeight: 700 }}>
+            Следующий уровень <ArrowRight size={14} />
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Parse checklist from JSON string if needed
+  let checklist: string[] = [];
+  try {
+    checklist = typeof raw.checklist === "string" ? JSON.parse(raw.checklist) : raw.checklist;
+  } catch {
+    checklist = [];
+  }
+
+  const current = {
+    ...raw,
+    checklist,
+    subtitle: STEP_SUBTITLES[raw.step] || "",
+    time: STEP_TIMES[raw.step] || "10 мин",
+    color: STEP_COLORS[raw.step] || "var(--color-accent)",
+  };
+
+  const isLast = step >= steps.length - 1;
+  const progress = Math.round(((completed.size) / steps.length) * 100);
 
   function handleComplete() {
     setCompleted(prev => new Set([...prev, step]));
@@ -204,7 +217,7 @@ const STEP_TERMS: Record<number, string[]> = {
           }}>
             Путь проекта
           </div>
-          {STEPS.map((s, i) => {
+          {steps.map((s, i) => {
             const isActive = i === step;
             const isStepDone = completed.has(i);
             return (
@@ -225,7 +238,7 @@ const STEP_TERMS: Record<number, string[]> = {
                   }
                   {i + 1}. {s.title}
                 </div>
-                <div style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>{s.subtitle}</div>
+                <div style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>{STEP_SUBTITLES[s.step] || ""}</div>
               </div>
             );
           })}
@@ -241,14 +254,14 @@ const STEP_TERMS: Record<number, string[]> = {
                 border: "1px solid var(--color-border)", background: "var(--color-bg-primary)",
                 color: "var(--color-text-secondary)", cursor: "pointer", fontWeight: 600, fontSize: "var(--text-xs)",
               }}>
-              <Hammer size={14} /> {mobileSidebarOpen ? "Скрыть шаги" : "Все шаги (" + STEPS.length + ")"}
+              <Hammer size={14} /> {mobileSidebarOpen ? "Скрыть шаги" : "Все шаги (" + steps.length + ")"}
             </button>
           </div>
 
           {/* Mobile sidebar dropdown */}
           {mobileSidebarOpen && (
             <div style={{ display: "none", marginBottom: "var(--space-m)", padding: "var(--space-m)", background: "var(--color-bg-primary)", border: "1px solid var(--color-border-light)" }} className="quest-mobile-sidebar">
-              {STEPS.map((s, i) => {
+              {steps.map((s, i) => {
                 const isActive = i === step;
                 const isStepDone = completed.has(i);
                 return (
@@ -267,7 +280,7 @@ const STEP_TERMS: Record<number, string[]> = {
 
           {/* Step badge */}
           <div style={{ display: "inline-block", padding: "4px 14px", borderRadius: 0, background: "var(--color-accent-light)", color: "var(--color-accent)", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: "var(--space-s)" }}>
-            Шаг {step + 1} из {STEPS.length} · ~{current.time}
+            Шаг {step + 1} из {steps.length} · ~{current.time}
           </div>
 
           <h1 style={{
@@ -289,7 +302,7 @@ const STEP_TERMS: Record<number, string[]> = {
                 <RichText text={current.detail} />
               <h2 style={{ fontSize: "var(--text-l)", fontWeight: 700, marginBottom: "var(--space-m)", fontFamily: "var(--font-heading)" }}>Что нужно сделать</h2>
                 <div style={{ display: "flex", flexDirection: "column" }}>
-                  {current.checklist.map((item, i) => (
+                  {current.checklist.map((item: string, i: number) => (
                     <div key={i} style={{
                       display: "flex", alignItems: "flex-start", gap: 12,
                       padding: "var(--space-s) 0", borderBottom: i < current.checklist.length - 1 ? "1px solid var(--color-border-light)" : "none",
@@ -371,7 +384,7 @@ const STEP_TERMS: Record<number, string[]> = {
               <div style={{ background: "var(--color-bg-primary)", padding: "var(--space-l)", borderRadius: 0, border: "1px solid var(--color-border-light)" }}>
                 <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: "var(--space-s)", fontFamily: "var(--font-heading)" }}>После завершения</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                  {current.checklist.slice(0, 4).map((item, i) => (
+                  {current.checklist.slice(0, 4).map((item: string, i: number) => (
                     <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: "var(--text-xs)", color: "var(--color-text-secondary)" }}>
                       {completed.has(step) ? <Check size={12} style={{ color: "var(--color-accent)", flexShrink: 0 }} /> : <Circle size={12} style={{ color: "var(--color-border)", flexShrink: 0 }} />}
                       <span style={{ opacity: completed.has(step) ? 0.6 : 1 }}>{item}</span>
@@ -388,7 +401,7 @@ const STEP_TERMS: Record<number, string[]> = {
                   lineHeight: 1.6, color: "var(--color-text-secondary)",
                 }}>
                   <div style={{ fontWeight: 700, fontSize: "var(--text-xs)", marginBottom: 4, color: "var(--color-success)" }}>Следующий этап</div>
-                  {STEPS[step + 1]?.title} — {STEPS[step + 1]?.subtitle}
+                  {steps[step + 1]?.title} — {STEP_SUBTITLES[steps[step + 1]?.step] || ""}
                 </div>
               )}
 
@@ -398,7 +411,7 @@ const STEP_TERMS: Record<number, string[]> = {
                 fontSize: "var(--text-xs)", lineHeight: 1.6, color: "var(--color-text-secondary)",
               }}>
                 <div style={{ fontWeight: 700, fontSize: "var(--text-xs)", marginBottom: 4, color: "var(--color-text-primary)" }}>Результат этапа</div>
-                {current.result}
+                {current.result || "Готово"}
               </div>
             </div>
           </div>

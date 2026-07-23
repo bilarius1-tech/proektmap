@@ -675,3 +675,16 @@ model BuildPattern {
   updatedAt       DateTime @updatedAt
   @@map("build_patterns")
 }
+
+model QuestStep {
+  id        String   @id @default(uuid())
+  step      Int      @unique // 1-8
+  title     String   // e.g. "Подготовка инструментов"
+  detail    String   // rich text with {{Term|...}} markup
+  checklist String   // JSON array of strings
+  why       String   // why this matters
+  prompt    String   @default("")   // copy-paste prompt for AI
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
