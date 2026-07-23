@@ -1,3 +1,4 @@
+import WhatsNewFeed from "@/components/whats-new/feed";
 import Link from "next/link";
 import { Globe, Smartphone, Gamepad2, Server, Camera, Package, ArrowRight, Check, Crown, Shield } from "lucide-react";
 
@@ -125,6 +126,8 @@ export default function Home() {
       </div>
 
       
+      <WhatsNewFeed />
+
       {/* Поисковая строка */}
       <div style={{ maxWidth: 700, margin: "0 auto", padding: "var(--space-xl) var(--space-m)", textAlign: "center" }}>
         <div style={{ fontSize: "var(--text-m)", fontWeight: 700, color: "var(--color-text-secondary)", marginBottom: "var(--space-m)" }}>
