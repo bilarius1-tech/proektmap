@@ -299,29 +299,22 @@ model MCPServer {
 model AITool {
   id          String   @id @default(uuid())
   name        String   @unique
-  slug        String   @unique @default("")
   provider    String
   type        String   @default("ide") // ide, no-code, agent, assistant
   description String   @default("")
   pros        String   @default("")  // JSON array of strings
   cons        String   @default("")  // JSON array of strings
   pricing     String   @default("")
-  pricingAmount String @default("")  // "0/мес" or "Бесплатно"
   url         String   @default("")
-  downloadUrl String   @default("")  // direct download link
   russianUi   Boolean  @default(false)
   russianSupport Boolean @default(false)
   requiresVpn Boolean  @default(false)
-  requiresForeignCard Boolean @default(false)
   codeOwnership Boolean @default(true)
   rating      Int      @default(7)  // 1-10
   bestFor     String   @default("")
   howToStart  String   @default("[]")   // JSON: [{title,desc}]
   faqItems    String   @default("[]")   // JSON: [{q,a}]
   detailDescription String @default("") // Markdown-like long description
-  hiddenFeatures  String @default("")  // text: "Скрытые возможности"
-  ourTake         String @default("")  // text: "Наша рекомендация"
-  detailComparison String @default("") // text: "Чем отличается от других"
   sortOrder   Int      @default(0)
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())

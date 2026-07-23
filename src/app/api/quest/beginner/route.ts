@@ -19,6 +19,15 @@ export async function GET() {
 }
 
 // POST — creates or updates a step (admin only)
+export async function DELETE(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const id = searchParams.get('id');
+  if (!id) return Response.json({ error: "id required" }, { status: 400 });
+  const db = await getDb();
+  await db.questStep.delete({ where: { id } });
+  return Response.json({ ok: true });
+}
+
 export async function POST(req: NextRequest) {
   const session = await auth();
   if (!session?.user || (session.user as any).role !== "admin") {
