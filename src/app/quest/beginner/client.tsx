@@ -2,15 +2,15 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowRight, Check, Sparkles, ChevronLeft, ChevronRight, Circle, ExternalLink } from "lucide-react";
+import { ArrowRight, Check, Sparkles, ChevronLeft, ChevronRight, Circle, ExternalLink, Hammer } from "lucide-react";
 
 const STEPS = [
   {
     title: "Подготовка инструментов",
     subtitle: "Устанавливаем базу для работы",
     time: "10 мин",
-    color: "#f59e0b",
-    detail: `Для AI-разработки нужны три бесплатных инструмента. Не пропускай этот шаг — без них ничего не заработает.`,
+    color: "var(--color-warning)",
+    detail: "Для AI-разработки нужны три бесплатных инструмента. Не пропускай этот шаг — без них ничего не заработает.",
     checklist: [
       "Скачать и установить Cursor с cursor.com (Windows/Mac/Linux)",
       "Установить Node.js (LTS) с nodejs.org",
@@ -24,7 +24,7 @@ const STEPS = [
     title: "Первый сайт через AI",
     subtitle: "Пишем не код, а промпт",
     time: "15 мин",
-    color: "#3b82f6",
+    color: "var(--color-accent)",
     detail: "Ты создашь сайт, не написав ни строчки кода. Только один текстовый промпт. ИИ сделает всё остальное.",
     checklist: [
       "Открыть Cursor → Ctrl+I (Mac: Cmd+I)",
@@ -32,7 +32,7 @@ const STEPS = [
       "Выполнить команды из терминала: npm install, npm run dev",
       "Открыть http://localhost:3000 — сайт работает!",
     ],
-    prompt: `Действуй как frontend-разработчик. Создай проект Next.js с Tailwind. Сделай сайт-визитку для Мастерской по ремонту телефонов. Шапка с названием и телефоном, 3 карточки услуг с ценами, форма заявки (Имя, Телефон), подвал. Тёмный дизайн. Напиши ВСЕ команды для терминала.`,
+    prompt: "Действуй как frontend-разработчик. Создай проект Next.js с Tailwind. Сделай сайт-визитку для Мастерской по ремонту телефонов. Шапка с названием и телефоном, 3 карточки услуг с ценами, форма заявки (Имя, Телефон), подвал. Тёмный дизайн. Напиши ВСЕ команды для терминала.",
     why: "Правильный промпт = 90% успеха. Мы даём ИИ роль, стек, структуру и пример. Он создаёт код, ты — запускаешь. Через 5 минут у тебя работающий сайт.",
     next: "Учимся менять сайт через ИИ",
     result: "Сайт открывается в браузере на localhost:3000",
@@ -41,15 +41,15 @@ const STEPS = [
     title: "Правки через ИИ",
     subtitle: "Не пишем код — описываем изменения",
     time: "10 мин",
-    color: "#8b5cf6",
-    detail: "Главное правило: ты не правишь код руками. Ты описываешь ИИ что изменить, а он меняет файлы сам. Это быстрее и безопаснее.",
+    color: "var(--color-info)",
+    detail: "Главное правило: ты не правишь код руками. Ты описываешь ИИ что изменить, а он меняет файлы сам.",
     checklist: [
-      "В том же чате Cursor написать промпт для правок (ниже)",
+      "В том же чате Cursor написать промпт для правок",
       "Дождаться пока ИИ изменит файлы",
       "Обновить страницу в браузере (F5)",
       "Проверить: карточки увеличиваются при наведении? Валидация работает?",
     ],
-    prompt: `Сайт работает. Улучши его: 1) В карточках услуг — hover-эффект (увеличение + тень). 2) В форме — поле Телефон обязательно. Покажи какие файлы изменил и объясни простыми словами.`,
+    prompt: "Сайт работает. Улучши его: 1) В карточках услуг — hover-эффект (увеличение + тень). 2) В форме — поле Телефон обязательно. Покажи какие файлы изменил и объясни простыми словами.",
     why: "Итеративная разработка — это цикл: написал → проверил → попросил улучшить. Не бойся просить ИИ переделать — он не устаёт. Каждая итерация занимает 2-3 минуты.",
     next: "Сохраняем код в облако",
     result: "Карточки анимируются, форма проверяет телефон",
@@ -58,8 +58,8 @@ const STEPS = [
     title: "Сохранить на GitHub",
     subtitle: "Код в безопасности",
     time: "10 мин",
-    color: "#22c55e",
-    detail: "Git — машина времени для проекта. GitHub — облако где хранятся все версии. Если компьютер сломается — код не пропадёт.",
+    color: "var(--color-success)",
+    detail: "Git — машина времени для проекта. GitHub — облако где хранятся все версии.",
     checklist: [
       "Создать репозиторий на GitHub (кнопка New)",
       "Спросить ИИ: «Дай 4 команды для git init, add, commit, push»",
@@ -74,37 +74,83 @@ const STEPS = [
     title: "Сайт в интернете",
     subtitle: "Деплой на Vercel",
     time: "10 мин",
-    color: "#ef4444",
-    detail: "Твой сайт работает локально. Сейчас он станет доступен всему миру. Vercel — бесплатный хостинг для Next.js проектов.",
+    color: "var(--color-error)",
+    detail: "Твой сайт работает локально. Сейчас он станет доступен всему миру.",
     checklist: [
       "Зайти на vercel.com → войти через GitHub",
       "Import Repository → выбрать проект → Deploy",
       "Подождать 1-2 минуты сборки",
       "Открыть ссылку вида проект.vercel.app — сайт в интернете!",
     ],
-    why: "Vercel автоматически собирает и публикует проект. Никаких серверов, никаких настроек. Ты просто подключаешь репозиторий — и сайт в интернете. Бесплатный домен, автоматический HTTPS.",
+    why: "Vercel автоматически собирает и публикует проект. Никаких серверов, никаких настроек. Ты просто подключаешь репозиторий — и сайт в интернете.",
     next: "Ты прошёл весь путь!",
     result: "Сайт доступен по ссылке в интернете",
+  },
+  {
+    title: "Структура проекта",
+    subtitle: "Понимаем что внутри папок",
+    time: "10 мин",
+    color: "var(--color-warning)",
+    detail: "Ты создал проект, но что внутри этих папок? Разберёмся что такое package.json, node_modules, pages, components.",
+    checklist: [
+      "Открыть папку проекта в Cursor",
+      "Найти файл package.json — прочитать что внутри",
+      "Понять: dependencies = библиотеки, scripts = команды",
+      "Найти папку src/app — здесь живут страницы",
+    ],
+    why: "Понимание структуры проекта = контроль над ним. Ты не просто копируешь команды — ты знаешь ЗАЧЕМ они нужны. Это отличает инженера от копипастера.",
+    next: "Учимся хранить секреты",
+    result: "Понимаешь структуру Next.js проекта",
+  },
+  {
+    title: "Переменные окружения",
+    subtitle: "Секреты и безопасность",
+    time: "10 мин",
+    color: "var(--color-info)",
+    detail: "API-ключи, пароли, токены — их нельзя хранить в коде. .env файл решает эту проблему. Научимся работать с секретами.",
+    checklist: [
+      "Создать файл .env в корне проекта",
+      "Добавить .env в .gitignore (чтобы не утёк в GitHub)",
+      "Создать .env.example — шаблон без реальных данных",
+      "Понять разницу: локальные ключи vs продакшен",
+    ],
+    prompt: "Объясни что такое .env файл, .gitignore и почему секреты нельзя хранить в коде. Покажи как создать .env.example для моего Next.js проекта. Я новичок.",
+    why: "Утечка API-ключа в GitHub = взлом за 5 минут + счёт на тысячи долларов. Это самая частая ошибка новичков. 5 минут настройки сейчас — тысячи долларов экономии потом.",
+    next: "Настройка SEO и аналитики",
+    result: ".env настроен, секреты в безопасности",
+  },
+  {
+    title: "SEO и аналитика",
+    subtitle: "Сайт находят в поиске",
+    time: "15 мин",
+    color: "var(--color-success)",
+    detail: "Сайт работает, но его никто не видит в Яндексе. Научимся добавлять метатеги, sitemap и подключать Яндекс.Метрику.",
+    checklist: [
+      "Добавить title и description на главную страницу",
+      "Создать sitemap.xml и robots.txt",
+      "Зарегистрироваться в Яндекс.Метрике",
+      "Добавить код Метрики в layout.tsx",
+    ],
+    prompt: "Добавь SEO для моего Next.js проекта: 1) Динамические meta-теги (title, description, OG) 2) sitemap.ts 3) Интеграцию Яндекс.Метрики через next/script. Объясни каждое изменение простыми словами.",
+    why: "Без SEO сайт не найдёт ни один поисковик. Ты можешь сделать лучший сайт в мире, но без метатегов его никто не увидит. Это последний шаг перед реальными пользователями.",
+    next: "Ты прошёл полный путь AI-разработчика!",
+    result: "SEO настроено, Метрика подключена",
   },
 ];
 
 export default function BeginnerPathClient() {
   const [step, setStep] = useState(0);
   const [completed, setCompleted] = useState<Set<number>>(new Set());
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem("beginner-path-v3");
-      if (saved) {
-        const data = JSON.parse(saved);
-        if (data.step) setStep(data.step);
-        if (data.completed) setCompleted(new Set(data.completed));
-      }
+      const saved = localStorage.getItem("beginner-path-v5");
+      if (saved) { const data = JSON.parse(saved); if (data.step) setStep(data.step); if (data.completed) setCompleted(new Set(data.completed)); }
     } catch {}
   }, []);
-
   useEffect(() => {
-    localStorage.setItem("beginner-path-v3", JSON.stringify({ step, completed: [...completed] }));
+    localStorage.setItem("beginner-path-v5", JSON.stringify({ step, completed: [...completed] }));
   }, [step, completed]);
 
   const current = STEPS[step];
@@ -117,89 +163,137 @@ export default function BeginnerPathClient() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#fafafa", fontFamily: "var(--font-body)" }}>
-    
+    <div style={{
+      minHeight: "100vh",
+      background: "var(--color-bg-secondary)",
+      fontFamily: "var(--font-body)",
+    }}>
+      {/* Progress bar */}
+      <div style={{ height: 4, background: "var(--color-border-light)" }}>
+        <div style={{ height: "100%", width: `${progress}%`, background: "var(--color-accent)", transition: "width 0.4s" }} />
+      </div>
+
       <div style={{ display: "flex" }}>
         {/* SIDEBAR — steps */}
         <aside style={{
-          width: 310, background: "white", borderRight: "1px solid #ececec",
-          minHeight: "calc(100vh - 72px)", padding: 35, flexShrink: 0,
-        }}>
-          <h3 style={{ marginBottom: 20, fontSize: 13, color: "#777", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+          width: "clamp(240px, 22vw, 290px)", background: "var(--color-bg-primary)",
+          borderRight: "1px solid var(--color-border-light)",
+          minHeight: "calc(100vh - 4px)", padding: "var(--space-xl)", flexShrink: 0,
+          display: "var(--sidebar-display, block)",
+        }} className="quest-sidebar">
+          <div style={{
+            fontSize: "var(--text-xs)", fontWeight: 800, color: "var(--color-text-tertiary)",
+            textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: "var(--space-m)",
+          }}>
             Путь проекта
-          </h3>
+          </div>
           {STEPS.map((s, i) => {
             const isActive = i === step;
             const isStepDone = completed.has(i);
             return (
               <div key={i}
-                onClick={() => { if (isStepDone || i <= Math.max(step, ...[...completed])) { setStep(i); } }}
+                onClick={() => { if (isStepDone || i <= Math.max(step, ...[...completed])) { setStep(i); setMobileSidebarOpen(false); } }}
                 style={{
-                  padding: 15, borderRadius: 0, marginBottom: 6, cursor: isStepDone || i <= step ? "pointer" : "default",
-                  background: isActive ? "#eef3ff" : "transparent",
-                  border: isActive ? "1px solid #d8e2ff" : "1px solid transparent",
-                  transition: "0.2s", opacity: i > step && !isStepDone ? 0.4 : 1,
+                  padding: "var(--space-s) var(--space-m)", borderRadius: 0, marginBottom: 4,
+                  cursor: isStepDone || i <= step ? "pointer" : "default",
+                  background: isActive ? "var(--color-accent-light)" : "transparent",
+                  border: isActive ? "1px solid var(--color-accent)" : "1px solid transparent",
+                  opacity: i > step && !isStepDone ? 0.35 : 1,
+                  transition: "background 0.15s",
                 }}>
-                <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 4, display: "flex", alignItems: "center", gap: 8 }}>
-                  {isStepDone ? <Check size={14} style={{ color: "var(--color-accent)" }} /> : <Circle size={14} style={{ color: isActive ? "var(--color-accent)" : "#ccc" }} />}
+                <div style={{ fontWeight: 600, fontSize: "var(--text-xs)", marginBottom: 2, display: "flex", alignItems: "center", gap: 8 }}>
+                  {isStepDone
+                    ? <Check size={14} style={{ color: "var(--color-accent)", flexShrink: 0 }} />
+                    : <Circle size={14} style={{ color: isActive ? "var(--color-accent)" : "var(--color-border)", flexShrink: 0 }} />
+                  }
                   {i + 1}. {s.title}
                 </div>
-                <div style={{ fontSize: 12, color: "#888" }}>{s.subtitle}</div>
+                <div style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>{s.subtitle}</div>
               </div>
             );
           })}
         </aside>
 
         {/* MAIN CONTENT */}
-        <main style={{ flex: 1, padding: 50, minWidth: 0 }}>
-          {/* Progress */}
-          <div style={{ height: 8, background: "#ececec", borderRadius: 0, overflow: "hidden", marginBottom: 20 }}>
-            <div style={{ height: "100%", width: `${progress}%`, background: current.color, transition: "width 0.4s" }} />
+        <main style={{ flex: 1, padding: "clamp(20px, 4vw, 50px)", minWidth: 0 }}>
+          {/* Mobile sidebar toggle */}
+          <div style={{ display: "none", marginBottom: "var(--space-m)" }} className="quest-mobile-toggle">
+            <button onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
+              style={{
+                display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 0,
+                border: "1px solid var(--color-border)", background: "var(--color-bg-primary)",
+                color: "var(--color-text-secondary)", cursor: "pointer", fontWeight: 600, fontSize: "var(--text-xs)",
+              }}>
+              <Hammer size={14} /> {mobileSidebarOpen ? "Скрыть шаги" : "Все шаги (" + STEPS.length + ")"}
+            </button>
           </div>
 
-          <div style={{ display: "inline-block", padding: "6px 14px", borderRadius: 0, background: `${current.color}15`, color: current.color, fontSize: 12, fontWeight: 600, marginBottom: 16 }}>
+          {/* Mobile sidebar dropdown */}
+          {mobileSidebarOpen && (
+            <div style={{ display: "none", marginBottom: "var(--space-m)", padding: "var(--space-m)", background: "var(--color-bg-primary)", border: "1px solid var(--color-border-light)" }} className="quest-mobile-sidebar">
+              {STEPS.map((s, i) => {
+                const isActive = i === step;
+                const isStepDone = completed.has(i);
+                return (
+                  <div key={i}
+                    onClick={() => { if (isStepDone || i <= step) { setStep(i); setMobileSidebarOpen(false); } }}
+                    style={{
+                      padding: "8px 12px", cursor: "pointer", fontWeight: isActive ? 700 : 500,
+                      fontSize: "var(--text-xs)", color: isActive ? "var(--color-accent)" : isStepDone ? "var(--color-success)" : "var(--color-text-secondary)",
+                    }}>
+                    {i + 1}. {s.title}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Step badge */}
+          <div style={{ display: "inline-block", padding: "4px 14px", borderRadius: 0, background: "var(--color-accent-light)", color: "var(--color-accent)", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: "var(--space-s)" }}>
             Шаг {step + 1} из {STEPS.length} · ~{current.time}
           </div>
 
-          <h1 style={{ fontSize: 38, fontWeight: 800, marginBottom: 12, letterSpacing: "-0.01em" }}>
+          <h1 style={{
+            fontSize: "var(--text-xxl)", fontWeight: 900, marginBottom: "var(--space-xs)",
+            fontFamily: "var(--font-heading)", letterSpacing: "-0.02em",
+          }}>
             {current.title}
           </h1>
-          <p style={{ fontSize: 17, lineHeight: 1.7, color: "#555", maxWidth: 700, marginBottom: 40 }}>
+          <p style={{ fontSize: "var(--text-s)", lineHeight: 1.7, color: "var(--color-text-secondary)", maxWidth: 700, marginBottom: "var(--space-xl)" }}>
             {current.detail}
           </p>
 
-          {/* Two columns */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: 35 }}>
-            {/* LEFT: Checklist + Why */}
+          {/* Grid: content + right panel */}
+          <div className="quest-grid" style={{ display: "grid", gridTemplateColumns: "1fr clamp(240px, 25%, 300px)", gap: "var(--space-xl)" }}>
+            {/* LEFT: Checklist + Why + Prompt */}
             <div>
-              {/* Checklist */}
               <div style={{
-                background: "white", borderRadius: 0, padding: 35,
-                border: "1px solid #ececec", marginBottom: 20,
+                background: "var(--color-bg-primary)", borderRadius: 0, padding: "var(--space-xl)",
+                border: "1px solid var(--color-border-light)", marginBottom: "var(--space-l)",
               }}>
-                <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 20 }}>Что нужно сделать</h2>
+                <h2 style={{ fontSize: "var(--text-l)", fontWeight: 700, marginBottom: "var(--space-m)", fontFamily: "var(--font-heading)" }}>Что нужно сделать</h2>
                 <div style={{ display: "flex", flexDirection: "column" }}>
                   {current.checklist.map((item, i) => (
                     <div key={i} style={{
                       display: "flex", alignItems: "flex-start", gap: 12,
-                      padding: "14px 0", borderBottom: i < current.checklist.length - 1 ? "1px solid #f2f2f2" : "none",
+                      padding: "var(--space-s) 0", borderBottom: i < current.checklist.length - 1 ? "1px solid var(--color-border-light)" : "none",
                     }}>
                       <div style={{
                         width: 22, height: 22, borderRadius: "50%", border: "2px solid var(--color-accent)",
                         display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1,
                       }} />
-                      <span style={{ lineHeight: 1.6, fontSize: 15 }}>{item}</span>
+                      <span style={{ lineHeight: 1.6, fontSize: "var(--text-s)" }}>{item}</span>
                     </div>
                   ))}
                 </div>
 
-                {/* Prompt */}
+                {/* Prompt block */}
                 {current.prompt && (
-                  <div style={{ marginTop: 20, padding: 20, background: "#f8f8f8", borderRadius: 0 }}>
-                    <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 8, color: "var(--color-accent)" }}>
+                  <div style={{ marginTop: "var(--space-m)", padding: "var(--space-m)", background: "var(--color-bg-secondary)", borderRadius: 0 }}>
+                    <div style={{ fontWeight: 600, fontSize: "var(--text-xs)", marginBottom: 8, color: "var(--color-accent)" }}>
                       <Sparkles size={14} style={{ display: "inline", marginRight: 4 }} /> Готовый промпт — скопируй и вставь в Cursor
                     </div>
-                    <div style={{ fontSize: 13, fontFamily: "monospace", whiteSpace: "pre-wrap", lineHeight: 1.7, color: "#444" }}>
+                    <div style={{ fontSize: "var(--text-xs)", fontFamily: "monospace", whiteSpace: "pre-wrap", lineHeight: 1.7, color: "var(--color-text-secondary)" }}>
                       {current.prompt}
                     </div>
                   </div>
@@ -207,25 +301,32 @@ export default function BeginnerPathClient() {
 
                 {/* Why */}
                 <div style={{
-                  marginTop: 20, padding: 20, background: "#FFF9EA", border: "1px solid #FFE29A", borderRadius: 0,
+                  marginTop: "var(--space-m)", padding: "var(--space-m)", background: "var(--color-warning-light)",
+                  border: "1px solid var(--color-warning)", borderRadius: 0,
                 }}>
-                  <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 8 }}>Почему это важно?</div>
-                  <div style={{ lineHeight: 1.7, color: "#666", fontSize: 14 }}>{current.why}</div>
+                  <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: 6 }}>Почему это важно?</div>
+                  <div style={{ lineHeight: 1.7, color: "var(--color-text-secondary)", fontSize: "var(--text-xs)" }}>{current.why}</div>
                 </div>
               </div>
 
-              {/* Navigation */}
-              <div style={{ display: "flex", gap: 10 }}>
+              {/* Nav buttons */}
+              <div style={{ display: "flex", gap: "var(--space-s)" }}>
                 {step > 0 && (
                   <button onClick={() => setStep(prev => prev - 1)}
-                    style={{ padding: "14px 24px", borderRadius: 0, border: "1px solid #ececec", background: "white", cursor: "pointer", fontWeight: 600, fontSize: 15 }}>
-                    <ChevronLeft size={16} style={{ display: "inline", marginRight: 4 }} /> Назад
+                    style={{
+                      padding: "var(--space-s) var(--space-l)", borderRadius: 0,
+                      border: "1px solid var(--color-border)", background: "var(--color-bg-primary)",
+                      cursor: "pointer", fontWeight: 600, fontSize: "var(--text-s)",
+                      display: "flex", alignItems: "center", gap: 6,
+                    }}>
+                    <ChevronLeft size={16} /> Назад
                   </button>
                 )}
                 <button onClick={handleComplete}
                   style={{
-                    flex: 1, padding: "14px 24px", borderRadius: 0, border: "none",
-                    background: current.color, color: "white", cursor: "pointer", fontWeight: 700, fontSize: 15,
+                    flex: 1, padding: "var(--space-s) var(--space-l)", borderRadius: 0, border: "none",
+                    background: "var(--color-accent)", color: "white", cursor: "pointer",
+                    fontWeight: 700, fontSize: "var(--text-s)",
                     display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
                   }}>
                   {isLast ? "Завершить маршрут" : "Готово, дальше"} <ChevronRight size={16} />
@@ -233,31 +334,31 @@ export default function BeginnerPathClient() {
               </div>
             </div>
 
-            {/* RIGHT: AI Architect + Results + Next */}
-            <div>
+            {/* RIGHT: Info panels */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-m)" }}>
               {/* AI Architect */}
-              <div style={{ background: "white", padding: 28, borderRadius: 0, border: "1px solid #ececec", marginBottom: 20 }}>
-                <h3 style={{ marginBottom: 12, fontSize: 16 }}>AI Архитектор</h3>
-                <p style={{ lineHeight: 1.7, color: "#666", fontSize: 14, marginBottom: 16 }}>
+              <div style={{ background: "var(--color-bg-primary)", padding: "var(--space-l)", borderRadius: 0, border: "1px solid var(--color-border-light)" }}>
+                <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: "var(--space-s)", fontFamily: "var(--font-heading)" }}>AI Архитектор</div>
+                <p style={{ lineHeight: 1.7, color: "var(--color-text-secondary)", fontSize: "var(--text-xs)", marginBottom: "var(--space-m)" }}>
                   Я сопровождаю тебя на протяжении всего маршрута. Моя задача — не писать код вместо тебя, а помогать принимать правильные инженерные решения.
                 </p>
                 <button onClick={handleComplete}
                   style={{
-                    display: "block", width: "100%", padding: 16, borderRadius: 0, border: "none",
-                    background: current.color, color: "white", fontWeight: 700, fontSize: 15, cursor: "pointer",
+                    display: "block", width: "100%", padding: "var(--space-s)", borderRadius: 0, border: "none",
+                    background: "var(--color-accent)", color: "white", fontWeight: 700, fontSize: "var(--text-xs)", cursor: "pointer",
                   }}>
-                  {isLast ? "Завершить" : "Начать этап"} <ArrowRight size={14} style={{ display: "inline", marginLeft: 4 }} />
+                  {isLast ? "Завершить" : "Начать этап →"}
                 </button>
               </div>
 
-              {/* After completion */}
-              <div style={{ background: "white", padding: 28, borderRadius: 0, border: "1px solid #ececec", marginBottom: 20 }}>
-                <h3 style={{ marginBottom: 12, fontSize: 16 }}>После завершения этапа</h3>
-                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                  {current.checklist.map((item, i) => (
-                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, color: "#555" }}>
-                      {completed.has(step) ? <Check size={14} style={{ color: "var(--color-accent)" }} /> : <Circle size={14} style={{ color: "#ddd" }} />}
-                      <span style={{ textDecoration: completed.has(step) ? "line-through" : "none", opacity: completed.has(step) ? 0.6 : 1 }}>{item}</span>
+              {/* Checklist status */}
+              <div style={{ background: "var(--color-bg-primary)", padding: "var(--space-l)", borderRadius: 0, border: "1px solid var(--color-border-light)" }}>
+                <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: "var(--space-s)", fontFamily: "var(--font-heading)" }}>После завершения</div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  {current.checklist.slice(0, 4).map((item, i) => (
+                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: "var(--text-xs)", color: "var(--color-text-secondary)" }}>
+                      {completed.has(step) ? <Check size={12} style={{ color: "var(--color-accent)", flexShrink: 0 }} /> : <Circle size={12} style={{ color: "var(--color-border)", flexShrink: 0 }} />}
+                      <span style={{ opacity: completed.has(step) ? 0.6 : 1 }}>{item}</span>
                     </div>
                   ))}
                 </div>
@@ -266,23 +367,37 @@ export default function BeginnerPathClient() {
               {/* Next step */}
               {!isLast && (
                 <div style={{
-                  padding: 18, background: "#EEF8F2", borderRadius: 0,
-                  fontSize: 14, lineHeight: 1.6, color: "#444",
+                  padding: "var(--space-m)", background: "var(--color-success-light)", borderRadius: 0,
+                  border: "1px solid var(--color-success)", fontSize: "var(--text-xs)",
+                  lineHeight: 1.6, color: "var(--color-text-secondary)",
                 }}>
-                  <strong style={{ display: "block", marginBottom: 6, fontSize: 13, color: "#065f46" }}>Следующий этап</strong>
+                  <div style={{ fontWeight: 700, fontSize: "var(--text-xs)", marginBottom: 4, color: "var(--color-success)" }}>Следующий этап</div>
                   {STEPS[step + 1]?.title} — {STEPS[step + 1]?.subtitle}
                 </div>
               )}
 
               {/* Result */}
-              <div style={{ marginTop: 15, padding: 15, background: "#f8f8f8", borderRadius: 0, fontSize: 13, lineHeight: 1.6, color: "#666" }}>
-                <strong style={{ display: "block", marginBottom: 6, color: "#444" }}>Результат этапа</strong>
+              <div style={{
+                padding: "var(--space-m)", background: "var(--color-bg-secondary)", borderRadius: 0,
+                fontSize: "var(--text-xs)", lineHeight: 1.6, color: "var(--color-text-secondary)",
+              }}>
+                <div style={{ fontWeight: 700, fontSize: "var(--text-xs)", marginBottom: 4, color: "var(--color-text-primary)" }}>Результат этапа</div>
                 {current.result}
               </div>
             </div>
           </div>
         </main>
       </div>
+
+      {/* Responsive CSS */}
+      <style>{`
+        @media (max-width: 768px) {
+          .quest-sidebar { display: none !important; }
+          .quest-mobile-toggle { display: block !important; }
+          .quest-mobile-sidebar { display: block !important; }
+          .quest-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </div>
   );
 }
