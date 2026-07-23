@@ -2,99 +2,157 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowRight, Check, Sparkles, ChevronLeft, ChevronRight, Circle, ExternalLink } from "lucide-react";
+import { ArrowRight, Check, Sparkles, Monitor, Terminal, Globe, Download, Cloud, ChevronRight, ChevronLeft } from "lucide-react";
 
 const STEPS = [
   {
     title: "Подготовка инструментов",
-    subtitle: "Устанавливаем базу для работы",
     time: "10 мин",
+    icon: Download,
     color: "#f59e0b",
-    detail: `Для AI-разработки нужны три бесплатных инструмента. Не пропускай этот шаг — без них ничего не заработает.`,
-    checklist: [
-      "Скачать и установить Cursor с cursor.com (Windows/Mac/Linux)",
-      "Установить Node.js (LTS) с nodejs.org",
-      "Зарегистрироваться на github.com",
+    content: `Твой путь в AI-разработку начинается с трёх инструментов. Все бесплатные — ты не потратишь ни рубля.
+
+🖥️ Cursor — это редактор кода со встроенным ИИ. Представь себе VS Code, но с ChatGPT внутри. Ты пишешь что хочешь сделать, а ИИ создаёт код. Скачай с cursor.com. Windows, Mac, Linux — всё поддерживается.
+
+⚡ Node.js — движок, на котором работает современный веб. Без него твой код просто текст. Скачай LTS-версию (Long Term Support — самая стабильная) с nodejs.org. После установки открой терминал и проверь: node -v (должен показать версию, например v20.11).
+
+☁️ GitHub — облако для хранения кода. Представь Google Drive, но для программистов. Зарегистрируйся на github.com (нужен email). Позже ты будешь хранить там все свои проекты.
+
+Почему именно эти три? Cursor даёт ИИ-помощника. Node.js даёт среду запуска. GitHub даёт сохранность. Без любого из этих трёх — разработка превращается в боль.`,
+    question: "Всё установлено?",
+    options: [
+      { id: "done", text: "✅ Cursor, Node.js и GitHub готовы — идём дальше", action: "next" },
+      { id: "help", text: "Нужна помощь с установкой", action: "explain" },
     ],
-    why: "Cursor даёт ИИ-помощника прямо в редакторе кода. Node.js — движок для запуска JavaScript. GitHub — облачное хранилище, чтобы код не потерялся. Без любого из трёх — разработка превращается в боль.",
-    next: "Создаём первый сайт через AI-промпт",
-    result: "Все инструменты установлены и готовы к работе",
   },
   {
     title: "Первый сайт через AI",
-    subtitle: "Пишем не код, а промпт",
     time: "15 мин",
+    icon: Monitor,
     color: "#3b82f6",
-    detail: "Ты создашь сайт, не написав ни строчки кода. Только один текстовый промпт. ИИ сделает всё остальное.",
-    checklist: [
-      "Открыть Cursor → Ctrl+I (Mac: Cmd+I)",
-      "Скопировать готовый промпт (ниже) и вставить в чат",
-      "Выполнить команды из терминала: npm install, npm run dev",
-      "Открыть http://localhost:3000 — сайт работает!",
+    content: `Сейчас ты создашь свой первый сайт. Не написав ни строчки кода. Только один промпт.
+
+Открой Cursor. Нажми Ctrl+I (на Mac: Cmd+I). Откроется AI-чат. Это твой главный инструмент — ты будешь писать сюда задачи, а ИИ будет создавать код.
+
+Скопируй этот промпт и вставь в чат:
+
+---
+Действуй как опытный frontend-разработчик. Создай новый проект на Next.js (App Router) с Tailwind CSS. Сделай одностраничный сайт-визитку для Мастерской по ремонту телефонов.
+
+Структура страницы:
+• Шапка с названием «Мастерская Телефончик» и номером +7 999 123-45-67
+• Секция «Наши услуги» с 3 карточками:
+  - Замена экрана — 2 500 ₽
+  - Замена батареи — 1 500 ₽
+  - Диагностика — Бесплатно
+• Простая форма заявки (Имя, Телефон, кнопка Отправить)
+• Подвал с копирайтом «© 2026 Мастерская Телефончик»
+
+Дизайн: современный, тёмные тона. Напиши ВСЕ команды для терминала — я новичок и хочу просто скопировать и вставить.
+---
+
+ИИ начнёт создавать файлы. В терминале Cursor (Ctrl+\`) появятся команды — выполняй их по одной. Обычно это:
+1. npm install (установить зависимости)
+2. npm run dev (запустить сервер)
+
+Открой браузер → http://localhost:3000. Ты увидишь свой сайт. Настоящий, работающий сайт. На твоём компьютере.`,
+    question: "Сайт открылся в браузере?",
+    options: [
+      { id: "works", text: "✅ Вижу сайт на localhost:3000 — работает!", action: "next" },
+      { id: "error", text: "Что-то пошло не так — ошибка", action: "explain" },
     ],
-    prompt: `Действуй как frontend-разработчик. Создай проект Next.js с Tailwind. Сделай сайт-визитку для Мастерской по ремонту телефонов. Шапка с названием и телефоном, 3 карточки услуг с ценами, форма заявки (Имя, Телефон), подвал. Тёмный дизайн. Напиши ВСЕ команды для терминала.`,
-    why: "Правильный промпт = 90% успеха. Мы даём ИИ роль, стек, структуру и пример. Он создаёт код, ты — запускаешь. Через 5 минут у тебя работающий сайт.",
-    next: "Учимся менять сайт через ИИ",
-    result: "Сайт открывается в браузере на localhost:3000",
   },
   {
     title: "Правки через ИИ",
-    subtitle: "Не пишем код — описываем изменения",
     time: "10 мин",
+    icon: Terminal,
     color: "#8b5cf6",
-    detail: "Главное правило: ты не правишь код руками. Ты описываешь ИИ что изменить, а он меняет файлы сам. Это быстрее и безопаснее.",
-    checklist: [
-      "В том же чате Cursor написать промпт для правок (ниже)",
-      "Дождаться пока ИИ изменит файлы",
-      "Обновить страницу в браузере (F5)",
-      "Проверить: карточки увеличиваются при наведении? Валидация работает?",
+    content: `Сайт работает. Теперь научимся его менять — не переписывая код руками.
+
+Главное правило AI-разработки: ты не правишь код. Ты описываешь ИИ что изменить, а он меняет файлы сам.
+
+В том же чате Cursor напиши новый промпт:
+
+---
+Сайт работает, спасибо. Улучши его:
+
+1. В секции «Наши услуги» сделай hover-эффект: при наведении курсора карточка услуги немного увеличивается и появляется тень.
+2. В форму заявки добавь проверку: поле «Телефон» обязательно для заполнения. Если пользователь не заполнил — покажи сообщение об ошибке.
+3. Покажи мне какие именно файлы ты изменил и объясни изменения простыми словами (я новичок).
+---
+
+Нажми Enter. ИИ прочитает твой код, найдёт нужные файлы и внесёт правки. Обнови страницу в браузере (F5) и проверь: наведи курсор на карточку — она увеличивается? Попробуй отправить пустую форму — показывает ошибку?
+
+Ты только что сделал итерацию. Это основа AI-разработки: написал → проверил → попросил улучшить → проверил снова. Не бойся просить ИИ переделать — он не устаёт.`,
+    question: "Изменения работают?",
+    options: [
+      { id: "works", text: "✅ Карточки увеличиваются, валидация работает", action: "next" },
+      { id: "not_sure", text: "Изменений не вижу", action: "explain" },
     ],
-    prompt: `Сайт работает. Улучши его: 1) В карточках услуг — hover-эффект (увеличение + тень). 2) В форме — поле Телефон обязательно. Покажи какие файлы изменил и объясни простыми словами.`,
-    why: "Итеративная разработка — это цикл: написал → проверил → попросил улучшить. Не бойся просить ИИ переделать — он не устаёт. Каждая итерация занимает 2-3 минуты.",
-    next: "Сохраняем код в облако",
-    result: "Карточки анимируются, форма проверяет телефон",
   },
   {
-    title: "Сохранить на GitHub",
-    subtitle: "Код в безопасности",
+    title: "Сохранить код на GitHub",
     time: "10 мин",
+    icon: Cloud,
     color: "#22c55e",
-    detail: "Git — машина времени для проекта. GitHub — облако где хранятся все версии. Если компьютер сломается — код не пропадёт.",
-    checklist: [
-      "Создать репозиторий на GitHub (кнопка New)",
-      "Спросить ИИ: «Дай 4 команды для git init, add, commit, push»",
-      "Выполнить команды в терминале Cursor (Ctrl+`)",
-      "Проверить: файлы видны на github.com",
+    content: `Ты создал сайт. Он работает на твоём компьютере. Но если компьютер сломается — всё пропадёт. Научимся сохранять код.
+
+Git — это машина времени для твоего проекта. Ты делаешь «снимок» кода, и можешь вернуться к нему в любой момент. GitHub — это облако, где эти снимки хранятся.
+
+Шаг 1: Создай репозиторий на GitHub. Зайди на github.com → кнопка New → название my-ai-website → Create repository. Скопируй ссылку (она выглядит как https://github.com/твой-логин/my-ai-website.git).
+
+Шаг 2: В терминале Cursor (Ctrl+\`) выполни команды, которые даст ИИ. Спроси его так:
+
+---
+Я новичок. Дай мне ровно 4 команды для терминала:
+1. Инициализировать Git в этой папке
+2. Сохранить все файлы
+3. Привязать к моему GitHub-репозиторию (ссылка: https://github.com/...)
+4. Отправить код на GitHub
+Объясни каждую команду простыми словами.
+---
+
+Выполни команды. Зайди на github.com в свой репозиторий — видишь файлы? Твой код теперь в безопасности.`,
+    question: "Код на GitHub?",
+    options: [
+      { id: "done", text: "✅ Файлы видны в репозитории на GitHub", action: "next" },
+      { id: "help", text: "Не получается — ошибка при git push", action: "explain" },
     ],
-    why: "Без Git ты потеряешь код при первой ошибке. С Git ты можешь откатиться на любую версию. GitHub хранит копию в облаке — доступно с любого компьютера.",
-    next: "Публикуем сайт в интернет",
-    result: "Код в репозитории на GitHub",
   },
   {
     title: "Сайт в интернете",
-    subtitle: "Деплой на Vercel",
     time: "10 мин",
+    icon: Globe,
     color: "#ef4444",
-    detail: "Твой сайт работает локально. Сейчас он станет доступен всему миру. Vercel — бесплатный хостинг для Next.js проектов.",
-    checklist: [
-      "Зайти на vercel.com → войти через GitHub",
-      "Import Repository → выбрать проект → Deploy",
-      "Подождать 1-2 минуты сборки",
-      "Открыть ссылку вида проект.vercel.app — сайт в интернете!",
+    content: `Последний шаг. Твой сайт работает локально. Сделаем так чтобы он был доступен всему миру.
+
+Vercel — это бесплатный хостинг для Next.js. Он сам берёт код из GitHub и публикует его в интернете. Никаких серверов, никаких настроек — просто подключи репозиторий.
+
+Шаг 1: Зайди на vercel.com → нажми Sign Up → войди через GitHub (кнопка Continue with GitHub).
+
+Шаг 2: Нажми Import Repository → выбери my-ai-website → нажми Deploy. Никакие настройки менять не нужно — Vercel сам определит что это Next.js и соберёт проект.
+
+Шаг 3: Подожди 1-2 минуты. Vercel покажет ссылку вида my-ai-website.vercel.app. Открой её. Открой с телефона. Отправь другу.
+
+Твой сайт в интернете. Настоящий. Работающий. Доступный всем. Ты прошёл путь от пустого экрана до работающего сайта за час. Это и есть AI-разработка.`,
+    question: "Сайт открывается по ссылке в интернете?",
+    options: [
+      { id: "live", text: "🎉 Да! Мой сайт в интернете — я могу показать его кому угодно", action: "next" },
+      { id: "stuck", text: "Что-то пошло не так", action: "explain" },
     ],
-    why: "Vercel автоматически собирает и публикует проект. Никаких серверов, никаких настроек. Ты просто подключаешь репозиторий — и сайт в интернете. Бесплатный домен, автоматический HTTPS.",
-    next: "Ты прошёл весь путь!",
-    result: "Сайт доступен по ссылке в интернете",
   },
 ];
 
-export default function BeginnerPathClient() {
+export default function BeginnerPathClient({ nodes }: any) {
   const [step, setStep] = useState(0);
+  const [selectedOption, setSelectedOption] = useState("");
   const [completed, setCompleted] = useState<Set<number>>(new Set());
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiResponse, setAiResponse] = useState("");
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem("beginner-path-v3");
+      const saved = localStorage.getItem("beginner-path-v2");
       if (saved) {
         const data = JSON.parse(saved);
         if (data.step) setStep(data.step);
@@ -104,202 +162,222 @@ export default function BeginnerPathClient() {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("beginner-path-v3", JSON.stringify({ step, completed: [...completed] }));
+    localStorage.setItem("beginner-path-v2", JSON.stringify({ step, completed: [...completed] }));
   }, [step, completed]);
 
   const current = STEPS[step];
   const isLast = step >= STEPS.length - 1;
-  const progress = Math.round(((completed.size) / STEPS.length) * 100);
+  const isDone = completed.has(step);
+  const option = current?.options?.find((o: any) => o.id === selectedOption);
+  const progress = Math.round(((step + 1) / STEPS.length) * 100);
 
-  function handleComplete() {
+  async function handleExplain() {
+    setAiLoading(true);
+    setAiResponse("");
+    try {
+      const res = await fetch("/api/ai/ask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          systemPrompt: "Ты — терпеливый наставник. Объясни пошагово что делать. Дай точные команды для терминала. Говори на русском, дружелюбно, как другу. Используй простые слова. Если пользователь на Windows — адаптируй инструкции.",
+          userMessage: `Я на шаге «${current.title}». Мой ответ: «${option?.text || "Нужна помощь"}». Объясни подробнее что делать.`,
+        }),
+      });
+      const data = await res.json();
+      setAiResponse(data.reply || "Попробуй ещё раз — я с тобой!");
+    } catch {
+      setAiResponse("Попробуй ещё раз — я с тобой!");
+    }
+    setAiLoading(false);
+  }
+
+  function handleNext() {
     setCompleted(prev => new Set([...prev, step]));
+    setSelectedOption("");
+    setAiResponse("");
     if (!isLast) setStep(prev => prev + 1);
   }
 
+  function handlePrev() {
+    if (step > 0) { setStep(prev => prev - 1); setSelectedOption(""); setAiResponse(""); }
+  }
+
+  if (!current) {
+    return (
+      <div style={{ minHeight: "100vh", background: "var(--color-bg-secondary)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 40, textAlign: "center" }}>
+        <div style={{ fontSize: 64, marginBottom: 16 }}>🎉</div>
+        <h1 style={{ fontSize: 32, fontWeight: 900, fontFamily: "var(--font-heading)", marginBottom: 8 }}>Ты прошёл весь путь!</h1>
+        <p style={{ fontSize: "var(--text-m)", color: "var(--color-text-secondary)", maxWidth: 500, lineHeight: 1.7, marginBottom: 24 }}>
+          От идеи до сайта в интернете за час. Ты научился: устанавливать инструменты → создавать сайт через AI-промпт → править код через ИИ → сохранять в Git → публиковать на Vercel.
+        </p>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button onClick={() => { setStep(0); setCompleted(new Set()); localStorage.removeItem("beginner-path-v2"); }}
+            style={{ padding: "12px 24px", borderRadius: 0, border: "1px solid var(--color-border)", background: "white", cursor: "pointer", fontWeight: 600 }}>
+            Пройти заново
+          </button>
+          <a href="/quest/services-site" style={{ display: "flex", alignItems: "center", gap: 6, padding: "12px 24px", borderRadius: 0, background: "var(--color-accent)", color: "white", textDecoration: "none", fontWeight: 700 }}>
+            Следующий уровень <ArrowRight size={14} />
+          </a>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div style={{ minHeight: "100vh", background: "#fafafa", fontFamily: "var(--font-body)" }}>
-      {/* Header */}
-      <header style={{
-        height: 72, background: "white", display: "flex", alignItems: "center", justifyContent: "space-between",
-        padding: "0 40px", borderBottom: "1px solid #ececec", position: "sticky", top: 0, zIndex: 50,
-      }}>
-        <Link href="/" style={{ fontSize: 22, fontWeight: 800, textDecoration: "none", color: "#222" }}>
-          Карта <span style={{ color: "var(--color-accent)" }}>роста</span>
-        </Link>
-        <div style={{ display: "flex", alignItems: "center", gap: 15 }}>
-          <div style={{ textAlign: "right" }}>
-            <div style={{ fontWeight: 600, fontSize: 14 }}>Путь новичка</div>
-            <div style={{ fontSize: 12, color: "#888" }}>AI-разработка с нуля</div>
+    <div style={{ minHeight: "100vh", background: "var(--color-bg-secondary)" }}>
+      {/* Progress bar */}
+      <div style={{ position: "sticky", top: 0, zIndex: 50, height: 4, background: "var(--color-border-light)" }}>
+        <div style={{ height: "100%", background: current.color, width: `${progress}%`, transition: "width 0.4s" }} />
+      </div>
+
+      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "var(--space-xl) var(--space-m)" }}>
+        <div className="quest-layout" style={{ display: "flex", gap: "var(--space-xl)", alignItems: "flex-start", flexWrap: "wrap" }}>
+        {/* LEFT: Step content */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          {/* Step header */}
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: "var(--space-l)" }}>
+            <div style={{ width: 48, height: 48, borderRadius: "50%", background: current.color, color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 800, flexShrink: 0 }}>
+              {step + 1}
+            </div>
+            <div>
+              <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", fontWeight: 600 }}>
+                Шаг {step + 1} из {STEPS.length} · ~{current.time}
+              </div>
+              <h2 style={{ fontSize: "var(--text-xl)", fontWeight: 900, fontFamily: "var(--font-heading)", margin: "4px 0 0" }}>
+                {current.title}
+              </h2>
+            </div>
           </div>
-          <div style={{ width: 42, height: 42, borderRadius: "50%", background: "var(--color-accent)", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontWeight: 800, fontSize: 16 }}>
-            {completed.size}/{STEPS.length}
+
+          {/* Content */}
+          <div style={{
+            padding: "var(--space-l)", background: "var(--color-bg-primary)", border: "1px solid var(--color-border-light)",
+            borderLeft: `4px solid ${current.color}`, borderRadius: 0, marginBottom: "var(--space-l)",
+            fontSize: "var(--text-s)", color: "var(--color-text-primary)", lineHeight: 1.8, whiteSpace: "pre-wrap",
+          }}>
+            {current.content}
+          </div>
+
+          {/* Question */}
+          <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: "var(--space-s)", color: "var(--color-text-primary)" }}>
+            {current.question}
+          </div>
+
+          {/* Options */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)", marginBottom: "var(--space-l)" }}>
+            {current.options.map((opt: any) => {
+              const isSelected = selectedOption === opt.id;
+              return (
+                <button key={opt.id}
+                  onClick={() => setSelectedOption(opt.id)}
+                  disabled={isDone}
+                  style={{
+                    textAlign: "left", padding: "var(--space-m)", borderRadius: 0,
+                    border: isSelected ? `2px solid ${current.color}` : "1px solid var(--color-border-light)",
+                    background: isSelected ? `${current.color}10` : "var(--color-bg-primary)",
+                    cursor: isDone ? "default" : "pointer",
+                    opacity: isDone && !isSelected ? 0.5 : 1,
+                    display: "flex", alignItems: "flex-start", gap: 10,
+                  }}>
+                  <div style={{ width: 24, height: 24, borderRadius: "50%", border: `2px solid ${isSelected ? current.color : "var(--color-border)"}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 2 }}>
+                    {isSelected && <Check size={14} style={{ color: current.color }} />}
+                  </div>
+                  <span style={{ fontWeight: 600, fontSize: "var(--text-s)" }}>{opt.text}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Action buttons */}
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: "var(--space-l)" }}>
+            {step > 0 && (
+              <button onClick={handlePrev}
+                style={{ display: "flex", alignItems: "center", gap: 4, padding: "10px 20px", borderRadius: 0, border: "1px solid var(--color-border)", background: "white", cursor: "pointer", fontWeight: 600, fontSize: "var(--text-s)" }}>
+                <ChevronLeft size={16} /> Назад
+              </button>
+            )}
+
+            {selectedOption && option?.action === "explain" && !aiResponse && (
+              <button onClick={handleExplain} disabled={aiLoading}
+                style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 20px", borderRadius: 0, background: current.color, color: "white", border: "none", cursor: "pointer", fontWeight: 700, fontSize: "var(--text-s)" }}>
+                <Sparkles size={16} /> {aiLoading ? "Думает..." : "Объясни подробнее"}
+              </button>
+            )}
+
+            {(aiResponse || isDone || (selectedOption && option?.action === "next")) && (
+              <button onClick={handleNext}
+                style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 20px", borderRadius: 0, background: "var(--color-accent)", color: "white", border: "none", cursor: "pointer", fontWeight: 700, fontSize: "var(--text-s)" }}>
+                {isLast ? "Завершить" : "Дальше"} <ChevronRight size={16} />
+              </button>
+            )}
+          </div>
+
+          {/* AI response */}
+          {aiResponse && (
+            <div style={{ padding: "var(--space-m)", background: `${current.color}10`, borderRadius: 0, border: `1px solid ${current.color}30`, marginBottom: "var(--space-l)" }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: current.color, marginBottom: 6 }}>
+                <Sparkles size={14} style={{ display: "inline", marginRight: 4 }} /> Ответ от AI-наставника
+              </div>
+              <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{aiResponse}</div>
+            </div>
+          )}
+        </div>
+
+        {/* RIGHT: Progress map */}
+        <div style={{
+          width: 220, flexShrink: 0, position: "sticky", top: 24,
+          padding: "var(--space-m)", background: "var(--color-bg-primary)",
+          border: "1px solid var(--color-border-light)", borderRadius: 0,
+        }}>
+          <div style={{ fontSize: 11, fontWeight: 800, color: "var(--color-text-tertiary)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "var(--space-m)" }}>
+            Карта пути
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+            {STEPS.map((s, i) => {
+              const isActive = i === step;
+              const isStepDone = completed.has(i);
+              return (
+                <button key={i}
+                  onClick={() => { if (isStepDone || i <= step) { setStep(i); setSelectedOption(""); setAiResponse(""); } }}
+                  style={{
+                    textAlign: "left", background: "none", border: "none", cursor: isStepDone || i <= step ? "pointer" : "default",
+                    padding: 0, display: "flex", gap: 0, minHeight: 56,
+                  }}>
+                  {/* Vertical line + circle */}
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 32, flexShrink: 0 }}>
+                    <div style={{
+                      width: isActive ? 32 : 28, height: isActive ? 32 : 28, borderRadius: "50%",
+                      background: isStepDone ? s.color : isActive ? s.color : "var(--color-border-light)",
+                      border: isActive && !isStepDone ? `3px solid ${s.color}40` : "none",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      color: isStepDone || isActive ? "white" : "var(--color-text-tertiary)",
+                      fontWeight: 800, fontSize: 12, transition: "all 0.2s",
+                    }}>
+                      {isStepDone ? <Check size={14} /> : i + 1}
+                    </div>
+                    {i < STEPS.length - 1 && (
+                      <div style={{ width: 2, flex: 1, minHeight: 12, background: isStepDone ? s.color : "var(--color-border-light)", opacity: 0.3 }} />
+                    )}
+                  </div>
+                  {/* Label */}
+                  <div style={{ padding: "8px 0 8px 10px", flex: 1 }}>
+                    <div style={{
+                      fontSize: 11, fontWeight: isActive ? 700 : 500,
+                      color: isStepDone ? s.color : isActive ? s.color : "var(--color-text-tertiary)",
+                      lineHeight: 1.3,
+                    }}>
+                      {s.title}
+                    </div>
+                    <div style={{ fontSize: 9, color: "var(--color-text-tertiary)", marginTop: 2 }}>{s.time}</div>
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </div>
-      </header>
-
-      <div style={{ display: "flex" }}>
-        {/* SIDEBAR — steps */}
-        <aside style={{
-          width: 310, background: "white", borderRight: "1px solid #ececec",
-          minHeight: "calc(100vh - 72px)", padding: 35, flexShrink: 0,
-        }}>
-          <h3 style={{ marginBottom: 20, fontSize: 13, color: "#777", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>
-            Путь проекта
-          </h3>
-          {STEPS.map((s, i) => {
-            const isActive = i === step;
-            const isStepDone = completed.has(i);
-            return (
-              <div key={i}
-                onClick={() => { if (isStepDone || i <= Math.max(step, ...[...completed])) { setStep(i); } }}
-                style={{
-                  padding: 15, borderRadius: 0, marginBottom: 6, cursor: isStepDone || i <= step ? "pointer" : "default",
-                  background: isActive ? "#eef3ff" : "transparent",
-                  border: isActive ? "1px solid #d8e2ff" : "1px solid transparent",
-                  transition: "0.2s", opacity: i > step && !isStepDone ? 0.4 : 1,
-                }}>
-                <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 4, display: "flex", alignItems: "center", gap: 8 }}>
-                  {isStepDone ? <Check size={14} style={{ color: "var(--color-accent)" }} /> : <Circle size={14} style={{ color: isActive ? "var(--color-accent)" : "#ccc" }} />}
-                  {i + 1}. {s.title}
-                </div>
-                <div style={{ fontSize: 12, color: "#888" }}>{s.subtitle}</div>
-              </div>
-            );
-          })}
-        </aside>
-
-        {/* MAIN CONTENT */}
-        <main style={{ flex: 1, padding: 50, minWidth: 0 }}>
-          {/* Progress */}
-          <div style={{ height: 8, background: "#ececec", borderRadius: 0, overflow: "hidden", marginBottom: 20 }}>
-            <div style={{ height: "100%", width: `${progress}%`, background: current.color, transition: "width 0.4s" }} />
-          </div>
-
-          <div style={{ display: "inline-block", padding: "6px 14px", borderRadius: 0, background: `${current.color}15`, color: current.color, fontSize: 12, fontWeight: 600, marginBottom: 16 }}>
-            Шаг {step + 1} из {STEPS.length} · ~{current.time}
-          </div>
-
-          <h1 style={{ fontSize: 38, fontWeight: 800, marginBottom: 12, letterSpacing: "-0.01em" }}>
-            {current.title}
-          </h1>
-          <p style={{ fontSize: 17, lineHeight: 1.7, color: "#555", maxWidth: 700, marginBottom: 40 }}>
-            {current.detail}
-          </p>
-
-          {/* Two columns */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: 35 }}>
-            {/* LEFT: Checklist + Why */}
-            <div>
-              {/* Checklist */}
-              <div style={{
-                background: "white", borderRadius: 0, padding: 35,
-                border: "1px solid #ececec", marginBottom: 20,
-              }}>
-                <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 20 }}>Что нужно сделать</h2>
-                <div style={{ display: "flex", flexDirection: "column" }}>
-                  {current.checklist.map((item, i) => (
-                    <div key={i} style={{
-                      display: "flex", alignItems: "flex-start", gap: 12,
-                      padding: "14px 0", borderBottom: i < current.checklist.length - 1 ? "1px solid #f2f2f2" : "none",
-                    }}>
-                      <div style={{
-                        width: 22, height: 22, borderRadius: "50%", border: "2px solid var(--color-accent)",
-                        display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1,
-                      }} />
-                      <span style={{ lineHeight: 1.6, fontSize: 15 }}>{item}</span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Prompt */}
-                {current.prompt && (
-                  <div style={{ marginTop: 20, padding: 20, background: "#f8f8f8", borderRadius: 0 }}>
-                    <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 8, color: "var(--color-accent)" }}>
-                      <Sparkles size={14} style={{ display: "inline", marginRight: 4 }} /> Готовый промпт — скопируй и вставь в Cursor
-                    </div>
-                    <div style={{ fontSize: 13, fontFamily: "monospace", whiteSpace: "pre-wrap", lineHeight: 1.7, color: "#444" }}>
-                      {current.prompt}
-                    </div>
-                  </div>
-                )}
-
-                {/* Why */}
-                <div style={{
-                  marginTop: 20, padding: 20, background: "#FFF9EA", border: "1px solid #FFE29A", borderRadius: 0,
-                }}>
-                  <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 8 }}>Почему это важно?</div>
-                  <div style={{ lineHeight: 1.7, color: "#666", fontSize: 14 }}>{current.why}</div>
-                </div>
-              </div>
-
-              {/* Navigation */}
-              <div style={{ display: "flex", gap: 10 }}>
-                {step > 0 && (
-                  <button onClick={() => setStep(prev => prev - 1)}
-                    style={{ padding: "14px 24px", borderRadius: 0, border: "1px solid #ececec", background: "white", cursor: "pointer", fontWeight: 600, fontSize: 15 }}>
-                    <ChevronLeft size={16} style={{ display: "inline", marginRight: 4 }} /> Назад
-                  </button>
-                )}
-                <button onClick={handleComplete}
-                  style={{
-                    flex: 1, padding: "14px 24px", borderRadius: 0, border: "none",
-                    background: current.color, color: "white", cursor: "pointer", fontWeight: 700, fontSize: 15,
-                    display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-                  }}>
-                  {isLast ? "Завершить маршрут" : "Готово, дальше"} <ChevronRight size={16} />
-                </button>
-              </div>
-            </div>
-
-            {/* RIGHT: AI Architect + Results + Next */}
-            <div>
-              {/* AI Architect */}
-              <div style={{ background: "white", padding: 28, borderRadius: 0, border: "1px solid #ececec", marginBottom: 20 }}>
-                <h3 style={{ marginBottom: 12, fontSize: 16 }}>AI Архитектор</h3>
-                <p style={{ lineHeight: 1.7, color: "#666", fontSize: 14, marginBottom: 16 }}>
-                  Я сопровождаю тебя на протяжении всего маршрута. Моя задача — не писать код вместо тебя, а помогать принимать правильные инженерные решения.
-                </p>
-                <button onClick={handleComplete}
-                  style={{
-                    display: "block", width: "100%", padding: 16, borderRadius: 0, border: "none",
-                    background: current.color, color: "white", fontWeight: 700, fontSize: 15, cursor: "pointer",
-                  }}>
-                  {isLast ? "Завершить" : "Начать этап"} <ArrowRight size={14} style={{ display: "inline", marginLeft: 4 }} />
-                </button>
-              </div>
-
-              {/* After completion */}
-              <div style={{ background: "white", padding: 28, borderRadius: 0, border: "1px solid #ececec", marginBottom: 20 }}>
-                <h3 style={{ marginBottom: 12, fontSize: 16 }}>После завершения этапа</h3>
-                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                  {current.checklist.map((item, i) => (
-                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, color: "#555" }}>
-                      {completed.has(step) ? <Check size={14} style={{ color: "var(--color-accent)" }} /> : <Circle size={14} style={{ color: "#ddd" }} />}
-                      <span style={{ textDecoration: completed.has(step) ? "line-through" : "none", opacity: completed.has(step) ? 0.6 : 1 }}>{item}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Next step */}
-              {!isLast && (
-                <div style={{
-                  padding: 18, background: "#EEF8F2", borderRadius: 0,
-                  fontSize: 14, lineHeight: 1.6, color: "#444",
-                }}>
-                  <strong style={{ display: "block", marginBottom: 6, fontSize: 13, color: "#065f46" }}>Следующий этап</strong>
-                  {STEPS[step + 1]?.title} — {STEPS[step + 1]?.subtitle}
-                </div>
-              )}
-
-              {/* Result */}
-              <div style={{ marginTop: 15, padding: 15, background: "#f8f8f8", borderRadius: 0, fontSize: 13, lineHeight: 1.6, color: "#666" }}>
-                <strong style={{ display: "block", marginBottom: 6, color: "#444" }}>Результат этапа</strong>
-                {current.result}
-              </div>
-            </div>
-          </div>
-        </main>
+      
+      <style>{}</style>
+</div>
       </div>
     </div>
   );
