@@ -2,6 +2,7 @@
 import { Star, ExternalLink, ArrowLeft, Check, X, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 import RelatedSidebar from "@/components/layout/related-sidebar";
+import SaveButton from "@/components/layout/save-button";
 import Breadcrumbs from "@/components/nav/breadcrumbs";
 
 export default function MCPDetailClient({ server }: any) {
@@ -13,9 +14,9 @@ export default function MCPDetailClient({ server }: any) {
     <div style={{ maxWidth: 1100, margin: "0 auto", padding: "var(--space-xl) var(--space-m)", display: "flex", gap: "var(--space-xl)", alignItems: "flex-start" }}>
       <div style={{ flex: 1, minWidth: 0 }}>
       <Breadcrumbs pathname={`/mcp/${server.slug}`} pageTitle={server.name} />
-      <Link href="/mcp" style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: "var(--text-s)", color: "var(--color-text-secondary)", textDecoration: "none", marginBottom: "var(--space-l)" }}>
+      <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}><SaveButton entityType="mcp" entitySlug={server.slug} isLoggedIn={false} /><Link href="/mcp" style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: "var(--text-s)", color: "var(--color-text-secondary)", textDecoration: "none", marginBottom: "var(--space-l)" }}>
         <ArrowLeft size={14} /> Назад к каталогу
-      </Link>
+      </Link></div>
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "var(--space-m)" }}>
         <div>

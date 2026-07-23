@@ -26,6 +26,7 @@ model User {
   website    String   @default("")
   publicProfile Boolean @default(false)
   projects  Project[]
+  collections UserCollection[]
   favorites Favorite[]
   posts       BlogPost[]
   @@map("users")
@@ -595,6 +596,18 @@ model PromptBlueprint {
   @@map("prompt_blueprints")
 }
 
+
+
+model UserCollection {
+  id         String   @id @default(uuid())
+  userId     String
+  entityType String
+  entitySlug String
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([userId, entityType, entitySlug])
+  @@map("user_bookmarks")
+}
 
 model Relation {
   id         String   @id @default(uuid())
