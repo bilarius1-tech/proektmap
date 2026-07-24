@@ -1,3 +1,4 @@
+import DemoBlock from "@/components/home/demo-block";
 import WhatsNewFeed from "@/components/whats-new/feed";
 import Link from "next/link";
 import { Globe, Smartphone, Gamepad2, Server, Camera, Package, ArrowRight, Check, Crown, Shield } from "lucide-react";
@@ -160,6 +161,8 @@ export default function Home() {
           <a href="/search?q=Next.js" style={{ color: "var(--color-accent)", textDecoration: "none" }}>Next.js</a>
         </div>
       </div>
+
+      <DemoBlock />
 
       {/* Реквизиты */}
       <div style={{ padding: "var(--space-xl) var(--space-m)", background: "var(--color-bg-secondary)", borderTop: "1px solid var(--color-border-light)", textAlign: "center" }}>
