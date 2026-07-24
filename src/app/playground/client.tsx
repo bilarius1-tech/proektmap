@@ -56,7 +56,7 @@ export default function PlaygroundClient() {
         </div>
 
         {/* Split */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-l)", minHeight: 500 }}>
+        <div className="playground-split" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-l)", minHeight: 500 }}>
           {/* LEFT: Prompt */}
           <div style={{ background: "var(--color-bg-primary)", border: "1px solid var(--color-border)", padding: "var(--space-l)", display: "flex", flexDirection: "column" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: "var(--space-m)" }}>
