@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
   const { prompt } = await req.json();
   if (!prompt) return NextResponse.json({ error: "prompt required" }, { status: 400 });
-  const apiKey = process.env.DEEPSEEK_API_KEY || "";
+  const { getDb } = await import("@/lib/db/index"); const db = await getDb(); const settings = await db.siteSettings.findUnique({ where: { id: "main" } }); const apiKey = settings?.deepseekApiKey || process.env.DEEPSEEK_API_KEY || "";
   if (!apiKey) return NextResponse.json({ error: "API key not configured" }, { status: 500 });
   const systemPrompt = "You are an AI that creates web pages. Return ONLY valid HTML inside triple backticks. Use inline styles and inline JS only. No external files. System-ui fonts, responsive, professional minimal design.";
   try {
