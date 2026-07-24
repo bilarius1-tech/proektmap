@@ -1,5 +1,4 @@
 import DemoBlock from "@/components/home/demo-block";
-import WhatsNewFeed from "@/components/whats-new/feed";
 import Link from "next/link";
 import { Globe, Smartphone, Gamepad2, Server, Camera, Package, ArrowRight, Check, Crown, Shield } from "lucide-react";
 
@@ -30,104 +29,20 @@ export default function Home() {
           <Link href="/corporate-website" style={{ display: "flex", alignItems: "center", gap: 6, padding: "14px 28px", borderRadius: "var(--radius-m)", background: "var(--color-accent)", color: "white", textDecoration: "none", fontSize: "var(--text-s)", fontWeight: 700 }}>
             Начать бесплатно <ArrowRight size={16} />
           </Link>
-          <Link href="/dashboard/billing" style={{ display: "flex", alignItems: "center", gap: 6, padding: "14px 28px", borderRadius: "var(--radius-m)", background: "white", color: "var(--color-accent)", border: "1px solid var(--color-accent)", textDecoration: "none", fontSize: "var(--text-s)", fontWeight: 700 }}>
+          <Link href="/pricing" style={{ display: "flex", alignItems: "center", gap: 6, padding: "14px 28px", borderRadius: "var(--radius-m)", background: "white", color: "var(--color-accent)", border: "1px solid var(--color-accent)", textDecoration: "none", fontSize: "var(--text-s)", fontWeight: 700 }}>
             <Crown size={16} /> Pro — 300 ₽/мес
           </Link>
         </div>
       </div>
 
-      {/* Как это работает */}
-      <div style={{ maxWidth: 900, margin: "0 auto", padding: "var(--space-xl) var(--space-m)" }}>
-        <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-xl)", fontWeight: 700, textAlign: "center", marginBottom: "var(--space-xl)", letterSpacing: "-0.01em" }}>Как это работает</h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "var(--space-l)" }}>
-          {[
-            { step: "1", title: "Выберите шаблон", desc: "Корпоративный сайт, SaaS, игра, мобильное приложение — выберите что создаёте." },
-            { step: "2", title: "Создайте проект", desc: "Дайте имя, выберите цвета и шрифты. Все промпты персонализируются под ваш проект." },
-            { step: "3", title: "Пройдите этапы", desc: "11 этапов от покупки домена до мониторинга. Каждый с готовым промптом для AI." },
-            { step: "4", title: "Запустите проект", desc: "К финалу у вас готовый сайт, SaaS или приложение — созданные с AI." },
-          ].map(item => (
-            <div key={item.step} style={{ padding: "var(--space-l)", background: "var(--color-bg-primary)", borderRadius: "var(--radius-m)", border: "1px solid var(--color-border)" }}>
-              <div style={{ width: 32, height: 32, borderRadius: "50%", background: "var(--color-accent)", color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: "var(--text-s)", marginBottom: "var(--space-s)" }}>{item.step}</div>
-              <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: 4 }}>{item.title}</div>
+      
               <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.6 }}>{item.desc}</div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Шаблоны */}
-      <div style={{ maxWidth: 900, margin: "0 auto", padding: "0 var(--space-m) var(--space-xl)" }}>
-        <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-xl)", fontWeight: 700, textAlign: "center", marginBottom: "var(--space-xl)", letterSpacing: "-0.01em" }}>Доступные шаблоны</h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: "var(--space-m)" }}>
-          {blueprints.map((bp) => {
-            const Icon = bp.icon;
-            return (
-              <Link key={bp.slug} href={bp.active ? `/${bp.slug}` : "#"}
-                style={{
-                  display: "flex", flexDirection: "column", padding: "var(--space-l)", background: "var(--color-bg-primary)",
-                  borderRadius: "var(--radius-m)", border: "1px solid var(--color-border)", textDecoration: "none", color: "inherit",
-                  opacity: bp.active ? 1 : 0.5, cursor: bp.active ? "pointer" : "default",
-                }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "var(--space-s)", marginBottom: "var(--space-s)" }}>
-                  <Icon size={22} style={{ color: "var(--color-accent)", flexShrink: 0 }} />
-                  <div style={{ fontWeight: 700, fontSize: "var(--text-s)" }}>{bp.title}</div>
-                </div>
-                <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", flex: 1, marginBottom: "var(--space-s)" }}>{bp.desc}</div>
-                {bp.active ? (
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span style={{ fontSize: "var(--text-xs)", color: "var(--color-accent)", fontWeight: 600 }}>{bp.decisions} решений</span>
-                    <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>{bp.xp} XP</span>
-                  </div>
-                ) : (
-                  <span style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>Скоро</span>
-                )}
-              </Link>
-            );
-          })}
-        </div>
-<a href="/mcp" style={{display:"flex",flexDirection:"column",padding:"var(--space-l)",background:"var(--color-bg-primary)",borderRadius:"var(--radius-m)",border:"1px solid var(--color-border)",textDecoration:"none",color:"inherit"}}>            <div style={{display:"flex",alignItems:"center",gap:"var(--space-s)",marginBottom:"var(--space-s)"}}>              <span style={{fontSize:22}}>🔌</span>              <div style={{fontWeight:700,fontSize:"var(--text-s)"}}>MCP-серверы</div>            </div>            <div style={{fontSize:"var(--text-xs)",color:"var(--color-text-secondary)",flex:1,marginBottom:"var(--space-s)"}}>Первый русскоязычный каталог — 34+ серверов</div>            <span style={{fontSize:"var(--text-xs)",color:"var(--color-accent)",fontWeight:600}}>Смотреть каталог</span>          </a>
-      </div>
-
-      {/* Тарифы */}
-      <div style={{ background: "var(--color-bg-primary)", padding: "var(--space-xl) var(--space-m)", borderTop: "1px solid var(--color-border-light)" }}>
-        <div style={{ maxWidth: 900, margin: "0 auto" }}>
-          <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-xl)", fontWeight: 700, textAlign: "center", marginBottom: "var(--space-xl)", letterSpacing: "-0.01em" }}>Тарифы</h2>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "var(--space-l)", alignItems: "start" }}>
-            {/* Бесплатный */}
-            <div style={{ padding: "var(--space-xl)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "var(--color-bg-primary)" }}>
-              <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.05em" }}>Бесплатный</div>
-              <div style={{ fontSize: 36, fontWeight: 800, marginBottom: "var(--space-s)" }}>0 ₽</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: "var(--space-l)", fontSize: "var(--text-xs)" }}>
-                {["Все Blueprint'ы (12 этапов)", "Библиотека промптов", "Прогресс и XP"].map(f => (
-                  <div key={f} style={{ display: "flex", alignItems: "center", gap: 6 }}><Check size={14} style={{ color: "var(--color-accent)" }} />{f}</div>
-                ))}
-              </div>
-              <Link href="/corporate-website" style={{ display: "block", textAlign: "center", padding: "12px", borderRadius: "var(--radius-m)", border: "1px solid var(--color-accent)", color: "var(--color-accent)", textDecoration: "none", fontSize: "var(--text-s)", fontWeight: 600 }}>Начать</Link>
-            </div>
-
-            {/* Pro */}
-            <div style={{ padding: "var(--space-xl)", borderRadius: "var(--radius-s)", border: "2px solid var(--color-accent)", background: "var(--color-accent-light)", position: "relative" }}>
-              <div style={{ position: "absolute", top: -12, left: "50%", transform: "translateX(-50%)", padding: "4px 14px", borderRadius: "var(--radius-full)", background: "var(--color-accent)", color: "white", fontSize: 10, fontWeight: 700 }}>РЕКОМЕНДУЕМ</div>
-              <div style={{ display: "flex", alignItems: "flex-end", gap: 4, marginBottom: 4 }}>
-                <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Pro</div>
-                <Crown size={14} style={{ color: "var(--color-accent)" }} />
-              </div>
-              <div style={{ fontSize: 36, fontWeight: 800, marginBottom: 4 }}>300 <span style={{ fontSize: "var(--text-m)", fontWeight: 500 }}>₽/мес</span></div>
-              <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", marginBottom: "var(--space-l)" }}>Можно отменить в любой момент</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: "var(--space-l)", fontSize: "var(--text-xs)" }}>
-                {["Всё из бесплатного", "AI-консультант (DeepSeek/OpenRouter)", "Персональные промпты с данными проекта", "Приоритетная поддержка"].map(f => (
-                  <div key={f} style={{ display: "flex", alignItems: "center", gap: 6, fontWeight: f === "Всё из бесплатного" ? 400 : 600 }}><Check size={14} style={{ color: "var(--color-accent)" }} />{f}</div>
-                ))}
-              </div>
-              <Link href="/dashboard/billing" style={{ display: "block", textAlign: "center", padding: "12px", borderRadius: "var(--radius-m)", background: "var(--color-accent)", color: "white", textDecoration: "none", fontSize: "var(--text-s)", fontWeight: 700 }}>Подключить Pro</Link>
-              <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", textAlign: "center", marginTop: 8 }}>Оплата через ЮKassa. После оплаты доступ открывается мгновенно.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       
-      <WhatsNewFeed />
 
       {/* Поисковая строка */}
       <div style={{ maxWidth: 700, margin: "0 auto", padding: "var(--space-xl) var(--space-m)", textAlign: "center" }}>

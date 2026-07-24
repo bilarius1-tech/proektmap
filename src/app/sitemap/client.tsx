@@ -4,13 +4,14 @@ import Link from "next/link";
 import {
   Compass, Package, MessageSquare, Plug, Wrench, BookOpen,
   Newspaper, Search, Users, Network, Home, Settings,
-  ArrowRight, ArrowDown, ExternalLink, Cpu, Train, Play
+  ArrowRight, ArrowDown, ExternalLink, Cpu, Train, Play, Crown
 } from "lucide-react";
 
 const FLOW = [
   {
     phase: "Вход",
     modules: [
+      { id: "pricing", title: "Тарифы", href: "/pricing", icon: Crown, desc: "Бесплатный и Pro за 300 ₽/мес. AI-консультант, персональные промпты, все Blueprint'ы.", links: ["home"] },
       { id: "home", title: "Главная", href: "/", icon: Home, desc: "Поиск по всей экосистеме. Популярные запросы: MCP, RAG, Prisma. Быстрый старт через Demo-тур.", links: ["search", "demo"] },
       { id: "search", title: "Поиск", href: "/search", icon: Search, desc: "7 источников: глоссарий, паттерны, MCP, инструменты, блог, промпты, решения.", links: ["glossary", "patterns"] },
     ],
