@@ -35,14 +35,6 @@ export default function Home() {
         </div>
       </div>
 
-      
-              <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.6 }}>{item.desc}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      
 
       {/* Поисковая строка */}
       <div style={{ maxWidth: 700, margin: "0 auto", padding: "var(--space-xl) var(--space-m)", textAlign: "center" }}>
