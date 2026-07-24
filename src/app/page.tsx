@@ -1,4 +1,3 @@
-import DemoBlock from "@/components/home/demo-block";
 import Link from "next/link";
 import { Globe, Smartphone, Gamepad2, Server, Camera, Package, ArrowRight, Check, Crown, Shield } from "lucide-react";
 
@@ -36,6 +35,18 @@ export default function Home() {
       </div>
 
 
+      {/* Architect Banner */}
+      <div style={{ maxWidth: 900, margin: "0 auto", padding: "0 var(--space-m) var(--space-m)" }}>
+        <Link href="/architect" style={{ display: "flex", alignItems: "center", gap: "var(--space-m)", padding: "var(--space-l)", background: "var(--color-accent-light)", border: "1px solid var(--color-accent)", borderLeft: "4px solid var(--color-accent)", textDecoration: "none", color: "inherit", borderRadius: 0 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: "var(--text-xs)", fontWeight: 700, color: "var(--color-accent)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 }}>🆕 Новый инструмент</div>
+            <div style={{ fontSize: "var(--text-s)", fontWeight: 700, fontFamily: "var(--font-heading)" }}>AI-Архитектор</div>
+            <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", marginTop: 2 }}>Опиши бизнес-идею — получи карту проекта: сущности, паттерны, MCP, стоимость, план</div>
+          </div>
+          <ArrowRight size={20} style={{ color: "var(--color-accent)", flexShrink: 0 }} />
+        </Link>
+      </div>
+
       {/* Поисковая строка */}
       <div style={{ maxWidth: 700, margin: "0 auto", padding: "var(--space-xl) var(--space-m)", textAlign: "center" }}>
         <div style={{ fontSize: "var(--text-m)", fontWeight: 700, color: "var(--color-text-secondary)", marginBottom: "var(--space-m)" }}>
@@ -69,7 +80,6 @@ export default function Home() {
         </div>
       </div>
 
-      <DemoBlock />
 
       {/* Реквизиты */}
       <div style={{ padding: "var(--space-xl) var(--space-m)", background: "var(--color-bg-secondary)", borderTop: "1px solid var(--color-border-light)", textAlign: "center" }}>

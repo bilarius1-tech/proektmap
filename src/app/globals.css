@@ -160,3 +160,7 @@
 @media (max-width: 768px) {
   .demo-split { grid-template-columns: 1fr !important; }
 }
+
+@media (max-width: 768px) {
+  .architect-input-wrap { flex-direction: column !important; }
+}
