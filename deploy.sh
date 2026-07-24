@@ -3,7 +3,7 @@
 set -e
 echo "🚀 Deploying ProektMap..."
 echo "📤 Pushing to GitHub..."
-git push origin master:main
+git push origin main
 echo "📥 Pulling on server + build..."
 ssh root@109.196.165.106 "
   cd /var/www/www-root/data/www/proektmap.ru &&
