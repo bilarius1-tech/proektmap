@@ -43,7 +43,9 @@ const SYSTEM_PROMPT = `Ты — Senior Product Manager и Staff Engineer. Соз
 3 варианта. От простого к сложному. План — 5-8 шагов.`;
 
 export async function POST(req: NextRequest) {
-  const { idea } = await req.json();
+  const { idea, isPro } = await req.json();
+  // Free users get limited analysis — only 3 option names/pros/cons, no details
+  const isLimited = !isPro;
   if (!idea || idea.length < 10) return NextResponse.json({ error: "Too short" }, { status: 400 });
 
   const db = await getDb();
@@ -73,6 +75,15 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    if (isLimited && result.options) {
+      // Strip detailed fields for free users
+      result.options = result.options.map((opt: any) => ({
+        name: opt.name, description: opt.description, complexity: opt.complexity,
+        mvpDays: opt.mvpDays, pros: opt.pros, cons: opt.cons, monetization: opt.monetization,
+        costDev: opt.costDev, costAi: opt.costAi, costServer: opt.costServer,
+        summary: opt.summary, toolRecommendation: opt.toolRecommendation,
+      }));
+    }
     return NextResponse.json(result);
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
