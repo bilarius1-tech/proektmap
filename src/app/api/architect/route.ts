@@ -13,60 +13,55 @@ export async function POST(req: NextRequest) {
   const systemPrompt = `Ты — AI-Архитектор. Проанализируй бизнес-идею и верни ТОЛЬКО JSON (без markdown):
 
 {
-  "productType": "Тип продукта (SaaS/Бот/Лендинг/CRM/Маркетплейс/API/Другое)",
-  "complexity": число 1-10,
-  "mvpDays": "Оценка MVP (например: 5-7 дней)",
-  "monetization": "Модель монетизации",
-  "entities": ["Сущность1 - описание", "Сущность2 - описание", ...],
-  "integrations": ["Интеграция1", "Интеграция2", ...],
-  "mcpServers": ["mcp-сервер1", "mcp-сервер2", ...],
-  "promptTypes": ["тип промпта1", "тип промпта2", ...],
-  "patternSlugs": ["slug-паттерна1", ...],
-  "mistakes": ["Типичная ошибка 1", "Типичная ошибка 2", ...],
-  "costDev": "Часы разработки (например: 20-30 часов)",
-  "costAi": "AI-расходы (например: 15/мес)",
-  "costServer": "Сервер (например: 5/мес)",
-  "plan": ["Этап 1: ...", "Этап 2: ...", "Этап 3: ..."],
-  "summary": "Краткое резюме проекта, 2-3 предложения"
-}`;
+  "productType": "Тип продукта (SaaS/Бот/Лендинг/CRM/Маркетплейс/API)",
+  "expertRecommendation": "Краткая экспертная рекомендация: какой вариант выбрать и почему. 2-3 предложения.",
+  "options": [
+    {
+      "name": "Название варианта (например: Быстрый MVP)",
+      "description": "Краткое описание подхода, 1-2 предложения",
+      "complexity": число 1-10,
+      "mvpDays": "Оценка (5-7 дней)",
+      "pros": ["Плюс 1", "Плюс 2", "Плюс 3"],
+      "cons": ["Минус 1", "Минус 2"],
+      "monetization": "Модель",
+      "costDev": "20-30 часов",
+      "costAi": "15/мес",
+      "costServer": "5/мес",
+      "entities": ["Сущность1 - описание", "Сущность2"],
+      "plan": ["Этап 1: ...", "Этап 2: ...", "Этап 3: ..."],
+      "mcpServers": ["slug1", "slug2"],
+      "patternSlugs": ["slug1", "slug2"],
+      "promptTypes": ["тип1", "тип2"],
+      "mistakes": ["Ошибка 1", "Ошибка 2"],
+      "summary": "Резюме варианта, 2-3 предложения"
+    }
+  ]
+}
+
+Создай РОВНО 3 варианта: от простого к сложному. Первый — быстрый MVP, второй — сбалансированный, третий — максимальный. Варианты должны реально отличаться архитектурой и стеком, а не формулировками.`;
 
   try {
     const res = await fetch("https://api.deepseek.com/v1/chat/completions", {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: "Bearer " + key },
-      body: JSON.stringify({ model: "deepseek-v4-flash", messages: [{ role: "system", content: systemPrompt }, { role: "user", content: idea }], max_tokens: 2000, temperature: 0.5 }),
+      body: JSON.stringify({ model: "deepseek-v4-flash", messages: [{ role: "system", content: systemPrompt }, { role: "user", content: idea }], max_tokens: 3000, temperature: 0.5 }),
     });
     const data = await res.json();
-    if (!res.ok) return NextResponse.json({ error: "DeepSeek API error: " + (data.error?.message || res.status), raw: "", patterns: [], mcp: [], prompts: [] });
     const text = data.choices?.[0]?.message?.content || "";
-
-    // Extract JSON from response
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     const result = jsonMatch ? JSON.parse(jsonMatch[0]) : { error: "Parse failed", raw: text };
 
-    // Enrich: resolve pattern slugs to actual patterns
-    if (result.patternSlugs?.length > 0) {
-      result.patterns = await db.buildPattern.findMany({
-        where: { slug: { in: result.patternSlugs }, isPublished: true },
-        select: { title: true, slug: true, difficulty: true, stack: true },
-      });
-    } else { result.patterns = []; }
-
-    // Enrich: resolve MCP servers
-    if (result.mcpServers?.length > 0) {
-      result.mcp = await db.mCPServer.findMany({
-        where: { slug: { in: result.mcpServers } },
-        select: { name: true, slug: true, category: true },
-      });
-    } else { result.mcp = []; }
-
-    // Enrich: resolve prompts
-    if (result.promptTypes?.length > 0) {
-      result.prompts = await db.promptBlueprint.findMany({
-        where: { OR: result.promptTypes.map((t: string) => ({ category: { contains: t, mode: "insensitive" as const } })) },
-        select: { title: true, slug: true, category: true }, take: 5,
-      });
-    } else { result.prompts = []; }
+    // Enrich each option: resolve slugs to actual DB entities
+    if (result.options) {
+      for (const opt of result.options) {
+        if (opt.patternSlugs?.length) opt.patterns = await db.buildPattern.findMany({ where: { slug: { in: opt.patternSlugs }, isPublished: true }, select: { title: true, slug: true, difficulty: true } });
+        else opt.patterns = [];
+        if (opt.mcpServers?.length) opt.mcp = await db.mCPServer.findMany({ where: { slug: { in: opt.mcpServers } }, select: { name: true, slug: true, category: true } });
+        else opt.mcp = [];
+        if (opt.promptTypes?.length) opt.prompts = await db.promptBlueprint.findMany({ where: { OR: opt.promptTypes.map((t: string) => ({ category: { contains: t, mode: "insensitive" as const } })) }, select: { title: true, slug: true, category: true }, take: 5 });
+        else opt.prompts = [];
+      }
+    }
 
     return NextResponse.json(result);
   } catch (err: any) {
