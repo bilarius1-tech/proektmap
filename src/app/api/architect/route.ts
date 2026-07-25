@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
     const res = await fetch("https://api.deepseek.com/v1/chat/completions", {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: "Bearer " + key },
-      body: JSON.stringify({ model: "deepseek-v4-flash", messages: [{ role: "system", content: SYSTEM_PROMPT }, { role: "user", content: idea }], max_tokens: 6000, temperature: 0.4 }),
+      body: JSON.stringify({ model: "deepseek-v4-flash", messages: [{ role: "system", content: SYSTEM_PROMPT }, { role: "user", content: idea }], max_tokens: 8000, temperature: 0.4 }),
     });
     const data = await res.json();
     const text = data.choices?.[0]?.message?.content || "";
