@@ -186,7 +186,8 @@ export default function ArchitectClient() {
                     <span>⚡ {opt.complexity}/10</span><span>⏱ {opt.mvpDays}</span><span>💰 {opt.costDev}</span>
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
-                    {opt.pros?.slice(0, 2).map((p: string, j: number) => <div key={j} style={{ fontSize: 11, color: "var(--color-accent)", display: "flex", alignItems: "center", gap: 4 }}><span>✓</span> {p}</div>)}
+                    {opt.toolRecommendation && <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", marginBottom: 4 }}>💻 {opt.toolRecommendation.split(".")[0]}</div>}
+                  {opt.pros?.slice(0, 2).map((p: string, j: number) => <div key={j} style={{ fontSize: 11, color: "var(--color-accent)", display: "flex", alignItems: "center", gap: 4 }}><span>✓</span> {p}</div>)}
                   </div>
                   {selectedOption === i && <div style={{ marginTop: "var(--space-s)", padding: "4px 12px", background: "var(--color-accent)", color: "#fff", fontSize: 10, fontWeight: 700, fontFamily: "var(--font-heading)", textAlign: "center" }}>ВЫБРАНО</div>}
                 </div>
