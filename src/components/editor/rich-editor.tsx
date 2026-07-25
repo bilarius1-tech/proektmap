@@ -48,9 +48,21 @@ export default function RichEditor({ content, onChange, placeholder }: { content
   }
 
   function addVideo() {
-    const url = prompt("Ссылка на видео (YouTube):");
+    const url = prompt("Ссылка на видео (YouTube, VK, Rutube):");
     if (!url) return;
-    editor.chain().focus().setYoutubeVideo({ src: url, width: 840, height: 472 }).run();
+    if (url.includes("youtube.com") || url.includes("youtu.be")) {
+      editor.chain().focus().setYoutubeVideo({ src: url, width: 840, height: 472 }).run();
+    } else {
+      let embed = url;
+      if (url.includes("rutube.ru")) {
+        const id = url.match(/video\/([\w]+)/)?.[1] || url.split("/").pop();
+        embed = "https://rutube.ru/play/embed/" + id;
+      } else if (url.includes("vk.com/video") || url.includes("vkvideo.ru")) {
+        embed = url.replace("/video", "/video_ext").replace("vkvideo.ru", "vk.com");
+        if (!embed.includes("oid=")) embed += (embed.includes("?") ? "&" : "?") + "oid=-1";
+      }
+      editor.chain().focus().insertContent('<div class="video-embed"><iframe src="' + embed + '" frameborder="0" allowfullscreen style="width:100%;aspect-ratio:16/9;"></iframe></div>').run();
+    }
   }
 
   function addCodeBlock() { editor.chain().focus().toggleCodeBlock().run(); }
@@ -101,7 +113,7 @@ export default function RichEditor({ content, onChange, placeholder }: { content
           .ProseMirror pre { background: #1e1e2e; color: #cdd6f4; padding: 16px; border-radius: var(--radius-m); font-family: var(--font-mono); font-size: var(--text-xs); overflow-x: auto; margin: 1em 0; }
           .ProseMirror code { background: var(--color-bg-secondary); padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono); font-size: 0.9em; }
           .ProseMirror pre code { background: none; padding: 0; font-size: inherit; }
-          .ProseMirror img { max-width: 100%; border-radius: var(--radius-m); margin: 1em 0; cursor: pointer; }
+          .ProseMirror img { max-width: 100%; height: auto; border-radius: var(--radius-m); margin: 1em 0; cursor: pointer; }
           .ProseMirror ul, .ProseMirror ol { padding-left: 24px; margin: 0.5em 0; }
           .ProseMirror li { margin: 0.25em 0; }
           .ProseMirror .video-embed { margin: 1em 0; }
