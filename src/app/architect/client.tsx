@@ -65,7 +65,7 @@ export default function ArchitectClient() {
   }
 
   const option = result?.options?.[selectedOption];
-  const showDetail = isPro || isLoggedIn === null;
+  const showDetail = isLoggedIn !== false;
 
   function exportPDF() {
     if (!option) return;

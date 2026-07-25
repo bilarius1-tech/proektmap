@@ -75,15 +75,6 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    if (isLimited && result.options) {
-      // Strip detailed fields for free users
-      result.options = result.options.map((opt: any) => ({
-        name: opt.name, description: opt.description, complexity: opt.complexity,
-        mvpDays: opt.mvpDays, pros: opt.pros, cons: opt.cons, monetization: opt.monetization,
-        costDev: opt.costDev, costAi: opt.costAi, costServer: opt.costServer,
-        summary: opt.summary, toolRecommendation: opt.toolRecommendation,
-      }));
-    }
     return NextResponse.json(result);
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
