@@ -14,7 +14,7 @@ export default function RichEditor({ content, onChange, placeholder }: { content
   const editor = useEditor({
     extensions: [
       StarterKit.configure({ heading: { levels: [1, 2, 3, 4] } }),
-      Image.configure({ inline: true, allowBase64: true }),
+      Image.configure({ HTMLAttributes: { class: "blog-img" } }),
       Youtube.configure({ width: 840, height: 472, modestBranding: true }),
       Placeholder.configure({ placeholder: placeholder || "..." }),
     ],
@@ -39,7 +39,8 @@ export default function RichEditor({ content, onChange, placeholder }: { content
         const res = await fetch("/api/upload", { method: "POST", body: fd });
         const data = await res.json();
         if (data.url) {
-          editor?.chain().focus().setImage({ src: data.url }).run();
+          const alt = prompt("Alt-текст для фото (для SEO):", file.name.replace(/\.[^.]+$/, ""));
+          editor?.chain().focus().setImage({ src: data.url, alt: alt || "" }).run();
         }
       } catch (err) { console.error("Upload failed", err); }
       setUploading(false);
