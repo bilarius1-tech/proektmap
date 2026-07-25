@@ -39,8 +39,15 @@ export default function RichEditor({ content, onChange, placeholder }: { content
         const res = await fetch("/api/upload", { method: "POST", body: fd });
         const data = await res.json();
         if (data.url) {
-          const alt = prompt("Alt-текст для фото (для SEO):", file.name.replace(/\.[^.]+$/, ""));
-          editor?.chain().focus().setImage({ src: data.url, alt: alt || "" }).run();
+          const alt = prompt("Alt-текст (SEO):", file.name.replace(/\.[^.]+$/, "")) || "";
+          const align = prompt("Выравнивание: left / center / right (оставьте пустым для обычного)");
+          if (align === "left" || align === "center" || align === "right") {
+            editor?.chain().focus().insertContent(
+              '<div style="text-align:' + align + ';margin:1em 0;"><img src="' + data.url + '" alt="' + alt + '" style="max-width:100%;height:auto;' + (align === 'left' ? 'float:left;margin-right:1em;' : align === 'right' ? 'float:right;margin-left:1em;' : '') + '" /></div>'
+            ).run();
+          } else {
+            editor?.chain().focus().setImage({ src: data.url, alt: alt }).run();
+          }
         }
       } catch (err) { console.error("Upload failed", err); }
       setUploading(false);
