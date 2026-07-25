@@ -107,7 +107,7 @@ export default function BlogPageClient({ posts, categories, total, page, perPage
                 <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.6, marginBottom: "var(--space-s)" }}>{p.excerpt}</p>
                 <div style={{ display: "flex", alignItems: "center", gap: "var(--space-m)", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>
                   <span style={{ display: "flex", alignItems: "center", gap: 4 }}><User size={12} />{<Link href={`/blog/author/${p.author?.email}`} style={{color:"inherit",textDecoration:"none"}}>{p.author?.name || "Аноним"}</Link>}</span>
-                  <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Calendar size={12} />{new Date(p.publishedAt).toLocaleDateString("ru")}</span><span style={{ display: "flex", alignItems: "center", gap: 4, color: "var(--color-text-tertiary)", fontSize: 11, marginLeft: 8 }}><Eye size={12} /> {p.viewCount || 0}</span>
+                  <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Calendar size={12} />{new Date(p.publishedAt).toLocaleDateString("ru")}</span><span style={{ display: "flex", alignItems: "center", gap: 4, color: "var(--color-text-tertiary)", fontSize: 11, marginLeft: 8 }}><Eye size={12} /> {p.viewCount || 0}</span><span style={{ display: "flex", alignItems: "center", gap: 4, color: "var(--color-text-tertiary)", fontSize: 11, marginLeft: 8 }}><Eye size={12} /> {p.viewCount || 0}</span>
                   <span style={{ display: "flex", alignItems: "center", gap: 4 }}><MessageCircle size={12} />{(p._count?.comments || 0)}</span>
                 </div>
               </div>

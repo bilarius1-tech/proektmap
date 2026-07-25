@@ -4,9 +4,19 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
 import Placeholder from "@tiptap/extension-placeholder";
-import { Bold, Italic, List, ListOrdered, Quote, Code, ImageIcon, Heading1, Heading2, Heading3, Heading4, Undo, Redo, Video } from "lucide-react";
+import { Bold, Italic, List, ListOrdered, Quote, Code, ImageIcon, Heading1, Heading2, Heading3, Heading4, Undo, Redo, Video, Upload } from "lucide-react";
 
 export default function RichEditor({ content, onChange, placeholder }: { content: string; onChange: (html: string) => void; placeholder?: string }) {
+  
+  const [mediaOpen, setMediaOpen] = useState(false);
+  const [mediaFiles, setMediaFiles] = useState<{url:string,name:string}[]>([]);
+
+  async function loadMedia() {
+    try { const res = await fetch("/api/admin/media"); const data = await res.json(); setMediaFiles(data.files || []); } catch { setMediaFiles([]); }
+  }
+
+  function insertMedia(url: string) { editor?.chain().focus().setImage({ src: url }).run(); setMediaOpen(false); }
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({ heading: { levels: [1, 2, 3, 4] } }),
@@ -108,6 +118,26 @@ export default function RichEditor({ content, onChange, placeholder }: { content
         `}</style>
         <EditorContent editor={editor} />
       </div>
+
+      {mediaOpen && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(0,0,0,0.5)" }} onClick={() => setMediaOpen(false)}>
+          <div style={{ background: "var(--color-bg-primary)", border: "1px solid var(--color-border)", padding: "var(--space-xl)", width: 600, maxHeight: "80vh", overflow: "auto", boxShadow: "0 20px 60px rgba(0,0,0,0.3)" }} onClick={e => e.stopPropagation()}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-l)" }}>
+              <h3 style={{ fontSize: "var(--text-l)", fontWeight: 800, fontFamily: "var(--font-heading)", margin: 0 }}>Медиа</h3>
+              <button onClick={() => setMediaOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18 }}>x</button>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))", gap: 8 }}>
+              {mediaFiles.map((f, i) => (
+                <div key={i} onClick={() => insertMedia(f.url)} style={{ cursor: "pointer", border: "1px solid var(--color-border)", padding: 4, textAlign: "center" }}>
+                  <img src={f.url} alt={f.name} style={{ width: "100%", height: 60, objectFit: "cover", marginBottom: 4 }} />
+                  <div style={{ fontSize: 9 }}>{f.name}</div>
+                </div>
+              ))}
+              {mediaFiles.length === 0 && <div style={{ gridColumn: "1/-1", textAlign: "center", padding: "var(--space-l)", color: "var(--color-text-tertiary)", fontSize: "var(--text-xs)" }}>Нет файлов</div>}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
