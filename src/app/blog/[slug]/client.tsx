@@ -56,8 +56,7 @@ export default function PostPageClient({ post, relatedPosts, readMore, isAdmin: 
         ))}
       </div>
 
-      <div style={{ fontSize: "var(--text-s)", lineHeight: 1.8, color: "var(--color-text-primary)", whiteSpace: "pre-wrap", marginBottom: "var(--space-xl)" }}>
-        {post.content}
+        <div className="blog-content" dangerouslySetInnerHTML={{ __html: post.content }} />
       </div>
 
       {/* Related posts */}
