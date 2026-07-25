@@ -164,3 +164,5 @@
 @media (max-width: 768px) {
   .architect-input-wrap { flex-direction: column !important; }
 }
+
+@media (max-width: 768px) { .blog-post-title { font-size: var(--text-l) !important; } .blog-sidebar { display: none; } .blog-layout { flex-direction: column !important; } }
