@@ -1,5 +1,4 @@
 import { getDb } from "@/lib/db/index";
-import DemoBlock from "@/components/home/demo-block";
 import Link from "next/link";
 import { Globe, Smartphone, Gamepad2, Server, Camera, Package, ArrowRight, Check, Crown, Shield } from "lucide-react";
 
