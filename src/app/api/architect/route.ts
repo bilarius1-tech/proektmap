@@ -1,46 +1,47 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db/index";
 
-const SYSTEM_PROMPT = `Ты — Senior Product Manager и Staff Engineer. Создай детальный архитектурный план. Он должен быть настолько конкретным, чтобы новичок понял суть, а AI-агент смог по нему писать код без галлюцинаций.
+const SYSTEM_PROMPT = `Ты — Senior Product Manager и Staff Engineer. Создай детальный архитектурный план для бизнес-идеи. План должен быть настолько конкретным, чтобы AI-агент (Cursor/Claude) смог по нему писать код без галлюцинаций.
 
 ЖЁСТКИЕ ПРАВИЛА:
-1. Сущности БД — бизнес-специфичные имена с типами полей. НЕ использовать User/Project/Settings. Пример: CrawlTarget (id, url, lastCrawled, status), AuditReport (id, siteId, score, errors[], createdAt).
-2. Не противоречить в стеке. Выбрал Next.js — весь документ про Next.js.
-3. Ошибки — нишевые. Не "пишите тесты", а "Блокировка IP парсера через Cloudflare".
-4. План — 5-8 КОНКРЕТНЫХ шагов с файлами/таблицами/пакетами. Не "Основной функционал", а "Создать коллекцию Article в Strapi: поля title, content, category. Связь one-to-many с Category. Права: editor read/write".
-5. Каждый шаг: (а) что создаётся, (б) ключевые пакеты, (в) что работает после шага.
+1. Сущности БД — с ПОЛНЫМИ полями: имя, тип, описание. Пример: CrawlTarget (id UUID PK, url string, depth number, status enum, createdAt timestamp).
+2. Стек технологий — каждая технология с ОБОСНОВАНИЕМ. Пример: "BullMQ + Redis — фоновый парсинг тысяч URL без блокировки запросов".
+3. План — по НЕДЕЛЯМ с конкретными файлами.
+4. Ошибки — специфичные для ниши.
+5. Атомарные промпты — 3 конкретных промпта для Cursor/Claude Code, каждый для одного файла/функции.
+6. Итоговый промпт — один большой промпт для старта проекта.
 
 Верни ТОЛЬКО JSON:
 {
   "productType": "Тип",
-  "expertRecommendation": "Какой вариант выбрать и почему. 2-3 предложения.",
-  "recommendedStack": "Стек (Next.js + Prisma + PostgreSQL + Tailwind)",
+  "expertRecommendation": "Рекомендация",
+  "recommendedStack": "Стек одной строкой",
   "options": [{
     "name": "Название",
-    "description": "Описание подхода",
+    "description": "Описание",
     "complexity": 5,
     "mvpDays": "7-10 дней",
-    "pros": ["Плюс 1", "Плюс 2"],
-    "cons": ["Минус 1"],
+    "pros": ["+"],
+    "cons": ["-"],
     "monetization": "Модель",
-    "costDev": "30-40 часов",
+    "costDev": "30-40ч",
     "costAi": "15/мес",
     "costServer": "5/мес",
-    "entities": ["EntityName (id, field1, field2) - описание", "..."],
-    "plan": [
-      "Шаг 1: Конкретно что создаётся, какие пакеты, что заработает",
-      "Шаг 2: ..."
-    ],
-    "mcpServers": ["slug1"],
-    "patternSlugs": ["slug1"],
-    "promptTypes": ["тип1"],
-    "mistakes": ["Нишевая ошибка 1", "Нишевая ошибка 2"],
-    "summary": "Резюме, 2-3 предложения",
-    "toolRecommendation": "Каким инструментом делать и почему",
-    "aiModelRecommendation": "Какую модель использовать и почему"
+    "entities": ["Entity (id UUID PK, field1 type, field2 type) - описание"],
+    "stack": [{"tech": "Технология", "reason": "Обоснование"}],
+    "plan": ["Неделя 1: ...", "Неделя 2: ..."],
+    "mcpServers": ["slug"],
+    "patternSlugs": ["slug"],
+    "promptTypes": ["тип"],
+    "mistakes": ["Ошибка 1"],
+    "atomicPrompts": ["Промпт 1: В файле lib/X.ts создай функцию...", "Промпт 2: ...", "Промпт 3: ..."],
+    "masterPrompt": "Ты — senior разработчик. Реализуй проект... (полный промпт)",
+    "summary": "Резюме",
+    "toolRecommendation": "Инструмент",
+    "aiModelRecommendation": "Модель"
   }]
 }
-3 варианта. От простого к сложному. План — 5-8 шагов.`;
+3 варианта. Минимум 3 недели в плане. 3 атомарных промпта.`
 
 export async function POST(req: NextRequest) {
   const { idea, isPro } = await req.json();
