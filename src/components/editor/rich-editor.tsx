@@ -3,6 +3,7 @@
 import React, { useState } from "react"; import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
+import Youtube from "@tiptap/extension-youtube";
 import Placeholder from "@tiptap/extension-placeholder";
 import { Bold, Italic, List, ListOrdered, Quote, Code, ImageIcon, Heading1, Heading2, Heading3, Heading4, Undo, Redo, Video, Upload } from "lucide-react";
 
@@ -21,6 +22,7 @@ export default function RichEditor({ content, onChange, placeholder }: { content
     extensions: [
       StarterKit.configure({ heading: { levels: [1, 2, 3, 4] } }),
       Image.configure({ allowBase64: false }),
+      Youtube.configure({ width: 840, height: 472 }),
       Placeholder.configure({ placeholder: placeholder || "Начните писать..." }),
     ],
     content,
@@ -46,20 +48,9 @@ export default function RichEditor({ content, onChange, placeholder }: { content
   }
 
   function addVideo() {
-    const url = prompt("Ссылка на видео (YouTube, VK Видео, Rutube):");
+    const url = prompt("Ссылка на видео (YouTube):");
     if (!url) return;
-    let embed = url;
-    if (url.includes("youtube.com/watch") || url.includes("youtu.be")) {
-      const id = url.match(/(?:v=|\/)([\w-]{11})/)?.[1] || url.split("/").pop();
-      embed = `https://www.youtube.com/embed/${id}`;
-    } else if (url.includes("rutube.ru")) {
-      const id = url.match(/video\/([\w]+)/)?.[1] || url.split("/").pop();
-      embed = `https://rutube.ru/play/embed/${id}`;
-    } else if (url.includes("vk.com/video") || url.includes("vkvideo.ru")) {
-      embed = url.replace("/video", "/video_ext").replace("vkvideo.ru", "vk.com");
-      if (!embed.includes("oid=")) embed += (embed.includes("?") ? "&" : "?") + "oid=-1";
-    }
-    editor.chain().focus().insertContent(`<div class="video-embed"><iframe src="${embed}" frameborder="0" allowfullscreen style="width:100%;aspect-ratio:16/9;border-radius:8px;"></iframe></div>`).run();
+    editor.chain().focus().setYoutubeVideo({ src: url, width: 840, height: 472 }).run();
   }
 
   function addCodeBlock() { editor.chain().focus().toggleCodeBlock().run(); }
