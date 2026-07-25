@@ -4,13 +4,28 @@ import { Sparkles, Loader, Zap, Database, Plug, Package, AlertTriangle, Clock, D
 import Link from "next/link";
 import { jsPDF } from "jspdf";
 
-const IDEAS = [
-  { label: "SaaS для SEO", text: "Сервис автоматической проверки сайтов на SEO-ошибки с генерацией отчётов и коммерческих предложений владельцам." },
-  { label: "Чат-бот поддержки", text: "AI-бот для Telegram, который отвечает на частые вопросы клиентов, собирает заявки и переключает на оператора." },
-  { label: "Лендинг услуг", text: "Продающий лендинг для стоматологии: hero, услуги, отзывы, форма записи, интеграция с Telegram." },
-  { label: "CRM для бизнеса", text: "Простая CRM для малого бизнеса: клиенты, сделки, задачи, напоминания. С интеграцией Telegram-уведомлений." },
-  { label: "AI-консультант", text: "Виджет AI-консультанта на сайт: отвечает на вопросы, знает услуги, собирает заявки в Telegram." },
+const CATEGORIES = [
+  { name: "SaaS", icon: "☁️", ideas: [
+    { label: "SEO-аудитор", text: "Сервис проверки сайтов на SEO-ошибки с генерацией отчётов и КП владельцам. Подписка 990 ₽/мес." },
+    { label: "AI-консультант", text: "Виджет на сайт: отвечает про услуги, собирает заявки, отправляет в Telegram. SaaS с подпиской." },
+    { label: "Конструктор лендингов", text: "No-code платформа: шаблоны, AI-генерация текста, A/B тесты, аналитика. B2B." },
+  ]},
+  { name: "Боты и автоматизация", icon: "🤖", ideas: [
+    { label: "Telegram-бот поддержки", text: "AI-бот: отвечает на FAQ из базы знаний, собирает заявки, переключает на оператора." },
+    { label: "Автоворонка продаж", text: "Бот квалифицирует лидов: задаёт вопросы, оценивает бюджет, передаёт тёплых менеджеру." },
+    { label: "Умный каталог", text: "Бот-витрина: поиск товаров по фото, рекомендации, корзина, оплата через ЮKassa." },
+  ]},
+  { name: "Маркетплейсы и CRM", icon: "🏪", ideas: [
+    { label: "Маркетплейс услуг", text: "Платформа где исполнители создают анкеты, а заказчики находят их по фильтрам. Рейтинг, отзывы, чат." },
+    { label: "CRM для малого бизнеса", text: "Клиенты, сделки, задачи, напоминания. Интеграция с Telegram и email-рассылками." },
+  ]},
+  { name: "Инструменты", icon: "🛠️", ideas: [
+    { label: "Генератор КП", text: "Сервис: ввёл данные клиента → получил персонализированное коммерческое предложение в PDF." },
+    { label: "AI-ассистент риэлтора", text: "Подбор объектов по параметрам, автообзвон, запись на показ, CRM для сделок." },
+  ]},
 ];
+
+const IDEAS = CATEGORIES.flatMap(c => c.ideas);
 
 const PROGRESS = ["Анализирую задачу...","Определяю тип продукта...","Прорабатываю 3 варианта архитектуры...","Проектирую сущности...","Подбираю стек и MCP...","Оцениваю стоимость...","Формирую план...","Готово!"];
 
@@ -98,13 +113,47 @@ export default function ArchitectClient() {
       </header>
 
       <div style={{ maxWidth: 1000, margin: "0 auto", padding: "var(--space-xl) var(--space-m)" }}>
-        {/* Input */}
+        {/* Quick steps */}
+          {!result && !loading && (
+            <div style={{ display: "flex", gap: "var(--space-l)", justifyContent: "center", marginBottom: "var(--space-l)", flexWrap: "wrap" }}>
+              {[
+                { num: "1", title: "Опиши идею", desc: "Напиши что хочешь создать. Чем детальнее — тем точнее анализ." },
+                { num: "2", title: "Выбери вариант", desc: "AI предложит 3 архитектуры: от быстрого MVP до максимальной." },
+                { num: "3", title: "Скопируй агенту", desc: "Markdown-документ → Cursor/Claude Code. Агент начнёт писать код." },
+              ].map(s => (
+                <div key={s.num} style={{ flex: "1", minWidth: 180, maxWidth: 280, padding: "var(--space-m)", background: "var(--color-bg-primary)", border: "1px solid var(--color-border)", textAlign: "center" }}>
+                  <div style={{ width: 32, height: 32, background: "var(--color-accent)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 14, fontFamily: "var(--font-heading)", margin: "0 auto 8px" }}>{s.num}</div>
+                  <div style={{ fontSize: "var(--text-xs)", fontWeight: 700, fontFamily: "var(--font-heading)", marginBottom: 4 }}>{s.title}</div>
+                  <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", lineHeight: 1.5 }}>{s.desc}</div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Input */}
         <div style={{ marginBottom: "var(--space-l)" }}><div style={{ display: "flex", gap: 0, border: "2px solid " + (idea.length >= 10 ? "var(--color-accent)" : "var(--color-border)"), background: "var(--color-bg-primary)", overflow: "hidden" }}>
           <input value={idea} onChange={e => setIdea(e.target.value)} onKeyDown={e => { if (e.key === "Enter" && e.ctrlKey) analyze(); }} placeholder="Опиши бизнес-идею... Например: сервис проверки сайтов на SEO-ошибки" style={{ flex: 1, padding: "16px 20px", border: "none", fontSize: "var(--text-m)", fontFamily: "var(--font-body)", outline: "none", background: "transparent", color: "var(--color-text-primary)" }} />
           <button onClick={analyze} disabled={loading || idea.length < 10} style={{ padding: "16px 28px", background: idea.length >= 10 ? "var(--color-accent)" : "var(--color-border)", color: "#fff", border: "none", fontSize: "var(--text-s)", fontWeight: 700, fontFamily: "var(--font-heading)", cursor: idea.length >= 10 ? "pointer" : "default", display: "flex", alignItems: "center", gap: 6, whiteSpace: "nowrap" }}>{loading ? <Loader size={16} style={{ animation: "spin 1s linear infinite" }} /> : <Zap size={16} />}{loading ? "Анализ..." : "Анализировать"}</button>
         </div></div>
 
-        {!result && !loading && (<div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: "var(--space-l)" }}>{IDEAS.map((s, i) => (<button key={i} onClick={() => setIdea(s.text)} style={{ padding: "6px 14px", background: idea === s.text ? "var(--color-accent-light)" : "var(--color-bg-primary)", border: "1px solid " + (idea === s.text ? "var(--color-accent)" : "var(--color-border)"), color: idea === s.text ? "var(--color-accent)" : "var(--color-text-secondary)", cursor: "pointer", fontSize: "var(--text-xs)", fontFamily: "var(--font-body)", borderRadius: 0, whiteSpace: "nowrap" }}>{s.label}</button>))}</div>)}
+        {!result && !loading && (
+            <div style={{ marginBottom: "var(--space-l)" }}>
+              <div style={{ fontSize: "var(--text-xs)", fontWeight: 700, color: "var(--color-text-tertiary)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "var(--space-s)" }}>Готовые примеры</div>
+              {CATEGORIES.map(cat => (
+                <div key={cat.name} style={{ marginBottom: "var(--space-m)" }}>
+                  <div style={{ fontSize: 10, fontWeight: 600, color: "var(--color-text-tertiary)", marginBottom: 6 }}>{cat.icon} {cat.name}</div>
+                  <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                    {cat.ideas.map(s => (
+                      <button key={s.label} onClick={() => setIdea(s.text)}
+                        style={{ padding: "8px 14px", background: idea === s.text ? "var(--color-accent-light)" : "var(--color-bg-primary)", border: "1px solid " + (idea === s.text ? "var(--color-accent)" : "var(--color-border)"), color: idea === s.text ? "var(--color-accent)" : "var(--color-text-secondary)", cursor: "pointer", fontSize: "var(--text-xs)", fontFamily: "var(--font-body)", borderRadius: 0, whiteSpace: "nowrap", textAlign: "left" }}>
+                        {s.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
 
         {loading && progressIdx >= 0 && (<div style={{ padding: "var(--space-l)", background: "var(--color-bg-primary)", border: "1px solid var(--color-border)", marginBottom: "var(--space-l)" }}><div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: "var(--space-s)" }}><div style={{ flex: 1, height: 4, background: "var(--color-border-light)", overflow: "hidden" }}><div style={{ width: ((progressIdx + 1) / PROGRESS.length * 100) + "%", height: "100%", background: "var(--color-accent)", transition: "width 0.3s" }} /></div><span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", whiteSpace: "nowrap" }}>{progressIdx + 1}/{PROGRESS.length}</span></div><div style={{ fontFamily: "monospace", fontSize: 12, color: "var(--color-text-secondary)", display: "flex", alignItems: "center", gap: 8 }}><span style={{ width: 8, height: 14, background: "var(--color-accent)", animation: "blink 1s step-end infinite" }} /><span>{PROGRESS[progressIdx]}</span></div></div>)}
 
