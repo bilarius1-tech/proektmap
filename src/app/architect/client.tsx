@@ -1,5 +1,5 @@
 'use client';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Sparkles, Loader, Zap, Database, Plug, Package, AlertTriangle, Clock, DollarSign, Server, Cpu, Copy, Check, ChevronDown, ChevronRight, Download, ThumbsUp, FileText } from "lucide-react";
 import Link from "next/link";
 import { jsPDF } from "jspdf";
@@ -40,6 +40,16 @@ export default function ArchitectClient() {
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
 
   function toggle(s: string) { setOpenSections(p => ({ ...p, [s]: !p[s] })); }
+
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+  const [isPro, setIsPro] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/auth/check").then(r => r.json()).then(d => {
+      setIsLoggedIn(d.authenticated || false);
+      setIsPro(d.subscription === "pro");
+    }).catch(() => setIsLoggedIn(false));
+  }, []);
 
   async function analyze() {
     if (!idea.trim() || idea.length < 10) return;
@@ -194,6 +204,22 @@ export default function ArchitectClient() {
               ))}
             </div>
 
+            {/* Pro gate */}
+            {option && !isPro && isLoggedIn !== null && (
+              <div style={{ padding: "var(--space-l)", background: "var(--color-accent-light)", border: "2px solid var(--color-accent)", textAlign: "center", marginBottom: "var(--space-l)" }}>
+                <div style={{ fontSize: "var(--text-l)", fontWeight: 800, fontFamily: "var(--font-heading)", marginBottom: 8 }}>Только для Pro</div>
+                <div style={{ fontSize: "var(--text-s)", color: "var(--color-text-secondary)", marginBottom: 16, lineHeight: 1.6 }}>
+                  Ты видишь 3 варианта архитектуры. Pro открывает: пошаговый план, сущности БД, стек, типичные ошибки, PDF.
+                </div>
+                {!isLoggedIn ? (
+                  <a href="/auth" style={{ padding: "12px 28px", background: "var(--color-accent)", color: "#fff", textDecoration: "none", fontSize: "var(--text-s)", fontWeight: 700, fontFamily: "var(--font-heading)", display: "inline-block" }}>Войти и подключить Pro</a>
+                ) : (
+                  <a href="/pricing" style={{ padding: "12px 28px", background: "var(--color-accent)", color: "#fff", textDecoration: "none", fontSize: "var(--text-s)", fontWeight: 700, fontFamily: "var(--font-heading)", display: "inline-block" }}>Pro за 300 /мес</a>
+                )}
+              </div>
+            )}
+
+            {(isPro || isLoggedIn === null) && (
             {/* Detailed view for selected option */}
             {option && (
               <>
@@ -230,7 +256,7 @@ export default function ArchitectClient() {
                     </div>)})}
                 </div>
 
-                {/* Actions */}
+                {/* Actions */})}
                 <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: "var(--space-s)" }}>
                   <button onClick={() => { navigator.clipboard.writeText(docText); setCopied("doc"); setTimeout(() => setCopied(""), 2000); }}
                     style={{ padding: "12px 24px", background: "var(--color-accent)", color: "#fff", border: "none", fontSize: "var(--text-s)", fontWeight: 700, fontFamily: "var(--font-heading)", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, borderRadius: 0 }}>
