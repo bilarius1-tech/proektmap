@@ -165,7 +165,7 @@
   .architect-input-wrap { flex-direction: column !important; }
 }
 
-@media (max-width: 768px) { .blog-post-title { font-size: var(--text-l) !important; } .blog-sidebar { display: none; } .blog-layout { flex-direction: column !important; } }
+@media (max-width: 768px) { .blog-post-title { font-size: var(--text-xxl); } .blog-sidebar { display: none; } .blog-layout { flex-direction: column !important; } }
 
 .blog-content img { max-width: 100% !important; height: auto !important; margin: 1em 0; border-radius: 0; }
 .blog-content iframe { max-width: 100%; aspect-ratio: 16/9; margin: 1em 0; border: 1px solid var(--color-border); }

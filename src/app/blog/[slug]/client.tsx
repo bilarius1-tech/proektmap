@@ -42,7 +42,7 @@ export default function PostPageClient({ post, relatedPosts, readMore, isAdmin: 
         </div>
       )}
 
-      <h1 className="blog-post-title" style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-xxxl)", fontWeight: 800, lineHeight: 1.1, letterSpacing: "-0.02em", marginBottom: "var(--space-m)" }}>{post.title}</h1>
+      <h1 className="blog-post-title" style={{ fontFamily: "var(--font-heading)", fontWeight: 800, lineHeight: 1.1, letterSpacing: "-0.02em", marginBottom: "var(--space-m)" }}>{post.title}</h1>
 
       <div style={{ display: "flex", alignItems: "center", gap: "var(--space-m)", flexWrap: "wrap", marginBottom: "var(--space-xl)", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>
         <span style={{ display: "flex", alignItems: "center", gap: 4 }}><User size={14} />{post.author ? <Link href={`/blog/author/${post.author.email}`} style={{ color: "inherit", textDecoration: "none" }}>{post.author.name}</Link> : "Аноним"}</span>
