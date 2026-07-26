@@ -83,7 +83,8 @@ export default function RichEditor({ content, onChange, placeholder }: {
       let embed = url;
       if (url.includes("rutube.ru")) { const m = url.match(/video\/([\w]+)/); embed = "https://rutube.ru/play/embed/" + (m ? m[1] : ""); }
       else if (url.includes("vk.com/video") || url.includes("vkvideo.ru")) {
-        embed = url.includes("/video_ext") ? url : url.replace("/video", "/video_ext"); embed = embed.replace("vkvideo.ru", "vk.com");
+        if (!embed.includes("/video_ext")) embed = embed.replace("/video", "/video_ext");
+        embed = embed.replace("vkvideo.ru", "vk.com");
         if (!embed.includes("oid=")) embed += (embed.includes("?") ? "&" : "?") + "oid=-1";
       }
       editor?.chain().focus().insertContent('<div class="video-embed"><iframe src="' + embed + '" allowfullscreen style="width:100%;aspect-ratio:16/9;border:0;"></iframe></div>').run();
