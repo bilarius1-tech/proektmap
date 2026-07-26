@@ -41,7 +41,7 @@ export default async function Home() {
       </div>
 
       
-      {"/* Два пути */"}
+      {/* Два пути */}
       <div style={{ maxWidth: 1000, margin: "0 auto", padding: "0 var(--space-m) var(--space-xl)" }}>
         <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-xl)", fontWeight: 700, textAlign: "center", marginBottom: "var(--space-l)", letterSpacing: "-0.01em" }}>
           Два пути к результату
