@@ -84,7 +84,12 @@ export default function RichEditor({ content, onChange, placeholder }: {
       if (url.includes("rutube.ru")) { const m = url.match(/video\/([\w]+)/); embed = "https://rutube.ru/play/embed/" + (m ? m[1] : ""); }
       else if (url.includes("vk.com/video") || url.includes("vkvideo.ru")) {
         if (!embed.includes("/video_ext")) embed = embed.replace("/video", "/video_ext");
-        embed = embed.replace("vkvideo.ru", "vk.com");
+        if (embed.includes("vkvideo.ru")) embed = embed.replace("vkvideo.ru", "vk.com");
+        // Extract oid and id from URL like video-219351616_456239242
+        const vkMatch = embed.match(/video_ext-?(\d+)_(\d+)/);
+        if (vkMatch) {
+          embed = "https://vk.com/video_ext.php?oid=-" + vkMatch[1] + "&id=" + vkMatch[2] + "&hd=2";
+        }
         if (!embed.includes("oid=")) embed += (embed.includes("?") ? "&" : "?") + "oid=-1";
       }
       editor?.chain().focus().insertContent('<div class="video-embed"><iframe src="' + embed + '" allowfullscreen style="width:100%;aspect-ratio:16/9;border:0;"></iframe></div>').run();
