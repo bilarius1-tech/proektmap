@@ -8,6 +8,7 @@ import TourOverlay from "@/components/blueprint/tour-overlay";
 import AIToolsComparison from "@/components/blueprint/ai-tools-comparison";
 import BlueprintFlow from "@/components/blueprint/flow-view";
 import { useRouter } from "next/navigation";
+import SkillChips from "./skill-chips";
 import { useState, useEffect } from "react";
 import {
   Eye, CheckCircle, Copy, ChevronDown, ChevronUp, Menu, X,
@@ -20,6 +21,7 @@ interface Decision {
   tradeoffs: string; mistakes: string;
   context: string; constraints: string; validation: string; iteration: string;
   xpReward: number; timeEstimate: string; impact: string;
+  skillsRequired?: string;
 }
 interface Stage {
   id: string; title: string; slug: string; icon: string; description: string | null;
@@ -380,6 +382,7 @@ export default function BlueprintPageClient({
                   }}>{done ? "✓" : ""}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontWeight: 700, fontSize: "var(--text-s)", textDecoration: done ? "line-through" : "none" }}>{dec.title}</div>
+                    <SkillChips skillsRequired={(dec as any).skillsRequired} />
                   </div>
                   <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", flexShrink: 0, fontWeight: 600 }}>+{dec.xpReward}</div>
                   <button onClick={(e) => { e.stopPropagation(); setExpandedDec(expanded ? null : dec.id); }}
