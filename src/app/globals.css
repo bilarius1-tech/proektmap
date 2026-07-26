@@ -167,6 +167,7 @@
 
 @media (max-width: 768px) { .blog-post-title { font-size: var(--text-xxl); } .blog-sidebar { display: none; } .blog-layout { flex-direction: column !important; } }
 
-.blog-content img { max-width: 100% !important; height: auto !important; margin: 1em 0; border-radius: 0; }
-.blog-content iframe { max-width: 100%; aspect-ratio: 16/9; margin: 1em 0; border: 1px solid var(--color-border); }
-.blog-content .video-embed { margin: 1em 0; }
+.blog-content { overflow-x: hidden; word-wrap: break-word; }
+.blog-content img { max-width: 100% !important; height: auto !important; margin: 1em 0; border-radius: 0; display: block; }
+.blog-content iframe { max-width: 100% !important; aspect-ratio: 16/9; margin: 1em 0; border: 1px solid var(--color-border); }
+.blog-content .video-embed { max-width: 100% !important; }
