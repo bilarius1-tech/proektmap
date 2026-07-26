@@ -186,6 +186,59 @@ export default function DashboardClient({ user, posts, blueprints, completedIds,
   );
 }
 
+
+function SkillsBlock() {
+  const [skills, setSkills] = useState<any[]>([]);
+  const [totalXp, setTotalXp] = useState(0);
+  useEffect(() => {
+    fetch("/api/user/skills").then(r => r.json()).then(d => {
+      setSkills(d.skills || []);
+      setTotalXp(d.totalXp || 0);
+    }).catch(() => {});
+  }, []);
+
+  if (skills.length === 0) return null;
+  const maxXp = Math.max(...skills.map((s: any) => s.xp), 1);
+
+  return (
+    <div style={{ marginBottom: "var(--space-xl)" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-m)" }}>
+        <h2 style={{ fontSize: "var(--text-l)", fontWeight: 700, fontFamily: "var(--font-heading)", margin: 0 }}>Мои навыки</h2>
+        <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", background: "var(--color-bg-primary)", border: "1px solid var(--color-border)", padding: "4px 12px" }}>
+          {totalXp} XP
+        </div>
+      </div>
+      <div style={{ background: "var(--color-bg-primary)", border: "1px solid var(--color-border)", padding: "var(--space-l)" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {skills.slice(0, 10).map((s: any) => {
+            const pct = Math.round((s.xp / maxXp) * 100);
+            return (
+              <div key={s.slug} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <span style={{ width: 110, fontSize: "var(--text-xs)", fontWeight: 700, fontFamily: "var(--font-heading)", flexShrink: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", color: s.xp > 0 ? "var(--color-text-primary)" : "var(--color-text-tertiary)" }}>
+                  {s.term}
+                </span>
+                <div style={{ flex: 1, height: 10, background: "var(--color-bg-secondary)", borderRadius: 0, overflow: "hidden" }}>
+                  <div style={{
+                    width: pct + "%", height: "100%",
+                    background: s.xp > 0
+                      ? "linear-gradient(90deg, var(--color-accent), #0fb880)"
+                      : "var(--color-border)",
+                    borderRadius: 0, transition: "width 0.5s ease",
+                  }} />
+                </div>
+                <span style={{ width: 36, fontSize: 11, fontWeight: 700, textAlign: "right", color: s.xp > 0 ? "var(--color-accent)" : "var(--color-text-tertiary)", fontFamily: "var(--font-heading)" }}>
+                  {s.xp}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
 function StatCard({ icon, value, label }: { icon: any; value: any; label: string }) {
   return (
     <div style={{ padding: "var(--space-m)", background: "white", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", textAlign: "center" }}>
