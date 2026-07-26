@@ -12,8 +12,8 @@ import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 import TextAlign from "@tiptap/extension-text-align";
 import Highlight from "@tiptap/extension-highlight";
-import Underline from "@tiptap/extension-underline";
-import Link from "@tiptap/extension-link";
+
+
 
 import {
   Bold, Italic, Underline as UnderlineIcon, List, ListOrdered,
@@ -39,8 +39,6 @@ export default function RichEditor({ content, onChange, placeholder }: {
       TableRow, TableCell, TableHeader,
       TextAlign.configure({ types: ["heading", "paragraph"] }),
       Highlight.configure({ multicolor: true }),
-      Underline,
-      Link.configure({ openOnClick: false, HTMLAttributes: { target: "_blank", rel: "noopener" } }),
       Placeholder.configure({ placeholder: placeholder || "Начните писать..." }),
     ],
     content,
