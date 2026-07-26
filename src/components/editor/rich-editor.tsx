@@ -18,7 +18,7 @@ import Link from "@tiptap/extension-link";
 import {
   Bold, Italic, Underline as UnderlineIcon, List, ListOrdered,
   Quote, Code, ImageIcon, Heading1, Heading2, Heading3,
-  Video, Upload, X, Search, Grid, Table as TableIcon,
+  Video, Upload, X, Search, Grid, Table as TableIcon, Sparkles, Wand2,
   Strikethrough, Highlighter, LinkIcon, AlignLeft, AlignCenter, AlignRight,
 } from "lucide-react";
 
@@ -102,6 +102,22 @@ export default function RichEditor({ content, onChange, placeholder }: {
   // LINK
   function addLink() { const u = prompt("URL:"); if (u) editor?.chain().focus().setLink({ href: u }).run(); }
 
+
+  const [aiLoading, setAiLoading] = useState(false);
+
+  async function aiEnhance(mode: string) {
+    const text = editor?.getText();
+    if (!text || text.length < 30) { alert("Текст слишком короткий (минимум 30 символов)"); return; }
+    setAiLoading(true);
+    try {
+      const res = await fetch("/api/blog/ai-enhance", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text, mode }) });
+      const data = await res.json();
+      if (data.html) editor?.commands.setContent(data.html);
+    } catch { alert("Ошибка AI"); }
+    setAiLoading(false);
+  }
+
+
   const Btn = ({ onClick, icon, active, disabled }: any) => (
     <button onClick={onClick} disabled={disabled} type="button" style={{
       padding: "6px 8px", border: "1px solid var(--color-border)", borderRadius: 0,
@@ -142,6 +158,10 @@ export default function RichEditor({ content, onChange, placeholder }: {
         <Btn onClick={openMedia} icon={<Grid size={16} />} active={false} />
         <Btn onClick={addVideo} icon={<Video size={16} />} active={false} />
         <Btn onClick={addTable} icon={<TableIcon size={16} />} active={false} />
+        <span style={{ width: 1, height: 20, background: "var(--color-border)", margin: "0 4px" }} />
+        <span style={{ fontSize: 10, color: "var(--color-text-tertiary)", display: "flex", alignItems: "center", padding: "0 4px" }}>AI</span>
+        <Btn onClick={() => aiEnhance("reformat")} icon={aiLoading ? <span style={{fontSize:10}}>...</span> : <Wand2 size={16} />} active={false} disabled={aiLoading} />
+        <Btn onClick={() => aiEnhance("expand")} icon={aiLoading ? <span style={{fontSize:10}}>...</span> : <Sparkles size={16} />} active={false} disabled={aiLoading} />
       </div>
 
       {/* EDITOR */}
