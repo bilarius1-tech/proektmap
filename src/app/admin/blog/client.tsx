@@ -43,7 +43,7 @@ export default function BlogAdminClient({ posts, categories, authors, pendingCom
     setSaving(true);
     const url = editId === "new" ? "/api/admin/blog" : `/api/admin/blog/${editId}`;
     const method = editId === "new" ? "POST" : "PUT";
-    if (!form.slug) form.slug = form.title.toLowerCase().replace(/[^a-zа-я0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 80);
+    if (!form.slug) form.slug = form.title.toLowerCase().replace(/[^a-zа-я0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 70) + "-" + Date.now().toString(36);
     const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
     if (res.ok) { router.refresh(); setEditId(null); }
     setSaving(false);
