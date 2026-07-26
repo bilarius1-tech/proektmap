@@ -43,7 +43,24 @@ export default function BlogAdminClient({ posts, categories, authors, pendingCom
     setSaving(true);
     const url = editId === "new" ? "/api/admin/blog" : `/api/admin/blog/${editId}`;
     const method = editId === "new" ? "POST" : "PUT";
-    if (!form.slug) form.slug = form.title.toLowerCase().replace(/[^a-zа-я0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 70) + "-" + Date.now().toString(36);
+    if (!form.slug) {
+      // ЧПУ генератор: транслит + очистка
+      const ru: Record<string, string> = {а:'a',б:'b',в:'v',г:'g',д:'d',е:'e',ё:'yo',ж:'zh',з:'z',и:'i',й:'y',к:'k',л:'l',м:'m',н:'n',о:'o',п:'p',р:'r',с:'s',т:'t',у:'u',ф:'f',х:'h',ц:'ts',ч:'ch',ш:'sh',щ:'sch',ъ:'',ы:'y',ь:'',э:'e',ю:'yu',я:'ya'};
+      let slug = form.title.toLowerCase().trim();
+      // Транслитерация кириллицы
+      slug = slug.split('').map(c => ru[c] || c).join('');
+      // Декодировать %XX
+      try { slug = decodeURIComponent(slug); } catch {}
+      // Заменить пробелы, подчёркивания, запятые на тире
+      slug = slug.replace(/[\s_,]+/g, '-');
+      // Удалить всё кроме a-z0-9 и тире
+      slug = slug.replace(/[^a-z0-9\-]/g, '');
+      // Убрать повторяющиеся тире
+      slug = slug.replace(/-+/g, '-').replace(/^-|-$/g, '');
+      // Обрезать до 70 символов + timestamp для уникальности
+      slug = slug.slice(0, 70) + '-' + Date.now().toString(36);
+      form.slug = slug || 'post-' + Date.now().toString(36);
+    }
     const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
     if (res.ok) { router.refresh(); setEditId(null); }
     setSaving(false);
