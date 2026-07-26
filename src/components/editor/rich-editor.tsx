@@ -16,7 +16,7 @@ import Underline from "@tiptap/extension-underline";
 import Link from "@tiptap/extension-link";
 
 import {
-  Bold, Italic, List, ListOrdered,
+  Bold, Italic, Underline as UnderlineIcon, List, ListOrdered,
   Quote, Code, ImageIcon, Heading1, Heading2, Heading3,
   Video, Upload, X, Search, Grid, Table as TableIcon, Sparkles, Wand2,
   Strikethrough, Highlighter, LinkIcon, AlignLeft, AlignCenter, AlignRight,
@@ -39,6 +39,8 @@ export default function RichEditor({ content, onChange, placeholder }: {
       TableRow, TableCell, TableHeader,
       TextAlign.configure({ types: ["heading", "paragraph"] }),
       Highlight.configure({ multicolor: true }),
+      Underline,
+      Link.configure({ openOnClick: false, HTMLAttributes: { target: "_blank", rel: "noopener" } }),
       Placeholder.configure({ placeholder: placeholder || "Начните писать..." }),
     ],
     content,
@@ -103,14 +105,11 @@ export default function RichEditor({ content, onChange, placeholder }: {
 
   async function aiEnhance(mode: string) {
     const text = editor?.getText();
-    if (!text || text.length < 30) { alert("Текст слишком короткий (минимум 30 символов)"); return; }
+    if (!text || text.length < 30) { alert("Текст слишком короткий"); return; }
     try {
       const res = await fetch("/api/blog/ai-enhance", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text, mode }) });
       const data = await res.json();
-      if (data.html) {
-        editor?.commands.setContent(data.html);
-        onChange(data.html);
-      }
+      if (data.html) { editor?.commands.setContent(data.html); onChange(data.html); }
     } catch { alert("Ошибка AI"); }
   }
 
