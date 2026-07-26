@@ -1,4 +1,5 @@
 "use client";
+import ContentHtml from "./content-html";
 import { useEffect, useState } from "react";
 
 import { Calendar, User, Tag, Eye, MessageCircle, ArrowLeft, Send } from "lucide-react";
@@ -57,7 +58,7 @@ export default function PostPageClient({ post, relatedPosts, readMore, isAdmin: 
       </div>
 
       <div style={{ fontSize: "var(--text-s)", lineHeight: 1.8, color: "var(--color-text-primary)",  marginBottom: "var(--space-xl)" }}>
-        <div dangerouslySetInnerHTML={{ __html: post.content }} />
+        <ContentHtml content={post.content} />
       </div>
 
       {/* Related posts */}
