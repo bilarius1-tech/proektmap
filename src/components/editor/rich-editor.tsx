@@ -16,7 +16,7 @@ import Underline from "@tiptap/extension-underline";
 import Link from "@tiptap/extension-link";
 
 import {
-  Bold, Italic, Underline as UnderlineIcon, List, ListOrdered,
+  Bold, Italic, List, ListOrdered,
   Quote, Code, ImageIcon, Heading1, Heading2, Heading3,
   Video, Upload, X, Search, Grid, Table as TableIcon, Sparkles, Wand2,
   Strikethrough, Highlighter, LinkIcon, AlignLeft, AlignCenter, AlignRight,
@@ -39,8 +39,6 @@ export default function RichEditor({ content, onChange, placeholder }: {
       TableRow, TableCell, TableHeader,
       TextAlign.configure({ types: ["heading", "paragraph"] }),
       Highlight.configure({ multicolor: true }),
-      Underline,
-      Link.configure({ openOnClick: false, HTMLAttributes: { target: "_blank", rel: "noopener" } }),
       Placeholder.configure({ placeholder: placeholder || "Начните писать..." }),
     ],
     content,
@@ -103,18 +101,17 @@ export default function RichEditor({ content, onChange, placeholder }: {
   function addLink() { const u = prompt("URL:"); if (u) editor?.chain().focus().setLink({ href: u }).run(); }
 
 
-  const [aiLoading, setAiLoading] = useState(false);
-
   async function aiEnhance(mode: string) {
     const text = editor?.getText();
     if (!text || text.length < 30) { alert("Текст слишком короткий (минимум 30 символов)"); return; }
-    setAiLoading(true);
     try {
       const res = await fetch("/api/blog/ai-enhance", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text, mode }) });
       const data = await res.json();
-      if (data.html) editor?.commands.setContent(data.html);
+      if (data.html) {
+        editor?.commands.setContent(data.html);
+        onChange(data.html);
+      }
     } catch { alert("Ошибка AI"); }
-    setAiLoading(false);
   }
 
 
@@ -160,8 +157,8 @@ export default function RichEditor({ content, onChange, placeholder }: {
         <Btn onClick={addTable} icon={<TableIcon size={16} />} active={false} />
         <span style={{ width: 1, height: 20, background: "var(--color-border)", margin: "0 4px" }} />
         <span style={{ fontSize: 10, color: "var(--color-text-tertiary)", display: "flex", alignItems: "center", padding: "0 4px" }}>AI</span>
-        <Btn onClick={() => aiEnhance("reformat")} icon={aiLoading ? <span style={{fontSize:10}}>...</span> : <Wand2 size={16} />} active={false} disabled={aiLoading} />
-        <Btn onClick={() => aiEnhance("expand")} icon={aiLoading ? <span style={{fontSize:10}}>...</span> : <Sparkles size={16} />} active={false} disabled={aiLoading} />
+        <Btn onClick={() => aiEnhance("reformat")} icon={<Wand2 size={16} />} active={false} />
+        <Btn onClick={() => aiEnhance("expand")} icon={<Sparkles size={16} />} active={false} />
       </div>
 
       {/* EDITOR */}
