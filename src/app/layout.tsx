@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import "@/app/globals.css";
 import "@/styles/tokens.css";
 import GlobalHeader from "@/components/layout/header";
 import GlobalFooter from "@/components/layout/footer";

@@ -918,3 +918,36 @@ dfeb819f Prompts v3
 - Доделать видео-вставку для VK/Rutube
 - Slug-транслитерация для блога
 
+
+---
+
+## 26.07.2026
+
+### Критическое открытие
+**globals.css не был импортирован в layout.tsx.** Все CSS-правила (.blog-content img, max-width, overflow-x, адаптивность) никогда не загружались. 3 дня правок не работали из-за отсутствия одного импорта. Исправлено:  в .
+
+### Что сделано
+**Блог — редактор**
+- TipTap переписан: 14 расширений, статические импорты
+- Таблицы, выравнивание, подсветка, ссылки
+- Медиагалерея с поиском и вставкой
+
+**Блог — отображение**
+- ContentHtml компонент: декодирует RSC Unicode-escape
+- Лайтбокс при клике на фото
+- Видео VK/Rutube: iframe embed
+- Видео YouTube: TipTap Youtube extension
+- video_ext не дублируется при повторном открытии
+
+**Загрузка файлов**
+- /api/media/[filename] — раздача без ребилда
+- /api/upload возвращает /api/media/ путь
+- ContentHtml заменяет старые /uploads/ на /api/media/
+
+### Баги найдены и исправлены
+- globals.css не импортирован → все CSS не работал
+- Next.js RSC сериализует HTML в unicode-escape → ContentHtml декодирует
+- Duplicate extensions link/underline → убраны (StarterKit содержит)
+- Table export named → import { Table }
+- Фото 404 после загрузки → /api/media/ эндпоинт
+
