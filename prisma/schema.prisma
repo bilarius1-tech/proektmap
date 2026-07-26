@@ -567,6 +567,8 @@ model GlossaryTerm {
   category          String   @default("general")
   relatedTerms      String   @default("")
   sortOrder         Int      @default(0)
+  isSkill           Boolean  @default(false)
+  skillWeight       Int      @default(1)
   isPublished       Boolean  @default(true)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
@@ -649,6 +651,7 @@ model QuestNode {
   nodeType        String   @default("decision")
   options         String   @default("[]")
   aiModeratorPrompt String @default("")
+  skillsRequired String   @default("[]")
   sortOrder       Int      @default(0)
   isPublished     Boolean  @default(false)
   createdAt       DateTime @default(now())
