@@ -40,6 +40,32 @@ export default async function Home() {
         </div>
       </div>
 
+      
+      {"/* Два пути */"}
+      <div style={{ maxWidth: 1000, margin: "0 auto", padding: "0 var(--space-m) var(--space-xl)" }}>
+        <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-xl)", fontWeight: 700, textAlign: "center", marginBottom: "var(--space-l)", letterSpacing: "-0.01em" }}>
+          Два пути к результату
+        </h2>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "var(--space-l)" }}>
+          <a href="/decisions" style={{ textDecoration: "none", color: "inherit", background: "var(--color-bg-primary)", border: "1px solid var(--color-border)", borderTop: "4px solid var(--color-accent)", padding: "var(--space-xl)", display: "flex", flexDirection: "column", borderRadius: 0 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: "var(--space-m)" }}>
+              <div style={{ width: 48, height: 48, background: "var(--color-accent)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 900, fontFamily: "var(--font-heading)" }}>D</div>
+              <div><div style={{ fontSize: "var(--text-s)", fontWeight: 800, fontFamily: "var(--font-heading)", marginBottom: 2 }}>Принимай решения</div><div style={{ fontSize: 11, color: "var(--color-accent)", fontWeight: 700 }}>Decision-Driven</div></div>
+            </div>
+            <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.7, flex: 1, marginBottom: "var(--space-m)" }}>Твой проект — цепочка осознанных инженерных решений. AI-Архитектор предлагает варианты, ты выбираешь, система строит карту навыков.</p>
+            <div style={{ marginTop: "auto", fontSize: "var(--text-xs)", fontWeight: 700, color: "var(--color-accent)", fontFamily: "var(--font-heading)" }}>ПОНЯТЬ → ВЫБРАТЬ → ПРОВЕРИТЬ</div>
+          </a>
+          <a href="/quest/beginner" style={{ textDecoration: "none", color: "inherit", background: "var(--color-bg-primary)", border: "1px solid var(--color-border)", borderTop: "4px solid #8b5cf6", padding: "var(--space-xl)", display: "flex", flexDirection: "column", borderRadius: 0 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: "var(--space-m)" }}>
+              <div style={{ width: 48, height: 48, background: "#8b5cf6", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 20, fontWeight: 900, fontFamily: "var(--font-heading)" }}>Q</div>
+              <div><div style={{ fontSize: "var(--text-s)", fontWeight: 800, fontFamily: "var(--font-heading)", marginBottom: 2 }}>Пройди путь</div><div style={{ fontSize: 11, color: "#8b5cf6", fontWeight: 700 }}>Быстрый старт</div></div>
+            </div>
+            <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.7, flex: 1, marginBottom: "var(--space-m)" }}>Никогда не писал код? Пройди 8 шагов от «что такое редактор» до работающего сайта в интернете. Каждый шаг — готовый промпт.</p>
+            <div style={{ marginTop: "auto", fontSize: "var(--text-xs)", fontWeight: 700, color: "#8b5cf6", fontFamily: "var(--font-heading)" }}>8 шагов → сайт в интернете</div>
+          </a>
+        </div>
+      </div>
+
       {/* Architect Banner */}
       <div style={{ maxWidth: 900, margin: "0 auto", padding: "0 var(--space-m) var(--space-m)" }}>
         <Link href="/architect" style={{ display: "flex", alignItems: "center", gap: "var(--space-m)", padding: "var(--space-l)", background: "var(--color-accent-light)", border: "1px solid var(--color-accent)", borderLeft: "4px solid var(--color-accent)", textDecoration: "none", color: "inherit", borderRadius: 0 }}>
