@@ -17,6 +17,6 @@ export async function POST(req: NextRequest) {
   await mkdir(uploadDir, { recursive: true });
   await writeFile(join(uploadDir, filename), buffer);
 
-  const url = `/uploads/${filename}`;
+  const url = "/api/media/" + filename;
   return NextResponse.json({ url });
 }
