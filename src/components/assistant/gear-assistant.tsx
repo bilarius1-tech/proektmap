@@ -98,7 +98,7 @@ export default function GearAssistant({
   if (state === "hidden") return null;
 
   return (
-    <div style={{ position: "fixed", bottom: 20, right: 20, zIndex: 400 }}>
+    <div style={{ position: "fixed", bottom: 56, right: 20, zIndex: 1000 }}>
       {showChat && (
         <div style={{ position: "absolute", bottom: 80, right: 0, width: 340, maxHeight: 400, background: "white", borderRadius: "var(--radius-xl)", boxShadow: "0 8px 32px rgba(0,0,0,0.15)", border: "1px solid var(--color-border)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", borderBottom: "1px solid var(--color-border-light)" }}>

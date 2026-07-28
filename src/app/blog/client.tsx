@@ -3,7 +3,7 @@ import { useState } from "react";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Eye, Calendar, User, Tag, ChevronLeft, ChevronRight, MessageCircle, FolderOpen } from "lucide-react";
+import { Eye, Calendar, User, Tag, ChevronLeft, ChevronRight, MessageCircle, FolderOpen, Rocket, Bookmark } from "lucide-react";
 
 export default function BlogPageClient({ posts, categories, total, page, perPage, currentCat }: any) {
   const [mobileCatOpen, setMobileCatOpen] = useState(false);
@@ -35,15 +35,29 @@ export default function BlogPageClient({ posts, categories, total, page, perPage
               fontSize: "var(--text-s)", fontWeight: currentCat === c.slug ? 700 : 500,
             }}>{c.name}</button>
           ))}
+          <div style={{ marginTop: "var(--space-m)", paddingTop: "var(--space-m)", borderTop: "1px solid var(--color-border-light)" }}>
+            <a href="/blog/bookmarks" style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 12px", borderRadius: "var(--radius-s)", color: "var(--color-text-secondary)", textDecoration: "none", fontSize: "var(--text-s)", fontWeight: 500 }}>
+              <Bookmark size={14} />
+              Мои закладки
+            </a>
+            <a href="/blog/suggest" style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 12px", borderRadius: "var(--radius-s)", color: "var(--color-accent)", textDecoration: "none", fontSize: "var(--text-s)", fontWeight: 600 }}>
+              ✍️ Предложить статью
+            </a>
+          </div>
         </div>
 
-        {/* Ad banner placeholder */}
+        {/* Suggest article CTA */}
         <div style={{
-          marginTop: "var(--space-xl)", padding: "var(--space-m)", background: "var(--color-bg-secondary)",
-          borderRadius: "var(--radius-m)", border: "1px dashed var(--color-border)", textAlign: "center",
-          fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)",
+          marginTop: "var(--space-xl)", padding: "var(--space-m)", background: "var(--color-accent-light)",
+          borderRadius: "var(--radius-m)", border: "1px solid var(--color-accent)", textAlign: "center",
         }}>
-          📢 Место для баннера
+          <div style={{ fontWeight: 700, fontSize: "var(--text-s)", color: "var(--color-accent)", marginBottom: 4 }}>✍️ Предложить статью</div>
+          <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", marginBottom: "var(--space-s)", lineHeight: 1.5 }}>
+            Есть чем поделиться? Напишите статью и мы опубликуем её после модерации.
+          </div>
+          <a href="/blog/suggest" style={{ display: "inline-block", padding: "8px 16px", borderRadius: "var(--radius-m)", background: "var(--color-accent)", color: "white", textDecoration: "none", fontSize: "var(--text-xs)", fontWeight: 600 }}>
+            Написать →
+          </a>
         </div>
       </aside>
 
@@ -107,8 +121,10 @@ export default function BlogPageClient({ posts, categories, total, page, perPage
                 <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.6, marginBottom: "var(--space-s)" }}>{p.excerpt}</p>
                 <div style={{ display: "flex", alignItems: "center", gap: "var(--space-m)", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>
                   <span style={{ display: "flex", alignItems: "center", gap: 4 }}><User size={12} />{<Link href={`/blog/author/${p.author?.email}`} style={{color:"inherit",textDecoration:"none"}}>{p.author?.name || "Аноним"}</Link>}</span>
-                  <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Calendar size={12} />{new Date(p.publishedAt).toLocaleDateString("ru")}</span><span style={{ display: "flex", alignItems: "center", gap: 4, color: "var(--color-text-tertiary)", fontSize: 11, marginLeft: 8 }}><Eye size={12} /> {p.viewCount || 0}</span><span style={{ display: "flex", alignItems: "center", gap: 4, color: "var(--color-text-tertiary)", fontSize: 11, marginLeft: 8 }}><Eye size={12} /> {p.viewCount || 0}</span>
+                  <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Calendar size={12} />{new Date(p.publishedAt).toLocaleDateString("ru")}</span><span style={{ display: "flex", alignItems: "center", gap: 4, color: "var(--color-text-tertiary)", fontSize: 11 }}><Eye size={12} /> {p.viewCount || 0}</span>
+                  {(p.impactScore > 0) && <span style={{ display: "flex", alignItems: "center", gap: 2, color: "var(--color-accent)", fontSize: 11, fontWeight: 600 }}>🔥 {p.impactScore}</span>}
                   <span style={{ display: "flex", alignItems: "center", gap: 4 }}><MessageCircle size={12} />{(p._count?.comments || 0)}</span>
+                  {(p.bookmarkCount > 0 || p.projectUseCount > 0) && <span style={{ display: "flex", alignItems: "center", gap: 4, color: "var(--color-text-tertiary)", fontSize: 11 }}>🔖{p.bookmarkCount || 0} 🚀{p.projectUseCount || 0}</span>}
                 </div>
               </div>
             </Link>

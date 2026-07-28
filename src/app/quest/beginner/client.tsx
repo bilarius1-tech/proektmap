@@ -209,7 +209,6 @@ export default function BeginnerPathClient() {
           width: "clamp(240px, 22vw, 290px)", background: "var(--color-bg-primary)",
           borderRight: "1px solid var(--color-border-light)",
           minHeight: "calc(100vh - 4px)", padding: "var(--space-xl)", flexShrink: 0,
-          display: "var(--sidebar-display, block)",
         }} className="quest-sidebar">
           <div style={{
             fontSize: "var(--text-xs)", fontWeight: 800, color: "var(--color-text-tertiary)",
@@ -247,7 +246,7 @@ export default function BeginnerPathClient() {
         {/* MAIN CONTENT */}
         <main style={{ flex: 1, padding: "clamp(20px, 4vw, 50px)", minWidth: 0 }}>
           {/* Mobile sidebar toggle */}
-          <div style={{ display: "none", marginBottom: "var(--space-m)" }} className="quest-mobile-toggle">
+          <div style={{ marginBottom: "var(--space-m)" }} className="quest-mobile-toggle">
             <button onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
               style={{
                 display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 0,
@@ -260,7 +259,7 @@ export default function BeginnerPathClient() {
 
           {/* Mobile sidebar dropdown */}
           {mobileSidebarOpen && (
-            <div style={{ display: "none", marginBottom: "var(--space-m)", padding: "var(--space-m)", background: "var(--color-bg-primary)", border: "1px solid var(--color-border-light)" }} className="quest-mobile-sidebar">
+            <div style={{ marginBottom: "var(--space-m)", padding: "var(--space-m)", background: "var(--color-bg-primary)", border: "1px solid var(--color-border-light)" }} className="quest-mobile-sidebar">
               {steps.map((s, i) => {
                 const isActive = i === step;
                 const isStepDone = completed.has(i);
@@ -279,12 +278,12 @@ export default function BeginnerPathClient() {
           )}
 
           {/* Step badge */}
-          <div style={{ display: "inline-block", padding: "4px 14px", borderRadius: 0, background: "var(--color-accent-light)", color: "var(--color-accent)", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: "var(--space-s)" }}>
+          <div style={{ display: "inline-block", padding: "4px 14px", borderRadius: "var(--radius-full)", background: "var(--color-accent-light)", color: "var(--color-accent)", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: "var(--space-s)" }}>
             Шаг {step + 1} из {steps.length} · ~{current.time}
           </div>
 
           <h1 style={{
-            fontSize: "var(--text-xxl)", fontWeight: 900, marginBottom: "var(--space-xs)",
+            fontSize: "var(--text-xxl)", fontWeight: 700, marginBottom: "var(--space-xs)",
             fontFamily: "var(--font-heading)", letterSpacing: "-0.02em",
           }}>
             {current.title}
@@ -296,7 +295,7 @@ export default function BeginnerPathClient() {
             {/* LEFT: Checklist + Why + Prompt */}
             <div>
               <div style={{
-                background: "var(--color-bg-primary)", borderRadius: 0, padding: "var(--space-xl)",
+                background: "var(--color-bg-primary)", borderRadius: "var(--radius-m)", padding: "var(--space-xl)",
                 border: "1px solid var(--color-border-light)", marginBottom: "var(--space-l)",
               }}>
                 <RichText text={current.detail} />
@@ -343,7 +342,7 @@ export default function BeginnerPathClient() {
                 {step > 0 && (
                   <button onClick={() => setStep(prev => prev - 1)}
                     style={{
-                      padding: "var(--space-s) var(--space-l)", borderRadius: 0,
+                      padding: "var(--space-s) var(--space-l)", borderRadius: "var(--radius-s)",
                       border: "1px solid var(--color-border)", background: "var(--color-bg-primary)",
                       cursor: "pointer", fontWeight: 600, fontSize: "var(--text-s)",
                       display: "flex", alignItems: "center", gap: 6,
@@ -353,7 +352,7 @@ export default function BeginnerPathClient() {
                 )}
                 <button onClick={handleComplete}
                   style={{
-                    flex: 1, padding: "var(--space-s) var(--space-l)", borderRadius: 0, border: "none",
+                    flex: 1, padding: "var(--space-s) var(--space-l)", borderRadius: "var(--radius-s)", border: "none",
                     background: "var(--color-accent)", color: "white", cursor: "pointer",
                     fontWeight: 700, fontSize: "var(--text-s)",
                     display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
@@ -417,16 +416,6 @@ export default function BeginnerPathClient() {
           </div>
         </main>
       </div>
-
-      {/* Responsive CSS */}
-      <style>{`
-        @media (max-width: 768px) {
-          .quest-sidebar { display: none !important; }
-          .quest-mobile-toggle { display: block !important; }
-          .quest-mobile-sidebar { display: block !important; }
-          .quest-grid { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
     </div>
   );
 }

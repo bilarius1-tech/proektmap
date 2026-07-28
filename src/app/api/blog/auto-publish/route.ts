@@ -92,7 +92,9 @@ export async function POST() {
         if (tm) title = tm[1].trim();
 
         // Remove title line from content
-        const content = fullText.replace(/ЗАГОЛОВОК:\s*.+(\n|$)/, "").trim();
+        let content = fullText.replace(/ЗАГОЛОВОК:\s*.+(\n|$)/, "").trim();
+        // Convert markdown links [text](url) to HTML <a> tags
+        content = content.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener" style="color:var(--color-accent)">$1</a>');
         const excerpt = content.replace(/[#*\[\]()]/g, "").slice(0, 200).replace(/\n/g, " ");
 
         // Generate clean transliterated slug

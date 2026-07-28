@@ -1,4 +1,5 @@
 import { getDb } from "@/lib/db/index";
+import AnimatedHero from "@/components/hero/animated-hero";
 import Link from "next/link";
 import { Globe, Smartphone, Gamepad2, Server, Camera, Package, ArrowRight, Check, Crown, Shield } from "lucide-react";
 
@@ -20,15 +21,16 @@ export default async function Home() {
   return (
     <div style={{ fontFamily: "Inter, sans-serif", background: "var(--color-bg-secondary)", color: "var(--color-text-primary)", minHeight: "100vh" }}>
       {/* Hero */}
-      <div style={{ background: "var(--color-bg-primary)", padding: "80px 20px 50px", textAlign: "center", borderBottom: "1px solid var(--color-border)" }}>
+      <AnimatedHero>
+      <div style={{ background: "transparent", padding: "80px 20px 50px", textAlign: "center" }}>
         <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 14px", borderRadius: "var(--radius-full)", background: "var(--color-accent-light)", color: "var(--color-accent)", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: "var(--space-m)" }}>
           AI Инженер
         </div>
         <h1 style={{ fontFamily: "var(--font-heading)", fontSize: "clamp(28px, 5vw, 40px)", fontWeight: 800, lineHeight: 1.05, marginBottom: "var(--space-s)", letterSpacing: "-0.02em" }}>
-          Научись создавать проекты<br />с помощью AI
+          Школа AI-инженеров: создай проект<br />с нуля с помощью ИИ
         </h1>
         <p style={{ fontSize: "var(--text-l)", color: "var(--color-text-secondary)", maxWidth: 520, margin: "0 auto", lineHeight: 1.6 }}>
-          Инженерный навигатор с готовыми промптами. Выбери шаблон и пройди путь от идеи до запуска.
+          AI-инжиниринг и vibe coding: готовые промпты, 12 этапов, AI-консультант. От идеи до сайта за 1 час.
         </p>
         <div style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: "var(--space-xl)", flexWrap: "wrap" }}>
           <Link href="/corporate-website" style={{ display: "flex", alignItems: "center", gap: 6, padding: "14px 28px", borderRadius: "var(--radius-m)", background: "var(--color-accent)", color: "white", textDecoration: "none", fontSize: "var(--text-s)", fontWeight: 700 }}>
@@ -39,8 +41,9 @@ export default async function Home() {
           </Link>
         </div>
       </div>
+      </AnimatedHero>
+      <div style={{ height: 1, background: "var(--color-border)" }} />
 
-      
       {/* Два пути */}
       <div style={{ maxWidth: 1000, margin: "0 auto", padding: "0 var(--space-m) var(--space-xl)" }}>
         <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-xl)", fontWeight: 700, textAlign: "center", marginBottom: "var(--space-l)", letterSpacing: "-0.01em" }}>

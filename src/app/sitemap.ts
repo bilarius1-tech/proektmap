@@ -18,6 +18,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/privacy`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.4 },
     { url: `${baseUrl}/offer`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.4 },
     { url: `${baseUrl}/auth`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.3 },
+    { url: `${baseUrl}/glossary`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.7 },
+    { url: `${baseUrl}/mcp`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
+    { url: `${baseUrl}/solutions`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.7 },
+    { url: `${baseUrl}/patterns`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.7 },
+    { url: `${baseUrl}/search`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.5 },
+    { url: `${baseUrl}/demo/win98`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
+    { url: `${baseUrl}/pricing`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
+    { url: `${baseUrl}/quest/beginner`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
+    { url: `${baseUrl}/vibecraft`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
   ];
 
   // Dynamic: blog posts
@@ -70,5 +79,37 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }));
   } catch {}
 
-  return [...staticPages, ...blogUrls, ...aiToolUrls, ...mcpUrls];
+  // Dynamic: solutions
+  let solutionUrls: MetadataRoute.Sitemap = [];
+  try {
+    const db = await getDb();
+    const solutions = await db.solution.findMany({ where: { isPublished: true }, select: { slug: true, updatedAt: true } });
+    solutionUrls = solutions.map(s => ({ url: `${baseUrl}/solutions/${s.slug}`, lastModified: s.updatedAt, changeFrequency: "monthly" as const, priority: 0.7 }));
+  } catch {}
+
+  // Dynamic: skills
+  let skillUrls: MetadataRoute.Sitemap = [];
+  try {
+    const db = await getDb();
+    const skills = await db.skill.findMany({ where: { isPublished: true }, select: { slug: true, updatedAt: true } });
+    skillUrls = skills.map(s => ({ url: `${baseUrl}/skills/${s.slug}`, lastModified: s.updatedAt, changeFrequency: "monthly" as const, priority: 0.7 }));
+  } catch {}
+
+  // Dynamic: glossary
+  let glossaryUrls: MetadataRoute.Sitemap = [];
+  try {
+    const db = await getDb();
+    const terms = await db.glossaryTerm.findMany({ where: { isPublished: true }, select: { slug: true, updatedAt: true } });
+    glossaryUrls = terms.map(t => ({ url: `${baseUrl}/glossary/${t.slug}`, lastModified: t.updatedAt, changeFrequency: "monthly" as const, priority: 0.6 }));
+  } catch {}
+
+  // Dynamic: patterns
+  let patternUrls: MetadataRoute.Sitemap = [];
+  try {
+    const db = await getDb();
+    const patterns = await db.buildPattern.findMany({ where: { isPublished: true }, select: { slug: true, updatedAt: true } });
+    patternUrls = patterns.map(p => ({ url: `${baseUrl}/patterns/${p.slug}`, lastModified: p.updatedAt, changeFrequency: "monthly" as const, priority: 0.6 }));
+  } catch {}
+
+  return [...staticPages, ...blogUrls, ...aiToolUrls, ...mcpUrls, ...solutionUrls, ...skillUrls, ...glossaryUrls, ...patternUrls];
 }

@@ -497,6 +497,9 @@ model BlogPost {
   categoryId    String?
   tags          String    @default("")
   viewCount     Int       @default(0)
+  impactScore   Int       @default(0)
+  bookmarkCount Int       @default(0)
+  projectUseCount Int     @default(0)
   aiGenerated   Boolean   @default(false)
   aiModel       String    @default("")
   metaTitle     String    @default("")
@@ -507,6 +510,7 @@ model BlogPost {
   author        User           @relation(fields: [authorId], references: [id])
   category      BlogCategory?  @relation(fields: [categoryId], references: [id])
   comments      BlogComment[]
+  interactions  BlogInteraction[]
   @@map("blog_posts")
 }
 
@@ -524,6 +528,17 @@ model BlogComment {
   parent      BlogComment? @relation("CommentReplies", fields: [parentId], references: [id])
   replies     BlogComment[] @relation("CommentReplies")
   @@map("blog_comments")
+}
+
+model BlogInteraction {
+  id        String   @id @default(uuid())
+  postId    String
+  userId    String?
+  type      String   // bookmark | project_use
+  createdAt DateTime @default(now())
+  post      BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  @@unique([postId, userId, type])
+  @@map("blog_interactions")
 }
 
 model AutoPublish {

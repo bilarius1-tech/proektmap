@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 
-export default function ContentHtml({ content }: { content: string }) {
+export default function ContentHtml({ content, tocHeadings }: { content: string; tocHeadings?: { level: number; text: string; id: string }[] }) {
   const [html, setHtml] = useState('');
   const [lightbox, setLightbox] = useState<string | null>(null);
 
@@ -12,6 +12,23 @@ export default function ContentHtml({ content }: { content: string }) {
     h = h.replace(/\u003c/g, '<').replace(/\u003e/g, '>').replace(/\u0026/g, '&');
     h = h.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"');
     h = h.replace(/src="\/uploads\//g, 'src="/api/media/');
+
+    // Inject IDs into h2/h3 for TOC anchor links
+    if (tocHeadings?.length) {
+      let idx = 0;
+      h = h.replace(/<h([23])([^>]*)>(.+?)<\/h[23]>/gi, (match: string, level: string, attrs: string, inner: string) => {
+        if (idx < tocHeadings!.length) {
+          const id = tocHeadings![idx].id;
+          idx++;
+          // Only add id if not already present
+          if (!/\bid\s*=/i.test(attrs)) {
+            return '<h' + level + attrs + ' id="' + id + '">' + inner + '</h' + level + '>';
+          }
+        }
+        return match;
+      });
+    }
+
     setHtml(h);
   }, [content]);
 

@@ -9,23 +9,22 @@ async function checkAdmin() {
   return u.role === "admin" || u.email === "bilariuss@yandex.ru";
 }
 
-export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   if (!(await checkAdmin())) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   const { id } = await params;
-  const data = await req.json();
+  const { status } = await req.json();
+  if (!status || !["approved", "rejected"].includes(status)) {
+    return NextResponse.json({ error: "Invalid status" }, { status: 400 });
+  }
   const db = await getDb();
-  const post = await db.blogPost.update({
-    where: { id },
-    data: { ...data, publishedAt: data.status === "published" && !data.publishedAt ? new Date() : data.publishedAt || undefined },
-  });
-  return NextResponse.json(post);
+  const comment = await db.blogComment.update({ where: { id }, data: { status } });
+  return NextResponse.json(comment);
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   if (!(await checkAdmin())) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   const { id } = await params;
   const db = await getDb();
-  await db.blogComment.deleteMany({ where: { postId: id } });
-  await db.blogPost.delete({ where: { id } });
+  await db.blogComment.delete({ where: { id } });
   return NextResponse.json({ ok: true });
 }

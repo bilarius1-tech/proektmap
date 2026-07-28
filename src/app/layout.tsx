@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "@/app/globals.css";
 import "@/styles/tokens.css";
 import GlobalHeader from "@/components/layout/header";
+import BlueprintProgressBar from "@/components/layout/blueprint-progress-bar";
 import GlobalFooter from "@/components/layout/footer";
 import StreakBanner from "@/components/layout/streak-banner";
 import AssistantWrapper from "@/components/assistant/assistant-wrapper";
@@ -11,10 +12,10 @@ import AnalyticsScripts, { AnalyticsFooter } from "@/components/analytics";
 
 export const metadata: Metadata = {
   title: {
-    default: "Карта роста — AI-инженерный навигатор",
+    default: "Школа AI-инженеров: создай проект с нуля с помощью ИИ — Карта роста",
     template: "%s — Карта роста",
   },
-  description: "Школа AI-инженеров. Научись создавать проекты с помощью AI. Готовые промпты, 12 этапов, персональный AI-консультант.",
+  description: "Школа AI-инженеров: обучение vibe coding, готовые промпты, 12 этапов разработки. Создай сайт за 1 час с помощью искусственного интеллекта. Персональный AI-консультант.",
   keywords: ["AI-инжиниринг", "vibe coding", "Next.js", "обучение", "разработка", "промпты"],
   authors: [{ name: "Тимофеев Алексей Геннадьевич" }],
   creator: "Тимофеев Алексей",
@@ -44,7 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ru">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Onest:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
         <meta name="theme-color" content="#0fb880" />
         <DesignTokens />
         <AnalyticsScripts />
@@ -56,6 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <GlobalHeader />
         <StreakBanner />
         <main style={{ flex: 1 }}>{children}</main>
+        <BlueprintProgressBar />
         <GlobalFooter />
         <AssistantWrapper />
         <CookieConsent />

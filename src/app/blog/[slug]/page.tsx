@@ -1,5 +1,6 @@
 import { getDb } from "@/lib/db/index";
 import { auth } from "@/lib/auth";
+import { highlightCodeBlocks } from "@/lib/blog/highlight";
 import PostPageClient from "./client";
 import { notFound } from "next/navigation";
 
@@ -51,5 +52,54 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
   const relatedPosts = scored.length >= 2 ? scored : candidates.slice(0, 3);
   const readMore = candidates.find((p: any) => !relatedPosts.find((r: any) => r.id === p.id)) || candidates[0];
 
-  return <PostPageClient post={JSON.parse(JSON.stringify(post))} relatedPosts={JSON.parse(JSON.stringify(relatedPosts))} readMore={JSON.parse(JSON.stringify(readMore || null))} isAdmin={isAdmin} />;
+  // Highlight code blocks
+  const highlightedContent = await highlightCodeBlocks(post.content);
+
+  // Reading time
+  const plainText = highlightedContent.replace(/<[^>]*>/g, '');
+  const readingTime = Math.max(1, Math.round(plainText.length / 1200)); // ~chars/min for RU
+
+  // TOC headings
+  const headingRegex = /<h([23])(?:\s[^>]*)?>(.+?)<\/h[23]>/gi;
+  const tocHeadings: { level: number; text: string; id: string }[] = [];
+  let m: RegExpExecArray | null;
+  const usedIds = new Set<string>();
+  while ((m = headingRegex.exec(highlightedContent)) !== null) {
+    const rawText = m[2].replace(/<[^>]*>/g, '').trim();
+    if (!rawText) continue;
+    let id = rawText.toLowerCase()
+      .replace(/[^a-zа-я0-9]+/g, '-')
+      .replace(/^-|-$/g, '')
+      .slice(0, 60);
+    // deduplicate
+    let dedup = id; let n = 2;
+    while (usedIds.has(dedup)) { dedup = id + '-' + n; n++; }
+    usedIds.add(dedup);
+    tocHeadings.push({ level: parseInt(m[1]), text: rawText, id: dedup });
+  }
+
+    // Cross-link tags with Skills and Solutions
+  const tagList = (post.tags || "").split(",").map((t: string) => t.trim().toLowerCase()).filter(Boolean);
+  let linkedSkills: any[] = [];
+  let linkedSolutions: any[] = [];
+  if (tagList.length > 0) {
+    const [skills, solutions] = await Promise.all([
+      db.skill.findMany({
+        where: { slug: { in: tagList }, isPublished: true },
+        select: { title: true, slug: true, difficulty: true },
+        take: 8,
+      }),
+      db.solution.findMany({
+        where: { slug: { in: tagList }, isPublished: true },
+        select: { title: true, slug: true, complexity: true },
+        take: 8,
+      }),
+    ]);
+    linkedSkills = skills;
+    linkedSolutions = solutions;
+  }
+
+  const postData = JSON.parse(JSON.stringify(post));
+  postData.content = highlightedContent;
+  return <PostPageClient post={postData} relatedPosts={JSON.parse(JSON.stringify(relatedPosts))} readMore={JSON.parse(JSON.stringify(readMore || null))} isAdmin={isAdmin} readingTime={readingTime} tocHeadings={tocHeadings} linkedSkills={JSON.parse(JSON.stringify(linkedSkills))} linkedSolutions={JSON.parse(JSON.stringify(linkedSolutions))} />;
 }
