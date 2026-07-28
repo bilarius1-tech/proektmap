@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from "react";
-import { Sparkles, Loader, Zap, Database, Plug, Package, AlertTriangle, Clock, DollarSign, Server, Cpu, Copy, Check, ChevronDown, ChevronRight, Download, Crown } from "lucide-react";
+import { Sparkles, Loader, Zap, Database, Plug, Package, AlertTriangle, Clock, DollarSign, Server, Cpu, Copy, Check, ChevronDown, ChevronRight, Download, Crown, Save } from "lucide-react";
 import Link from "next/link";
 import { jsPDF } from "jspdf";
 
@@ -35,6 +35,7 @@ export default function ArchitectClient() {
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState("");
   const [selectedOption, setSelectedOption] = useState(0);
+  const [includeMarketAnalysis, setIncludeMarketAnalysis] = useState(true);
   const [copied, setCopied] = useState("");
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({});
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
@@ -49,13 +50,15 @@ export default function ArchitectClient() {
 
   function toggle(s: string) { setOpenSections(p => ({ ...p, [s]: !p[s] })); }
 
+  async function saveSolution() { if (!option || !result) return; try { const res = await fetch("/api/solutions", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({title: option.name || result.productType, description: option.description, productType: result.productType, complexity: option.complexity, mvpDays: option.mvpDays, monetization: option.monetization, costDev: option.costDev, costAi: option.costAi, costServer: option.costServer, summary: option.summary, stack: option.stack, entities: option.entities || [], plan: option.plan || [], skills: (option.patterns||[]).map((p:any)=>p.slug).concat((option.mcp||[]).map((m:any)=>m.slug)), mistakes: option.mistakes || [], marketAnalysis: result.marketAnalysis || null }) }); const data = await res.json(); if (data.slug) alert("Решение сохранено: /solutions/" + data.slug); } catch { alert("Ошибка сохранения"); } }
+
   async function analyze() {
     if (!idea.trim() || idea.length < 10) return;
     setLoading(true); setError(""); setResult(null); setProgressIdx(0); setSelectedOption(0);
     const timer = setInterval(() => setProgressIdx(p => { if (p >= PROGRESS.length - 1) { clearInterval(timer); return p; } return p + 1; }), 800);
     try {
       await new Promise(r => setTimeout(r, 500));
-      const res = await fetch("/api/architect", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ idea }) });
+      const res = await fetch("/api/architect", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ idea, includeMarketAnalysis }) });
       const data = await res.json();
       clearInterval(timer);
       if (data.error && !data.options) { setError(data.error); setProgressIdx(-1); setLoading(false); return; }
@@ -156,10 +159,74 @@ export default function ArchitectClient() {
 
         {result && (
           <div>
+            {result.marketAnalysis && (
+            <div style={{ marginBottom: "var(--space-l)" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "var(--space-s)", marginBottom: "var(--space-s)" }}>
+                {result.marketAnalysis.marketSize && <div style={{ padding: "var(--space-m)", background: "var(--color-bg-primary)", border: "1px solid var(--color-border)" }}><div style={{ fontSize: 10, color: "var(--color-text-tertiary)", textTransform: "uppercase", marginBottom: 4 }}>Объём рынка</div><div style={{ fontSize: "var(--text-xs)", lineHeight: 1.5 }}>{result.marketAnalysis.marketSize}</div></div>}
+                {result.marketAnalysis.targetAudience && <div style={{ padding: "var(--space-m)", background: "var(--color-bg-primary)", border: "1px solid var(--color-border)" }}><div style={{ fontSize: 10, color: "var(--color-text-tertiary)", textTransform: "uppercase", marginBottom: 4 }}>Целевая аудитория</div><div style={{ fontSize: "var(--text-xs)", lineHeight: 1.5 }}>{result.marketAnalysis.targetAudience}</div></div>}
+                {result.marketAnalysis.differentiation && <div style={{ padding: "var(--space-m)", background: "var(--color-bg-primary)", border: "1px solid var(--color-border)" }}><div style={{ fontSize: 10, color: "var(--color-text-tertiary)", textTransform: "uppercase", marginBottom: 4 }}>Дифференциация</div><div style={{ fontSize: "var(--text-xs)", lineHeight: 1.5 }}>{result.marketAnalysis.differentiation}</div></div>}
+                {result.marketAnalysis.monetizationStrategy && <div style={{ padding: "var(--space-m)", background: "var(--color-bg-primary)", border: "1px solid var(--color-border)" }}><div style={{ fontSize: 10, color: "var(--color-text-tertiary)", textTransform: "uppercase", marginBottom: 4 }}>Монетизация</div><div style={{ fontSize: "var(--text-xs)", lineHeight: 1.5 }}>{result.marketAnalysis.monetizationStrategy}</div></div>}
+                {result.marketAnalysis.goToMarket && <div style={{ padding: "var(--space-m)", background: "var(--color-bg-primary)", border: "1px solid var(--color-border)" }}><div style={{ fontSize: 10, color: "var(--color-text-tertiary)", textTransform: "uppercase", marginBottom: 4 }}>Выход на рынок</div><div style={{ fontSize: "var(--text-xs)", lineHeight: 1.5 }}>{result.marketAnalysis.goToMarket}</div></div>}
+              </div>
+              {result.marketAnalysis.competitors?.length > 0 && (
+                <div style={{ background: "var(--color-bg-primary)", border: "1px solid var(--color-border)", padding: "var(--space-l)", marginBottom: "var(--space-s)" }}>
+                  <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", textTransform: "uppercase", marginBottom: 8, fontWeight: 700 }}>Конкуренты</div>
+                  {result.marketAnalysis.competitors.map((comp: string, i: number) => <div key={i} style={{ padding: "4px 0", fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", display: "flex", gap: 8 }}><span>{i+1}.</span><span>{comp}</span></div>)}
+                </div>
+              )}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-s)" }}>
+                {result.marketAnalysis.risks?.length > 0 && (
+                  <div style={{ background: "#fef2f2", border: "1px solid #fecaca", padding: "var(--space-m)" }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: "#991b1b", textTransform: "uppercase", marginBottom: 6 }}>Риски</div>
+                    {result.marketAnalysis.risks.map((r: string, i: number) => <div key={i} style={{ fontSize: "var(--text-xs)", color: "#991b1b", padding: "2px 0" }}>• {r}</div>)}
+                  </div>
+                )}
+                {result.marketAnalysis.opportunities?.length > 0 && (
+                  <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", padding: "var(--space-m)" }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: "#166534", textTransform: "uppercase", marginBottom: 6 }}>Возможности</div>
+                    {result.marketAnalysis.opportunities.map((o: string, i: number) => <div key={i} style={{ fontSize: "var(--text-xs)", color: "#166534", padding: "2px 0" }}>• {o}</div>)}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
             {result.expertRecommendation && (
               <div style={{ padding: "var(--space-l)", background: "var(--color-accent-light)", border: "1px solid var(--color-accent)", borderLeft: "4px solid var(--color-accent)", marginBottom: "var(--space-l)" }}>
                 <div style={{ fontSize: "var(--text-xs)", fontWeight: 700, color: "var(--color-accent)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>Экспертная рекомендация</div>
-                <div style={{ fontSize: "var(--text-s)", color: "var(--color-text-primary)", lineHeight: 1.7 }}>{result.expertRecommendation}</div>
+                <div style={{ fontSize: "var(--text-s)", color: "var(--color-text-primary)", lineHeight: 1.7 }}>{result.marketAnalysis && (
+            <div style={{ marginBottom: "var(--space-l)" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "var(--space-s)", marginBottom: "var(--space-s)" }}>
+                {result.marketAnalysis.marketSize && <div style={{ padding: "var(--space-m)", background: "var(--color-bg-primary)", border: "1px solid var(--color-border)" }}><div style={{ fontSize: 10, color: "var(--color-text-tertiary)", textTransform: "uppercase", marginBottom: 4 }}>Объём рынка</div><div style={{ fontSize: "var(--text-xs)", lineHeight: 1.5 }}>{result.marketAnalysis.marketSize}</div></div>}
+                {result.marketAnalysis.targetAudience && <div style={{ padding: "var(--space-m)", background: "var(--color-bg-primary)", border: "1px solid var(--color-border)" }}><div style={{ fontSize: 10, color: "var(--color-text-tertiary)", textTransform: "uppercase", marginBottom: 4 }}>Целевая аудитория</div><div style={{ fontSize: "var(--text-xs)", lineHeight: 1.5 }}>{result.marketAnalysis.targetAudience}</div></div>}
+                {result.marketAnalysis.differentiation && <div style={{ padding: "var(--space-m)", background: "var(--color-bg-primary)", border: "1px solid var(--color-border)" }}><div style={{ fontSize: 10, color: "var(--color-text-tertiary)", textTransform: "uppercase", marginBottom: 4 }}>Дифференциация</div><div style={{ fontSize: "var(--text-xs)", lineHeight: 1.5 }}>{result.marketAnalysis.differentiation}</div></div>}
+                {result.marketAnalysis.monetizationStrategy && <div style={{ padding: "var(--space-m)", background: "var(--color-bg-primary)", border: "1px solid var(--color-border)" }}><div style={{ fontSize: 10, color: "var(--color-text-tertiary)", textTransform: "uppercase", marginBottom: 4 }}>Монетизация</div><div style={{ fontSize: "var(--text-xs)", lineHeight: 1.5 }}>{result.marketAnalysis.monetizationStrategy}</div></div>}
+                {result.marketAnalysis.goToMarket && <div style={{ padding: "var(--space-m)", background: "var(--color-bg-primary)", border: "1px solid var(--color-border)" }}><div style={{ fontSize: 10, color: "var(--color-text-tertiary)", textTransform: "uppercase", marginBottom: 4 }}>Выход на рынок</div><div style={{ fontSize: "var(--text-xs)", lineHeight: 1.5 }}>{result.marketAnalysis.goToMarket}</div></div>}
+              </div>
+              {result.marketAnalysis.competitors?.length > 0 && (
+                <div style={{ background: "var(--color-bg-primary)", border: "1px solid var(--color-border)", padding: "var(--space-l)", marginBottom: "var(--space-s)" }}>
+                  <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", textTransform: "uppercase", marginBottom: 8, fontWeight: 700 }}>Конкуренты</div>
+                  {result.marketAnalysis.competitors.map((comp: string, i: number) => <div key={i} style={{ padding: "4px 0", fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", display: "flex", gap: 8 }}><span>{i+1}.</span><span>{comp}</span></div>)}
+                </div>
+              )}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-s)" }}>
+                {result.marketAnalysis.risks?.length > 0 && (
+                  <div style={{ background: "#fef2f2", border: "1px solid #fecaca", padding: "var(--space-m)" }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: "#991b1b", textTransform: "uppercase", marginBottom: 6 }}>Риски</div>
+                    {result.marketAnalysis.risks.map((r: string, i: number) => <div key={i} style={{ fontSize: "var(--text-xs)", color: "#991b1b", padding: "2px 0" }}>• {r}</div>)}
+                  </div>
+                )}
+                {result.marketAnalysis.opportunities?.length > 0 && (
+                  <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", padding: "var(--space-m)" }}>
+                    <div style={{ fontSize: 10, fontWeight: 700, color: "#166534", textTransform: "uppercase", marginBottom: 6 }}>Возможности</div>
+                    {result.marketAnalysis.opportunities.map((o: string, i: number) => <div key={i} style={{ fontSize: "var(--text-xs)", color: "#166534", padding: "2px 0" }}>• {o}</div>)}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+            {result.expertRecommendation}</div>
               </div>
             )}
 

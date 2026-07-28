@@ -706,3 +706,32 @@ model QuestStep {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+
+model Solution {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  description String   @default("")
+  productType String   @default("")
+  complexity  Int      @default(5)
+  mvpDays     String   @default("")
+  monetization String  @default("")
+  costDev     String   @default("")
+  costAi      String   @default("")
+  costServer  String   @default("")
+  summary     String   @default("")
+  stack       String   @default("")
+  entities    String   @default("[]")
+  plan        String   @default("[]")
+  skills      String   @default("[]")
+  mistakes    String   @default("[]")
+  authorId    String?
+  authorName  String   @default("")
+  votes       Int      @default(0)
+  usageCount  Int      @default(0)
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  @@map("solutions")
+}
