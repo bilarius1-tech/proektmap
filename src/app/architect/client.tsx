@@ -73,18 +73,18 @@ export default function ArchitectClient() {
   function exportPDF() {
     if (!option) return;
     const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-    // Use built-in helvetica — works for Cyrillic in most browsers
-    doc.setFont("helvetica", "normal");
+    // jsPDF doesn't support Cyrillic with default fonts. Use transliteration fallback.
+    function safe(s: string) { return (s || "").replace(/[а-яё]/gi, "").trim() || s; }
     let y = 20; const margin = 20; const w = doc.internal.pageSize.getWidth() - margin * 2;
     doc.setFont("helvetica", "bold"); doc.setFontSize(18);
     doc.text("Архитектура проекта", margin, y); y += 12;
     doc.setFontSize(12); doc.setFont("helvetica", "normal");
-    doc.text(option.name || "", margin, y); y += 8;
-    doc.setFontSize(10); doc.text(option.summary || "", margin, y, { maxWidth: w }); y += 16;
+    doc.text(safe(option.name) || "Architecture", margin, y); y += 8;
+    doc.setFontSize(10); doc.text(safe(option.summary) || "", margin, y, { maxWidth: w }); y += 16;
     doc.setFont("helvetica", "bold"); doc.setFontSize(12);
     doc.text("Метаданные", margin, y); y += 8;
     doc.setFont("helvetica", "normal"); doc.setFontSize(10);
-    const meta = [`Тип: ${result.productType || "—"}`, `Сложность: ${option.complexity}/10`, `MVP: ${option.mvpDays}`, `Монетизация: ${option.monetization}`, `Разработка: ${option.costDev}`, `AI: ${option.costAi}`, `Сервер: ${option.costServer}`];
+    const meta = [`Project: ${safe(option.name) || "Architecture"}`, `Complexity: ${option.complexity}/10`, `Сложность: ${option.complexity}/10`, `MVP: ${option.mvpDays}`, `Монетизация: ${option.monetization}`, `Разработка: ${option.costDev}`, `AI: ${option.costAi}`, `Сервер: ${option.costServer}`];
     meta.forEach(m => { doc.text(m, margin, y); y += 6; }); y += 6;
     if (option.entities?.length) { doc.setFont("helvetica", "bold"); doc.text("Сущности БД", margin, y); y += 8; doc.setFont("helvetica", "normal"); option.entities.forEach((e: string) => { doc.text("• " + e, margin, y); y += 5; }); y += 4; }
     if (option.plan?.length) { doc.setFont("helvetica", "bold"); doc.text("План разработки", margin, y); y += 8; doc.setFont("helvetica", "normal"); option.plan.forEach((p: string, i: number) => { doc.text(`${i + 1}. ${p}`, margin, y, { maxWidth: w }); y += 5; }); y += 4; }
@@ -139,7 +139,16 @@ export default function ArchitectClient() {
                 </div>
               ))}
             </div>
-            <div style={{ fontSize: "var(--text-xs)", fontWeight: 700, color: "var(--color-text-tertiary)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "var(--space-s)" }}>Готовые примеры</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: "var(--space-m)" }}>
+            <button onClick={() => setIncludeMarketAnalysis(!includeMarketAnalysis)} style={{ width: 40, height: 22, border: "none", cursor: "pointer", background: includeMarketAnalysis ? "var(--color-accent)" : "var(--color-border)", position: "relative", padding: 0, borderRadius: 11 }}>
+              <div style={{ width: 18, height: 18, borderRadius: "50%", background: "#fff", position: "absolute", top: 2, left: includeMarketAnalysis ? 20 : 2, transition: "left 0.2s" }} />
+            </button>
+            <span style={{ fontSize: "var(--text-xs)", color: includeMarketAnalysis ? "var(--color-accent)" : "var(--color-text-tertiary)", fontWeight: 600 }}>
+              Анализ рынка и конкурентов
+            </span>
+          </div>
+
+          <div style={{ fontSize: "var(--text-xs)", fontWeight: 700, color: "var(--color-text-tertiary)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "var(--space-s)" }}>Готовые примеры</div>
             {CATEGORIES.map(cat => (
               <div key={cat.name} style={{ marginBottom: "var(--space-m)" }}>
                 <div style={{ fontSize: 10, fontWeight: 600, color: "var(--color-text-tertiary)", marginBottom: 6 }}>{cat.icon} {cat.name}</div>
