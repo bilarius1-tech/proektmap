@@ -58,13 +58,13 @@ export default function ArchitectClient() {
     const timer = setInterval(() => setProgressIdx(p => { if (p >= PROGRESS.length - 1) { clearInterval(timer); return p; } return p + 1; }), 800);
     try {
       await new Promise(r => setTimeout(r, 500));
-      const res = await fetch("/api/architect", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ idea, includeMarketAnalysis }) });
+      const res = await fetch("/api/architect", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ idea, includeMarketAnalysis }), signal: AbortSignal.timeout(45000) });
       const data = await res.json();
       clearInterval(timer);
       if (data.error && !data.options) { setError(data.error); setProgressIdx(-1); setLoading(false); return; }
       setProgressIdx(PROGRESS.length);
       setTimeout(() => { setResult(data); setLoading(false); setOpenSections({ entities: true, plan: true }); }, 400);
-    } catch { clearInterval(timer); setError("Ошибка соединения"); setLoading(false); }
+    } catch { clearInterval(timer); const errMsg = (e instanceof DOMException && e.name === "TimeoutError") ? "Превышено время ожидания (45 сек). Сервер не ответил. Попробуйте упростить запрос." : "Ошибка соединения. Проверьте интернет и попробуйте снова."; setError(errMsg); setLoading(false); }
   }
 
   const option = result?.options?.[selectedOption];

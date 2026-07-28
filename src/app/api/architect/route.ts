@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
   if (!key) return NextResponse.json({ error: "No key" }, { status: 500 });
 
   try {
-    const res = await fetch("https://api.deepseek.com/v1/chat/completions", {
+    const res = await fetch("https://api.deepseek.com/v1/chat/completions", { signal: AbortSignal.timeout(35000),
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: "Bearer " + key },
       body: JSON.stringify({ model: "deepseek-v4-flash", messages: [{ role: "system", content: SYSTEM_PROMPT }, { role: "user", content: idea }], max_tokens: 8000, temperature: 0.4 }),
