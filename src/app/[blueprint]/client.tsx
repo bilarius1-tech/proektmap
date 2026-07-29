@@ -12,7 +12,7 @@ import SkillChips from "./skill-chips";
 import { useState, useEffect } from "react";
 import {
   Eye, CheckCircle, Copy, ChevronDown, ChevronUp, Menu, X, Target, Database, Clock, Package,
-  Lock, LogIn, FolderOpen, Plus, Briefcase, ArrowRight,
+  Lock, LogIn, FolderOpen, Plus, Briefcase, ArrowRight, Play,
 } from "lucide-react";
 
 interface Decision {
@@ -92,7 +92,7 @@ export default function BlueprintPageClient({
   blueprint, isLoggedIn, isPro, projectContext, userProjects, userContext, glossaryTerms, pattern, isDemo,
 }: {
   blueprint: Blueprint; isLoggedIn: boolean; isPro: boolean;
-  projectContext: ProjectContext | null; userProjects: MiniProject[]; userContext: string; glossaryTerms: any[]; isDemo: boolean; pattern: any; fromPage: string | null;
+  projectContext: ProjectContext | null; userProjects: MiniProject[]; userContext: string; glossaryTerms: any[]; isDemo: boolean; pattern: any; fromPage: string | null; projectCount?: number; completedCount?: number;
 }) {
   const router = useRouter();
   const stages = blueprint.stages.map(bs => bs.stage);
@@ -232,6 +232,8 @@ export default function BlueprintPageClient({
               {(blueprint as any).timeToComplete && <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Clock size={14} style={{ color: "var(--color-accent)" }} /> {(blueprint as any).timeToComplete}</span>}
               <span style={{ display: "flex", alignItems: "center", gap: 4 }}><CheckCircle size={14} style={{ color: "var(--color-accent)" }} /> {blueprint.totalXp} XP</span>
               <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Database size={14} style={{ color: "var(--color-accent)" }} /> {blueprint.totalDecisions} этапов</span>
+              {(blueprint as any).viewCount > 0 && <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Eye size={14} style={{ color: "var(--color-accent)" }} /> {(blueprint as any).viewCount} просмотров</span>}
+              {(blueprint as any).startCount > 0 && <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Play size={14} style={{ color: "var(--color-accent)" }} /> {(blueprint as any).startCount} запусков</span>}
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "var(--space-m)" }}>
               {(() => {

@@ -36,6 +36,11 @@ export default async function BlueprintPage({
   });
   if (!bp) notFound();
 
+  // Track view + load analytics
+  await db.blueprint.update({ where: { id: bp.id }, data: { viewCount: { increment: 1 } } });
+  const projectCount = await db.project.count({ where: { blueprintId: bp.id } });
+  const completedCount = await db.project.count({ where: { blueprintId: bp.id, status: "completed" } });
+
   const session = await auth();
   const isLoggedIn = !!session?.user;
   const isPro = isLoggedIn && ((session.user as any).subscription === "pro" || (session.user as any).role === "admin");
@@ -74,6 +79,8 @@ export default async function BlueprintPage({
       pattern={pattern ? JSON.parse(JSON.stringify(pattern)) : null}
       fromPage={fromPage || null}
       isDemo={isDemo === "true"}
+      projectCount={projectCount}
+      completedCount={completedCount}
     />
   );
 }

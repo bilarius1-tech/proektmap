@@ -5,14 +5,14 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
-interface BlueprintForm { id?: string; title: string; slug: string; description: string; icon: string; difficulty: string; isPublished: boolean; sortOrder: number; }
+interface BlueprintForm { id?: string; title: string; slug: string; description: string; icon: string; difficulty: string; isPublished: boolean; sortOrder: number; coverImage: string; goal: string; timeToComplete: string; targetAudience: string; }
 
 export default function BPForm({ initial }: { initial?: any }) {
   const router = useRouter();
   const [form, setForm] = useState<BlueprintForm>({
     title: initial?.title || "", slug: initial?.slug || "", description: initial?.description || "",
     icon: initial?.icon || "Globe", difficulty: initial?.difficulty || "easy",
-    isPublished: initial?.isPublished ?? false, sortOrder: initial?.sortOrder || 0, id: initial?.id,
+    isPublished: initial?.isPublished ?? false, sortOrder: initial?.sortOrder || 0, id: initial?.id, coverImage: initial?.coverImage || "", goal: initial?.goal || "", timeToComplete: initial?.timeToComplete || "", targetAudience: initial?.targetAudience || "",
   });
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
@@ -39,6 +39,9 @@ export default function BPForm({ initial }: { initial?: any }) {
           <div><label style={lbl}>Slug</label><input className="input" value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })} /></div>
           <div><label style={lbl}>Иконка (Lucide)</label><input className="input" value={form.icon} onChange={e => setForm({ ...form, icon: e.target.value })} /></div>
         </div>
+        <div><label style={lbl}>Обложка (URL)</label><input className="input" value={form.coverImage} onChange={e => setForm({ ...form, coverImage: e.target.value })} placeholder="https://... или /uploads/..."/></div>
+        <div><label style={lbl}>Цель</label><input className="input" value={form.goal} onChange={e => setForm({ ...form, goal: e.target.value })} placeholder="Что получит пользователь"/></div>
+        <div><label style={lbl}>Время прохождения</label><input className="input" value={form.timeToComplete} onChange={e => setForm({ ...form, timeToComplete: e.target.value })} placeholder="2 недели по 1 часу в день"/></div>
         <div><label style={lbl}>Описание</label><textarea className="input" rows={2} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} /></div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "var(--space-s)" }}>
           <div><label style={lbl}>Сложность</label><select className="input" value={form.difficulty} onChange={e => setForm({ ...form, difficulty: e.target.value })}><option value="easy">Лёгкий</option><option value="medium">Средний</option><option value="hard">Сложный</option></select></div>

@@ -1,6 +1,6 @@
 import { getDb } from "@/lib/db/index";
 import Link from "next/link";
-import { Clock, Target, Database, CheckCircle, Package, ArrowRight, Globe, Server, Smartphone, Gamepad2 } from "lucide-react";
+import { Clock, Target, Database, CheckCircle, Package, ArrowRight, Eye, Globe, Server, Smartphone, Gamepad2 } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 export const metadata = {
@@ -44,10 +44,16 @@ export default async function BlueprintsPage() {
             }}
             className="card-hover"
             >
+              {/* Cover image */}
+              {bp.coverImage && (
+                <div style={{ height: 180, overflow: "hidden" }}>
+                  <img src={bp.coverImage} alt={bp.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                </div>
+              )}
               {/* Header */}
               <div style={{
-                padding: "var(--space-xl) var(--space-l) var(--space-m)",
-                background: "linear-gradient(135deg, var(--color-accent-light), var(--color-bg-primary))",
+                padding: bp.coverImage ? "var(--space-l)" : "var(--space-xl) var(--space-l) var(--space-m)",
+                background: bp.coverImage ? "var(--color-bg-primary)" : "linear-gradient(135deg, var(--color-accent-light), var(--color-bg-primary))",
                 display: "flex", alignItems: "flex-start", gap: "var(--space-m)",
               }}>
                 <div style={{
@@ -92,6 +98,9 @@ export default async function BlueprintsPage() {
                 <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>
                   <CheckCircle size={14} /> {bp.totalXp} XP
                 </span>
+                {bp.viewCount > 0 && <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>
+                  <Eye size={14} /> {bp.viewCount}
+                </span>}
               </div>
 
               {/* Bottom */}
