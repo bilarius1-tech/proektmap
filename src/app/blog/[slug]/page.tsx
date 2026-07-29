@@ -11,7 +11,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const db = await getDb();
   const post = await db.blogPost.findUnique({ where: { slug }, include: { category: true, author: true } });
   if (!post || post.status !== "published") return {};
-  const ogImage = `https://proektmap.ru/api/og?title=${encodeURIComponent(post.title)}&category=${encodeURIComponent(post.category?.name || "")}&author=${encodeURIComponent(post.author?.name || "")}`;
+  const ogImage = post.coverImage?.startsWith("/") ? `https://proektmap.ru${post.coverImage}` : post.coverImage || `https://proektmap.ru/api/og?title=${encodeURIComponent(post.title)}&category=${encodeURIComponent(post.category?.name || "")}&author=${encodeURIComponent(post.author?.name || "")}`;
   return {
     title: post.metaTitle || post.title,
     description: post.metaDesc || post.excerpt,

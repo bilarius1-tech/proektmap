@@ -2,7 +2,7 @@
 import ContentHtml from "./content-html";
 import { useEffect, useState } from "react";
 
-import { Calendar, User, Tag, Eye, MessageCircle, ArrowLeft, Send, Bookmark, Rocket, Clock, List } from "lucide-react";
+import { Calendar, User, Tag, Eye, MessageCircle, ArrowLeft, Send, Bookmark, Rocket, Clock, List, Share2 } from "lucide-react";
 import Link from "next/link";
 
 function formatDate(d: string) {
@@ -139,6 +139,28 @@ export default function PostPageClient({ post, relatedPosts, readMore, isAdmin: 
             <Tag size={10} />{t.trim()}
           </span>
         ))}
+        <div style={{ marginLeft: "auto", display: "flex", gap: 4 }}>
+          <button onClick={() => {
+            const url = encodeURIComponent(window.location.href);
+            const title = encodeURIComponent(post.title);
+            window.open(`https://t.me/share/url?url=${url}&text=${title}`, "_blank", "width=600,height=400");
+          }} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-tertiary)", padding: 4, display: "flex", alignItems: "center", gap: 3, fontSize: 10 }} title="Поделиться в Telegram">
+            <span style={{ fontWeight: 700, color: "#2AABEE" }}>TG</span>
+          </button>
+          <button onClick={() => {
+            const url = encodeURIComponent(window.location.href);
+            const title = encodeURIComponent(post.title);
+            window.open(`https://vk.com/share.php?url=${url}&title=${title}`, "_blank", "width=600,height=400");
+          }} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-tertiary)", padding: 4, display: "flex", alignItems: "center", gap: 3, fontSize: 10 }} title="Поделиться ВКонтакте">
+            <span style={{ fontWeight: 700, color: "#0077FF" }}>VK</span>
+          </button>
+          <button onClick={() => {
+            navigator.clipboard.writeText(window.location.href);
+            alert("Ссылка скопирована!");
+          }} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-tertiary)", padding: 4 }} title="Скопировать ссылку">
+            <Share2 size={14} />
+          </button>
+        </div>
       </div>
 
       <div style={{ fontSize: "var(--text-s)", lineHeight: 1.8, color: "var(--color-text-primary)",  marginBottom: "var(--space-xl)" }}>

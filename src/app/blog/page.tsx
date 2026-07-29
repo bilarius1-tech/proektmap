@@ -20,7 +20,7 @@ export default async function BlogPage({ searchParams }: { searchParams: Promise
       orderBy: { publishedAt: "desc" },
       skip: (page - 1) * perPage,
       take: perPage,
-      include: { author: { select: { name: true, email: true } }, category: { select: { name: true, slug: true } } },
+      include: { author: { select: { name: true, email: true } }, category: { select: { name: true, slug: true } }, _count: { select: { comments: true } } },
     }),
     db.blogPost.count({ where }),
     db.blogCategory.findMany({ where: { isActive: true }, orderBy: { sortOrder: "asc" } }),

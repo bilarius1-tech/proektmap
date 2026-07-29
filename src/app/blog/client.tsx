@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -175,10 +175,28 @@ export default function BlogPageClient({ posts, categories, total, page, perPage
 }
 
 function RecentComments() {
-  // Static placeholder — real data would come from API
-  return (
+  const [comments, setComments] = useState<any[]>([]);
+  useEffect(() => {
+    fetch("/api/blog/comments/recent").then(r => r.json()).then(d => setComments(d.comments || []));
+  }, []);
+  if (!comments.length) return (
     <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", lineHeight: 1.6 }}>
       Пока нет комментариев. Будьте первым!
+    </div>
+  );
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      {comments.map((c: any) => (
+        <a key={c.id} href={`/blog/${c.post?.slug || "#"}`} style={{ textDecoration: "none", color: "inherit" }}>
+          <div style={{ fontSize: "var(--text-xs)", lineHeight: 1.5, color: "var(--color-text-secondary)", marginBottom: 2 }}>
+            {c.content.slice(0, 80)}{c.content.length > 80 ? "..." : ""}
+          </div>
+          <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", display: "flex", gap: 8 }}>
+            <span style={{ fontWeight: 600 }}>{c.authorName}</span>
+            <span>{new Date(c.createdAt).toLocaleDateString("ru")}</span>
+          </div>
+        </a>
+      ))}
     </div>
   );
 }
