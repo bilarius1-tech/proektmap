@@ -36,8 +36,8 @@ export default async function Home() {
           AI-инжиниринг и vibe coding: готовые промпты, 12 этапов, AI-консультант. От идеи до сайта за 1 час.
         </p>
         <div style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: "var(--space-xl)", flexWrap: "wrap" }}>
-          <Link href="/corporate-website" style={{ display: "flex", alignItems: "center", gap: 6, padding: "14px 28px", borderRadius: "var(--radius-m)", background: "var(--color-accent)", color: "white", textDecoration: "none", fontSize: "var(--text-s)", fontWeight: 700 }}>
-            Начать бесплатно <ArrowRight size={16} />
+          <Link href="/blueprints" style={{ display: "flex", alignItems: "center", gap: 6, padding: "14px 28px", borderRadius: "var(--radius-m)", background: "var(--color-accent)", color: "white", textDecoration: "none", fontSize: "var(--text-s)", fontWeight: 700 }}>
+            Посмотреть все Blueprint'ы <ArrowRight size={16} />
           </Link>
           <Link href="/pricing" style={{ display: "flex", alignItems: "center", gap: 6, padding: "14px 28px", borderRadius: "var(--radius-m)", background: "white", color: "var(--color-accent)", border: "1px solid var(--color-accent)", textDecoration: "none", fontSize: "var(--text-s)", fontWeight: 700 }}>
             <Crown size={16} /> Pro — 300 /мес

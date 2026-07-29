@@ -11,8 +11,8 @@ import { useRouter } from "next/navigation";
 import SkillChips from "./skill-chips";
 import { useState, useEffect } from "react";
 import {
-  Eye, CheckCircle, Copy, ChevronDown, ChevronUp, Menu, X,
-  Lock, LogIn, FolderOpen, Plus, Briefcase,
+  Eye, CheckCircle, Copy, ChevronDown, ChevronUp, Menu, X, Target, Database, Clock, Package,
+  Lock, LogIn, FolderOpen, Plus, Briefcase, ArrowRight,
 } from "lucide-react";
 
 interface Decision {
@@ -113,6 +113,7 @@ export default function BlueprintPageClient({
   const [showDecisionMap, setShowDecisionMap] = useState(false);
   const [viewMode, setViewMode] = useState<"list"|"flow">("flow");
   const [sidebarPulse, setSidebarPulse] = useState(0);
+  const [showOverview, setShowOverview] = useState(true);
   const [notifications, setNotifications] = useState<Array<{id:number; msg:string; type:string}>>([]);
 
   useEffect(() => {
@@ -200,7 +201,54 @@ export default function BlueprintPageClient({
           onComplete={() => {}}
         />
       )}
-      <div style={{ display: "flex", minHeight: "calc(100dvh - 56px)" }} suppressHydrationWarning>
+      {showOverview && (
+        <div style={{ maxWidth: 960, margin: "0 auto", padding: "var(--space-xl) var(--space-m)" }}>
+          <div style={{
+            background: "var(--color-bg-primary)", border: "1px solid var(--color-border)",
+            borderRadius: "var(--radius-l)", padding: "var(--space-xl)",
+          }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "var(--space-m)", marginBottom: "var(--space-l)" }}>
+              <div>
+                <div style={{ fontSize: "var(--text-xs)", fontWeight: 700, color: "var(--color-accent)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 }}>Blueprint</div>
+                <h1 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-xxl)", fontWeight: 800, margin: 0, letterSpacing: "-0.02em" }}>{blueprint.title}</h1>
+              </div>
+              <button onClick={() => setShowOverview(false)} style={{
+                padding: "12px 28px", borderRadius: "var(--radius-m)",
+                background: "var(--color-accent)", color: "white", border: "none",
+                fontSize: "var(--text-s)", fontWeight: 700, cursor: "pointer",
+                display: "flex", alignItems: "center", gap: 6,
+              }}>Начать путь <ArrowRight size={16} /></button>
+            </div>
+            {(blueprint as any).goal && (
+              <div style={{ marginBottom: "var(--space-l)", padding: "var(--space-m)", background: "var(--color-accent-light)", borderRadius: "var(--radius-s)", display: "flex", gap: 10 }}>
+                <Target size={20} style={{ color: "var(--color-accent)", flexShrink: 0, marginTop: 2 }} />
+                <div>
+                  <div style={{ fontSize: "var(--text-xs)", fontWeight: 700, color: "var(--color-accent)", marginBottom: 2 }}>Цель</div>
+                  <div style={{ fontSize: "var(--text-s)", color: "var(--color-text-primary)", lineHeight: 1.6 }}>{(blueprint as any).goal}</div>
+                </div>
+              </div>
+            )}
+            <div style={{ display: "flex", gap: "var(--space-xl)", flexWrap: "wrap", marginBottom: "var(--space-l)", fontSize: "var(--text-xs)", color: "var(--color-text-secondary)" }}>
+              {(blueprint as any).timeToComplete && <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Clock size={14} style={{ color: "var(--color-accent)" }} /> {(blueprint as any).timeToComplete}</span>}
+              <span style={{ display: "flex", alignItems: "center", gap: 4 }}><CheckCircle size={14} style={{ color: "var(--color-accent)" }} /> {blueprint.totalXp} XP</span>
+              <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Database size={14} style={{ color: "var(--color-accent)" }} /> {blueprint.totalDecisions} этапов</span>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "var(--space-m)" }}>
+              {(() => {
+                try { const e = JSON.parse((blueprint as any).entities || "[]"); if (e.length) return <div style={{ padding: "var(--space-m)", background: "var(--color-bg-secondary)", borderRadius: "var(--radius-s)" }}><div style={{ fontSize: "var(--text-xs)", fontWeight: 700, marginBottom: "var(--space-s)" }}>🗄 Сущности БД</div>{e.slice(0,8).map((x:any,i:number) => <div key={i} style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.6 }}>• {typeof x==="string"?x:x.name||x.table||JSON.stringify(x)}</div>)}</div>; } catch {} return null;
+              })()}
+              {(() => {
+                try { const c = JSON.parse((blueprint as any).checklist || "[]"); if (c.length) return <div style={{ padding: "var(--space-m)", background: "var(--color-bg-secondary)", borderRadius: "var(--radius-s)" }}><div style={{ fontSize: "var(--text-xs)", fontWeight: 700, marginBottom: "var(--space-s)" }}>✅ Чек-лист</div>{c.slice(0,8).map((x:string,i:number) => <div key={i} style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.6 }}>• {x}</div>)}</div>; } catch {} return null;
+              })()}
+              {(() => {
+                try { const a = JSON.parse((blueprint as any).artifacts || "[]"); if (a.length) return <div style={{ padding: "var(--space-m)", background: "var(--color-bg-secondary)", borderRadius: "var(--radius-s)" }}><div style={{ fontSize: "var(--text-xs)", fontWeight: 700, marginBottom: "var(--space-s)" }}>📦 Артефакты</div>{a.slice(0,8).map((x:any,i:number) => <div key={i} style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.6 }}>• {typeof x==="string"?x:x.name||JSON.stringify(x)}</div>)}</div>; } catch {} return null;
+              })()}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div style={{ display: showOverview ? "none" : "flex", minHeight: "calc(100dvh - 56px)" }} suppressHydrationWarning>
       {/* DESKTOP sidebar */}
       {!isMobile && (
         <aside style={{
