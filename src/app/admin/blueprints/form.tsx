@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
+import ImagePicker from "@/components/media/image-picker";
 import Link from "next/link";
 
 interface BlueprintForm { id?: string; title: string; slug: string; description: string; icon: string; difficulty: string; isPublished: boolean; sortOrder: number; coverImage: string; goal: string; timeToComplete: string; targetAudience: string; }
@@ -39,7 +40,7 @@ export default function BPForm({ initial }: { initial?: any }) {
           <div><label style={lbl}>Slug</label><input className="input" value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })} /></div>
           <div><label style={lbl}>Иконка (Lucide)</label><input className="input" value={form.icon} onChange={e => setForm({ ...form, icon: e.target.value })} /></div>
         </div>
-        <div><label style={lbl}>Обложка (URL)</label><input className="input" value={form.coverImage} onChange={e => setForm({ ...form, coverImage: e.target.value })} placeholder="https://... или /uploads/..."/></div>
+        <div><label style={lbl}>Обложка (URL или /uploads/...)</label><ImagePicker value={form.coverImage} onChange={url => setForm({ ...form, coverImage: url })} /></div>
         <div><label style={lbl}>Цель</label><input className="input" value={form.goal} onChange={e => setForm({ ...form, goal: e.target.value })} placeholder="Что получит пользователь"/></div>
         <div><label style={lbl}>Время прохождения</label><input className="input" value={form.timeToComplete} onChange={e => setForm({ ...form, timeToComplete: e.target.value })} placeholder="2 недели по 1 часу в день"/></div>
         <div><label style={lbl}>Описание</label><textarea className="input" rows={2} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} /></div>
