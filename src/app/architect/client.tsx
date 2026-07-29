@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { Sparkles, Loader, Zap, Database, Plug, Package, AlertTriangle, Clock, DollarSign, Server, Cpu, Copy, Check, ChevronDown, ChevronRight, Download, Crown, Save } from "lucide-react";
 import Link from "next/link";
-import { jsPDF } from "jspdf";
 
 const CATEGORIES = [
   { name: "SaaS", icon: "☁️", ideas: [
@@ -72,24 +71,17 @@ export default function ArchitectClient() {
 
   function exportPDF() {
     if (!option) return;
-    const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
-    // jsPDF doesn't support Cyrillic with default fonts. Use transliteration fallback.
-    function safe(s: string) { return (s || "").replace(/[а-яё]/gi, "").trim() || s; }
-    let y = 20; const margin = 20; const w = doc.internal.pageSize.getWidth() - margin * 2;
-    doc.setFont("helvetica", "bold"); doc.setFontSize(18);
-    doc.text("Архитектура проекта", margin, y); y += 12;
-    doc.setFontSize(12); doc.setFont("helvetica", "normal");
-    doc.text(safe(option.name) || "Architecture", margin, y); y += 8;
-    doc.setFontSize(10); doc.text(safe(option.summary) || "", margin, y, { maxWidth: w }); y += 16;
-    doc.setFont("helvetica", "bold"); doc.setFontSize(12);
-    doc.text("Метаданные", margin, y); y += 8;
-    doc.setFont("helvetica", "normal"); doc.setFontSize(10);
-    const meta = [`Project: ${safe(option.name) || "Architecture"}`, `Complexity: ${option.complexity}/10`, `Сложность: ${option.complexity}/10`, `MVP: ${option.mvpDays}`, `Монетизация: ${option.monetization}`, `Разработка: ${option.costDev}`, `AI: ${option.costAi}`, `Сервер: ${option.costServer}`];
-    meta.forEach(m => { doc.text(m, margin, y); y += 6; }); y += 6;
-    if (option.entities?.length) { doc.setFont("helvetica", "bold"); doc.text("Сущности БД", margin, y); y += 8; doc.setFont("helvetica", "normal"); option.entities.forEach((e: string) => { doc.text("• " + e, margin, y); y += 5; }); y += 4; }
-    if (option.plan?.length) { doc.setFont("helvetica", "bold"); doc.text("План разработки", margin, y); y += 8; doc.setFont("helvetica", "normal"); option.plan.forEach((p: string, i: number) => { doc.text(`${i + 1}. ${p}`, margin, y, { maxWidth: w }); y += 5; }); y += 4; }
-    if (option.mistakes?.length) { doc.setFont("helvetica", "bold"); doc.text("Типичные ошибки", margin, y); y += 8; doc.setFont("helvetica", "normal"); option.mistakes.forEach((m: string) => { doc.text("❌ " + m, margin, y, { maxWidth: w }); y += 5; }); }
-    doc.save("architect-blueprint.pdf");
+    const html = fullDoc();
+    const w = window.open("", "_blank", "width=800,height=600");
+    if (!w) return;
+    w.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Архитектура проекта</title>'
+      + '<style>body{font-family:Inter,sans-serif;max-width:700px;margin:40px auto;line-height:1.7;color:#111;font-size:14px}'
+      + 'h1{font-size:24px}h2{font-size:18px;margin-top:24px;border-bottom:1px solid #eee;padding-bottom:4px}'
+      + 'pre{background:#f5f5f5;padding:12px;font-size:13px;overflow-x:auto}'
+      + 'ul{padding-left:20px}li{margin:4px 0}@media print{body{margin:20px}}</style></head>'
+      + '<body>' + html + '</body></html>');
+    w.document.close();
+    setTimeout(() => w.print(), 500);
   }
 
   function fullDoc(): string { if (!option) return ""; const L = ["# " + (option.name || "Архитектура"), "", option.summary || "", "", "## Метаданные", `- Тип: ${result.productType}`, `- Сложность: ${option.complexity}/10`, `- MVP: ${option.mvpDays}`, `- Монетизация: ${option.monetization}`, `- Разработка: ${option.costDev}`, `- AI: ${option.costAi}`, `- Сервер: ${option.costServer}`, ""];
