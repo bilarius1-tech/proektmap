@@ -49,7 +49,42 @@ export default function ArchitectClient() {
 
   function toggle(s: string) { setOpenSections(p => ({ ...p, [s]: !p[s] })); }
 
-  async function saveSolution() { if (!option || !result) return; try { const res = await fetch("/api/solutions", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({title: option.name || result.productType, description: option.description, productType: result.productType, complexity: option.complexity, mvpDays: option.mvpDays, monetization: option.monetization, costDev: option.costDev, costAi: option.costAi, costServer: option.costServer, summary: option.summary, stack: option.stack, entities: option.entities || [], plan: option.plan || [], skills: (option.patterns||[]).map((p:any)=>p.slug).concat((option.mcp||[]).map((m:any)=>m.slug)), mistakes: option.mistakes || [], marketAnalysis: result.marketAnalysis || null }) }); const data = await res.json(); if (data.slug) alert("Решение сохранено: /solutions/" + data.slug); } catch { alert("Ошибка сохранения"); } }
+  async function saveSolution() {
+    if (!option || !result) return;
+    try {
+      const summary = option.summary || option.description || result.expertRecommendation || "";
+      const res = await fetch("/api/solutions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: option.name || result.productType,
+          description: option.description || "",
+          productType: result.productType,
+          complexity: option.complexity || 5,
+          mvpDays: option.mvpDays || "",
+          monetization: option.monetization || "",
+          costDev: option.costDev || "",
+          costAi: option.costAi || "",
+          costServer: option.costServer || "",
+          summary: summary,
+          stack: option.stack || [],
+          entities: option.entities || [],
+          plan: option.plan || [],
+          skills: (option.patterns || []).map((p: any) => p.slug).concat((option.mcp || []).map((m: any) => m.slug)),
+          mistakes: option.mistakes || [],
+        }),
+      });
+      const data = await res.json();
+      if (data.slug) {
+        alert("Решение сохранено: /solutions/" + data.slug);
+        window.open("/solutions/" + data.slug, "_blank");
+      } else {
+        alert("Ошибка: " + (data.error || "неизвестная"));
+      }
+    } catch (e: any) {
+      alert("Ошибка сохранения: " + (e.message || "сеть"));
+    }
+  }
 
   async function analyze() {
     if (!idea.trim() || idea.length < 10) return;
