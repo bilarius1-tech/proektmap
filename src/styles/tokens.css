@@ -9,7 +9,7 @@
   --font-mono: "JetBrains Mono", "Fira Code", monospace;
   /* Colors */
   --color-bg-primary: #FAFAFA;
-  --color-bg-secondary: #F2F2F2;
+  --color-bg-secondary: #ffffff;
   --color-bg-tertiary: #E8E8E8;
   --color-surface: #FFFFFF;
   --color-elevated: #FFFFFF;
@@ -28,7 +28,7 @@
   --color-error: #ff0000;
   --color-error-light: #ffe6e6;
 
-  --color-border: #E5E5E5;
+  --color-border: #efefef;
   --color-border-light: #F0F0F0;
 
   /* Typography */

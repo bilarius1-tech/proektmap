@@ -211,6 +211,11 @@
   }
 }
 
+/* Hero mobile */
+@media (max-width: 480px) {
+  .hero-title { font-size: 26px; }
+  .hero-btn { width: 100%; justify-content: center; }
+}
 .blog-content { overflow-x: hidden; word-wrap: break-word; }
 .blog-content img { max-width: 100% !important; height: auto !important; margin: 1em 0; border-radius: 0; display: block; }
 .blog-content iframe { max-width: 100% !important; aspect-ratio: 16/9; margin: 1em 0; border: 1px solid var(--color-border); }
