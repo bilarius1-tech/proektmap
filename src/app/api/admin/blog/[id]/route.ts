@@ -6,7 +6,7 @@ async function checkAdmin() {
   const session = await auth();
   if (!session?.user) return false;
   const u = session.user as any;
-  return u.role === "admin" || u.email === "bilariuss@yandex.ru";
+  return u.role === "admin";
 }
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

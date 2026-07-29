@@ -25,7 +25,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
   const db = await getDb();
   const session = await auth();
   const userEmail = (session?.user as any)?.email || "";
-  const isAdmin = (session?.user as any)?.role === "admin" || userEmail === "bilariuss@yandex.ru";
+  const isAdmin = (session?.user as any)?.role === "admin" ;
   const post = await db.blogPost.findUnique({
     where: { slug },
     include: {

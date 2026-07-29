@@ -14,7 +14,7 @@ export default function PostPageClient({ post, relatedPosts, readMore, isAdmin: 
   useEffect(() => {
     if (serverIsAdmin) { setIsAdmin(true); return; }
     fetch("/api/auth/check").then(r => r.json()).then(d => {
-      if (d.email === "bilariuss@yandex.ru" || d.role === "admin") setIsAdmin(true);
+      if (d.role === "admin") setIsAdmin(true);
     });
   }, [serverIsAdmin]);
   const [showCommentForm, setShowCommentForm] = useState(false);
