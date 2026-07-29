@@ -104,6 +104,8 @@ model Decision {
   promptTitle   String?
   promptTemplate String?
   promptContext  String?
+  goal        String    @default("")
+  entities    String    @default("[]")
   videos       Json      @default("[]")
   sortOrder     Int      @default(0)
   createdAt     DateTime @default(now())
