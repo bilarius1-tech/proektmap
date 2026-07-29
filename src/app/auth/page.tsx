@@ -32,10 +32,6 @@ export default function AuthPage() {
     setLoading(false);
   }
 
-  async function handleYandex() {
-    await signIn("yandex", { callbackUrl: "/dashboard" });
-  }
-
   return (
     <div style={{ fontFamily: "Inter, sans-serif", background: "var(--color-bg-secondary)", minHeight: "100dvh", display: "flex", alignItems: "center", justifyContent: "center", padding: "var(--space-m)" }}>
       <div style={{ width: "100%", maxWidth: 380, background: "var(--color-bg-primary)", borderRadius: "var(--radius-xl)", padding: "var(--space-xl)", border: "1px solid var(--color-border-light)" }}>
@@ -46,21 +42,6 @@ export default function AuthPage() {
           <p style={{ fontSize: "var(--text-s)", color: "var(--color-text-tertiary)" }}>Войдите чтобы продолжить</p>
         </div>
 
-        {/* Yandex */}
-        <button onClick={handleYandex} style={{
-          width: "100%", padding: "12px", borderRadius: "var(--radius-m)", border: "1px solid var(--color-border)",
-          background: "var(--color-bg-primary)", color: "var(--color-text-primary)", fontSize: "var(--text-m)", fontWeight: 600,
-          cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "var(--space-s)", marginBottom: "var(--space-m)",
-        }}>
-          <span style={{ color: "#fc3f1d", fontWeight: 800 }}>Я</span> Войти через Яндекс
-        </button>
-
-        {/* Divider */}
-        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-s)", marginBottom: "var(--space-m)", color: "var(--color-text-tertiary)", fontSize: "var(--text-xs)" }}>
-          <div style={{ flex: 1, height: 1, background: "var(--color-border-light)" }} />
-          или
-          <div style={{ flex: 1, height: 1, background: "var(--color-border-light)" }} />
-        </div>
 
         {/* Tabs */}
         <div style={{ display: "flex", marginBottom: "var(--space-m)", borderBottom: "1px solid var(--color-border-light)" }}>
