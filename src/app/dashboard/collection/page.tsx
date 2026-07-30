@@ -13,18 +13,38 @@ export default async function CollectionPage() {
   const db = await getDb();
 
   const items = await db.userCollection.findMany({
-    where: { userId, entityType: "blog_post" },
+    where: { userId },
     orderBy: { createdAt: "desc" },
-    take: 50,
+    take: 100,
   });
 
-  // Fetch blog post titles
-  const postSlugs = items.map(i => i.entitySlug);
-  const posts = postSlugs.length > 0 ? await db.blogPost.findMany({
-    where: { id: { in: postSlugs } },
-    select: { id: true, title: true, slug: true, excerpt: true, viewCount: true, publishedAt: true },
-  }) : [];
-  const postMap = new Map(posts.map(p => [p.id, p]));
+  // Fetch titles for all entity types
+  const blogIds = items.filter(i => i.entityType === "blog_post").map(i => i.entitySlug);
+  const solutionSlugs = items.filter(i => i.entityType === "solution").map(i => i.entitySlug);
+  const skillSlugs = items.filter(i => i.entityType === "skill").map(i => i.entitySlug);
+  const termSlugs = items.filter(i => i.entityType === "glossary_term").map(i => i.entitySlug);
+  const decisionSlugs = items.filter(i => i.entityType === "decision").map(i => i.entitySlug);
 
-  return <CollectionClient items={JSON.parse(JSON.stringify(items))} postMap={JSON.parse(JSON.stringify(Object.fromEntries(postMap)))} />;
+  const [blogPosts, solutions, skills, terms, decisions] = await Promise.all([
+    blogIds.length ? db.blogPost.findMany({ where: { id: { in: blogIds } }, select: { id: true, title: true, slug: true, excerpt: true, viewCount: true, publishedAt: true } }) : [],
+    solutionSlugs.length ? db.solution.findMany({ where: { slug: { in: solutionSlugs } }, select: { slug: true, title: true, summary: true } }) : [],
+    skillSlugs.length ? db.skill.findMany({ where: { slug: { in: skillSlugs } }, select: { slug: true, title: true } }) : [],
+    termSlugs.length ? db.glossaryTerm.findMany({ where: { slug: { in: termSlugs } }, select: { slug: true, term: true, simpleExplanation: true } }) : [],
+    decisionSlugs.length ? db.decision.findMany({ where: { slug: { in: decisionSlugs } }, select: { slug: true, title: true } }) : [],
+  ]);
+
+  const blogMap = Object.fromEntries(blogPosts.map(p => [p.id, p]));
+  const solutionMap = Object.fromEntries(solutions.map(s => [s.slug, s]));
+  const skillMap = Object.fromEntries(skills.map(s => [s.slug, s]));
+  const termMap = Object.fromEntries(terms.map(t => [t.slug, t]));
+  const decisionMap = Object.fromEntries(decisions.map(d => [d.slug, d]));
+
+  return <CollectionClient
+    items={JSON.parse(JSON.stringify(items))}
+    blogMap={JSON.parse(JSON.stringify(blogMap))}
+    solutionMap={JSON.parse(JSON.stringify(solutionMap))}
+    skillMap={JSON.parse(JSON.stringify(skillMap))}
+    termMap={JSON.parse(JSON.stringify(termMap))}
+    decisionMap={JSON.parse(JSON.stringify(decisionMap))}
+  />;
 }
