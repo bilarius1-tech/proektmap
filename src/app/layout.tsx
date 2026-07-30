@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   creator: "Тимофеев Алексей",
   publisher: "ИП Тимофеев А.Г.",
   robots: { index: true, follow: true },
-  alternates: { canonical: "https://proektmap.ru" },
+  alternates: { canonical: "https://proektmap.ru", types: { "application/rss+xml": "https://proektmap.ru/blog/rss.xml" } },
   openGraph: {
     type: "website",
     locale: "ru_RU",

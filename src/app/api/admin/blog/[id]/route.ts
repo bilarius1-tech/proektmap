@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db/index";
 import { auth } from "@/lib/auth";
+import { pingSearchEngines } from "@/lib/seo/ping";
 
 async function checkAdmin() {
   const session = await auth();
@@ -18,6 +19,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     where: { id },
     data: { ...data, publishedAt: data.status === "published" && !data.publishedAt ? new Date() : data.publishedAt || undefined },
   });
+  if (data.status === "published") pingSearchEngines(post.slug).catch(() => {});
   return NextResponse.json(post);
 }
 

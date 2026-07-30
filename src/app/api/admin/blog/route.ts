@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db/index";
 import { auth } from "@/lib/auth";
+import { pingSearchEngines } from "@/lib/seo/ping";
 
 async function checkAdmin() {
   const session = await auth();
@@ -24,5 +25,6 @@ export async function POST(req: NextRequest) {
   const post = await db.blogPost.create({
     data: { ...data, authorId: (session!.user as any).id, publishedAt: data.status === "published" ? new Date() : null },
   });
+  if (post.status === "published") pingSearchEngines(post.slug).catch(() => {});
   return NextResponse.json(post);
 }
