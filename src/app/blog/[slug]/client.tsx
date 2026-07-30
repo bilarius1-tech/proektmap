@@ -2,7 +2,7 @@
 import ContentHtml from "./content-html";
 import { useEffect, useState } from "react";
 
-import { Calendar, User, Tag, Eye, MessageCircle, ArrowLeft, Send, Bookmark, Rocket, Clock, List, Share2 } from "lucide-react";
+import { Calendar, User, Tag, Eye, MessageCircle, ArrowLeft, Send, Bookmark, Rocket, Clock, List, Share2, ThumbsUp, ThumbsDown } from "lucide-react";
 import Link from "next/link";
 
 function formatDate(d: string) {
@@ -23,13 +23,13 @@ export default function PostPageClient({ post, relatedPosts, readMore, isAdmin: 
   const [submitted, setSubmitted] = useState(false);
 
   // Impact score
-  const [impact, setImpact] = useState({ impactScore: post.impactScore || 0, viewCount: post.viewCount || 0, bookmarkCount: post.bookmarkCount || 0, projectUseCount: post.projectUseCount || 0 });
+  const [impact, setImpact] = useState({ impactScore: post.impactScore || 0, viewCount: post.viewCount || 0, bookmarkCount: post.bookmarkCount || 0, projectUseCount: post.projectUseCount || 0, likeCount: post.likeCount || 0, dislikeCount: post.dislikeCount || 0 });
   const [userActions, setUserActions] = useState<string[]>([]);
   const [impactLoading, setImpactLoading] = useState(false);
   useEffect(() => {
     fetch(`/api/blog/${post.id}/impact`).then(r => r.json()).then(d => {
       if (d.impactScore !== undefined) {
-        setImpact({ impactScore: d.impactScore, viewCount: d.viewCount, bookmarkCount: d.bookmarkCount, projectUseCount: d.projectUseCount });
+        setImpact({ impactScore: d.impactScore, viewCount: d.viewCount, bookmarkCount: d.bookmarkCount, projectUseCount: d.projectUseCount, likeCount: d.likeCount || 0, dislikeCount: d.dislikeCount || 0 });
         setUserActions(d.userInteractions || []);
       }
     });
@@ -44,7 +44,7 @@ export default function PostPageClient({ post, relatedPosts, readMore, isAdmin: 
     });
     if (res.status === 401) { setImpactLoading(false); return; }
     const d = await res.json();
-    setImpact({ impactScore: d.impactScore, viewCount: d.viewCount, bookmarkCount: d.bookmarkCount, projectUseCount: d.projectUseCount });
+    setImpact({ impactScore: d.impactScore, viewCount: d.viewCount, bookmarkCount: d.bookmarkCount, projectUseCount: d.projectUseCount, likeCount: d.likeCount || 0, dislikeCount: d.dislikeCount || 0 });
     setUserActions(d.userInteractions || []);
     setImpactLoading(false);
   }
@@ -185,6 +185,7 @@ export default function PostPageClient({ post, relatedPosts, readMore, isAdmin: 
           <div style={{ display: "flex", gap: "var(--space-s)", marginLeft: "auto" }}>
             <button
               onClick={() => toggleImpact("bookmark")}
+              title="Добавить в закладки — сохраняется в Личном кабинете"
               disabled={impactLoading}
               style={{
                 display: "flex", alignItems: "center", gap: 4,
@@ -201,6 +202,7 @@ export default function PostPageClient({ post, relatedPosts, readMore, isAdmin: 
             </button>
             <button
               onClick={() => toggleImpact("project_use")}
+              title="Отметить что использовали этот материал в своём проекте"
               disabled={impactLoading}
               style={{
                 display: "flex", alignItems: "center", gap: 4,
@@ -214,6 +216,37 @@ export default function PostPageClient({ post, relatedPosts, readMore, isAdmin: 
             >
               <Rocket size={14} />
               {userActions.includes("project_use") ? "Использую" : "Использовал в проекте"}
+            </button>
+            <button
+              onClick={() => toggleImpact("like")}
+              disabled={impactLoading}
+              title="Понравилась статья"
+              style={{
+                display: "flex", alignItems: "center", gap: 4,
+                padding: "8px 12px", borderRadius: "var(--radius-m)",
+                background: userActions.includes("like") ? "var(--color-accent-light)" : "var(--color-bg-secondary)",
+                color: userActions.includes("like") ? "var(--color-accent)" : "var(--color-text-secondary)",
+                border: userActions.includes("like") ? "1px solid var(--color-accent)" : "1px solid var(--color-border)",
+                fontSize: "var(--text-xs)", fontWeight: 600, cursor: "pointer",
+              }}
+            >
+              <ThumbsUp size={14} fill={userActions.includes("like") ? "var(--color-accent)" : "none"} />
+              {impact.likeCount > 0 && impact.likeCount}
+            </button>
+            <button
+              onClick={() => toggleImpact("dislike")}
+              disabled={impactLoading}
+              title="Не понравилась статья"
+              style={{
+                display: "flex", alignItems: "center", gap: 4,
+                padding: "8px 12px", borderRadius: "var(--radius-m)",
+                background: userActions.includes("dislike") ? "var(--color-error-light)" : "var(--color-bg-secondary)",
+                color: userActions.includes("dislike") ? "var(--color-error)" : "var(--color-text-secondary)",
+                border: userActions.includes("dislike") ? "1px solid var(--color-error)" : "1px solid var(--color-border)",
+                fontSize: "var(--text-xs)", fontWeight: 600, cursor: "pointer",
+              }}
+            >
+              <ThumbsDown size={14} fill={userActions.includes("dislike") ? "var(--color-error)" : "none"} />
             </button>
           </div>
         </div>

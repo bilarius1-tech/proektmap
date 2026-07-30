@@ -510,6 +510,8 @@ model BlogPost {
   tags          String    @default("")
   viewCount     Int       @default(0)
   impactScore   Int       @default(0)
+  likeCount     Int       @default(0)
+  dislikeCount  Int       @default(0)
   bookmarkCount Int       @default(0)
   projectUseCount Int     @default(0)
   aiGenerated   Boolean   @default(false)

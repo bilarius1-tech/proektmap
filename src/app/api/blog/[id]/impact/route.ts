@@ -46,7 +46,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const userEmail = (session.user as any).email;
   const { type } = await req.json(); // "bookmark" | "project_use"
 
-  if (!type || !["bookmark", "project_use"].includes(type)) {
+  if (!type || !["bookmark", "project_use", "like", "dislike"].includes(type)) {
     return NextResponse.json({ error: "Invalid type" }, { status: 400 });
   }
 
@@ -59,16 +59,24 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   if (existing) {
     await db.blogInteraction.delete({ where: { id: existing.id } });
+    if (type === "bookmark") {
+      await db.userCollection.deleteMany({ where: { userId: userEmail, entityType: "blog_post", entitySlug: id } }).catch(() => {});
+    }
   } else {
     await db.blogInteraction.create({
       data: { postId: id, userId: userEmail, type },
     });
+    if (type === "bookmark") {
+      await db.userCollection.create({ data: { userId: userEmail, entityType: "blog_post", entitySlug: id } }).catch(() => {});
+    }
   }
 
   // Recalculate counts
-  const [bookmarkCount, projectUseCount] = await Promise.all([
+  const [bookmarkCount, projectUseCount, likeCount, dislikeCount] = await Promise.all([
     db.blogInteraction.count({ where: { postId: id, type: "bookmark" } }),
     db.blogInteraction.count({ where: { postId: id, type: "project_use" } }),
+    db.blogInteraction.count({ where: { postId: id, type: "like" } }),
+    db.blogInteraction.count({ where: { postId: id, type: "dislike" } }),
   ]);
 
   const post = await db.blogPost.findUnique({ where: { id }, select: { viewCount: true } });
@@ -76,7 +84,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   await db.blogPost.update({
     where: { id },
-    data: { impactScore, bookmarkCount, projectUseCount },
+    data: { impactScore, bookmarkCount, projectUseCount, likeCount, dislikeCount },
   });
 
   // Get updated user interactions
@@ -90,6 +98,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     viewCount: post!.viewCount,
     bookmarkCount,
     projectUseCount,
+    likeCount,
+    dislikeCount,
     userInteractions: userInteractions.map((i: any) => i.type),
   });
 }

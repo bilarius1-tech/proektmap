@@ -1,42 +1,30 @@
 import { getDb } from "@/lib/db/index";
-import CollectionPageClient from "./client";
-export const dynamic = "force-dynamic";
 import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import CollectionClient from "./client";
 
-export const metadata = { title: "Моя карта знаний — ProektMap" };
+export const dynamic = "force-dynamic";
+export const metadata = { title: "Мои закладки — Карта роста" };
 
-export default async function Page() {
+export default async function CollectionPage() {
   const session = await auth();
-  if (!session?.user) return <div style={{ padding: 40, textAlign: "center" }}>Войдите чтобы увидеть сохранённое</div>;
-
-  const db = await getDb();
+  if (!session?.user) redirect("/auth?callbackUrl=/dashboard/collection");
   const userId = (session.user as any).id;
-  const saves = await db.userCollection.findMany({ where: { userId }, orderBy: { createdAt: "desc" } });
+  const db = await getDb();
 
-  // Resolve
-  const items: any[] = [];
-  for (const s of saves) {
-    let title = "", subtitle = "", href = "";
-    try {
-      if (s.entityType === "glossary") {
-        const t = await db.glossaryTerm.findUnique({ where: { slug: s.entitySlug }, select: { term: true, level: true, category: true } });
-        if (t) { title = t.term; subtitle = t.category || ""; href = "/glossary/" + s.entitySlug; }
-      }
-      if (s.entityType === "prompt") {
-        const p = await db.promptBlueprint.findUnique({ where: { slug: s.entitySlug }, select: { title: true, category: true } });
-        if (p) { title = p.title; subtitle = p.category; href = "/prompts"; }
-      }
-      if (s.entityType === "pattern") {
-        const p = await db.buildPattern.findUnique({ where: { slug: s.entitySlug }, select: { title: true, difficulty: true } });
-        if (p) { title = p.title; subtitle = p.difficulty; href = "/patterns/" + s.entitySlug; }
-      }
-      if (s.entityType === "mcp") {
-        const m = await db.mCPServer.findUnique({ where: { slug: s.entitySlug }, select: { name: true, category: true } });
-        if (m) { title = m.name; subtitle = m.category || ""; href = "/mcp/" + s.entitySlug; }
-      }
-    } catch {}
-    if (title) items.push({ ...s, title, subtitle, href });
-  }
+  const items = await db.userCollection.findMany({
+    where: { userId, entityType: "blog_post" },
+    orderBy: { createdAt: "desc" },
+    take: 50,
+  });
 
-  return <CollectionPageClient items={JSON.parse(JSON.stringify(items))} />;
+  // Fetch blog post titles
+  const postSlugs = items.map(i => i.entitySlug);
+  const posts = postSlugs.length > 0 ? await db.blogPost.findMany({
+    where: { id: { in: postSlugs } },
+    select: { id: true, title: true, slug: true, excerpt: true, viewCount: true, publishedAt: true },
+  }) : [];
+  const postMap = new Map(posts.map(p => [p.id, p]));
+
+  return <CollectionClient items={JSON.parse(JSON.stringify(items))} postMap={JSON.parse(JSON.stringify(Object.fromEntries(postMap)))} />;
 }
