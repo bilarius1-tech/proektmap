@@ -105,3 +105,22 @@
 - Hub Page «Российский AI-стек»
 - Квиз «Какой Blueprint»
 - Калькулятор стоимости
+
+
+---
+
+## 2026-07-31 — База знаний, Knowledge Panel, Text Selection
+
+### Personal Knowledge Base
+- **Модель KnowledgeClip** добавлена в Prisma: id, userId, text, pageTitle, pageUrl, blueprintId?, skillId?, glossaryId?, note, color
+- **API /api/knowledge**: GET (список), POST (сохранить), DELETE (удалить) — авторизация через auth()
+- **TextSelectionPopover**: при выделении текста появляется кнопка «💾 Сохранить» над выделением
+- **KnowledgePanel**: выезжающая панель 420px справа, группировка клипов по источникам, удаление, AI-кнопки «Объяснить» и «Конспект»
+- **KnowledgeProvider**: клиентская обёртка, коммуникация через custom events `kp:toggle` / `kp:toggle-learning`
+- **KnowledgeButtons**: кнопки в хедере — 📚 «База знаний» и 🎓 «Режим обучения»
+- **SessionProvider**: добавлен в layout для поддержки useSession в клиентских компонентах
+
+### Техническое
+- Схема Prisma обновлена через `prisma db push` + `prisma generate`
+- API использует `(session.user as any).id` как остальные роуты проекта
+- Панель знаний открывается/закрывается через кастомные события — не зависит от пропсов
