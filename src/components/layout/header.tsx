@@ -4,6 +4,7 @@ import MobileMenu from "./mobile-menu";
 import AuthBlock from "./auth-block";
 import FavoritesIndicator from "./favorites-indicator";
 import ThemeToggle from "./theme-toggle";
+import DesktopMenuItem from "./desktop-menu-item";
 
 export default async function GlobalHeader() {
   let menuItems: any = [];
@@ -30,10 +31,7 @@ export default async function GlobalHeader() {
         </Link>
         <nav style={{ display: "flex", gap: 4, alignItems: "center", marginLeft: "var(--space-l)" }} className="hide-mobile">
           {(menuItems as any[]).map((item: any) => (
-            <Link key={item.id} href={item.href || "#"} style={{
-              color: "var(--color-text-secondary)", fontSize: "var(--text-s)", textDecoration: "none",
-              padding: "6px 12px", borderRadius: "var(--radius-s)", transition: "background 0.1s",
-            }}>{item.label || ""}</Link>
+            <DesktopMenuItem key={item.id} item={item} />
           ))}
         </nav>
       </div>
