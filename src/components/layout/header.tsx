@@ -5,6 +5,7 @@ import AuthBlock from "./auth-block";
 import FavoritesIndicator from "./favorites-indicator";
 import ThemeToggle from "./theme-toggle";
 import DesktopMenuItem from "./desktop-menu-item";
+import KnowledgeButtons from "@/components/knowledge/knowledge-buttons";
 
 export default async function GlobalHeader() {
   let menuItems: any = [];
@@ -37,6 +38,7 @@ export default async function GlobalHeader() {
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: "var(--space-s)" }}>
+        <KnowledgeButtons />
         <FavoritesIndicator initialCount={0} />
         <ThemeToggle />
         <AuthBlock />

@@ -764,3 +764,21 @@ model Solution {
   updatedAt   DateTime @updatedAt
   @@map("solutions")
 }
+
+model KnowledgeClip {
+  id          String   @id @default(uuid())
+  userId      String
+  text        String
+  pageTitle   String   @default("")
+  pageUrl     String   @default("")
+  blueprintId String?
+  skillId     String?
+  glossaryId  String?
+  note        String   @default("")
+  color       String   @default("default")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("knowledge_clips")
+}
+

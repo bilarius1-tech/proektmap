@@ -9,6 +9,8 @@ import AssistantWrapper from "@/components/assistant/assistant-wrapper";
 import DesignTokens from "@/components/design/design-tokens";
 import CookieConsent from "@/components/cookie-consent";
 import AnalyticsScripts, { AnalyticsFooter } from "@/components/analytics";
+import { SessionProvider } from "@/components/session-provider";
+import KnowledgeProvider from "@/components/knowledge/knowledge-provider";
 
 export const metadata: Metadata = {
   title: {
@@ -51,18 +53,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="theme-color" content="#0fb880" />
         <DesignTokens />
         <AnalyticsScripts />
-        {/* Hreflang */}
         <link rel="alternate" href="https://proektmap.ru" hrefLang="ru" />
         <link rel="alternate" href="https://proektmap.ru" hrefLang="x-default" />
       </head>
       <body suppressHydrationWarning style={{ display: "flex", flexDirection: "column", minHeight: "100dvh" }}>
-        <GlobalHeader />
-        <StreakBanner />
-        <main style={{ flex: 1 }}>{children}</main>
-        <BlueprintProgressBar />
-        <GlobalFooter />
-        <AssistantWrapper />
-        <CookieConsent />
+        <SessionProvider>
+          <GlobalHeader />
+          <StreakBanner />
+          <main style={{ flex: 1 }}>{children}</main>
+          <BlueprintProgressBar />
+          <GlobalFooter />
+          <AssistantWrapper />
+          <CookieConsent />
+          <KnowledgeProvider />
+        </SessionProvider>
         <AnalyticsFooter />
       </body>
     </html>
