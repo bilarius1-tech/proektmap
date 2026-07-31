@@ -59,3 +59,49 @@
 - Главная: анимированный hero (переливающиеся блобы), счётчики, «Как это работает», сетка 960px
 - Фон #ffffff, бордеры #efefef, Lucide иконки вместо эмодзи
 - Ночной режим работает
+
+
+---
+
+## 2026-07-30 — Telegram Bot MAX, Песочница, Hub Pages
+
+### Стратегия
+- Проведена стратегическая сессия: курс на Российскую AI-экосистему
+- Якорный продукт: **Telegram Bot MAX** — раздел-экосистема
+- Приоритеты: Telegram → AI без VPN → Vibe Coding → Витрина → AI-Фриланс
+- Документы: `ROADMAP.md`, `STRATEGY.md`
+
+### Telegram-экосистема (seed-telegram-ecosystem.js)
+- Blueprint «Telegram Бот»: 6 этапов, 24 решения, 520 XP
+- AI Tools (5): aiogram, grammy, python-telegram-bot, Telethon, BotFather
+- Glossary (11): Polling, Webhook, Inline Keyboard, Telegram Stars, Mini App, FSM...
+- Skills (3): aiogram бот, Mini App React, Платежи
+- Solutions (3): Бот-магазин, AI-консультант, Приём заказов
+- Prompts (4): Архитектор, Генератор aiogram, Генератор Mini App, Assistant
+- Relations (26): всё связано с Blueprint
+
+### Hub Pages — новый формат
+- `docs/HUB-PAGE.md` — задокументированный паттерн
+- **/telegram**: что такое бот, 5 шагов создания, подводные камни, FAQ, Term-глоссарий
+- **/ai-without-vpn**: 5 замен сервисов, российский стек, таблица, FAQ
+- **/vibecraft**: 10 инструментов, таблица сравнения, гайд РФ (оплата/хостинг/домен/почта), 10 вопросов из Telegram
+
+### Меню
+- Раздел «Песочница»: 🤖 Telegram Бот, 🛡️ AI без VPN, ⚡ Vibe Coding
+- Мега-меню: выпадающий список 2-колоночной сеткой, адаптив
+- Компонент `desktop-menu-item.tsx` с hover-логикой
+
+### Философия v2.0
+- `docs/PHILOSOPHY.md`: Песочница как четвёртый столп экосистемы
+- Воронка: Песочница → Blueprint → Проект → Результат
+- 4 столпа: 🧭 Песочница, 📐 Blueprint, 🧠 AI Архитектор, 🎓 Знания
+
+### Техническое
+- Прямой доступ к Prisma через скрипты (node + adapter-pg + dotenv)
+- Prisma 7 имена: `aITool`, `mCPServer`
+- Схема: scp скрипт → копирование в проект → node запуск
+
+### План на завтра
+- Hub Page «Российский AI-стек»
+- Квиз «Какой Blueprint»
+- Калькулятор стоимости
