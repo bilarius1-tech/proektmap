@@ -1,6 +1,8 @@
 import { getDb } from "@/lib/db/index";
 import AnimatedHero from "@/components/hero/animated-hero";
 import Link from "next/link";
+import BlueprintQuiz from "@/components/widgets/blueprint-quiz";
+import CostCalculator from "@/components/widgets/cost-calculator";
 import { Globe, Smartphone, Gamepad2, Server, Camera, Package, ArrowRight, Check, Crown, Shield, Map, Bot, Rocket, GitBranch, Compass } from "lucide-react";
 
 const blueprints = [
@@ -185,6 +187,12 @@ export default async function Home() {
             </div>
           </div>
         )}
+      </div>
+
+      {/* Виджеты */}
+      <div style={{ maxWidth: 960, margin: "0 auto", padding: "0 var(--space-m) var(--space-xl)", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(380px, 1fr))", gap: "var(--space-xl)" }}>
+        <BlueprintQuiz />
+        <CostCalculator />
       </div>
 
       {/* Реквизиты */}
