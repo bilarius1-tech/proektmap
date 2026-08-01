@@ -26,6 +26,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/demo/win98`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.5 },
     { url: `${baseUrl}/pricing`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
     { url: `${baseUrl}/quest/beginner`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
+    { url: `${baseUrl}/telegram`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
+    { url: `${baseUrl}/ai-without-vpn`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
     { url: `${baseUrl}/vibecraft`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
   ];
 
@@ -37,7 +39,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       where: { status: "published" },
       select: { slug: true, updatedAt: true },
       orderBy: { updatedAt: "desc" },
-      take: 100,
+      take: 500,
     });
     blogUrls = posts.map(p => ({
       url: `${baseUrl}/blog/${p.slug}`,
