@@ -11,34 +11,43 @@ export async function POST(req: NextRequest) {
   const { url } = await req.json();
   if (!url) return NextResponse.json({ error: "URL required" }, { status: 400 });
 
-  // Clean URL: strip query params, hash, trailing slashes for parsing
-  const cleanUrl = url.replace(/[?#].*$/, "").replace(/\/+$/, "");
+  // Clean URL
+  const cleanUrl = url.replace(/[?#].*$/, "").replace(/\/+$/, "").replace(/\.git$/, "");
 
-  // Fetch page content
   let rawText = "";
-  try {
-    // Try GitHub API first if it's a GitHub URL
-    const ghMatch = cleanUrl.match(/github\.com\/([^\/]+)\/([^\/]+)/);
-    if (ghMatch) {
-      const repoOwner = ghMatch[1];
-      const repoName = ghMatch[2].replace(/[?#].*$/, "");
-      const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}`;
+
+  // Try GitHub API
+  const ghMatch = cleanUrl.match(/github\.com\/([^\/]+)\/([^\/]+)/);
+  if (ghMatch) {
+    const repoOwner = ghMatch[1];
+    const repoName = ghMatch[2].replace(/[?#].*$/, "").replace(/\.git$/, "");
+    const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}`;
+
+    try {
       const ghRes = await fetch(apiUrl, {
         headers: { "User-Agent": "ProektMap/1.0", "Accept": "application/json" },
         signal: AbortSignal.timeout(10000),
       });
+
+      if (ghRes.status === 404) {
+        return NextResponse.json({ error: "Репозиторий не найден на GitHub. Проверьте ссылку." }, { status: 404 });
+      }
+      if (ghRes.status === 403) {
+        return NextResponse.json({ error: "Лимит запросов GitHub API. Попробуйте через минуту." }, { status: 429 });
+      }
+
       if (ghRes.ok) {
         const repo = await ghRes.json();
         rawText = [
-          `Name: ${repo.name}`,
-          `Description: ${repo.description || ""}`,
+          `Name: ${repo.name || repoOwner + "/" + repoName}`,
+          `Description: ${repo.description || "(нет описания)"}`,
           `Topics: ${(repo.topics || []).join(", ")}`,
-          `Language: ${repo.language || ""}`,
-          `Stars: ${repo.stargazers_count}`,
-          `URL: ${repo.html_url}`,
+          `Language: ${repo.language || "не указан"}`,
+          `Stars: ${repo.stargazers_count || 0}`,
+          `URL: ${repo.html_url || url}`,
         ].join("\n");
 
-        // Also try to get README
+        // Try README
         try {
           const readmeRes = await fetch(
             `https://api.github.com/repos/${repoOwner}/${repoName}/readme`,
@@ -46,33 +55,41 @@ export async function POST(req: NextRequest) {
           );
           if (readmeRes.ok) {
             const readme = await readmeRes.json();
-            const content = Buffer.from(readme.content, "base64").toString("utf-8").slice(0, 2000);
+            const content = Buffer.from(readme.content, "base64").toString("utf-8").slice(0, 2500);
             rawText += "\nREADME:\n" + content;
           }
         } catch {}
       }
-    } else {
-      // Regular URL fetch
+    } catch (e: any) {
+      // GitHub API failed, try fetching the page directly as fallback
+      console.error("GitHub API error:", e.message);
+    }
+  }
+
+  // Fallback: fetch the page directly if GitHub API didn't work
+  if (!rawText || rawText.length < 50) {
+    try {
       const pageRes = await fetch(url, {
         headers: { "User-Agent": "ProektMap/1.0" },
         signal: AbortSignal.timeout(10000),
       });
-      const html = await pageRes.text();
-      // Strip HTML tags
-      rawText = html
-        .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
-        .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
-        .replace(/<[^>]+>/g, " ")
-        .replace(/\s+/g, " ")
-        .trim()
-        .slice(0, 3000);
+      if (pageRes.ok) {
+        const html = await pageRes.text();
+        rawText = html
+          .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
+          .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
+          .replace(/<[^>]+>/g, " ")
+          .replace(/\s+/g, " ")
+          .trim()
+          .slice(0, 4000);
+      }
+    } catch (e: any) {
+      return NextResponse.json({ error: `Не удалось загрузить страницу: ${e.message}` }, { status: 500 });
     }
-  } catch (e: any) {
-    return NextResponse.json({ error: `Failed to fetch: ${e.message}` }, { status: 500 });
   }
 
-  if (!rawText || rawText.length < 30) {
-    return NextResponse.json({ error: "Не удалось извлечь содержимое страницы" }, { status: 400 });
+  if (!rawText || rawText.length < 50) {
+    return NextResponse.json({ error: "На странице недостаточно текста для анализа. Убедитесь что ссылка рабочая." }, { status: 400 });
   }
 
   // AI fill
@@ -81,7 +98,7 @@ export async function POST(req: NextRequest) {
   const key = settings?.deepseekApiKey || process.env.DEEPSEEK_API_KEY || "";
   if (!key) return NextResponse.json({ error: "Нет API ключа" }, { status: 500 });
 
-  const prompt = `Проанализируй информацию о проекте и заполни карточку на русском языке. Верни ТОЛЬКО JSON, без пояснений.
+  const prompt = `Проанализируй информацию о проекте и заполни карточку на русском языке. Верни ТОЛЬКО чистый JSON, без markdown-блоков и пояснений.
 
 {
   "title": "название проекта (на русском, до 80 символов)",
@@ -90,14 +107,14 @@ export async function POST(req: NextRequest) {
   "aiTools": "AI-инструменты через запятую, например: Cursor, Claude, ChatGPT",
   "authorName": "имя автора или организации",
   "authorUrl": "ссылка на GitHub/сайт автора",
-  "category": "одно из: Бот, Сайт, SaaS, Игра, Инструмент, Другое",
+  "category": "Бот, Сайт, SaaS, Игра, Инструмент или Другое",
   "status": "Запущен или В разработке"
 }
 
 Информация о проекте:
-${rawText}
+${rawText.slice(0, 3000)}
 
-URL: ${url}`;
+URL проекта: ${url}`;
 
   try {
     const aiRes = await fetch("https://api.deepseek.com/v1/chat/completions", {
@@ -108,16 +125,20 @@ URL: ${url}`;
     });
 
     if (!aiRes.ok) {
+      const errText = await aiRes.text().catch(() => "");
       return NextResponse.json({ error: `AI API error ${aiRes.status}` }, { status: 502 });
     }
 
     const aiData = await aiRes.json();
     const content = aiData.choices?.[0]?.message?.content || "";
 
-    // Extract JSON
-    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    // Extract JSON from response (handle ```json blocks or raw JSON)
+    let jsonStr = content;
+    const mdMatch = content.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+    if (mdMatch) jsonStr = mdMatch[1];
+    const jsonMatch = jsonStr.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      return NextResponse.json({ error: "AI не вернул JSON" }, { status: 500 });
+      return NextResponse.json({ error: "AI не вернул JSON. Попробуйте ещё раз." }, { status: 500 });
     }
 
     const project = JSON.parse(jsonMatch[0]);
