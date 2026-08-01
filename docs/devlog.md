@@ -124,3 +124,32 @@
 - Схема Prisma обновлена через `prisma db push` + `prisma generate`
 - API использует `(session.user as any).id` как остальные роуты проекта
 - Панель знаний открывается/закрывается через кастомные события — не зависит от пропсов
+
+
+---
+
+## 2026-07-31 (продолжение) — AI Цех, документация, закрытие дня
+
+### AI Цех
+- **Модель AiProject**: title, slug, description, url, techStack, aiTools, authorName, screenshot, category, status, featured, viewCount
+- **API CRUD**: GET/POST/PUT/DELETE `/api/admin/ai-projects`
+- **AI-fill**: POST `/api/admin/ai-projects/ai-fill` — парсит GitHub API (название, описание, topics, README) → DeepSeek → JSON карточки
+- **Админка** `/admin/ai-projects`: таблица, форма с ImagePicker, панель AI-заполнения по ссылке
+- **Каталог** `/ai-workshop`: плотная сетка карточек с фото, фильтр по категориям, счётчики просмотров
+- **Страница проекта** `/ai-workshop/[slug]`: скриншот, стек с авто-линковкой на AI-инструменты, похожие проекты
+- **Меню**: Песочница → 🏭 AI Цех
+
+### Песочница — документация
+- `docs/SANDOBOX.md` — философия, список страниц, структура Hub Page, виджеты, дизайн-система
+- `docs/AI-WORKSHOP.md` — модель, API, AI-fill механика, админка, план развития
+
+### Песочница — итоговый состав
+- `/sandbox` — индекс (бенто-сетка)
+- `/telegram` — Telegram Бот MAX
+- `/ai-without-vpn` — AI без VPN
+- `/vibecraft` — Vibe Coding Tools
+- `/russian-ai-stack` — Российский AI-стек
+- `/ai-workshop` — AI Цех
+
+### Дизайн-система
+- Все страницы Песочницы приведены к единому стилю: 0px радиусы, CSS-переменные, серые цвета, плотная сетка
