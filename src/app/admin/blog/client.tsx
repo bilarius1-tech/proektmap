@@ -91,11 +91,14 @@ export default function BlogAdminClient({ posts, categories, authors, pendingCom
         body: JSON.stringify({ ...form, slug }),
       });
 
-      const data = await res.json();
+      let data: any = {};
+      try {
+        const text = await res.text();
+        if (text) data = JSON.parse(text);
+      } catch {}
 
       if (res.ok) {
         showToast("success", editId === "new" ? "✅ Блог успешно создан" : "✅ Блог успешно обновлён");
-        // Auto-close editor after short delay so user sees the toast
         setTimeout(() => {
           setEditId(null);
           setForm(empty);
@@ -103,12 +106,12 @@ export default function BlogAdminClient({ posts, categories, authors, pendingCom
           router.refresh();
         }, 800);
       } else {
-        const errMsg = data?.error || data?.message || "Неизвестная ошибка";
-        showToast("error", `❌ ${errMsg}`);
+        const errMsg = data?.error || data?.message || `Сервер вернул ${res.status} ${res.statusText}`;
+        showToast("error", errMsg);
         setSaving(false);
       }
     } catch (e: any) {
-      showToast("error", `❌ Ошибка сети: ${e.message || "Не удалось сохранить"}`);
+      showToast("error", e.message || "Не удалось сохранить");
       setSaving(false);
     }
   }

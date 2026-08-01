@@ -18,13 +18,25 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  if (!(await checkAdmin())) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  const data = await req.json();
-  const db = await getDb();
-  const session = await auth();
-  const post = await db.blogPost.create({
-    data: { ...data, authorId: (session!.user as any).id, publishedAt: data.status === "published" ? new Date() : null },
-  });
-  if (post.status === "published") pingSearchEngines(post.slug).catch(() => {});
-  return NextResponse.json(post);
+  try {
+    if (!(await checkAdmin())) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    const data = await req.json();
+    const db = await getDb();
+    const session = await auth();
+
+    // Check slug uniqueness
+    if (data.slug) {
+      const slugExists = await db.blogPost.findUnique({ where: { slug: data.slug } });
+      if (slugExists) return NextResponse.json({ error: "Slug уже занят. Придумайте другой заголовок." }, { status: 409 });
+    }
+
+    const post = await db.blogPost.create({
+      data: { ...data, authorId: (session!.user as any).id, publishedAt: data.status === "published" ? new Date() : null },
+    });
+    if (post.status === "published") pingSearchEngines(post.slug).catch(() => {});
+    return NextResponse.json(post);
+  } catch (e: any) {
+    console.error("POST /api/admin/blog error:", e);
+    return NextResponse.json({ error: e?.message || "Ошибка сервера" }, { status: 500 });
+  }
 }
