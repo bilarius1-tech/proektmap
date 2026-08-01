@@ -11,13 +11,18 @@ export async function POST(req: NextRequest) {
   const { url } = await req.json();
   if (!url) return NextResponse.json({ error: "URL required" }, { status: 400 });
 
+  // Clean URL: strip query params, hash, trailing slashes for parsing
+  const cleanUrl = url.replace(/[?#].*$/, "").replace(/\/+$/, "");
+
   // Fetch page content
   let rawText = "";
   try {
     // Try GitHub API first if it's a GitHub URL
-    const ghMatch = url.match(/github\.com\/([^\/]+)\/([^\/]+)/);
+    const ghMatch = cleanUrl.match(/github\.com\/([^\/]+)\/([^\/]+)/);
     if (ghMatch) {
-      const apiUrl = `https://api.github.com/repos/${ghMatch[1]}/${ghMatch[2]}`;
+      const repoOwner = ghMatch[1];
+      const repoName = ghMatch[2].replace(/[?#].*$/, "");
+      const apiUrl = `https://api.github.com/repos/${repoOwner}/${repoName}`;
       const ghRes = await fetch(apiUrl, {
         headers: { "User-Agent": "ProektMap/1.0", "Accept": "application/json" },
         signal: AbortSignal.timeout(10000),
@@ -36,7 +41,7 @@ export async function POST(req: NextRequest) {
         // Also try to get README
         try {
           const readmeRes = await fetch(
-            `https://api.github.com/repos/${ghMatch[1]}/${ghMatch[2]}/readme`,
+            `https://api.github.com/repos/${repoOwner}/${repoName}/readme`,
             { headers: { "User-Agent": "ProektMap/1.0", "Accept": "application/json" }, signal: AbortSignal.timeout(5000) }
           );
           if (readmeRes.ok) {
