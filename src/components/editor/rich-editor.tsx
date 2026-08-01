@@ -109,7 +109,7 @@ export default function RichEditor({ content, onChange, placeholder }: {
     try {
       const res = await fetch("/api/blog/ai-enhance", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text, mode }) });
       const data = await res.json();
-      if (data.html) { editor?.commands.setContent(data.html); onChange(data.html); }
+      if (data.html) { if (data.html.startsWith("<") || data.html.startsWith("<")) { editor?.commands.setContent(data.html); onChange(data.html); } else { alert("AI 043204350440043d0443043b 04420435043a04410442 0432043c043504410442043e HTML. 041f043e043f0440043e04310443043904420435 043504490451 044004300437."); } } else if (data.error) { alert(data.error); }
     } catch { alert("Ошибка AI"); }
   }
 
