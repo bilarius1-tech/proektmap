@@ -782,3 +782,24 @@ model KnowledgeClip {
   @@map("knowledge_clips")
 }
 
+model AiProject {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  description String   @default("")
+  url         String   @default("")
+  techStack   String   @default("")   
+  aiTools     String   @default("")   
+  authorName  String   @default("")
+  authorUrl   String   @default("")
+  screenshot  String   @default("")
+  category    String   @default("Бот")
+  status      String   @default("Запущен")
+  featured    Boolean  @default(false)
+  viewCount   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("ai_projects")
+}
+
