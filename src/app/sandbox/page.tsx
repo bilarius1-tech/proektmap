@@ -1,6 +1,6 @@
 import { getDb } from "@/lib/db/index";
 import Link from "next/link";
-import { Bot, Globe, Shield, Zap, Cpu, Wrench, Lightbulb, BookOpen, Compass, Sparkles, ArrowRight, Eye, FileText, Layers, Grid3X3 } from "lucide-react";
+import { Bot, Globe, Shield, Zap, Cpu, Wrench, Lightbulb, BookOpen, Compass, Sparkles, ArrowRight, Eye, FileText, Layers, Grid3X3, Clock } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 export const metadata = {
@@ -21,6 +21,11 @@ export default async function SandboxPage() {
     db.solution.count({ where: { isPublished: true } }),
     db.blogPost.count({ where: { status: "published" } }),
   ]);
+
+  // Dynamic: latest content for the "New" section
+  const latestBlueprints = await db.blueprint.findMany({ where: { isPublished: true }, orderBy: { createdAt: "desc" }, take: 4, select: { title: true, slug: true, difficulty: true } });
+  const latestTools = await db.aITool.findMany({ where: { isActive: true }, orderBy: { createdAt: "desc" }, take: 4, select: { name: true, slug: true, type: true } });
+  const latestPatterns = await db.buildPattern.findMany({ where: { isPublished: true }, orderBy: { createdAt: "desc" }, take: 4, select: { title: true, slug: true, difficulty: true } });
 
   const telegramDecisions = await db.decision.count({ where: { slug: { contains: "tg-" } } });
   const telegramTools = await db.aITool.count({ where: { bestFor: { contains: "telegram" } } });
@@ -183,6 +188,46 @@ export default async function SandboxPage() {
           <Link href="/#quiz-section" style={{ display: "inline-flex", alignItems: "center", gap: "var(--space-xs)", padding: "14px 32px", background: "var(--color-accent)", color: "#fff", textDecoration: "none", fontSize: "var(--text-s)", fontWeight: 700, borderRadius: 0 }}>
             Пройти квиз <ArrowRight size={16} />
           </Link>
+        </section>
+
+        {/* LATEST CONTENT — динамическая секция */}
+        <section style={{ marginTop: "var(--space-xl)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "var(--space-s)", marginBottom: "var(--space-l)" }}>
+            <Clock size={20} style={{ color: "var(--color-accent)" }} />
+            <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-xl)", fontWeight: 700, margin: 0 }}>Новое на платформе</h2>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "var(--space-m)" }}>
+            <div style={{ background: "var(--color-bg-secondary)", border: "1px solid var(--color-border)", padding: "var(--space-l)" }}>
+              <h3 style={{ fontSize: "var(--text-s)", fontWeight: 700, marginBottom: "var(--space-m)", color: "var(--color-accent)" }}>Blueprint'ы</h3>
+              {latestBlueprints.map((bp: any) => (
+                <Link key={bp.slug} href={`/blueprints/${bp.slug}`} style={{ display: "block", padding: "8px 0", fontSize: "var(--text-s)", color: "var(--color-text-primary)", textDecoration: "none", borderBottom: "1px solid var(--color-border-light)" }}>
+                  {bp.title}
+                  <span style={{ fontSize: 11, color: "var(--color-text-tertiary)", marginLeft: 8 }}>{bp.difficulty === "easy" ? "🟢" : bp.difficulty === "hard" ? "🔴" : "🟡"}</span>
+                </Link>
+              ))}
+              <Link href="/blueprints" style={{ display: "block", marginTop: "var(--space-s)", fontSize: "var(--text-xs)", color: "var(--color-accent)", textDecoration: "none" }}>Все Blueprint'ы →</Link>
+            </div>
+            <div style={{ background: "var(--color-bg-secondary)", border: "1px solid var(--color-border)", padding: "var(--space-l)" }}>
+              <h3 style={{ fontSize: "var(--text-s)", fontWeight: 700, marginBottom: "var(--space-m)", color: "var(--color-accent)" }}>Инструменты</h3>
+              {latestTools.map((t: any) => (
+                <Link key={t.slug} href={`/ai-tools/${t.slug}`} style={{ display: "block", padding: "8px 0", fontSize: "var(--text-s)", color: "var(--color-text-primary)", textDecoration: "none", borderBottom: "1px solid var(--color-border-light)" }}>
+                  {t.name}
+                  <span style={{ fontSize: 11, color: "var(--color-text-tertiary)", marginLeft: 8 }}>{t.type}</span>
+                </Link>
+              ))}
+              <Link href="/ai-tools" style={{ display: "block", marginTop: "var(--space-s)", fontSize: "var(--text-xs)", color: "var(--color-accent)", textDecoration: "none" }}>Все инструменты →</Link>
+            </div>
+            <div style={{ background: "var(--color-bg-secondary)", border: "1px solid var(--color-border)", padding: "var(--space-l)" }}>
+              <h3 style={{ fontSize: "var(--text-s)", fontWeight: 700, marginBottom: "var(--space-m)", color: "var(--color-accent)" }}>Паттерны</h3>
+              {latestPatterns.map((p: any) => (
+                <Link key={p.slug} href={`/patterns/${p.slug}`} style={{ display: "block", padding: "8px 0", fontSize: "var(--text-s)", color: "var(--color-text-primary)", textDecoration: "none", borderBottom: "1px solid var(--color-border-light)" }}>
+                  {p.title}
+                  <span style={{ fontSize: 11, color: "var(--color-text-tertiary)", marginLeft: 8 }}>{p.difficulty === "easy" ? "🟢" : p.difficulty === "hard" ? "🔴" : "🟡"}</span>
+                </Link>
+              ))}
+              <Link href="/patterns" style={{ display: "block", marginTop: "var(--space-s)", fontSize: "var(--text-xs)", color: "var(--color-accent)", textDecoration: "none" }}>Все паттерны →</Link>
+            </div>
+          </div>
         </section>
 
       </div>

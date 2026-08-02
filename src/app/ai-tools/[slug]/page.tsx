@@ -2,6 +2,7 @@ import { getDb } from "@/lib/db/index";
 import { notFound } from "next/navigation";
 import { auth } from "@/lib/auth";
 import AIToolDetailClient from "./client";
+import RelatedBlueprintsBlock from "@/components/layout/related-blueprints-block";
 
 export const dynamic = "force-dynamic";
 
@@ -93,6 +94,7 @@ export default async function Page({ params }: any) {
         alternatives={JSON.parse(JSON.stringify(alternatives))}
         isLoggedIn={isLoggedIn}
       />
+          <RelatedBlueprintsBlock toolSlug={tool.slug} />
     </>
   );
 }

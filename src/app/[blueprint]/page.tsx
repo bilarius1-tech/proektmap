@@ -2,6 +2,7 @@ import { getDb } from "@/lib/db";
 export const dynamic = "force-dynamic";
 import { notFound } from "next/navigation";
 import BlueprintPageClient from "./client";
+import RelatedToolsBlock from "@/components/layout/related-tools-block";
 import type { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import { getProjectContext, buildUserContext } from "@/lib/project-context";
@@ -9,8 +10,10 @@ import { getProjectContext, buildUserContext } from "@/lib/project-context";
 export async function generateMetadata({ params }: { params: Promise<{ blueprint: string }> }): Promise<Metadata> {
   const { blueprint: slug } = await params;
   try {
-    const db = await getDb();
-    const bp = await db.blueprint.findUnique({ where: { slug }, select: { title: true, description: true } });
+    const db = await getDb(      </>
+    );
+    const bp = await db.blueprint.findUnique({ where: { slug }, select: { title: true, description: true } }      </>
+    );
     if (!bp) return {};
     return {
       title: `${bp.title} — Карта роста`,
@@ -28,47 +31,62 @@ export default async function BlueprintPage({
 }) {
   const { blueprint: slug } = await params;
   const { project: projectId, pattern: patternSlug, from: fromPage, demo: isDemo } = await searchParams;
-  const db = await getDb();
+  const db = await getDb(      </>
+    );
 
   const bp = await db.blueprint.findUnique({
     where: { slug },
     include: { stages: { orderBy: { sortOrder: "asc" }, include: { stage: { include: { decisions: { orderBy: { sortOrder: "asc" } } } } } } },
-  });
-  if (!bp) notFound();
+  }      </>
+    );
+  if (!bp) notFound(      </>
+    );
 
   // Track view + load analytics
-  await db.blueprint.update({ where: { id: bp.id }, data: { viewCount: { increment: 1 } } });
-  const projectCount = await db.project.count({ where: { blueprintId: bp.id } });
-  const completedCount = await db.project.count({ where: { blueprintId: bp.id, status: "completed" } });
+  await db.blueprint.update({ where: { id: bp.id }, data: { viewCount: { increment: 1 } } }      </>
+    );
+  const projectCount = await db.project.count({ where: { blueprintId: bp.id } }      </>
+    );
+  const completedCount = await db.project.count({ where: { blueprintId: bp.id, status: "completed" } }      </>
+    );
 
-  const session = await auth();
+  const session = await auth(      </>
+    );
   const isLoggedIn = !!session?.user;
-  const isPro = isLoggedIn && ((session.user as any).subscription === "pro" || (session.user as any).role === "admin");
+  const isPro = isLoggedIn && ((session.user as any).subscription === "pro" || (session.user as any).role === "admin"      </>
+    );
 
   // Load user's project if specified
   let projectContext = null;
   let userProjects: any[] = [];
   if (isLoggedIn && projectId) {
-    projectContext = await getProjectContext(projectId);
+    projectContext = await getProjectContext(projectId      </>
+    );
   }
   if (isLoggedIn) {
     userProjects = await db.project.findMany({
       where: { userId: (session.user as any).id, blueprintId: bp.id },
       select: { id: true, name: true, progress: true, status: true },
       orderBy: { createdAt: "desc" },
-    });
+    }      </>
+    );
   }
 
-  const userContext = buildUserContext(projectContext || { id: "", name: "", description: "", domain: "", stack: "", niche: "", colors: "", goals: "", blueprintTitle: "" });
+  const userContext = buildUserContext(projectContext || { id: "", name: "", description: "", domain: "", stack: "", niche: "", colors: "", goals: "", blueprintTitle: "" }      </>
+    );
 
   // Load pattern context if ?pattern=xxx
   let pattern = null;
   if (patternSlug) {
-    pattern = await db.buildPattern.findUnique({ where: { slug: patternSlug } });
+    pattern = await db.buildPattern.findUnique({ where: { slug: patternSlug } }      </>
+    );
   }
 
-  const glossaryTerms = await db.glossaryTerm.findMany({ where: { isPublished: true }, orderBy: { sortOrder: "asc" }, take: 12 });
+  const glossaryTerms = await db.glossaryTerm.findMany({ where: { isPublished: true }, orderBy: { sortOrder: "asc" }, take: 12 }      </>
+    );
   return (
+      <>
+      <RelatedToolsBlock blueprintSlug={bp.slug} />
     <BlueprintPageClient
       blueprint={JSON.parse(JSON.stringify(bp))} glossaryTerms={JSON.parse(JSON.stringify(glossaryTerms))}
       isLoggedIn={isLoggedIn}
@@ -82,5 +100,6 @@ export default async function BlueprintPage({
       projectCount={projectCount}
       completedCount={completedCount}
     />
-  );
+        </>
+    );
 }
