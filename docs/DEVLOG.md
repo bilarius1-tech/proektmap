@@ -1101,3 +1101,28 @@ dfeb819f Prompts v3
 - Blueprint AI Engineering (MCP, Agent, RAG, Multi-Agent, Knowledge Graph)
 - SEO-оптимизация новых Blueprint-лендингов
 
+
+
+---
+
+## 02.08.2026 (вечер) — Content Hub v1
+
+### Проблема
+Инструменты, Карта пути и Песочница — три раздела в полной изоляции. 6 сущностей создавались вручную без связей.
+
+### Решение: ProektMap Content Hub
+
+**Фаза 1 — Динамическая Песочница**
+- Секция «Новое на платформе»: Blueprint'ы, Инструменты, Паттерны из БД
+
+**Фаза 2 — Авто-связи Blueprint ↔ Инструменты**
+- Graph API: типы blueprint и aitool + keyword fallback
+- auto-link API: POST /api/admin/auto-link
+- RelatedToolsBlock / RelatedBlueprintsBlock на страницах
+- 16 авто-связей создано
+
+**Фаза 3 — Auto-link API**
+- API создан, сервер нестабилен (цикл рестартов PM2)
+
+### Коммиты
+- c060a297 feat: Content Hub — авто-связи Blueprint↔Tools + живая Песочница
