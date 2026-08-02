@@ -689,6 +689,17 @@
 - FlowView v2: узлы с текстом, прогресс-бары, цвета по статусу
 - Карта метро: клик → инфокарточка (не мгновенный переход)
 
+### Дополнение (вечер)
+
+**Динамическое меню Blueprint'ов**
+- BlueprintsMenu: серверный компонент — авто-список из БД (always fresh)
+- BlueprintsDropdown: клиентский дропдаун с иконками, сложностью, гридом 2 колонки
+- Header: динамическое меню вместо ручных MenuItem — новые Blueprint'ы появляются автоматически
+- MobileMenu: секция Blueprints в мобильной версии
+- POST API: исправлен — coverImage, goal, timeToComplete, targetAudience сохраняются
+- Форма: поле targetAudience (Для кого)
+- Удалены 7 ручных ссылок из menu_items
+
 ### План на завтра
 - 📱 mobile-app Blueprint
 - 💳 Интеграция ЮKassa webhook
@@ -1036,6 +1047,17 @@ dfeb819f Prompts v3
 - Навыки засижены для 8+ типов решений
 - React #310 в AI-кнопках исправлен
 
+### Дополнение (вечер)
+
+**Динамическое меню Blueprint'ов**
+- BlueprintsMenu: серверный компонент — авто-список из БД (always fresh)
+- BlueprintsDropdown: клиентский дропдаун с иконками, сложностью, гридом 2 колонки
+- Header: динамическое меню вместо ручных MenuItem — новые Blueprint'ы появляются автоматически
+- MobileMenu: секция Blueprints в мобильной версии
+- POST API: исправлен — coverImage, goal, timeToComplete, targetAudience сохраняются
+- Форма: поле targetAudience (Для кого)
+- Удалены 7 ручных ссылок из menu_items
+
 ### План на завтра
 - SOLUTIONS-LIBRARY.md — Архитектор → коллективная база решений
 
@@ -1062,6 +1084,17 @@ dfeb819f Prompts v3
 - 9 Blueprint'ов всего: 5 старых + 4 новых
 - Всего в каталоге: SaaS, Игра, Корп.сайт, Компания+каталог, Telegram Бот, CRM, AI-ассистент, Интернет-магазин, Маркетплейс
 - Общий XP пул: ~4000+ XP
+
+### Дополнение (вечер)
+
+**Динамическое меню Blueprint'ов**
+- BlueprintsMenu: серверный компонент — авто-список из БД (always fresh)
+- BlueprintsDropdown: клиентский дропдаун с иконками, сложностью, гридом 2 колонки
+- Header: динамическое меню вместо ручных MenuItem — новые Blueprint'ы появляются автоматически
+- MobileMenu: секция Blueprints в мобильной версии
+- POST API: исправлен — coverImage, goal, timeToComplete, targetAudience сохраняются
+- Форма: поле targetAudience (Для кого)
+- Удалены 7 ручных ссылок из menu_items
 
 ### План на завтра
 - Blueprint AI SEO-аудитор (уровень 2)
