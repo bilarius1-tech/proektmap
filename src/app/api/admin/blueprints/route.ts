@@ -13,6 +13,10 @@ export async function POST(req: NextRequest) {
       difficulty: data.difficulty || "easy",
       isPublished: data.isPublished ?? false,
       sortOrder: data.sortOrder || 0,
+      coverImage: data.coverImage || "",
+      goal: data.goal || "",
+      timeToComplete: data.timeToComplete || "",
+      targetAudience: data.targetAudience || "",
     },
   });
   return NextResponse.json({ ok: true, blueprint: bp });

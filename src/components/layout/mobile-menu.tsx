@@ -8,9 +8,10 @@ interface MenuItem {
   id: string; label: string; href: string; children?: MenuItem[];
 }
 
-export default function MobileMenu({ items }: { items: MenuItem[] }) {
+export default function MobileMenu({ items, blueprints }: { items: MenuItem[]; blueprints?: { id: string; title: string; slug: string }[] }) {
   const [open, setOpen] = useState(false);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const bpList = blueprints || [];
 
   function toggleParent(id: string) {
     setExpanded(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
@@ -18,7 +19,6 @@ export default function MobileMenu({ items }: { items: MenuItem[] }) {
 
   return (
     <>
-      {/* Hamburger button — visible only on mobile */}
       <button onClick={() => setOpen(!open)} className="mobile-only" style={{
         background: "none", border: "none", padding: 8, cursor: "pointer",
         color: "var(--color-text-primary)",
@@ -26,7 +26,6 @@ export default function MobileMenu({ items }: { items: MenuItem[] }) {
         {open ? <X size={22} /> : <Menu size={22} />}
       </button>
 
-      {/* Overlay + Panel */}
       {open && (
         <>
           <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 98 }} onClick={() => setOpen(false)} />
@@ -45,6 +44,35 @@ export default function MobileMenu({ items }: { items: MenuItem[] }) {
             </div>
 
             <nav style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              {/* Blueprints section */}
+              {bpList.length > 0 && (
+                <>
+                  <button onClick={() => toggleParent("blueprints-mobile")} style={{
+                    display: "flex", alignItems: "center", justifyContent: "space-between",
+                    width: "100%", padding: "12px", border: "none", background: "transparent",
+                    cursor: "pointer", fontSize: "var(--text-m)", fontWeight: 600,
+                    color: "var(--color-accent)",
+                  }}>
+                    🗺️ Blueprints ({bpList.length})
+                    <ChevronDown size={16} style={{ transform: expanded.has("blueprints-mobile") ? "rotate(180deg)" : "none", transition: "0.2s" }} />
+                  </button>
+                  {expanded.has("blueprints-mobile") && (
+                    <div style={{ paddingLeft: "var(--space-m)" }}>
+                      {bpList.map(bp => (
+                        <Link key={bp.id} href={`/blueprints/${bp.slug}`} onClick={() => setOpen(false)}
+                          style={{ display: "block", padding: "10px 12px", color: "var(--color-text-secondary)", textDecoration: "none", fontSize: "var(--text-s)" }}>
+                          📄 {bp.title}
+                        </Link>
+                      ))}
+                      <Link href="/blueprints" onClick={() => setOpen(false)}
+                        style={{ display: "block", padding: "10px 12px", color: "var(--color-accent)", textDecoration: "none", fontSize: "var(--text-s)", fontWeight: 600 }}>
+                        Все Blueprints →
+                      </Link>
+                    </div>
+                  )}
+                </>
+              )}
+
               {items.map(item => (
                 <div key={item.id}>
                   {item.children && item.children.length > 0 ? (
@@ -81,9 +109,6 @@ export default function MobileMenu({ items }: { items: MenuItem[] }) {
           </div>
         </>
       )}
-
-      {/* Show hamburger on mobile */}
-
     </>
   );
 }

@@ -43,6 +43,7 @@ export default function BPForm({ initial }: { initial?: any }) {
         <div><label style={lbl}>Обложка (URL или /uploads/...)</label><ImagePicker value={form.coverImage} onChange={url => setForm({ ...form, coverImage: url })} /></div>
         <div><label style={lbl}>Цель</label><input className="input" value={form.goal} onChange={e => setForm({ ...form, goal: e.target.value })} placeholder="Что получит пользователь"/></div>
         <div><label style={lbl}>Время прохождения</label><input className="input" value={form.timeToComplete} onChange={e => setForm({ ...form, timeToComplete: e.target.value })} placeholder="2 недели по 1 часу в день"/></div>
+        <div><label style={lbl}>Для кого</label><input className="input" value={form.targetAudience} onChange={e => setForm({ ...form, targetAudience: e.target.value })} placeholder="Малый бизнес, фрилансеры"/></div>
         <div><label style={lbl}>Описание</label><textarea className="input" rows={2} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} /></div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "var(--space-s)" }}>
           <div><label style={lbl}>Сложность</label><select className="input" value={form.difficulty} onChange={e => setForm({ ...form, difficulty: e.target.value })}><option value="easy">Лёгкий</option><option value="medium">Средний</option><option value="hard">Сложный</option></select></div>
