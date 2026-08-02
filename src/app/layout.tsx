@@ -51,6 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Onest:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
         <meta name="theme-color" content="#0fb880" />
+        <meta name="google-site-verification" content="smmoUXndmRCwowjp1qQ9LVbQlqtbZwFUoNg5GxlVz6E" />
         <DesignTokens />
         <AnalyticsScripts />
         <link rel="alternate" href="https://proektmap.ru" hrefLang="ru" />
