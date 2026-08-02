@@ -12,6 +12,7 @@ const ROUTE_LABELS: Record<string, string> = {
   blog: 'Блог',
   prompts: 'Промты',
   'ai-tools': 'AI-инструменты',
+  'ai-workshop': 'AI Цех',
   models: 'AI Модели',
   architecture: 'Карта метро',
   specialists: 'Специалисты',
@@ -22,6 +23,7 @@ const ROUTE_LABELS: Record<string, string> = {
   offer: 'Оферта',
   contacts: 'Контакты',
   auth: 'Вход',
+  blueprints: 'Blueprints',
 };
 
 export default function Breadcrumbs({ pathname, pageTitle }: { pathname: string; pageTitle?: string }) {
@@ -38,23 +40,44 @@ export default function Breadcrumbs({ pathname, pageTitle }: { pathname: string;
 
   if (crumbs.length <= 1) return null;
 
+  // Schema.org BreadcrumbList
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Главная", "item": "https://proektmap.ru" },
+      ...crumbs.map((crumb, i) => ({
+        "@type": "ListItem",
+        "position": i + 2,
+        "name": crumb.label,
+        "item": `https://proektmap.ru${crumb.href}`,
+      })),
+    ],
+  };
+
   return (
-    <nav style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', padding: 'var(--space-s) 0', flexWrap: 'wrap' }}>
-      <Link href="/" style={{ color: 'var(--color-text-tertiary)', textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-        <Home size={12} />
-      </Link>
-      {crumbs.map((crumb, i) => (
-        <span key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <ChevronRight size={10} style={{ opacity: 0.4 }} />
-          {i === crumbs.length - 1 ? (
-            <span style={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>{crumb.label}</span>
-          ) : (
-            <Link href={crumb.href} style={{ color: 'var(--color-text-secondary)', textDecoration: 'none' }}>
-              {crumb.label}
-            </Link>
-          )}
-        </span>
-      ))}
-    </nav>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <nav style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 'var(--text-xs)', color: 'var(--color-text-tertiary)', padding: 'var(--space-s) 0', flexWrap: 'wrap' }}>
+        <Link href="/" style={{ color: 'var(--color-text-tertiary)', textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+          <Home size={12} />
+        </Link>
+        {crumbs.map((crumb, i) => (
+          <span key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <ChevronRight size={10} style={{ opacity: 0.4 }} />
+            {i === crumbs.length - 1 ? (
+              <span style={{ fontWeight: 600, color: 'var(--color-text-primary)' }}>{crumb.label}</span>
+            ) : (
+              <Link href={crumb.href} style={{ color: 'var(--color-text-secondary)', textDecoration: 'none' }}>
+                {crumb.label}
+              </Link>
+            )}
+          </span>
+        ))}
+      </nav>
+    </>
   );
 }

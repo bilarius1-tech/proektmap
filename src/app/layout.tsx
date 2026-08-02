@@ -14,11 +14,11 @@ import KnowledgeProvider from "@/components/knowledge/knowledge-provider";
 
 export const metadata: Metadata = {
   title: {
-    default: "Школа AI-инженеров: создай проект с нуля с помощью ИИ — Карта роста",
-    template: "%s — Карта роста",
+    default: "Создание сайтов, SaaS и Telegram-ботов с помощью ИИ — ProektMap",
+    template: "%s — ProektMap",
   },
-  description: "Школа AI-инженеров: обучение vibe coding, готовые промпты, 12 этапов разработки. Создай сайт за 1 час с помощью искусственного интеллекта. Персональный AI-консультант.",
-  keywords: ["AI-инжиниринг", "vibe coding", "Next.js", "обучение", "разработка", "промпты"],
+  description: "Конструктор цифровых проектов на ИИ: создавайте сайты, Telegram-ботов, CRM-системы, SaaS и другие цифровые продукты. Готовые Blueprint, инструменты, решения и реальные кейсы.",
+  keywords: ["создать сайт", "создать телеграм бота", "создать saas", "создать crm", "конструктор проектов", "разработка с ии", "blueprint", "cursor инструкция", "claude code"],
   authors: [{ name: "Тимофеев Алексей Геннадьевич" }],
   creator: "Тимофеев Алексей",
   publisher: "ИП Тимофеев А.Г.",
@@ -27,17 +27,17 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "ru_RU",
-    siteName: "Карта роста",
-    title: "Школа AI-инженеров: создай проект с нуля с помощью ИИ",
-    description: "Обучение vibe coding: готовые промпты, 12 этапов, AI-консультант. От идеи до сайта за 1 час.",
+    siteName: "ProektMap",
+    title: "Создание сайтов, SaaS и Telegram-ботов с помощью ИИ — ProektMap",
+    description: "Конструктор цифровых проектов на ИИ: сайты, Telegram-боты, CRM, SaaS. Готовые Blueprint, инструменты и реальные кейсы.",
     url: "https://proektmap.ru",
-    images: [{ url: "https://proektmap.ru/api/og?title=Школа+AI-инженеров&category=ProektMap&author=Карта+роста", width: 1200, height: 630 }],
+    images: [{ url: "https://proektmap.ru/api/og?title=Создавайте+цифровые+продукты+с+ИИ&category=ProektMap&author=Конструктор+проектов", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Школа AI-инженеров: создай проект с нуля с помощью ИИ",
-    description: "Обучение vibe coding: готовые промпты, 12 этапов, AI-консультант. От идеи до сайта за 1 час.",
-    images: ["https://proektmap.ru/api/og?title=Школа+AI-инженеров&category=ProektMap&author=Карта+роста"],
+    title: "Создание сайтов, SaaS и Telegram-ботов с помощью ИИ — ProektMap",
+    description: "Конструктор цифровых проектов на ИИ: сайты, Telegram-боты, CRM, SaaS. Готовые Blueprint и реальные кейсы.",
+    images: ["https://proektmap.ru/api/og?title=Создавайте+цифровые+продукты+с+ИИ&category=ProektMap&author=Конструктор+проектов"],
   },
   icons: {
     icon: "/favicon.svg",
@@ -55,6 +55,25 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AnalyticsScripts />
         <link rel="alternate" href="https://proektmap.ru" hrefLang="ru" />
         <link rel="alternate" href="https://proektmap.ru" hrefLang="x-default" />
+        {/* Schema.org — Website */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "ProektMap",
+              alternateName: "Конструктор цифровых проектов",
+              url: "https://proektmap.ru",
+              description: "Конструктор цифровых проектов на ИИ: создавайте сайты, Telegram-ботов, CRM-системы, SaaS и другие цифровые продукты. Готовые Blueprint, инструменты, решения и реальные кейсы.",
+              potentialAction: {
+                "@type": "SearchAction",
+                target: "https://proektmap.ru/search?q={search_term_string}",
+                "query-input": "required name=search_term_string",
+              },
+            }),
+          }}
+        />
       </head>
       <body suppressHydrationWarning style={{ display: "flex", flexDirection: "column", minHeight: "100dvh" }}>
         <SessionProvider>

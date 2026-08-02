@@ -4,8 +4,8 @@ import { Clock, Target, Database, CheckCircle, Package, ArrowRight, Eye, Globe, 
 
 export const dynamic = "force-dynamic";
 export const metadata = {
-  title: "Blueprint'ы — готовая дорожная карта проекта",
-  description: "Выбери Blueprint под свой проект. Каждый содержит: цель, сущности БД, навыки, чек-лист, артефакты и AI-промпты для каждого этапа.",
+  title: "Как создать сайт, Telegram-бота или SaaS — пошаговые Blueprint",
+  description: "Готовые дорожные карты для создания цифровых продуктов: сайтов, SaaS, CRM, Telegram-ботов, игр. Каждый Blueprint содержит этапы, решения, AI-промпты и стек технологий.",
 };
 
 const ICON_MAP: Record<string, any> = { Globe, Server, Smartphone, Gamepad2 };
@@ -35,7 +35,7 @@ export default async function BlueprintsPage() {
           const skills = safeJson(bp.skills || "[]");
           
           return (
-            <Link key={bp.id} href={`/${bp.slug}`} style={{
+            <Link key={bp.id} href={`/blueprints/${bp.slug}`} style={{
               textDecoration: "none", color: "inherit",
               background: "var(--color-bg-primary)", border: "1px solid var(--color-border)",
               borderRadius: "var(--radius-m)", overflow: "hidden",

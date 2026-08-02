@@ -11,10 +11,10 @@ export async function generateMetadata({ params }: any) {
   const tool = await db.aITool.findUnique({ where: { slug } });
   if (!tool) return { title: "Инструмент не найден" };
   return {
-    title: tool.name + " — обзор AI-инструмента",
-    description: tool.name + ": " + (tool.description || "").substring(0, 150) + ". " + tool.pricing + ". Рейтинг " + tool.rating + "/10.",
+    title: tool.name + " — инструкция, настройка, цена, отзывы",
+    description: tool.name + ": " + (tool.shortDescription || tool.description || "").substring(0, 150) + ". Цена: " + (tool.pricingAmount || tool.pricing || "от 0") + ". Рейтинг " + tool.rating + "/10.",
     openGraph: {
-      title: tool.name + " — обзор AI-инструмента | Карта роста",
+      title: tool.name + " — инструкция по настройке и использованию",
       description: (tool.description || "").substring(0, 200),
       type: "article",
     },
@@ -26,6 +26,28 @@ export default async function Page({ params }: any) {
   const db = await getDb();
   const tool = await db.aITool.findUnique({ where: { slug } });
   if (!tool) notFound();
+
+  // Fetch alternatives (same type, different slug)
+  const alternatives = await db.aITool.findMany({
+    where: { type: tool.type, slug: { not: slug }, isActive: true },
+    take: 4,
+    select: { name: true, slug: true, pricingAmount: true, rating: true },
+  });
+
+  // Build HowTo schema if steps exist
+  const steps = JSON.parse(tool.howToStart || "[]");
+  const howToSchema = steps.length > 0 ? {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": `Как начать работать с ${tool.name}`,
+    "description": tool.description || `Пошаговая инструкция по настройке ${tool.name}`,
+    "step": steps.map((s: any, i: number) => ({
+      "@type": "HowStep",
+      "position": i + 1,
+      "name": s.title,
+      "text": s.desc,
+    })),
+  } : null;
 
   const session = await auth();
   const isLoggedIn = !!session?.user;
@@ -62,9 +84,13 @@ export default async function Page({ params }: any) {
           }),
         }}
       />
+      {howToSchema && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }} />
+      )}
       <AIToolDetailClient
         tool={JSON.parse(JSON.stringify(tool))}
         related={related}
+        alternatives={JSON.parse(JSON.stringify(alternatives))}
         isLoggedIn={isLoggedIn}
       />
     </>

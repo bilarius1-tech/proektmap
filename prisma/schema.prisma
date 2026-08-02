@@ -341,6 +341,7 @@ model AITool {
   hiddenFeatures  String @default("")  // text: "Скрытые возможности"
   ourTake         String @default("")  // text: "Наша рекомендация"
   detailComparison String @default("") // text: "Чем отличается от других"
+  mistakes        String   @default("")  // text: "Типичные ошибки при использовании"
   supportedModels String   @default("[]")
   sortOrder   Int      @default(0)
   isActive    Boolean  @default(true)
@@ -795,6 +796,7 @@ model AiProject {
   screenshot  String   @default("")
   category    String   @default("Бот")
   status      String   @default("Запущен")
+  language    String   @default("ru")
   featured    Boolean  @default(false)
   viewCount   Int      @default(0)
   createdAt   DateTime @default(now())

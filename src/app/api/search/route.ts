@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
   const query = q.toLowerCase();
 
   const [
-    glossary, patterns, mcp, tools, blog, decisions, prompts
+    glossary, patterns, mcp, tools, blog, decisions, prompts, aiProjects
   ] = await Promise.all([
     db.glossaryTerm.findMany({
       where: { isPublished: true, OR: [
@@ -69,6 +69,17 @@ export async function GET(req: NextRequest) {
       select: { id: true, title: true, slug: true, description: true },
       take: 5,
     }),
+    db.aiProject.findMany({
+      where: { OR: [
+        { title: { contains: query, mode: "insensitive" } },
+        { description: { contains: query, mode: "insensitive" } },
+        { techStack: { contains: query, mode: "insensitive" } },
+        { aiTools: { contains: query, mode: "insensitive" } },
+        { authorName: { contains: query, mode: "insensitive" } },
+      ]},
+      select: { id: true, title: true, slug: true, description: true, category: true, language: true },
+      take: 6,
+    }),
   ]);
 
   const results = [
@@ -79,6 +90,7 @@ export async function GET(req: NextRequest) {
     ...blog.map(b => ({ ...b, type: "blog", typeLabel: "📝 Блог", href: "/blog/" + b.slug, snippet: highlightText(b.excerpt || "", query) })),
     ...decisions.map(d => ({ ...d, type: "decision", typeLabel: "⚡ Решение", href: "/corporate-website?stage=" + d.slug, snippet: highlightText(d.content || "", query) })),
     ...prompts.map(p => ({ ...p, type: "prompt", typeLabel: "💬 Промпт", href: "/prompts", snippet: highlightText(p.description, query) })),
+    ...aiProjects.map(p => ({ ...p, type: "aiProject", typeLabel: "🏭 AI Цех", href: "/ai-workshop/" + p.slug, snippet: highlightText(p.description, query), subtitle: p.category + (p.language === "en" ? " · EN" : " · RU") })),
   ];
 
   return NextResponse.json({ results, query: q, total: results.length });

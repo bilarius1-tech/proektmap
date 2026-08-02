@@ -144,6 +144,18 @@ URL проекта: ${url}`;
     const project = JSON.parse(jsonMatch[0]);
     project.url = url;
 
+    // Auto-generate slug from title (transliterate Russian → Latin)
+    if (!project.slug && project.title) {
+      const ru: Record<string, string> = {а:'a',б:'b',в:'v',г:'g',д:'d',е:'e',ё:'yo',ж:'zh',з:'z',и:'i',й:'y',к:'k',л:'l',м:'m',н:'n',о:'o',п:'p',р:'r',с:'s',т:'t',у:'u',ф:'f',х:'h',ц:'ts',ч:'ch',ш:'sh',щ:'sch',ъ:'',ы:'y',ь:'',э:'e',ю:'yu',я:'ya'};
+      let slug = project.title.toLowerCase().trim();
+      slug = slug.split('').map((c: string) => ru[c] || c).join('');
+      try { slug = decodeURIComponent(slug); } catch {}
+      slug = slug.replace(/[\s_,]+/g, '-');
+      slug = slug.replace(/[^a-z0-9\-]/g, '');
+      slug = slug.replace(/-+/g, '-').replace(/^-|-$/g, '');
+      project.slug = slug.slice(0, 70);
+    }
+
     return NextResponse.json(project);
   } catch (e: any) {
     return NextResponse.json({ error: e.message || "AI request failed" }, { status: 500 });

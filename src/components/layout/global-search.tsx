@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Search, X, ArrowRight, FileText, FolderOpen, BookOpen } from "lucide-react";
+import { Search, X, ArrowRight, FileText, FolderOpen, BookOpen, Factory } from "lucide-react";
 
 interface SearchResult {
-  type: "stage" | "decision" | "prompt";
-  id: string; title: string; subtitle: string | null; slug: string; stage?: string;
+  type: string;
+  id: string; title: string; subtitle?: string; slug?: string; href?: string;
+  snippet?: string; typeLabel?: string; stage?: string; category?: string; language?: string;
 }
 
 export default function GlobalSearch() {
@@ -54,6 +55,10 @@ export default function GlobalSearch() {
   function go(result: SearchResult) {
     setOpen(false);
     setQuery("");
+    if (result.href) {
+      window.location.href = result.href;
+      return;
+    }
     if (result.type === "prompt") {
       window.location.href = "/prompts";
       return;
@@ -62,13 +67,22 @@ export default function GlobalSearch() {
       window.location.href = `/corporate-website?stage=${result.stage}`;
       return;
     }
+    if (result.type === "tool") {
+      window.location.href = "/ai-tools";
+      return;
+    }
     window.location.href = "/corporate-website";
   }
 
-  const icons: Record<string, any> = {
-    stage: <FolderOpen size={14} style={{ color: "var(--color-accent)" }} />,
+  const typeIcons: Record<string, any> = {
+    glossary: <BookOpen size={14} style={{ color: "var(--color-accent)" }} />,
+    pattern: <FolderOpen size={14} style={{ color: "var(--color-accent)" }} />,
+    mcp: <FileText size={14} style={{ color: "var(--color-accent)" }} />,
+    tool: <FileText size={14} style={{ color: "var(--color-accent)" }} />,
+    blog: <FileText size={14} style={{ color: "var(--color-accent)" }} />,
     decision: <FileText size={14} style={{ color: "var(--color-accent)" }} />,
     prompt: <BookOpen size={14} style={{ color: "var(--color-accent)" }} />,
+    aiProject: <Factory size={14} style={{ color: "var(--color-accent)" }} />,
   };
 
   return (
@@ -97,7 +111,7 @@ export default function GlobalSearch() {
             <input
               ref={inputRef}
               value={query} onChange={e => setQuery(e.target.value)}
-              placeholder="Поиск по этапам, решениям, промптам..."
+              placeholder="Поиск по всему сайту..."
               style={{ flex: 1, border: "none", outline: "none", fontSize: "var(--text-s)", background: "transparent" }}
             />
             {query && <button onClick={() => setQuery("")} style={{ background: "none", border: "none", cursor: "pointer", padding: 2 }}><X size={14} style={{ color: "var(--color-text-tertiary)" }} /></button>}
@@ -107,18 +121,18 @@ export default function GlobalSearch() {
             {!loading && results.length === 0 && query.length >= 2 && (
               <div style={{ padding: "var(--space-m)", textAlign: "center", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>Ничего не найдено</div>
             )}
-            {results.map(r => (
-              <div key={r.id} onClick={() => go(r)} style={{
+            {results.map((r, i) => (
+              <div key={r.id || i} onClick={() => go(r)} style={{
                 display: "flex", alignItems: "center", gap: "var(--space-s)", padding: "10px 14px",
                 cursor: "pointer", borderBottom: "1px solid var(--color-border-light)",
               }}>
-                {icons[r.type]}
+                {typeIcons[r.type] || <FileText size={14} style={{ color: "var(--color-text-tertiary)" }} />}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: "var(--text-s)", fontWeight: 600 }}>{r.title}</div>
                   {r.subtitle && <div style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>{r.subtitle}</div>}
                 </div>
                 <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 99, background: "var(--color-bg-secondary)", color: "var(--color-text-tertiary)", flexShrink: 0 }}>
-                  {r.type === "decision" ? "Решение" : r.type === "stage" ? "Этап" : "Промпт"}
+                  {r.typeLabel || r.type}
                 </span>
                 <ArrowRight size={12} style={{ color: "var(--color-text-tertiary)", flexShrink: 0 }} />
               </div>

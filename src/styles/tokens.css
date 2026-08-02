@@ -156,16 +156,9 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
 
 @media (max-width: 480px) {
   :root {
-  --font-heading: "Onest", "Inter", sans-serif;
-  --font-body: "Inter", sans-serif;
-  --font-mono: "JetBrains Mono", "Fira Code", monospace;
     --space-xl: 20px;
     --space-l: 16px;
     --space-m: 12px;
-  }
-
-  .hide-mobile {
-    display: none !important;
   }
 }
 
@@ -174,6 +167,37 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
   button, a, [role="button"] {
     min-height: 44px;
     min-width: 44px;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   HEADER RESPONSIVE — каскадная адаптация
+   ═══════════════════════════════════════════ */
+
+/* Laptop compact: 960–1150px — tighter spacing, smaller font */
+@media (max-width: 1150px) {
+  .header-nav {
+    gap: 1px !important;
+  }
+  .header-nav > a,
+  .header-nav > div > button {
+    font-size: 12px !important;
+    padding: 4px 7px !important;
+  }
+  .header-right {
+    gap: 4px !important;
+  }
+  .header-logo {
+    font-size: 15px !important;
+  }
+}
+
+/* Tablet: <960px — hamburger menu */
+@media (max-width: 960px) {
+  .hide-mobile { display: none !important; }
+  .mobile-only { display: flex !important; }
+  .header-logo {
+    margin-left: 0 !important;
   }
 }
 
@@ -221,8 +245,6 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
   .blog-layout main { padding: var(--space-m); max-width: 100%; }
   .blog-card { flex-direction: column; }
   .blog-card-image { width: 100%; height: 180px; }
-  .hide-mobile { display: none; }
-  .mobile-only { display: flex; }
 }
 
 @media (max-width: 480px) {

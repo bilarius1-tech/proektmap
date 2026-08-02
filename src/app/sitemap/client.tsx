@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import {
-  Compass, Package, MessageSquare, Plug, Wrench, BookOpen,
+  Compass, Package, MessageSquare, Plug, Wrench, BookOpen, Factory,
   Newspaper, Search, Users, Network, Home, Settings,
   ArrowRight, ArrowDown, ExternalLink, Cpu, Train, Play, Crown
 } from "lucide-react";
@@ -35,6 +35,7 @@ const FLOW = [
       { id: "prompts", title: "Промпты", href: "/prompts", icon: MessageSquare, desc: "8 инженерных решений с RPG-статами. System + User Prompt. Совместимость с GPT, Claude, Gemini.", links: ["mcp", "patterns"] },
       { id: "mcp", title: "MCP-серверы", href: "/mcp", icon: Plug, desc: "34 сервера Model Context Protocol. Парсер GitHub, DeepSeek-перевод, cron-обновление.", links: ["ai-tools", "prompts"] },
       { id: "ai-tools", title: "AI-инструменты", href: "/ai-tools", icon: Wrench, desc: "31 инструмент: Cursor, Reasonix, Aider, DeepSeek Coder. Фильтр по РФ, VPN, цене. Закладки, модели, подбор.", links: ["mcp", "models"] },
+      { id: "ai-workshop", title: "🏭 AI Цех", href: "/ai-workshop", icon: Factory, desc: "Витрина проектов созданных с помощью AI: российские и мировые. Telegram боты, SaaS, игры. Фильтр по языку и категории.", links: ["ai-tools", "models"] },
       { id: "models", title: "Модели", href: "/models", icon: Cpu, desc: "Сравнение AI-моделей: GPT, Claude, Gemini, DeepSeek. Рекомендации под задачу.", links: ["ai-tools"] },
     ],
   },

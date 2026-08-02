@@ -61,7 +61,7 @@ export default function SearchPage() {
           Поиск по ProektMap
         </h1>
         <p style={{ fontSize: "var(--text-s)", color: "var(--color-text-secondary)", lineHeight: 1.6 }}>
-          Ищите по глоссарию, паттернам, MCP-серверам, инструментам, блогу, промптам и решениям.
+          Ищите по глоссарию, паттернам, MCP-серверам, инструментам, AI Цеху, блогу, промптам и решениям.
         </p>
 
         <div style={{ position: "relative", marginTop: "var(--space-m)", maxWidth: 500 }}>

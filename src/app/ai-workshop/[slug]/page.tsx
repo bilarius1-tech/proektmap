@@ -52,7 +52,32 @@ export default async function AiProjectPage({ params }: { params: Promise<{ slug
     select: { id: true, title: true, slug: true, screenshot: true, category: true },
   });
 
+  // Schema.org SoftwareApplication
+  const softwareSchema = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": project.title,
+    "description": project.description,
+    "applicationCategory": project.category === "Бот" ? "MessagingApplication" : project.category === "Игра" ? "GameApplication" : "BusinessApplication",
+    "operatingSystem": "Web",
+    "author": {
+      "@type": "Person",
+      "name": project.authorName || "ProektMap",
+    },
+    "url": project.url || `https://proektmap.ru/ai-workshop/${project.slug}`,
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "RUB",
+    },
+  };
+
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema) }}
+      />
     <div style={{ fontFamily: "var(--font-body)", background: "var(--color-bg-primary)", color: "var(--color-text-primary)", minHeight: "100vh" }}>
       <div style={{ maxWidth: 960, margin: "0 auto", padding: "var(--space-xl) var(--space-m)" }}>
 
@@ -67,6 +92,7 @@ export default async function AiProjectPage({ params }: { params: Promise<{ slug
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: "var(--space-s)" }}>
               <span style={{ padding: "3px 10px", fontSize: 11, fontWeight: 600, background: "var(--color-bg-tertiary)", color: "var(--color-text-secondary)" }}>{project.category}</span>
               <span style={{ padding: "3px 10px", fontSize: 11, fontWeight: 600, background: project.status === "Запущен" ? "var(--color-accent-light)" : "var(--color-bg-tertiary)", color: project.status === "Запущен" ? "var(--color-accent)" : "var(--color-text-secondary)" }}>{project.status}</span>
+              <span style={{ padding: "3px 10px", fontSize: 11, fontWeight: 600, background: "var(--color-bg-tertiary)", color: "var(--color-text-secondary)" }}>{project.language === "en" ? "🇬🇧 EN" : "🇷🇺 RU"}</span>
               {project.featured && <span style={{ color: "#fbbf24" }}><Star size={16} /></span>}
             </div>
             <h1 style={{ fontFamily: "var(--font-heading)", fontSize: "clamp(28px, 5vw, 36px)", fontWeight: 800, margin: "0 0 var(--space-m)", letterSpacing: "-0.02em" }}>{project.title}</h1>
@@ -131,6 +157,39 @@ export default async function AiProjectPage({ params }: { params: Promise<{ slug
           </div>
         </div>
 
+        {/* CTA: Blueprint + Tools cross-linking */}
+        <section style={{ marginBottom: "var(--space-xxl)", background: "var(--color-bg-secondary)", border: "1px solid var(--color-border)", padding: "var(--space-xl)" }}>
+          <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-l)", fontWeight: 700, margin: "0 0 var(--space-s)" }}>
+            🚀 Как повторить этот проект
+          </h2>
+          <p style={{ fontSize: "var(--text-s)", color: "var(--color-text-secondary)", lineHeight: 1.7, margin: "0 0 var(--space-m)" }}>
+            Хочешь создать похожий проект? Выбери подходящий Blueprint с пошаговой дорожной картой, готовыми решениями и AI-промптами.
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "var(--space-m)", marginBottom: "var(--space-m)" }}>
+            <BlueprintLink
+              href="/blueprints"
+              icon="📋"
+              title="Все Blueprints"
+              desc="Каталог готовых дорожных карт: сайты, SaaS, боты, CRM, игры"
+            />
+            <BlueprintLink
+              href="/ai-tools"
+              icon="🛠️"
+              title="AI-инструменты"
+              desc="Cursor, Claude Code, Reasonix — сравни и выбери свой"
+            />
+            <BlueprintLink
+              href="/glossary"
+              icon="📖"
+              title="Глоссарий"
+              desc="Термины и технологии: от API до WebSocket"
+            />
+          </div>
+          <Link href="/blueprints" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 24px", background: "var(--color-accent)", color: "#fff", textDecoration: "none", fontSize: "var(--text-s)", fontWeight: 600 }}>
+            Выбрать Blueprint <ArrowRight size={16} />
+          </Link>
+        </section>
+
         {/* Related */}
         {related.length > 0 && (
           <section style={{ borderTop: "1px solid var(--color-border)", paddingTop: "var(--space-xl)" }}>
@@ -147,5 +206,16 @@ export default async function AiProjectPage({ params }: { params: Promise<{ slug
         )}
       </div>
     </div>
+    </>
+  );
+}
+
+function BlueprintLink({ href, icon, title, desc }: { href: string; icon: string; title: string; desc: string }) {
+  return (
+    <Link href={href} style={{ textDecoration: "none", color: "inherit", display: "block", padding: "var(--space-m)", background: "var(--color-bg-primary)", border: "1px solid var(--color-border)" }}>
+      <div style={{ fontSize: 20, marginBottom: 4 }}>{icon}</div>
+      <div style={{ fontWeight: 700, fontSize: "var(--text-xs)", marginBottom: 2 }}>{title}</div>
+      <div style={{ fontSize: 10, color: "var(--color-text-secondary)", lineHeight: 1.5 }}>{desc}</div>
+    </Link>
   );
 }

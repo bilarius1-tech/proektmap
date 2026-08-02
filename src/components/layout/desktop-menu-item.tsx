@@ -12,6 +12,16 @@ const CHILD_ICONS: Record<string, string> = {
   "Telegram Бот": "🤖",
   "AI без VPN": "🛡️",
   "Vibe Coding": "⚡",
+  "Российский AI-стек": "🇷🇺",
+  "Все Blueprints": "📋",
+  "Корпоративный сайт": "🏢",
+  "SaaS-продукт": "🚀",
+  "Каталог + заказы": "🛒",
+  "Разработка игры": "🎮",
+  "Промты": "💬",
+  "Паттерны": "📦",
+  "MCP": "🔌",
+  "AI": "🧠",
 };
 
 export default function DesktopMenuItem({ item }: { item: MenuItem }) {
