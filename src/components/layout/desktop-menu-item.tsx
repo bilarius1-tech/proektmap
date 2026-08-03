@@ -114,12 +114,25 @@ export default function DesktopMenuItem({ item }: { item: MenuItem }) {
 
           {/* Title */}
           <div style={{
+            display: "flex", justifyContent: "space-between", alignItems: "center",
             fontSize: 11, fontWeight: 700, textTransform: "uppercase",
             color: "var(--color-text-secondary)", letterSpacing: "0.05em",
             marginBottom: "var(--space-m)", paddingBottom: "var(--space-s)",
             borderBottom: "1px solid var(--color-border)",
           }}>
-            {item.label}
+            <span>{item.label}</span>
+            {item.href && item.href !== "#" && (
+              <Link
+                href={item.href}
+                onClick={() => setOpen(false)}
+                style={{
+                  fontSize: 11, color: "var(--color-accent)", textDecoration: "none",
+                  fontWeight: 600, textTransform: "none", letterSpacing: 0,
+                }}
+              >
+                Все →
+              </Link>
+            )}
           </div>
 
           {/* Grid of children */}
