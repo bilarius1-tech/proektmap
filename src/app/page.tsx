@@ -17,6 +17,7 @@ const blueprints = [
 export default async function Home() {
   const db = await getDb();
   const latestPosts = await db.blogPost.findMany({ where: { status: "published" }, orderBy: { publishedAt: "desc" }, take: 3, select: { title: true, slug: true, excerpt: true, coverImage: true, publishedAt: true, viewCount: true } });
+  const latestBlueprints = await db.blueprint.findMany({ where: { isPublished: true }, orderBy: { createdAt: "desc" }, take: 3, select: { title: true, slug: true, description: true, coverImage: true, difficulty: true, icon: true } });
   const popularPosts = await db.blogPost.findMany({ where: { status: "published" }, orderBy: { viewCount: "desc" }, take: 3, select: { title: true, slug: true, publishedAt: true, viewCount: true } });
   const [decisionCount, skillCount, postCount] = await Promise.all([
     db.decision.count(), db.skill.count({ where: { isPublished: true } }), db.blogPost.count({ where: { status: "published" } }),
@@ -143,6 +144,32 @@ export default async function Home() {
                   <div style={{ fontSize: "var(--text-xs)", fontWeight: 700, fontFamily: "var(--font-heading)", marginBottom: 4, lineHeight: 1.4 }}>{p.title}</div>
                   {p.excerpt && <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", lineHeight: 1.5, marginBottom: "var(--space-s)", flex: 1 }}>{p.excerpt.slice(0, 100)}{p.excerpt.length > 100 ? "..." : ""}</div>}
                   <div style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>{new Date(p.publishedAt).toLocaleDateString("ru")} &middot; {p.viewCount || 0} просмотров</div>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Latest Blueprints */}
+        {latestBlueprints.length > 0 && (
+          <div style={{ marginBottom: "var(--space-xl)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-m)" }}>
+              <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-l)", fontWeight: 700, margin: 0 }}>Новые Blueprint'ы</h2>
+              <a href="/blueprints" style={{ fontSize: "var(--text-xs)", color: "var(--color-accent)", textDecoration: "none", fontWeight: 600 }}>Все Blueprint'ы →</a>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "var(--space-m)" }}>
+              {latestBlueprints.map((bp: any) => (
+                <a key={bp.slug} href={`/blueprints/${bp.slug}`} style={{ padding: "var(--space-l)", background: "var(--color-bg-primary)", border: "1px solid var(--color-border)", textDecoration: "none", color: "inherit", display: "flex", flexDirection: "column" }}>
+                  {bp.coverImage ? <img src={bp.coverImage} alt="" style={{ width: "100%", height: 140, objectFit: "cover", marginBottom: "var(--space-s)" }} /> : (
+                    <div style={{ width: "100%", height: 140, background: "var(--color-bg-secondary)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "var(--space-s)", fontSize: 32 }}>
+                      {bp.icon === "Bot" ? "🤖" : bp.icon === "Store" ? "🛒" : bp.icon === "Users" ? "👥" : bp.icon === "ShoppingBag" ? "🛍️" : bp.icon === "Brain" ? "🧠" : bp.icon === "Globe" ? "🌐" : "📄"}
+                    </div>
+                  )}
+                  <div style={{ fontSize: "var(--text-xs)", fontWeight: 700, fontFamily: "var(--font-heading)", marginBottom: 4, lineHeight: 1.4 }}>{bp.title}</div>
+                  {bp.description && <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", lineHeight: 1.5, marginBottom: "var(--space-s)", flex: 1 }}>{bp.description.slice(0, 100)}{bp.description.length > 100 ? "..." : ""}</div>}
+                  <div style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>
+                    {bp.difficulty === "easy" ? "🟢 Лёгкий" : bp.difficulty === "hard" ? "🔴 Сложный" : "🟡 Средний"}
+                  </div>
                 </a>
               ))}
             </div>
