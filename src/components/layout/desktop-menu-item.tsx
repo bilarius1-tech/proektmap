@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 
-interface MenuChild { id: string; label: string; href: string; icon?: string; }
+interface MenuChild { id: string; label: string; href: string; icon?: string; emoji?: string; }
 interface MenuItem { id: string; label: string; href: string; icon?: string; children?: MenuChild[]; }
 
 // Icon mapping for child items
@@ -148,7 +148,7 @@ export default function DesktopMenuItem({ item }: { item: MenuItem }) {
                 }}
               >
                 <span style={{ fontSize: 20, flexShrink: 0 }}>
-                  {CHILD_ICONS[child.label] || "📄"}
+                  {child.emoji || CHILD_ICONS[child.label] || "📄"}
                 </span>
                 <span>{child.label}</span>
               </Link>

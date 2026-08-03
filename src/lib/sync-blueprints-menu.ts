@@ -44,11 +44,12 @@ export async function syncBlueprintsToMenu() {
       await db.menuItem.update({
         where: { id: existingMap.get(bp.id)! },
         data: {
-          label: `${emoji} ${bp.title}`,
+          label: bp.title,
           href,
           sortOrder: bp.sortOrder,
           parentId: BLUEPRINTS_PARENT_ID,
           isActive: true,
+          emoji,
         },
       });
       existingMap.delete(bp.id);
@@ -56,7 +57,7 @@ export async function syncBlueprintsToMenu() {
       // Create new
       await db.menuItem.create({
         data: {
-          label: `${emoji} ${bp.title}`,
+          label: bp.title,
           href,
           sortOrder: bp.sortOrder,
           parentId: BLUEPRINTS_PARENT_ID,

@@ -17,12 +17,13 @@ const STEP_TITLES: Record<number, string> = {
 export default function BlueprintProgressBar() {
   const pathname = usePathname();
   const [progress, setProgress] = useState<{ step: number; completed: number[] } | null>(null);
-  const [dismissed, setDismissed] = useState(false);
+  const [dismissed, setDismissed] = useState(true); // hidden until checked
   const [minimized, setMinimized] = useState(false);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const dismissed = localStorage.getItem(DISMISS_KEY);
-    if (dismissed) { setDismissed(true); return; }
+    const d = localStorage.getItem(DISMISS_KEY);
+    if (!d) setDismissed(false);
 
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -31,6 +32,7 @@ export default function BlueprintProgressBar() {
         if (data.step !== undefined) setProgress(data);
       }
     } catch {}
+    setReady(true);
   }, [pathname]);
 
   function dismiss() {
@@ -38,13 +40,12 @@ export default function BlueprintProgressBar() {
     localStorage.setItem(DISMISS_KEY, "1");
   }
 
+  // Don't render anything until client-side check completes
+  if (!ready) return null;
+
   if (dismissed || pathname.startsWith("/quest/")) return null;
 
   if (!progress) {
-    // Show CTA for users who haven't started
-    const hasStarted = !!progress;
-    if (hasStarted || dismissed) return null;
-
     return (
       <div style={{
         position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 999,
@@ -103,7 +104,6 @@ export default function BlueprintProgressBar() {
     );
   }
 
-  // User has progress — show status bar
   const step = progress.step;
   const completed = progress.completed || [];
   const total = 8;
@@ -140,7 +140,6 @@ export default function BlueprintProgressBar() {
           display: "flex", alignItems: "center", gap: "var(--space-m)",
           flexWrap: "wrap", justifyContent: "center",
         }}>
-          {/* Step indicator */}
           <div style={{
             display: "flex", alignItems: "center", gap: 8,
             background: "var(--color-accent-light)", padding: "4px 12px",
@@ -151,23 +150,18 @@ export default function BlueprintProgressBar() {
               Шаг {step + 1} из {total}
             </span>
           </div>
-
           <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", fontWeight: 500 }}>
             {currentTitle}
           </span>
-
-          {/* Mini progress */}
           <div style={{ flex: "0 0 100px", height: 4, background: "var(--color-border-light)", borderRadius: 99, overflow: "hidden" }}>
             <div style={{
               width: `${pct}%`, height: "100%", background: "var(--color-accent)",
               borderRadius: 99, transition: "width 0.4s",
             }} />
           </div>
-
           <span style={{ fontSize: 10, color: "var(--color-text-tertiary)", fontWeight: 600 }}>
             {completed.length}/{total} 🏆
           </span>
-
           <Link href="/quest/beginner" style={{
             padding: "6px 16px", borderRadius: "var(--radius-full)",
             background: "var(--color-accent)", color: "white", textDecoration: "none",
@@ -176,7 +170,6 @@ export default function BlueprintProgressBar() {
           }}>
             Продолжить <ChevronRight size={14} />
           </Link>
-
           <button onClick={dismiss} style={{
             background: "none", border: "none", cursor: "pointer",
             color: "var(--color-text-tertiary)", padding: 4,
