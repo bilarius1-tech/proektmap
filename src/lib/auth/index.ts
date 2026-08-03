@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import YandexProvider from "next-auth/providers/yandex";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { compare } from "bcryptjs";
@@ -17,6 +18,10 @@ function getAuthPrisma() {
 
 export const authOptions: NextAuthOptions = {
   providers: [
+    YandexProvider({
+      clientId: process.env.YANDEX_CLIENT_ID || "",
+      clientSecret: process.env.YANDEX_CLIENT_SECRET || "",
+    }),
     CredentialsProvider({
       name: "email",
       credentials: {
@@ -37,6 +42,25 @@ export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt" },
   pages: { signIn: "/auth" },
   callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider === "yandex" && user.email) {
+        try {
+          const db = getAuthPrisma();
+          const existing = await db.user.findUnique({ where: { email: user.email.toLowerCase() } });
+          if (!existing) {
+            await db.user.create({
+              data: {
+                email: user.email.toLowerCase(),
+                name: user.name || user.email.split("@")[0],
+                role: "user",
+                subscription: "free",
+              },
+            });
+          }
+        } catch (e) { console.error("Yandex signIn error:", e); }
+      }
+      return true;
+    },
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;

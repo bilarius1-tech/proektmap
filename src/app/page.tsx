@@ -17,6 +17,7 @@ const blueprints = [
 export default async function Home() {
   const db = await getDb();
   const latestPosts = await db.blogPost.findMany({ where: { status: "published" }, orderBy: { publishedAt: "desc" }, take: 3, select: { title: true, slug: true, excerpt: true, coverImage: true, publishedAt: true, viewCount: true } });
+  const latestUsers = await db.user.findMany({ orderBy: { createdAt: "desc" }, take: 4, select: { id: true, name: true, email: true, avatar: true, createdAt: true, status: true, role: true } });
   const latestBlueprints = await db.blueprint.findMany({ where: { isPublished: true }, orderBy: { createdAt: "desc" }, take: 3, select: { title: true, slug: true, description: true, coverImage: true, difficulty: true, icon: true } });
   const popularPosts = await db.blogPost.findMany({ where: { status: "published" }, orderBy: { viewCount: "desc" }, take: 3, select: { title: true, slug: true, publishedAt: true, viewCount: true } });
   const [decisionCount, skillCount, postCount] = await Promise.all([
@@ -169,6 +170,28 @@ export default async function Home() {
                   {bp.description && <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", lineHeight: 1.5, marginBottom: "var(--space-s)", flex: 1 }}>{bp.description.slice(0, 100)}{bp.description.length > 100 ? "..." : ""}</div>}
                   <div style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>
                     {bp.difficulty === "easy" ? "🟢 Лёгкий" : bp.difficulty === "hard" ? "🔴 Сложный" : "🟡 Средний"}
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Latest Users */}
+        {latestUsers.length > 0 && (
+          <div style={{ marginBottom: "var(--space-xl)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-m)" }}>
+              <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-l)", fontWeight: 700, margin: 0 }}>Новые участники</h2>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "var(--space-m)" }}>
+              {latestUsers.map((u: any) => (
+                <a key={u.id} href={`/profile/${u.id}`} style={{ padding: "var(--space-m)", background: "var(--color-bg-primary)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-m)", textDecoration: "none", color: "inherit", display: "flex", alignItems: "center", gap: "var(--space-m)" }}>
+                  <div style={{ width: 40, height: 40, borderRadius: "var(--radius-full)", background: u.avatar ? `url(${u.avatar}) center/cover` : "var(--color-bg-secondary)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 700, flexShrink: 0 }}>
+                    {!u.avatar && (u.name?.[0] || u.email[0]).toUpperCase()}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontWeight: 600, fontSize: "var(--text-xs)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{u.name || u.email.split("@")[0]}</div>
+                    <div style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>{u.status === "junior" ? "Новичок" : u.status}</div>
                   </div>
                 </a>
               ))}
