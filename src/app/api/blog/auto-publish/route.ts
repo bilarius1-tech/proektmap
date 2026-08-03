@@ -27,11 +27,17 @@ function cleanSlug(title: string): string {
   return translit(clean).replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 70);
 }
 
-export async function POST() {
-  // Auth check
-  const session = await auth();
-  if (!session?.user || (session.user as any).role !== "admin") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+export async function POST(req: Request) {
+  // Cron secret — bypasses auth for automated runs
+  const cronSecret = req.headers.get('x-cron-secret') || new URL(req.url).searchParams.get('secret') || '';
+  const isCron = cronSecret === process.env.CRON_SECRET && process.env.CRON_SECRET;
+
+  // Auth check (skip for cron)
+  if (!isCron) {
+    const session = await auth();
+    if (!session?.user || (session.user as any).role !== "admin") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
   }
 
   const db = await getDb();
