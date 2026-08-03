@@ -368,6 +368,29 @@ model ReferralLink {
   @@map("referral_links")
 }
 
+model RussianAIProject {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  company     String
+  category    String   // LLM, Image, Voice, Code, Business, OpenSource
+  description String?
+  website     String?
+  pricing     String   @default("free") // free, freemium, paid
+  hasApi      Boolean  @default(false)
+  isOpenSource Boolean @default(false)
+  rating      Int      @default(5)
+  logo        String   @default("")
+  useCases    String   @default("[]") // JSON array
+  howToStart  String   @default("[]") // JSON array
+  isPublished Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("russian_ai_projects")
+}
+
 model SiteSettings {
   id        String   @id @default("main")
   proPrice  Int      @default(300)
