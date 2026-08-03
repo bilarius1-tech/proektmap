@@ -9,7 +9,7 @@ interface MenuItem {
   children: MenuItem[];
 }
 
-export default function MenuEditor({ items: initialItems }: { items: MenuItem[] }) {
+export default function MenuEditor({ items: initialItems, blueprints, allBlueprints }: { items: MenuItem[]; blueprints?: any[]; allBlueprints?: any[] }) {
   const [items, setItems] = useState(initialItems);
   const [editing, setEditing] = useState<Partial<MenuItem> | null>(null);
   const [saving, setSaving] = useState(false);
@@ -89,6 +89,49 @@ export default function MenuEditor({ items: initialItems }: { items: MenuItem[] 
           </button>
         ))}
       </div>
+
+      {/* Blueprints section */}
+      {(blueprints && blueprints.length > 0) && (
+        <div style={{ marginBottom: "var(--space-xl)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "var(--space-s)", marginBottom: "var(--space-m)" }}>
+            <span style={{ fontSize: "var(--text-s)", fontWeight: 700 }}>🗺️ Blueprint'ы</span>
+            <span style={{ fontSize: 11, color: "var(--color-text-tertiary)", background: "var(--color-accent-light)", padding: "2px 8px", borderRadius: "var(--radius-s)" }}>
+              Авто-список из БД
+            </span>
+            <span style={{ fontSize: 11, color: "var(--color-text-tertiary)", marginLeft: "auto" }}>
+              Изменяйте sortOrder и isPublished в{' '}
+              <a href="/admin/blueprints" style={{ color: "var(--color-accent)", textDecoration: "underline" }}>админке Blueprint'ов</a>
+            </span>
+          </div>
+          <div className="card" style={{ padding: "var(--space-s)" }}>
+            {blueprints.map((bp: any, i: number) => (
+              <div key={bp.id} style={{
+                display: "flex", alignItems: "center", gap: "var(--space-s)",
+                padding: "var(--space-s)", borderBottom: i < blueprints.length - 1 ? "1px solid var(--color-border-light)" : "none",
+              }}>
+                <span style={{ fontSize: 16, flexShrink: 0 }}>📄</span>
+                <span style={{ fontWeight: 600, flex: 1, fontSize: "var(--text-s)" }}>{bp.title}</span>
+                <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", fontFamily: "var(--font-mono)" }}>/blueprints/{bp.slug}</span>
+                <span style={{ fontSize: 10, color: "var(--color-text-tertiary)", background: "var(--color-bg-tertiary)", padding: "2px 6px", borderRadius: "var(--radius-s)" }}>
+                  sort: {bp.sortOrder}
+                </span>
+                {bp.isPublished ? (
+                  <span style={{ fontSize: 10, color: "var(--color-accent)", fontWeight: 600 }}>✓ показ.</span>
+                ) : (
+                  <span style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>скрыт</span>
+                )}
+                <a href={'/admin/blueprints/' + bp.id} style={{
+                  padding: "2px 10px", fontSize: 10, border: "1px solid var(--color-border)",
+                  background: "var(--color-bg-secondary)", textDecoration: "none", color: "var(--color-text-secondary)",
+                  fontWeight: 600,
+                }}>
+                  ✏️
+                </a>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Add button */}
       <div style={{ marginBottom: "var(--space-m)" }}>
