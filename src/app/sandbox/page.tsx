@@ -33,11 +33,13 @@ export default async function SandboxPage() {
   const vpnTools = await db.aITool.count({ where: { isActive: true, OR: [{ name: { contains: "YandexGPT" } }, { name: { contains: "GigaChat" } }, { name: { contains: "Cline" } }] } });
   const aiModels = await db.aITool.count({ where: { isActive: true, OR: [{ name: { contains: "YandexGPT" } }, { name: { contains: "GigaChat" } }, { name: { contains: "DeepSeek" } }, { name: { contains: "Kandinsky" } }] } });
 
+  const russianAiCount = await db.russianAIProject.count({ where: { isPublished: true } });
+
   const cards = [
     { slug: "telegram", title: "Telegram Бот MAX", desc: "Всё для создания ботов: Blueprint, фреймворки, глоссарий, готовые решения. От идеи до работающего бота с платежами и AI.", icon: Bot, size: "large" as const, stat: String(telegramDecisions + telegramTools), statLabel: "решений и инструментов", href: "/telegram" },
     { slug: "vibecraft", title: "Vibe Coding", desc: "Создавай сайты без кода: Cursor, Bolt.new, Lovable, Cline. Гайд для России: оплата, хостинг, домен, почта.", icon: Zap, size: "medium" as const, stat: String(vibeTools), statLabel: "инструментов в обзоре", href: "/vibecraft" },
     { slug: "ai-without-vpn", title: "AI без VPN", desc: "Как работать с нейросетями из России: замена западных сервисов, оплата в рублях, хостинг РФ.", icon: Shield, size: "medium" as const, stat: String(vpnTools), statLabel: "российских AI-сервисов", href: "/ai-without-vpn" },
-    { slug: "russian-ai-stack", title: "Российский AI-стек", desc: "YandexGPT, GigaChat, Kandinsky, Шедеврум — обзор, цены, API, примеры кода.", icon: Cpu, size: "small" as const, stat: String(aiModels), statLabel: "моделей в сравнении", href: "/russian-ai-stack" },
+    { slug: "russian-ai", title: "Российский AI", desc: `Каталог из ${russianAiCount} российских AI-проектов: YandexGPT, GigaChat, Kandinsky, SpeechKit. Карта рынка с фильтрами и категориями.`, icon: Cpu, size: "small" as const, stat: String(russianAiCount), statLabel: "проектов в каталоге", href: "/russian-ai" },
     { slug: "blueprints", title: "Все Blueprint'ы", desc: "Готовые дорожные карты: сайт компании, SaaS, Telegram бот, игра. Выбери свой путь.", icon: Compass, size: "small" as const, stat: String(blueprintCount), statLabel: "Blueprint'ов", href: "/blueprints" },
     { slug: "ai-tools", title: "AI-инструменты", desc: `Каталог из ${toolCount} инструментов с русскими обзорами, рейтингами и гайдами.`, icon: Wrench, size: "small" as const, stat: String(toolCount), statLabel: "инструментов", href: "/ai-tools" },
     { slug: "solutions", title: "Готовые решения", desc: "Клонируй и запускай: бот-магазин, AI-консультант, приём заказов. Код на GitHub.", icon: Layers, size: "small" as const, stat: String(solutionCount), statLabel: "решений", href: "/solutions" },
