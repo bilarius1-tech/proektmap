@@ -1163,3 +1163,43 @@ dfeb819f Prompts v3
 ### Коммиты
 - 17b23025 security: middleware admin protection + homepage Blueprint widget
 - 3b66d2df feat: переименование меню + 3 SEO-лендинга
+
+---
+
+## 03.08.2026 (вечер) — 2 Blueprint'а + фикс парсера
+
+### Сделано
+**2 новых Blueprint'а (особый подход, 10 этапов каждый)**
+- AI-конструктор сайтов (ai-website-builder): 950 XP. AI SDK + Sandpack + CodeMirror + OpenRouter
+- Конструктор сайтов (site-builder): 1050 XP. На базе nordic-builder.ru, 15+ блоков, dnd-kit, GigaChat
+
+**Починка парсера блогов**
+- Проблема: cron не мог авторизоваться (curl без кук → 403)
+- Фикс: CRON_SECRET токен в .env + bypass в API
+- Добавлено 3 новых источника: Habr (ru), Tproger (ru), dev.to (en)
+- Reddit отключён (постоянный 403)
+- 6 активных источников, ~12 постов/день с AI-переводом
+
+### Коммиты дня (15 шт)
+39d027f7 fix: cron parser auth
+7c7a23a8 feat: 3 новых RSS-источника
+1fbfcaeb docs: DEVLOG
+3b66d2df feat: переименование меню + SEO-лендинги
+17b23025 security: middleware admin protection
+b746e578 feat: Все → в дропдаунах
+79a549f2 fix: информер, emoji
+23d5d9f2 fix: меню и информер
+98b3e116 feat: Blueprints в menu_items
+b1140ed5 feat: /admin/menu Blueprint'ы
+4525b90d fix: кнопка ✏️ Ред.
+1a1b0d71 feat: авто-связи + матчинг
+d8e572aa fix: page.tsx + билд
+07ada0a5 docs: DEVLOG Content Hub
+3aabebca feat: 2 Blueprint — AI-конструктор + Конструктор
+
+### Статистика проекта
+- 11 Blueprint'ов всего
+- 6 RSS-источников (2 на русском)
+- Меню: единое управление через /admin/menu
+- Админка: middleware защита
+- SEO: 3 лендинга + виджет на главной
