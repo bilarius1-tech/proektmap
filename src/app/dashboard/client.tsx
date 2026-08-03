@@ -49,6 +49,10 @@ export default function DashboardClient({ user, posts, blueprints, completedIds,
             display: "flex", alignItems: "center", gap: 6, padding: "10px 18px", borderRadius: "var(--radius-m)",
             background: "var(--color-bg-secondary)", color: "var(--color-text-primary)", border: "1px solid var(--color-border)", fontSize: "var(--text-s)", fontWeight: 600, cursor: "pointer",
           }}>✍️ Написать статью</button>
+          <button onClick={() => router.push("/blueprints")} style={{
+            display: "flex", alignItems: "center", gap: 6, padding: "10px 18px", borderRadius: "var(--radius-m)",
+            background: "var(--color-accent)", color: "white", border: "none", fontSize: "var(--text-s)", fontWeight: 600, cursor: "pointer",
+          }}>🚀 Создать проект</button>
           {!isPro && (
             <button onClick={() => router.push("/dashboard/billing")} style={{
               display: "flex", alignItems: "center", gap: 6, padding: "10px 18px", borderRadius: "var(--radius-m)",
