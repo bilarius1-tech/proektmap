@@ -19,6 +19,9 @@ export default async function AdminDashboard() {
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const newUsersToday = await db.user.count({ where: { createdAt: { gte: today } } });
   const newPostsToday = await db.blogPost.count({ where: { createdAt: { gte: today } } });
+  const totalComments = await db.blogComment.count();
+  const pendingComments = await db.blogComment.count({ where: { status: "pending" } });
+  const pendingCommentList = await db.blogComment.findMany({ where: { status: "pending" }, orderBy: { createdAt: "desc" }, take: 5, include: { post: { select: { title: true } } } });
 
   // Last 7 days for chart
   const last7Days = Array.from({ length: 7 }, (_, i) => {
@@ -145,6 +148,51 @@ export default async function AdminDashboard() {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* MODERATION */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", gap: "var(--space-xl)", marginTop: "var(--space-xl)" }}>
+        <div style={{ background: pendingComments > 0 ? "#fef2f2" : "var(--color-bg-primary)", border: `1px solid ${pendingComments > 0 ? "#fecaca" : "var(--color-border)"}`, borderRadius: "var(--radius-l)", padding: "var(--space-xl)" }}>
+          <h2 style={{ fontSize: "var(--text-m)", fontWeight: 700, marginBottom: "var(--space-m)", display: "flex", alignItems: "center", gap: 8 }}>
+            {pendingComments > 0 ? "🔴" : "✅"} На модерации: {pendingComments} комментариев
+          </h2>
+          {pendingCommentList.length > 0 ? pendingCommentList.map(c => (
+            <div key={c.id} style={{ padding: "var(--space-s) 0", borderBottom: "1px solid var(--color-border-light)" }}>
+              <div style={{ fontSize: "var(--text-xs)", fontWeight: 600 }}>{c.authorName}</div>
+              <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", margin: "4px 0" }}>{c.content.slice(0, 120)}</div>
+              <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", display: "flex", gap: 12 }}>
+                <span>📝 {c.post?.title?.slice(0, 40)}</span>
+                <span>{new Date(c.createdAt).toLocaleDateString("ru")}</span>
+              </div>
+            </div>
+          )) : (
+            <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>
+              {totalComments === 0 ? "Комментариев пока нет. Когда появятся — будут здесь." : "Всё чисто! Все комментарии одобрены."}
+            </div>
+          )}
+          {totalComments > 0 && (
+            <Link href="/admin/blog/comments" style={{ display: "block", marginTop: "var(--space-m)", fontSize: "var(--text-xs)", color: "var(--color-accent)", textDecoration: "none", fontWeight: 600 }}>
+              Все комментарии ({totalComments}) →
+            </Link>
+          )}
+        </div>
+
+        <div style={{ background: "var(--color-bg-primary)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-l)", padding: "var(--space-xl)" }}>
+          <h2 style={{ fontSize: "var(--text-m)", fontWeight: 700, marginBottom: "var(--space-m)" }}>📋 Контент-статистика</h2>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {[
+              { label: "Постов", value: posts, sub: `+${newPostsToday} сегодня` },
+              { label: "Комментариев", value: totalComments, sub: `${pendingComments} на модерации` },
+              { label: "Blueprint'ов", value: blueprints, sub: "готовых проектов" },
+              { label: "AI-проектов РФ", value: russianAI, sub: "в каталоге" },
+            ].map(row => (
+              <div key={row.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "var(--space-s) 0", borderBottom: "1px solid var(--color-border-light)" }}>
+                <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)" }}>{row.label}</span>
+                <span style={{ fontSize: "var(--text-xs)", fontWeight: 700 }}>{row.value} <span style={{ fontWeight: 400, color: "var(--color-text-tertiary)", fontSize: 10 }}>{row.sub}</span></span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
