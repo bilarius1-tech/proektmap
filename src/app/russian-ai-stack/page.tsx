@@ -19,6 +19,7 @@ export default async function RussianAiStackPage() {
 
   return (
     <div style={{ fontFamily: "Inter, sans-serif", background: "var(--color-bg-primary)", color: "var(--color-text-primary)", minHeight: "100vh" }}>
+      <div style={{ background: "var(--color-accent-light)", borderBottom: "1px solid var(--color-accent)", padding: "10px var(--space-m)", textAlign: "center", fontSize: "var(--text-xs)" }}>📋 <a href="/russian-ai" style={{ color: "var(--color-accent)", fontWeight: 700 }}>Полный каталог: 45+ российских AI-проектов</a> — с поиском, фильтрами и детальными страницами</div>
 
       {/* HERO */}
       <div style={{ background: "linear-gradient(135deg, #0c1929 0%, #162844 50%, #1a3a5c 100%)", padding: "80px 20px 60px", textAlign: "center", position: "relative", overflow: "hidden" }}>

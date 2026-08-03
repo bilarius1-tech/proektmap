@@ -46,6 +46,7 @@ export default async function RussianAIPage({ searchParams }: { searchParams: Pr
   return (
     <div style={{ maxWidth: 1100, margin: "0 auto", padding: "var(--space-xl) var(--space-m)", fontFamily: "var(--font-body)" }}>
       <h1 style={{ fontFamily: "var(--font-heading)", fontSize: "clamp(28px,5vw,40px)", fontWeight: 900, margin: "0 0 var(--space-s)" }}>
+      <div style={{ background: "#f0f7ff", border: "1px solid #93c5fd", padding: "10px var(--space-m)", borderRadius: "var(--radius-m)", marginBottom: "var(--space-l)", fontSize: "var(--text-xs)", display: "inline-block" }}>📖 <a href="/russian-ai-stack" style={{ color: "#2563eb", fontWeight: 700 }}>Подробный обзор и сравнение</a> — YandexGPT vs GigaChat, цены, API, примеры кода</div><br/>
         🇷🇺 Российский AI
       </h1>
       <p style={{ fontSize: "var(--text-m)", color: "var(--color-text-secondary)", marginBottom: "var(--space-l)", maxWidth: 700 }}>
