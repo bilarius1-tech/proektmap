@@ -10,6 +10,12 @@ import KnowledgeButtons from "@/components/knowledge/knowledge-buttons";
 export default async function GlobalHeader() {
   let menuItems: any = [];
   try {
+    const db = await getDb();
+    menuItems = await db.menuItem.findMany({
+      where: { parentId: null, isActive: true, location: "header" },
+      orderBy: { sortOrder: "asc" },
+      include: { children: { where: { isActive: true }, orderBy: { sortOrder: "asc" } } },
+    });
   } catch (e) {}
 
   return (
@@ -20,7 +26,7 @@ export default async function GlobalHeader() {
       position: "sticky", top: 0, zIndex: 100,
     }}>
       <div style={{ display: "flex", alignItems: "center", gap: "var(--space-s)" }}>
-        <MobileMenu items={menuItems}  />
+        <MobileMenu items={menuItems} />
         <Link href="/" className="header-logo" style={{ fontFamily: "var(--font-heading)", fontSize: 18, fontWeight: 700, textDecoration: "none", color: "inherit", whiteSpace: "nowrap" }}>
           Карта<span style={{ color: "var(--color-accent)" }}> роста</span>
         </Link>
