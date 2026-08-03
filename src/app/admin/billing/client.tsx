@@ -1,127 +1,101 @@
 'use client';
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Crown, Check, X, RefreshCw, Calendar, Mail, Clock } from "lucide-react";
+import { Crown, RefreshCw, Calendar, Clock, CreditCard, TrendingUp, Users, DollarSign } from "lucide-react";
 
-export default function BillingClient({ users }: { users: any[] }) {
+export default function BillingClient({ users, subscriptions, payments }: { users: any[]; subscriptions: any[]; payments: any[] }) {
   const router = useRouter();
   const [saving, setSaving] = useState<string | null>(null);
-  const [message, setMessage] = useState("");
+  const [msg, setMsg] = useState("");
 
-  const proCount = users.filter(u => u.subscription === "pro").length;
-  const freeCount = users.filter(u => u.subscription === "free").length;
+  const proUsers = users.filter((u: any) => u.subscription === "pro");
+  const activeSubs = subscriptions.filter((s: any) => s.status === "active");
+  const totalRevenue = payments.filter((p: any) => p.status === "completed").reduce((s: number, p: any) => s + p.amount, 0) / 100;
 
-  async function togglePro(userId: string, currentStatus: string) {
+  async function togglePro(userId: string, current: string) {
     setSaving(userId);
-    const newStatus = currentStatus === "pro" ? "free" : "pro";
-    const expiresAt = newStatus === "pro" ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() : null;
-    await fetch("/api/admin/billing", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId, subscription: newStatus, subscriptionExpiresAt: expiresAt }),
-    });
-    setMessage(`${newStatus === "pro" ? "Pro активирован" : "Pro отключён"} для пользователя`);
-    setTimeout(() => setMessage(""), 3000);
-    setSaving(null);
-    router.refresh();
+    const newSub = current === "pro" ? "free" : "pro";
+    await fetch("/api/admin/billing", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userId, subscription: newSub }) });
+    setMsg(newSub === "pro" ? "✅ Pro активирован" : "❌ Pro отключён");
+    setTimeout(() => setMsg(""), 3000);
+    setSaving(null); router.refresh();
   }
 
-  function formatDate(d: string | null) {
-    if (!d) return "—";
-    const date = new Date(d);
-    const now = new Date();
-    const days = Math.ceil((date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-    if (days < 0) return "Истекла " + Math.abs(days) + " дн. назад";
-    if (days === 0) return "Сегодня";
-    return date.toLocaleDateString("ru") + " (" + days + " дн.)";
+  async function addManualPayment(userId: string) {
+    const amount = prompt("Сумма в рублях:");
+    if (!amount) return;
+    setSaving(userId);
+    await fetch("/api/admin/billing/payment", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ userId, amount: parseInt(amount) * 100, method: "manual", status: "completed" }) });
+    setMsg("✅ Платёж добавлен");
+    setTimeout(() => setMsg(""), 3000);
+    setSaving(null); router.refresh();
   }
+
+  const lab: any = { display: "block", fontSize: 10, fontWeight: 600, color: "var(--color-text-tertiary)", textTransform: "uppercase", marginBottom: 4 };
 
   return (
-    <div style={{ padding: "var(--space-xl)", fontFamily: "var(--font-body)" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-l)", flexWrap: "wrap", gap: 12 }}>
+    <div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-l)" }}>
         <div>
-          <h1 style={{ fontSize: "var(--text-xxl)", fontWeight: 800, fontFamily: "var(--font-heading)" }}>Биллинг</h1>
-          <p style={{ color: "var(--color-text-tertiary)", fontSize: "var(--text-s)" }}>
-            {users.length} пользователей · <span style={{ color: "var(--color-accent)", fontWeight: 600 }}>{proCount} Pro</span> · {freeCount} Free
-          </p>
+          <h1 style={{ fontSize: "var(--text-xl)", fontWeight: 800, margin: 0 }}>💳 Биллинг</h1>
+          <p style={{ color: "var(--color-text-tertiary)", fontSize: "var(--text-s)" }}>Подписки, платежи, статусы</p>
         </div>
       </div>
 
-      {message && (
-        <div style={{ padding: "var(--space-m)", background: "var(--color-accent-light)", border: "1px solid var(--color-accent)", marginBottom: "var(--space-l)", fontSize: "var(--text-xs)", fontWeight: 600 }}>
-          {message}
-        </div>
-      )}
+      {msg && <div style={{ padding: "var(--space-s) var(--space-m)", background: "var(--color-accent-light)", border: "1px solid var(--color-accent)", marginBottom: "var(--space-m)", fontSize: "var(--text-xs)", fontWeight: 600 }}>{msg}</div>}
 
-      <div style={{ background: "var(--color-bg-primary)", border: "1px solid var(--color-border)", overflow: "auto" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "var(--text-xs)", fontFamily: "var(--font-body)" }}>
-          <thead>
-            <tr style={{ background: "var(--color-bg-secondary)", borderBottom: "1px solid var(--color-border)" }}>
-              {["Email", "Имя", "Статус", "Подписка", "Истекает", "Роль", "Действие"].map(h => (
-                <th key={h} style={{ padding: "10px 14px", textAlign: "left", fontWeight: 600, color: "var(--color-text-secondary)", whiteSpace: "nowrap" }}>{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((u: any) => (
-              <tr key={u.id} style={{ borderBottom: "1px solid var(--color-border-light)" }}>
-                <td style={{ padding: "10px 14px", maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                    <Mail size={12} style={{ color: "var(--color-text-tertiary)" }} />
-                    <span>{u.email}</span>
-                  </div>
-                </td>
-                <td style={{ padding: "10px 14px" }}>{u.name || "—"}</td>
-                <td style={{ padding: "10px 14px" }}>
-                  <span style={{
-                    padding: "2px 8px", fontSize: 10, fontWeight: 600,
-                    background: u.status === "senior" ? "var(--color-accent-light)" : "var(--color-bg-secondary)",
-                    color: u.status === "senior" ? "var(--color-accent)" : "var(--color-text-tertiary)",
-                    borderRadius: 0,
-                  }}>{u.status === "senior" ? "Senior" : u.status === "junior" ? "Junior" : u.status || "—"}</span>
-                </td>
-                <td style={{ padding: "10px 14px" }}>
-                  <span style={{
-                    padding: "2px 10px", fontSize: 10, fontWeight: 700,
-                    background: u.subscription === "pro" ? "var(--color-accent-light)" : "var(--color-bg-secondary)",
-                    color: u.subscription === "pro" ? "var(--color-accent)" : "var(--color-text-tertiary)",
-                    borderRadius: 0, display: "flex", alignItems: "center", gap: 4, width: "fit-content",
-                  }}>
-                    {u.subscription === "pro" && <Crown size={10} />}
-                    {u.subscription === "pro" ? "Pro" : "Free"}
-                  </span>
-                </td>
-                <td style={{ padding: "10px 14px" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "var(--color-text-secondary)" }}>
-                    <Calendar size={10} style={{ color: "var(--color-text-tertiary)" }} />
-                    {u.subscription === "pro" ? formatDate(u.subscriptionExpiresAt) : "—"}
-                  </div>
-                </td>
-                <td style={{ padding: "10px 14px" }}>
-                  <span style={{
-                    padding: "2px 8px", fontSize: 10, fontWeight: 600,
-                    background: u.role === "admin" ? "#fef3c7" : "var(--color-bg-secondary)",
-                    color: u.role === "admin" ? "#92400e" : "var(--color-text-tertiary)",
-                    borderRadius: 0,
-                  }}>{u.role === "admin" ? "Админ" : "Пользователь"}</span>
-                </td>
-                <td style={{ padding: "10px 14px" }}>
-                  <button onClick={() => togglePro(u.id, u.subscription)}
-                    disabled={saving === u.id}
-                    style={{
-                      padding: "6px 14px", border: "1px solid " + (u.subscription === "pro" ? "#ef4444" : "var(--color-accent)"),
-                      background: "transparent", color: u.subscription === "pro" ? "#ef4444" : "var(--color-accent)",
-                      cursor: "pointer", fontSize: 11, fontWeight: 600, fontFamily: "var(--font-body)", borderRadius: 0,
-                      display: "flex", alignItems: "center", gap: 4, whiteSpace: "nowrap",
-                    }}>
-                    {saving === u.id ? <RefreshCw size={10} style={{ animation: "spin 1s linear infinite" }} /> :
-                     u.subscription === "pro" ? <><X size={10} /> Отключить</> : <><Crown size={10} /> Активировать</>}
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {/* Stats */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: "var(--space-m)", marginBottom: "var(--space-xl)" }}>
+        <StatBox icon={<Users size={18} />} label="Всего пользователей" value={users.length} />
+        <StatBox icon={<Crown size={18} />} label="Pro-пользователей" value={proUsers.length} color="var(--color-accent)" />
+        <StatBox icon={<Calendar size={18} />} label="Активных подписок" value={activeSubs.length} />
+        <StatBox icon={<DollarSign size={18} />} label="Выручка" value={`${totalRevenue} ₽`} color="var(--color-accent)" />
+      </div>
+
+      {/* Users with subscriptions */}
+      <h2 style={{ fontSize: "var(--text-l)", fontWeight: 700, marginBottom: "var(--space-m)" }}>Пользователи</h2>
+      <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)" }}>
+        {users.map((u: any) => {
+          const sub = subscriptions.find((s: any) => s.userId === u.id);
+          const userPayments = payments.filter((p: any) => p.userId === u.id);
+          const isPro = u.subscription === "pro";
+          return (
+            <div key={u.id} style={{ display: "flex", alignItems: "center", gap: "var(--space-m)", padding: "var(--space-m)", background: "var(--color-bg-primary)", border: `1px solid ${isPro ? "var(--color-accent)" : "var(--color-border)"}`, borderRadius: "var(--radius-m)", flexWrap: "wrap" }}>
+              <div style={{ flex: 1, minWidth: 180 }}>
+                <div style={{ fontWeight: 600, fontSize: "var(--text-s)" }}>{u.name || u.email}</div>
+                <div style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}>{u.email}</div>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ padding: "4px 12px", borderRadius: "var(--radius-full)", fontSize: 11, fontWeight: 600, background: isPro ? "var(--color-accent-light)" : "var(--color-bg-secondary)", color: isPro ? "var(--color-accent)" : "var(--color-text-tertiary)" }}>
+                  {isPro ? "PRO" : "Free"}
+                </span>
+                {sub?.expiresAt && <span style={{ fontSize: 11, color: "var(--color-text-tertiary)", display: "flex", alignItems: "center", gap: 4 }}><Clock size={12} /> {new Date(sub.expiresAt).toLocaleDateString("ru")}</span>}
+                {sub?.autoRenew && <span style={{ fontSize: 10, color: "var(--color-accent)" }}>Авто</span>}
+              </div>
+              <div style={{ fontSize: 11, color: "var(--color-text-tertiary)" }}>{userPayments.length} платежей · {userPayments.filter((p: any) => p.status === "completed").reduce((s: number, p: any) => s + p.amount, 0) / 100} ₽</div>
+              <div style={{ display: "flex", gap: 6 }}>
+                <button onClick={() => togglePro(u.id, u.subscription)} disabled={saving === u.id} className="btn btn-ghost" style={{ fontSize: 11, padding: "4px 12px" }}>
+                  {saving === u.id ? "..." : isPro ? "Отключить Pro" : "Дать Pro"}
+                </button>
+                <button onClick={() => addManualPayment(u.id)} disabled={saving === u.id} className="btn btn-ghost" style={{ fontSize: 11, padding: "4px 12px" }}>
+                  + Платёж
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function StatBox({ icon, label, value, color }: any) {
+  return (
+    <div style={{ padding: "var(--space-m)", background: "var(--color-bg-primary)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-m)", display: "flex", alignItems: "center", gap: "var(--space-m)" }}>
+      <div style={{ color: color || "var(--color-text-secondary)" }}>{icon}</div>
+      <div>
+        <div style={{ fontSize: "var(--text-l)", fontWeight: 800, fontFamily: "var(--font-heading)", color: color || "inherit" }}>{value}</div>
+        <div style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>{label}</div>
       </div>
     </div>
   );

@@ -7,157 +7,169 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  name      String?
-  passwordHash String?   @default("")
-  xp        Int      @default(0)
-  level     String   @default("novice")
-  role      String   @default("user")
-  subscription String   @default("free")
-  streak    Int      @default(0)
-  lastLogin DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  avatar     String   @default("")
-  bio        String   @default("")
-  status     String   @default("junior")
+  id                    String           @id @default(uuid())
+  email                 String           @unique
+  name                  String?
+  passwordHash          String?          @default("")
+  xp                    Int              @default(0)
+  level                 String           @default("novice")
+  role                  String           @default("user")
+  subscription          String           @default("free")
+  streak                Int              @default(0)
+  lastLogin             DateTime?
+  createdAt             DateTime         @default(now())
+  updatedAt             DateTime         @updatedAt
+  avatar                String           @default("")
+  bio                   String           @default("")
+  status                String           @default("junior")
   subscriptionExpiresAt DateTime?
-  skills     String   @default("")
-  website    String   @default("")
-  publicProfile Boolean @default(false)
-  projects  Project[]
-  collections UserCollection[]
-  favorites Favorite[]
-  posts       BlogPost[]
+  skills                String           @default("")
+  website               String           @default("")
+  publicProfile         Boolean          @default(false)
+  emailVerified         DateTime?
+  verifyToken           String?
+  projects              Project[]
+  collections           UserCollection[]
+  favorites             Favorite[]
+  posts                 BlogPost[]
+  subscriptions         Subscription[]
+  payments              Payment[]
+
   @@map("users")
 }
 
 model Blueprint {
-  id          String   @id @default(uuid())
-  title       String
-  slug        String   @unique
-  description String?
-  icon        String   @default("Globe")
-  difficulty  String   @default("easy")
-  totalXp     Int      @default(0)
-  totalDecisions Int   @default(0)
-  coverImage  String   @default("")
-  viewCount   Int      @default(0)
-  startCount  Int      @default(0)
-  completeCount Int    @default(0)
-  goal        String   @default("")
-  entities    String   @default("[]")
-  checklist   String   @default("[]")
-  artifacts   String   @default("[]")
-  targetAudience String @default("")
-  timeToComplete String  @default("")
-  isPublished Boolean  @default(false)
-  sortOrder   Int      @default(0)
-  createdAt   DateTime @default(now())
-  stages      BlueprintStage[]
-  projects    Project[]
-  patterns    BuildPattern[]
+  id             String           @id @default(uuid())
+  title          String
+  slug           String           @unique
+  description    String?
+  icon           String           @default("Globe")
+  difficulty     String           @default("easy")
+  totalXp        Int              @default(0)
+  totalDecisions Int              @default(0)
+  coverImage     String           @default("")
+  viewCount      Int              @default(0)
+  startCount     Int              @default(0)
+  completeCount  Int              @default(0)
+  goal           String           @default("")
+  entities       String           @default("[]")
+  checklist      String           @default("[]")
+  artifacts      String           @default("[]")
+  targetAudience String           @default("")
+  timeToComplete String           @default("")
+  isPublished    Boolean          @default(false)
+  sortOrder      Int              @default(0)
+  createdAt      DateTime         @default(now())
+  stages         BlueprintStage[]
+  projects       Project[]
+  patterns       BuildPattern[]
+
   @@map("blueprints")
 }
 
 model Stage {
-  id          String   @id @default(uuid())
+  id          String           @id @default(uuid())
   title       String
-  slug        String   @unique
+  slug        String           @unique
   description String?
-  icon        String   @default("Zap")
-  sortOrder   Int      @default(0)
-  createdAt   DateTime @default(now())
+  icon        String           @default("Zap")
+  sortOrder   Int              @default(0)
+  createdAt   DateTime         @default(now())
   decisions   Decision[]
   blueprints  BlueprintStage[]
+
   @@map("stages")
 }
 
 model BlueprintStage {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   blueprintId String
   stageId     String
-  sortOrder   Int      @default(0)
-  blueprint Blueprint @relation(fields: [blueprintId], references: [id], onDelete: Cascade)
-  stage     Stage     @relation(fields: [stageId], references: [id], onDelete: Cascade)
+  sortOrder   Int       @default(0)
+  blueprint   Blueprint @relation(fields: [blueprintId], references: [id], onDelete: Cascade)
+  stage       Stage     @relation(fields: [stageId], references: [id], onDelete: Cascade)
+
   @@unique([blueprintId, stageId])
   @@map("blueprint_stages")
 }
 
 model Decision {
-  id            String   @id @default(uuid())
-  stageId       String
-  title         String
-  slug          String   @unique
-  problem       String
-  why           String   @default("")
-  recommended   String   @default("")
-  content       String   @default("")
-  tradeoffs     String   @default("")
-  whenNotUse    String   @default("")
-  mistakes      String   @default("")
-  context       String   @default("")
-  constraints   String   @default("")
-  validation    String   @default("")
-  iteration     String   @default("")
-  difficulty    String   @default("easy")
-  xpReward      Int      @default(15)
-  timeEstimate  String   @default("15 мин")
-  impact        String   @default("")
-  promptTitle   String?
+  id             String                @id @default(uuid())
+  stageId        String
+  title          String
+  slug           String                @unique
+  problem        String
+  why            String                @default("")
+  recommended    String                @default("")
+  content        String                @default("")
+  tradeoffs      String                @default("")
+  whenNotUse     String                @default("")
+  mistakes       String                @default("")
+  context        String                @default("")
+  constraints    String                @default("")
+  validation     String                @default("")
+  iteration      String                @default("")
+  difficulty     String                @default("easy")
+  xpReward       Int                   @default(15)
+  timeEstimate   String                @default("15 мин")
+  impact         String                @default("")
+  promptTitle    String?
   promptTemplate String?
   promptContext  String?
-  goal        String    @default("")
-  entities    String    @default("[]")
-  videos       Json      @default("[]")
-  sortOrder     Int      @default(0)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  stage          Stage              @relation(fields: [stageId], references: [id], onDelete: Cascade)
+  goal           String                @default("")
+  entities       String                @default("[]")
+  videos         Json                  @default("[]")
+  sortOrder      Int                   @default(0)
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  stage          Stage                 @relation(fields: [stageId], references: [id], onDelete: Cascade)
   artifacts      Artifact[]
   checks         CheckItem[]
   alternatives   DecisionAlternative[]
-  relationsFrom  DecisionRelation[] @relation("from")
-  relationsTo    DecisionRelation[] @relation("to")
+  relationsFrom  DecisionRelation[]    @relation("from")
+  relationsTo    DecisionRelation[]    @relation("to")
   progress       ProjectDecision[]
-  skills        DecisionSkill[]
-  favorites     Favorite[]
+  skills         DecisionSkill[]
+  favorites      Favorite[]
+
   @@map("decisions")
 }
 
 model DecisionAlternative {
-  id         String   @id @default(uuid())
-  decisionId String
-  title      String
+  id          String   @id @default(uuid())
+  decisionId  String
+  title       String
   description String?
-  pros       String   @default("")
-  cons       String   @default("")
-  sortOrder  Int      @default(0)
-  decision Decision @relation(fields: [decisionId], references: [id], onDelete: Cascade)
+  pros        String   @default("")
+  cons        String   @default("")
+  sortOrder   Int      @default(0)
+  decision    Decision @relation(fields: [decisionId], references: [id], onDelete: Cascade)
+
   @@map("decision_alternatives")
 }
 
 model DecisionRelation {
-  id              String   @id @default(uuid())
-  fromDecisionId  String
-  toDecisionId    String
-  relationType    String
-  note            String?
-  fromDecision Decision @relation("from", fields: [fromDecisionId], references: [id], onDelete: Cascade)
-  toDecision   Decision @relation("to", fields: [toDecisionId], references: [id], onDelete: Cascade)
+  id             String   @id @default(uuid())
+  fromDecisionId String
+  toDecisionId   String
+  relationType   String
+  note           String?
+  fromDecision   Decision @relation("from", fields: [fromDecisionId], references: [id], onDelete: Cascade)
+  toDecision     Decision @relation("to", fields: [toDecisionId], references: [id], onDelete: Cascade)
+
   @@unique([fromDecisionId, toDecisionId, relationType])
   @@map("decision_relations")
 }
 
 model Artifact {
-  id         String   @id @default(uuid())
-  decisionId String
-  title      String
+  id          String   @id @default(uuid())
+  decisionId  String
+  title       String
   description String?
-  template   String?
-  sortOrder  Int      @default(0)
-  decision Decision @relation(fields: [decisionId], references: [id], onDelete: Cascade)
+  template    String?
+  sortOrder   Int      @default(0)
+  decision    Decision @relation(fields: [decisionId], references: [id], onDelete: Cascade)
+
   @@map("artifacts")
 }
 
@@ -166,27 +178,29 @@ model CheckItem {
   decisionId String
   title      String
   sortOrder  Int      @default(0)
-  decision Decision @relation(fields: [decisionId], references: [id], onDelete: Cascade)
+  decision   Decision @relation(fields: [decisionId], references: [id], onDelete: Cascade)
+
   @@map("check_items")
 }
 
 model Project {
-  id          String   @id @default(uuid())
+  id          String            @id @default(uuid())
   userId      String
   blueprintId String
-  progress    Int      @default(0)
-  name        String   @default("")
-  description String   @default("")
-  domain      String   @default("")
-  stack       String   @default("")
-  niche       String   @default("")
-  colors      String   @default("")
-  goals       String   @default("")
-  status      String   @default("active")
-  createdAt   DateTime @default(now())
-  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  blueprint Blueprint         @relation(fields: [blueprintId], references: [id])
-  decisions ProjectDecision[]
+  progress    Int               @default(0)
+  name        String            @default("")
+  description String            @default("")
+  domain      String            @default("")
+  stack       String            @default("")
+  niche       String            @default("")
+  colors      String            @default("")
+  goals       String            @default("")
+  status      String            @default("active")
+  createdAt   DateTime          @default(now())
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  blueprint   Blueprint         @relation(fields: [blueprintId], references: [id])
+  decisions   ProjectDecision[]
+
   @@map("projects")
 }
 
@@ -200,8 +214,9 @@ model ProjectDecision {
   userChoice  String    @default("")
   userReason  String    @default("")
   createdAt   DateTime  @default(now())
-  project  Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  decision Decision @relation(fields: [decisionId], references: [id], onDelete: Cascade)
+  project     Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  decision    Decision  @relation(fields: [decisionId], references: [id], onDelete: Cascade)
+
   @@unique([projectId, decisionId])
   @@map("project_decisions")
 }
@@ -216,10 +231,10 @@ model MenuItem {
   isActive  Boolean  @default(true)
   icon      String?
   createdAt DateTime @default(now())
-  
-  sourceType String?   // "blueprint" — если создан автоматически из Blueprint
-  sourceId   String?   // id Blueprint'а
-  emoji      String?   // кастомный emoji вместо Lucide-иконки
+
+  sourceType String? // "blueprint" — если создан автоматически из Blueprint
+  sourceId   String? // id Blueprint'а
+  emoji      String? // кастомный emoji вместо Lucide-иконки
 
   parent   MenuItem?  @relation("MenuChildren", fields: [parentId], references: [id])
   children MenuItem[] @relation("MenuChildren")
@@ -228,26 +243,26 @@ model MenuItem {
 }
 
 model Skill {
-  id          String   @id @default(uuid())
+  id          String @id @default(uuid())
   title       String
-  slug        String   @unique
-  description String   @default("")
-  
+  slug        String @unique
+  description String @default("")
+
   // SKILL.md — основной контент
-  skillMd     String   @default("")
-  
+  skillMd String @default("")
+
   // Вспомогательные файлы (паттерн vibe-coding-cn)
-  assetsPath  String?  // путь к assets/
-  scriptsPath String?  // путь к scripts/
-  refsPath    String?  // путь к references/
-  
-  difficulty  String   @default("easy")
-  xpReward    Int      @default(15)
-  timeEstimate String  @default("15 мин")
-  isPublished Boolean  @default(false)
-  sortOrder   Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  assetsPath  String? // путь к assets/
+  scriptsPath String? // путь к scripts/
+  refsPath    String? // путь к references/
+
+  difficulty   String   @default("easy")
+  xpReward     Int      @default(15)
+  timeEstimate String   @default("15 мин")
+  isPublished  Boolean  @default(false)
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   // Промпты (как у Decision)
   promptTitle    String?
@@ -255,104 +270,140 @@ model Skill {
 
   // Связи
   decisions DecisionSkill[]
-  
+
   @@map("skills")
 }
 
 model DecisionSkill {
-  id         String   @id @default(uuid())
+  id         String @id @default(uuid())
   decisionId String
   skillId    String
-  sortOrder  Int      @default(0)
-  
+  sortOrder  Int    @default(0)
+
   decision Decision @relation(fields: [decisionId], references: [id], onDelete: Cascade)
   skill    Skill    @relation(fields: [skillId], references: [id], onDelete: Cascade)
-  
+
   @@unique([decisionId, skillId])
   @@map("decision_skills")
 }
 
-
-
-
 model MCPTrend {
-  id        String   @id @default(uuid())
-  serverId  String
-  stars     Int
-  forks     Int      @default(0)
-  recordedAt DateTime @default(now())
-  server    MCPServer @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  id         String    @id @default(uuid())
+  serverId   String
+  stars      Int
+  forks      Int       @default(0)
+  recordedAt DateTime  @default(now())
+  server     MCPServer @relation(fields: [serverId], references: [id], onDelete: Cascade)
+
   @@map("mcp_trends")
 }
 
 model MCPServer {
-  id            String   @id @default(uuid())
-  name          String   @unique
-  slug          String   @unique
-  description   String   @default("")
-  longDescription String @default("")
-  category      String   @default("")
-  tags          String   @default("")
-  githubUrl     String   @default("")
-  websiteUrl    String   @default("")
-  stars         Int      @default(0)
-  rating        Int      @default(7)
-  russianDocs   Boolean  @default(false)
-  requiresApiKey Boolean @default(false)
-  difficulty    String   @default("easy")
-  howToUse      String   @default("[]")
-  pros          String   @default("[]")
-  cons          String   @default("[]")
-  sortOrder     Int      @default(0)
-  isActive      Boolean  @default(true)
-  isFeatured    Boolean  @default(false)
-  russianAlternative String @default("")
-  trends      MCPTrend[]
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                 String     @id @default(uuid())
+  name               String     @unique
+  slug               String     @unique
+  description        String     @default("")
+  longDescription    String     @default("")
+  category           String     @default("")
+  tags               String     @default("")
+  githubUrl          String     @default("")
+  websiteUrl         String     @default("")
+  stars              Int        @default(0)
+  rating             Int        @default(7)
+  russianDocs        Boolean    @default(false)
+  requiresApiKey     Boolean    @default(false)
+  difficulty         String     @default("easy")
+  howToUse           String     @default("[]")
+  pros               String     @default("[]")
+  cons               String     @default("[]")
+  sortOrder          Int        @default(0)
+  isActive           Boolean    @default(true)
+  isFeatured         Boolean    @default(false)
+  russianAlternative String     @default("")
+  trends             MCPTrend[]
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
   @@map("mcp_servers")
 }
 
 model AITool {
-  id          String   @id @default(uuid())
-  name        String   @unique
-  slug        String   @unique @default("")
-  provider    String
-  type        String   @default("ide") // ide, no-code, agent, assistant
-  description String   @default("")
-  pros        String   @default("")  // JSON array of strings
-  cons        String   @default("")  // JSON array of strings
-  pricing     String   @default("")
-  pricingAmount String @default("")  // "0/мес" or "Бесплатно"
-  url         String   @default("")
-  downloadUrl String   @default("")  // direct download link
-  creator     String   @default("")
-  foundedYear Int      @default(0)
-  lastUpdate  String   @default("")
-  headquarters String  @default("")
-  shortDescription String @default("")
-  guideDescription String @default("")
-  russianUi   Boolean  @default(false)
-  russianSupport Boolean @default(false)
-  requiresVpn Boolean  @default(false)
-  requiresForeignCard Boolean @default(false)
-  codeOwnership Boolean @default(true)
-  rating      Int      @default(7)  // 1-10
-  bestFor     String   @default("")
-  howToStart  String   @default("[]")   // JSON: [{title,desc}]
-  faqItems    String   @default("[]")   // JSON: [{q,a}]
-  detailDescription String @default("") // Markdown-like long description
-  hiddenFeatures  String @default("")  // text: "Скрытые возможности"
-  ourTake         String @default("")  // text: "Наша рекомендация"
-  detailComparison String @default("") // text: "Чем отличается от других"
-  mistakes        String   @default("")  // text: "Типичные ошибки при использовании"
-  supportedModels String   @default("[]")
-  sortOrder   Int      @default(0)
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id                  String   @id @default(uuid())
+  name                String   @unique
+  slug                String   @unique @default("")
+  provider            String
+  type                String   @default("ide") // ide, no-code, agent, assistant
+  description         String   @default("")
+  pros                String   @default("") // JSON array of strings
+  cons                String   @default("") // JSON array of strings
+  pricing             String   @default("")
+  pricingAmount       String   @default("") // "0/мес" or "Бесплатно"
+  url                 String   @default("")
+  downloadUrl         String   @default("") // direct download link
+  creator             String   @default("")
+  foundedYear         Int      @default(0)
+  lastUpdate          String   @default("")
+  headquarters        String   @default("")
+  shortDescription    String   @default("")
+  guideDescription    String   @default("")
+  russianUi           Boolean  @default(false)
+  russianSupport      Boolean  @default(false)
+  requiresVpn         Boolean  @default(false)
+  requiresForeignCard Boolean  @default(false)
+  codeOwnership       Boolean  @default(true)
+  rating              Int      @default(7) // 1-10
+  bestFor             String   @default("")
+  howToStart          String   @default("[]") // JSON: [{title,desc}]
+  faqItems            String   @default("[]") // JSON: [{q,a}]
+  detailDescription   String   @default("") // Markdown-like long description
+  hiddenFeatures      String   @default("") // text: "Скрытые возможности"
+  ourTake             String   @default("") // text: "Наша рекомендация"
+  detailComparison    String   @default("") // text: "Чем отличается от других"
+  mistakes            String   @default("") // text: "Типичные ошибки при использовании"
+  supportedModels     String   @default("[]")
+  sortOrder           Int      @default(0)
+  isActive            Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
   @@map("ai_tools")
+}
+
+model Subscription {
+  id             String        @id @default(uuid())
+  userId         String
+  plan           String        @default("free") // free, pro, business
+  status         String        @default("active") // active, cancelled, expired
+  startsAt       DateTime      @default(now())
+  expiresAt      DateTime?
+  autoRenew      Boolean       @default(false)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  payments       Payment[]
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  blogCategory   BlogCategory? @relation(fields: [blogCategoryId], references: [id])
+  blogCategoryId String?
+
+  @@map("subscriptions")
+}
+
+model Payment {
+  id             String        @id @default(uuid())
+  subscriptionId String?
+  userId         String
+  amount         Int           @default(0) // копейки
+  currency       String        @default("RUB")
+  status         String        @default("pending") // pending, completed, failed, refunded
+  method         String        @default("manual") // manual, yookassa, card
+  externalId     String? // ID транзакции в платёжной системе
+  description    String?
+  createdAt      DateTime      @default(now())
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  blogCategory   BlogCategory? @relation(fields: [blogCategoryId], references: [id])
+  blogCategoryId String?
+
+  @@map("payments")
 }
 
 model ReferralLink {
@@ -365,91 +416,93 @@ model ReferralLink {
   sortOrder   Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
   @@map("referral_links")
 }
 
 model RussianAIProject {
-  id          String   @id @default(uuid())
-  name        String
-  slug        String   @unique
-  company     String
-  category    String   // LLM, Image, Voice, Code, Business, OpenSource
-  description String?
-  website     String?
-  pricing     String   @default("free") // free, freemium, paid
-  hasApi      Boolean  @default(false)
-  isOpenSource Boolean @default(false)
-  rating      Int      @default(5)
-  logo        String   @default("")
-  useCases    String   @default("[]") // JSON array
-  howToStart  String   @default("[]") // JSON array
-  isPublished Boolean  @default(true)
-  sortOrder   Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String   @id @default(uuid())
+  name         String
+  slug         String   @unique
+  company      String
+  category     String // LLM, Image, Voice, Code, Business, OpenSource
+  description  String?
+  website      String?
+  pricing      String   @default("free") // free, freemium, paid
+  hasApi       Boolean  @default(false)
+  isOpenSource Boolean  @default(false)
+  rating       Int      @default(5)
+  logo         String   @default("")
+  useCases     String   @default("[]") // JSON array
+  howToStart   String   @default("[]") // JSON array
+  isPublished  Boolean  @default(true)
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   @@map("russian_ai_projects")
 }
 
 model SiteSettings {
-  id        String   @id @default("main")
-  proPrice  Int      @default(300)
-  yookassaShopId    String   @default("")
-  yookassaSecretKey String   @default("")
-  deepseekApiKey     String   @default("")
-  openrouterApiKey   String   @default("")
-  openrouterModel    String   @default("openai/gpt-4o-mini")
-  deepseekModel      String   @default("deepseek-chat")
-  autoPublishEnabled Boolean  @default(false)
-  autoPublishHour    Int      @default(9)
-  mcpAutoScan        Boolean  @default(false)
-  mcpScanDay         String   @default("monday")
-  mcpScanHour        Int      @default(3)
-  mcpTranslateRu     Boolean  @default(true)
-  assistantGreeting  String   @default("")
-  assistantHintInterval Int   @default(25)
-  assistantProOnly   Boolean  @default(true)
-  accentColor        String   @default("#0fb880")
-  headingFont        String   @default("Montserrat")
-  bodyFont           String   @default("Inter")
-  borderRadius       Int      @default(0)
-  designStyle        String   @default("swiss")
-  yandexMetrikaId    String   @default("")
-  yandexWebmasterId  String   @default("")
-  googleAnalyticsId  String   @default("")
-  seoTitle           String   @default("")
-  seoDescription     String   @default("")
-  seoKeywords        String   @default("")
-  headerCode         String   @default("")
-  footerCode         String   @default("")
-  siteName           String   @default("Карта роста")
-  siteUrl            String   @default("https://proektmap.ru")
-  updatedAt DateTime @updatedAt
+  id                    String   @id @default("main")
+  proPrice              Int      @default(300)
+  yookassaShopId        String   @default("")
+  yookassaSecretKey     String   @default("")
+  deepseekApiKey        String   @default("")
+  openrouterApiKey      String   @default("")
+  openrouterModel       String   @default("openai/gpt-4o-mini")
+  deepseekModel         String   @default("deepseek-chat")
+  autoPublishEnabled    Boolean  @default(false)
+  autoPublishHour       Int      @default(9)
+  mcpAutoScan           Boolean  @default(false)
+  mcpScanDay            String   @default("monday")
+  mcpScanHour           Int      @default(3)
+  mcpTranslateRu        Boolean  @default(true)
+  assistantGreeting     String   @default("")
+  assistantHintInterval Int      @default(25)
+  assistantProOnly      Boolean  @default(true)
+  accentColor           String   @default("#0fb880")
+  headingFont           String   @default("Montserrat")
+  bodyFont              String   @default("Inter")
+  borderRadius          Int      @default(0)
+  designStyle           String   @default("swiss")
+  yandexMetrikaId       String   @default("")
+  yandexWebmasterId     String   @default("")
+  googleAnalyticsId     String   @default("")
+  seoTitle              String   @default("")
+  seoDescription        String   @default("")
+  seoKeywords           String   @default("")
+  headerCode            String   @default("")
+  footerCode            String   @default("")
+  siteName              String   @default("Карта роста")
+  siteUrl               String   @default("https://proektmap.ru")
+  updatedAt             DateTime @updatedAt
+
   @@map("site_settings")
 }
 
 model AIModel {
-  id          String   @id @default(uuid())
-  name        String   @unique   // "Claude Opus 4.8"
-  provider    String             // "Anthropic", "OpenAI", "DeepSeek"...
-  category    String             // "coding", "reasoning", "vision"
-  
+  id       String @id @default(uuid())
+  name     String @unique // "Claude Opus 4.8"
+  provider String // "Anthropic", "OpenAI", "DeepSeek"...
+  category String // "coding", "reasoning", "vision"
+
   // Ratings (1-10)
-  codeRating      Int    @default(7)
-  siteRating      Int    @default(7)
-  agentRating     Int    @default(7)
-  speedRating     Int    @default(7)
-  
+  codeRating  Int @default(7)
+  siteRating  Int @default(7)
+  agentRating Int @default(7)
+  speedRating Int @default(7)
+
   // Pricing
-  pricePerMillion  Int    @default(0)  // ₽ за 1M токенов
-  contextWindow    Int    @default(128000)
-  
+  pricePerMillion Int @default(0) // ₽ за 1M токенов
+  contextWindow   Int @default(128000)
+
   // Recommendations
-  bestFor     String  @default("")  // "Лендинг, SaaS, Telegram Bot"
-  notFor      String  @default("")  // "Тяжёлая аналитика"
-  
-  isPublished Boolean @default(true)
-  sortOrder   Int     @default(0)
+  bestFor String @default("") // "Лендинг, SaaS, Telegram Bot"
+  notFor  String @default("") // "Тяжёлая аналитика"
+
+  isPublished Boolean  @default(true)
+  sortOrder   Int      @default(0)
   lastUpdated DateTime @default(now())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -489,86 +542,92 @@ model PromptVariable {
 }
 
 model PromptCategory {
-  id          String   @id @default(uuid())
-  name        String   @unique
-  slug        String   @unique
-  icon        String   @default("folder")
-  sortOrder   Int      @default(0)
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(uuid())
+  name      String   @unique
+  slug      String   @unique
+  icon      String   @default("folder")
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("prompt_categories")
 }
 
 model Favorite {
-  id          String   @id @default(uuid())
-  userId      String
-  decisionId  String
-  createdAt   DateTime @default(now())
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  decision    Decision @relation(fields: [decisionId], references: [id], onDelete: Cascade)
+  id         String   @id @default(uuid())
+  userId     String
+  decisionId String
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  decision   Decision @relation(fields: [decisionId], references: [id], onDelete: Cascade)
+
   @@unique([userId, decisionId])
   @@map("favorites")
 }
 
 model BlogCategory {
-  id          String    @id @default(uuid())
-  name        String    @unique
-  slug        String    @unique
-  description String    @default("")
-  sortOrder   Int       @default(0)
-  isActive    Boolean   @default(true)
-  posts       BlogPost[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id            String         @id @default(uuid())
+  name          String         @unique
+  slug          String         @unique
+  description   String         @default("")
+  sortOrder     Int            @default(0)
+  isActive      Boolean        @default(true)
+  posts         BlogPost[]
+  subscriptions Subscription[]
+  payments      Payment[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
   @@map("blog_categories")
 }
 
 model BlogPost {
-  id            String    @id @default(uuid())
-  title         String
-  slug          String    @unique
-  content       String
-  excerpt       String    @default("")
-  coverImage    String    @default("")
-  status        String    @default("draft")
-  authorId      String
-  categoryId    String?
-  tags          String    @default("")
-  viewCount     Int       @default(0)
-  impactScore   Int       @default(0)
-  likeCount     Int       @default(0)
-  dislikeCount  Int       @default(0)
-  bookmarkCount Int       @default(0)
-  projectUseCount Int     @default(0)
-  aiGenerated   Boolean   @default(false)
-  aiModel       String    @default("")
-  metaTitle     String    @default("")
-  metaDesc      String    @default("")
-  publishedAt   DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  author        User           @relation(fields: [authorId], references: [id])
-  category      BlogCategory?  @relation(fields: [categoryId], references: [id])
-  comments      BlogComment[]
-  interactions  BlogInteraction[]
+  id              String            @id @default(uuid())
+  title           String
+  slug            String            @unique
+  content         String
+  excerpt         String            @default("")
+  coverImage      String            @default("")
+  status          String            @default("draft")
+  authorId        String
+  categoryId      String?
+  tags            String            @default("")
+  viewCount       Int               @default(0)
+  impactScore     Int               @default(0)
+  likeCount       Int               @default(0)
+  dislikeCount    Int               @default(0)
+  bookmarkCount   Int               @default(0)
+  projectUseCount Int               @default(0)
+  aiGenerated     Boolean           @default(false)
+  aiModel         String            @default("")
+  metaTitle       String            @default("")
+  metaDesc        String            @default("")
+  publishedAt     DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  author          User              @relation(fields: [authorId], references: [id])
+  category        BlogCategory?     @relation(fields: [categoryId], references: [id])
+  comments        BlogComment[]
+  interactions    BlogInteraction[]
+
   @@map("blog_posts")
 }
 
 model BlogComment {
-  id          String    @id @default(uuid())
+  id          String        @id @default(uuid())
   postId      String
   authorName  String
-  authorEmail String    @default("")
+  authorEmail String        @default("")
   content     String
-  status      String    @default("pending")
+  status      String        @default("pending")
   parentId    String?
-  rating      Int       @default(0)
-  createdAt   DateTime  @default(now())
-  post        BlogPost  @relation(fields: [postId], references: [id], onDelete: Cascade)
-  parent      BlogComment? @relation("CommentReplies", fields: [parentId], references: [id])
+  rating      Int           @default(0)
+  createdAt   DateTime      @default(now())
+  post        BlogPost      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  parent      BlogComment?  @relation("CommentReplies", fields: [parentId], references: [id])
   replies     BlogComment[] @relation("CommentReplies")
+
   @@map("blog_comments")
 }
 
@@ -576,24 +635,26 @@ model BlogInteraction {
   id        String   @id @default(uuid())
   postId    String
   userId    String?
-  type      String   // bookmark | project_use
+  type      String // bookmark | project_use
   createdAt DateTime @default(now())
   post      BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
   @@unique([postId, userId, type])
   @@map("blog_interactions")
 }
 
 model AutoPublish {
-  id          String    @id @default(uuid())
-  topic       String
-  category    String    @default("")
-  model       String    @default("openrouter")
-  schedule    String    @default("0 9 * * *")
-  isActive    Boolean   @default(true)
-  lastRunAt   DateTime?
-  nextRunAt   DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id        String    @id @default(uuid())
+  topic     String
+  category  String    @default("")
+  model     String    @default("openrouter")
+  schedule  String    @default("0 9 * * *")
+  isActive  Boolean   @default(true)
+  lastRunAt DateTime?
+  nextRunAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
   @@map("auto_publish")
 }
 
@@ -608,6 +669,7 @@ model BlogFeed {
   lastFetched DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+
   @@map("blog_feeds")
 }
 
@@ -633,44 +695,38 @@ model GlossaryTerm {
   @@map("glossary_terms")
 }
 
-
-
-
-
-
 model PromptBlueprint {
-  id              String   @id @default(uuid())
-  title           String
-  slug            String   @unique
-  category        String   @default("System")
-  description     String   @default("")
-  whenToUse       String   @default("")
-  whenNotUse      String   @default("")
-  expectedResult  String   @default("")
-  systemPrompt    String   @default("")
-  userPrompt      String   @default("")
-  exampleOutput   String   @default("")
-  stats           String   @default("{}")
-  compatibility   String   @default("[]")
-  dependencies    String   @default("[]")
-  evolution       String   @default("[]")
-  patternIds      String   @default("[]")
-  mcpIds          String   @default("[]")
-  agentIds        String   @default("[]")
-  difficulty      Int      @default(3)
-  qualityScore    Int      @default(85)
-  timeSaved       String   @default("4 часа")
-  tokensEstimate  Int      @default(2000)
-  usageCount      Int      @default(0)
-  isPublished     Boolean  @default(false)
-  isFeatured      Boolean  @default(false)
-  sortOrder       Int      @default(0)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String   @id @default(uuid())
+  title          String
+  slug           String   @unique
+  category       String   @default("System")
+  description    String   @default("")
+  whenToUse      String   @default("")
+  whenNotUse     String   @default("")
+  expectedResult String   @default("")
+  systemPrompt   String   @default("")
+  userPrompt     String   @default("")
+  exampleOutput  String   @default("")
+  stats          String   @default("{}")
+  compatibility  String   @default("[]")
+  dependencies   String   @default("[]")
+  evolution      String   @default("[]")
+  patternIds     String   @default("[]")
+  mcpIds         String   @default("[]")
+  agentIds       String   @default("[]")
+  difficulty     Int      @default(3)
+  qualityScore   Int      @default(85)
+  timeSaved      String   @default("4 часа")
+  tokensEstimate Int      @default(2000)
+  usageCount     Int      @default(0)
+  isPublished    Boolean  @default(false)
+  isFeatured     Boolean  @default(false)
+  sortOrder      Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
   @@map("prompt_blueprints")
 }
-
-
 
 model UserCollection {
   id         String   @id @default(uuid())
@@ -679,6 +735,7 @@ model UserCollection {
   entitySlug String
   createdAt  DateTime @default(now())
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@unique([userId, entityType, entitySlug])
   @@map("user_bookmarks")
 }
@@ -692,104 +749,107 @@ model Relation {
   weight     Int      @default(1)
   relType    String   @default("related")
   createdAt  DateTime @default(now())
+
   @@unique([sourceType, sourceSlug, targetType, targetSlug])
   @@map("relations")
 }
 
-
 model QuestNode {
-  id              String   @id @default(uuid())
-  questId         String
-  stage           Int
-  title           String
-  description     String
-  context         String   @default("")
-  question        String   @default("")
-  nodeType        String   @default("decision")
-  options         String   @default("[]")
-  aiModeratorPrompt String @default("")
-  skillsRequired String   @default("[]")
-  sortOrder       Int      @default(0)
-  isPublished     Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id                String   @id @default(uuid())
+  questId           String
+  stage             Int
+  title             String
+  description       String
+  context           String   @default("")
+  question          String   @default("")
+  nodeType          String   @default("decision")
+  options           String   @default("[]")
+  aiModeratorPrompt String   @default("")
+  skillsRequired    String   @default("[]")
+  sortOrder         Int      @default(0)
+  isPublished       Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
   @@unique([questId, sortOrder])
   @@map("quest_nodes")
 }
 
 model QuestEdge {
-  id          String   @id @default(uuid())
-  questId     String
-  sourceId    String
-  targetId    String
-  condition   String   @default("")
+  id        String @id @default(uuid())
+  questId   String
+  sourceId  String
+  targetId  String
+  condition String @default("")
+
   @@map("quest_edges")
 }
 
 model BuildPattern {
-  id              String   @id @default(uuid())
+  id              String     @id @default(uuid())
   title           String
-  slug            String   @unique
-  description     String   @default("")
-  longDescription String   @default("")
-  difficulty      String   @default("beginner")
-  timeToBuild     String   @default("2 дня")
-  category        String   @default("")
-  outcome         String   @default("{}")
-  entities        String   @default("[]")
-  stack           String   @default("[]")
-  architecture    String   @default("[]")
-  evolution       String   @default("[]")
-  mistakes        String   @default("[]")
+  slug            String     @unique
+  description     String     @default("")
+  longDescription String     @default("")
+  difficulty      String     @default("beginner")
+  timeToBuild     String     @default("2 дня")
+  category        String     @default("")
+  outcome         String     @default("{}")
+  entities        String     @default("[]")
+  stack           String     @default("[]")
+  architecture    String     @default("[]")
+  evolution       String     @default("[]")
+  mistakes        String     @default("[]")
   blueprintId     String?
-  blueprint       Blueprint?  @relation(fields: [blueprintId], references: [id])
-  isPublished     Boolean  @default(false)
-  isFeatured      Boolean  @default(false)
-  sortOrder       Int      @default(0)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  blueprint       Blueprint? @relation(fields: [blueprintId], references: [id])
+  isPublished     Boolean    @default(false)
+  isFeatured      Boolean    @default(false)
+  sortOrder       Int        @default(0)
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
   @@map("build_patterns")
 }
 
 model QuestStep {
   id        String   @id @default(uuid())
   step      Int      @unique // 1-8
-  title     String   // e.g. "Подготовка инструментов"
-  detail    String   // rich text with {{Term|...}} markup
-  checklist String   // JSON array of strings
-  why       String   // why this matters
-  prompt    String   @default("")   // copy-paste prompt for AI
+  title     String // e.g. "Подготовка инструментов"
+  detail    String // rich text with {{Term|...}} markup
+  checklist String // JSON array of strings
+  why       String // why this matters
+  prompt    String   @default("") // copy-paste prompt for AI
   sortOrder Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-
 model Solution {
-  id          String   @id @default(uuid())
-  title       String
-  slug        String   @unique
-  description String   @default("")
-  productType String   @default("")
-  complexity  Int      @default(5)
-  mvpDays     String   @default("")
-  monetization String  @default("")
-  costDev     String   @default("")
-  costAi      String   @default("")
-  costServer  String   @default("")
-  summary     String   @default("")
-  stack       String   @default("")
-  entities    String   @default("[]")
-  plan        String   @default("[]")
-  skills      String   @default("[]")
-  mistakes    String   @default("[]")
-  authorId    String?
-  authorName  String   @default("")
-  votes       Int      @default(0)
-  usageCount  Int      @default(0)
-  isPublished Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String   @id @default(uuid())
+  title        String
+  slug         String   @unique
+  description  String   @default("")
+  productType  String   @default("")
+  complexity   Int      @default(5)
+  mvpDays      String   @default("")
+  monetization String   @default("")
+  costDev      String   @default("")
+  costAi       String   @default("")
+  costServer   String   @default("")
+  summary      String   @default("")
+  stack        String   @default("")
+  entities     String   @default("[]")
+  plan         String   @default("[]")
+  skills       String   @default("[]")
+  mistakes     String   @default("[]")
+  authorId     String?
+  authorName   String   @default("")
+  votes        Int      @default(0)
+  usageCount   Int      @default(0)
+  isPublished  Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
   @@map("solutions")
 }
 
@@ -816,8 +876,8 @@ model AiProject {
   slug        String   @unique
   description String   @default("")
   url         String   @default("")
-  techStack   String   @default("")   
-  aiTools     String   @default("")   
+  techStack   String   @default("")
+  aiTools     String   @default("")
   authorName  String   @default("")
   authorUrl   String   @default("")
   screenshot  String   @default("")
@@ -831,4 +891,3 @@ model AiProject {
 
   @@map("ai_projects")
 }
-
