@@ -5,27 +5,11 @@ import AuthBlock from "./auth-block";
 import FavoritesIndicator from "./favorites-indicator";
 import ThemeToggle from "./theme-toggle";
 import DesktopMenuItem from "./desktop-menu-item";
-import BlueprintsMenu from "./blueprints-menu";
 import KnowledgeButtons from "@/components/knowledge/knowledge-buttons";
 
 export default async function GlobalHeader() {
   let menuItems: any = [];
-  let blueprints: any = [];
   try {
-    const db = await getDb();
-    menuItems = await db.menuItem.findMany({
-      where: { parentId: null, isActive: true, location: "header" },
-      orderBy: { sortOrder: "asc" },
-      include: { children: { where: { isActive: true }, orderBy: { sortOrder: "asc" } } },
-    });
-  } catch (e) {}
-  try {
-    const db2 = await getDb();
-    blueprints = await db2.blueprint.findMany({
-      where: { isPublished: true },
-      orderBy: { sortOrder: "asc" },
-      select: { id: true, title: true, slug: true },
-    });
   } catch (e) {}
 
   return (
@@ -36,13 +20,11 @@ export default async function GlobalHeader() {
       position: "sticky", top: 0, zIndex: 100,
     }}>
       <div style={{ display: "flex", alignItems: "center", gap: "var(--space-s)" }}>
-        <MobileMenu items={menuItems} blueprints={blueprints} />
+        <MobileMenu items={menuItems}  />
         <Link href="/" className="header-logo" style={{ fontFamily: "var(--font-heading)", fontSize: 18, fontWeight: 700, textDecoration: "none", color: "inherit", whiteSpace: "nowrap" }}>
           Карта<span style={{ color: "var(--color-accent)" }}> роста</span>
         </Link>
         <nav style={{ display: "flex", gap: 4, alignItems: "center", marginLeft: "var(--space-l)" }} className="header-nav hide-mobile">
-          {/* Динамическое меню Blueprint'ов — всегда актуально */}
-          <BlueprintsMenu />
           {(menuItems as any[]).map((item: any) => (
             <DesktopMenuItem key={item.id} item={item} />
           ))}

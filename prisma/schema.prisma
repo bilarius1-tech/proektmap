@@ -217,6 +217,10 @@ model MenuItem {
   icon      String?
   createdAt DateTime @default(now())
   
+  sourceType String?   // "blueprint" — если создан автоматически из Blueprint
+  sourceId   String?   // id Blueprint'а
+  emoji      String?   // кастомный emoji вместо Lucide-иконки
+
   parent   MenuItem?  @relation("MenuChildren", fields: [parentId], references: [id])
   children MenuItem[] @relation("MenuChildren")
 

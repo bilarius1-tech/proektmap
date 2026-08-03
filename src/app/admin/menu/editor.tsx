@@ -5,7 +5,7 @@ import { Plus, Edit, Trash2, GripVertical } from "lucide-react";
 
 interface MenuItem {
   id: string; label: string; href: string; parentId: string | null;
-  sortOrder: number; isActive: boolean; icon: string | null; location: string;
+  sortOrder: number; isActive: boolean; icon: string | null; emoji: string | null; location: string; sourceType: string | null;
   children: MenuItem[];
 }
 
@@ -47,7 +47,7 @@ export default function MenuEditor({ items: initialItems, blueprints, allBluepri
   }
 
   function startEdit(item: MenuItem) {
-    setEditing({ ...item });
+    setEditing({ ...item, emoji: item.emoji || "" });
   }
 
   function onDragStart(e: React.DragEvent, id: string) {
@@ -194,6 +194,7 @@ export default function MenuEditor({ items: initialItems, blueprints, allBluepri
             <form onSubmit={handleSave} style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)" }}>
               <div><label style={lbl}>Название *</label><input className="input" value={editing.label || ""} onChange={e => setEditing({ ...editing, label: e.target.value })} required /></div>
               <div><label style={lbl}>Ссылка *</label><input className="input" value={editing.href || ""} onChange={e => setEditing({ ...editing, href: e.target.value })} placeholder="/page" required /></div>
+              <div><label style={lbl}>Emoji</label><input className="input" value={editing.emoji || ""} onChange={e => setEditing({ ...editing, emoji: e.target.value })} placeholder="🤖" style={{ width: 80 }} /></div>
               <div><label style={lbl}>Порядок</label><input className="input" type="number" value={editing.sortOrder || 0} onChange={e => setEditing({ ...editing, sortOrder: parseInt(e.target.value) || 0 })} /></div>
               <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: "var(--text-s)" }}>
                 <input type="checkbox" checked={editing.isActive ?? true} onChange={e => setEditing({ ...editing, isActive: e.target.checked })} />
