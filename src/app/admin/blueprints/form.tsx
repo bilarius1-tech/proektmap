@@ -16,7 +16,19 @@ export default function BPForm({ initial }: { initial?: any }) {
     isPublished: initial?.isPublished ?? false, sortOrder: initial?.sortOrder || 0, id: initial?.id, coverImage: initial?.coverImage || "", goal: initial?.goal || "", timeToComplete: initial?.timeToComplete || "", targetAudience: initial?.targetAudience || "",
   });
   const [saving, setSaving] = useState(false);
+  const [linking, setLinking] = useState(false);
+  const [linkMsg, setLinkMsg] = useState("");
   const [msg, setMsg] = useState("");
+
+  async function handleAutoLink() {
+    if (!form.slug) { setLinkMsg("Сначала сохраните Blueprint"); return; }
+    setLinking(true); setLinkMsg("🔍 Ищем связанные инструменты...");
+    const res = await fetch("/api/admin/auto-link", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sourceType: "blueprint", sourceSlug: form.slug }) });
+    const d = await res.json();
+    if (d.ok) setLinkMsg('✅ Создано связей: ' + d.count + (d.count > 0 ? ' (' + d.created.join(', ') + ')' : ''));
+    else setLinkMsg('❌ ' + (d.error || 'Ошибка'));
+    setLinking(false);
+  }
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -56,9 +68,11 @@ export default function BPForm({ initial }: { initial?: any }) {
           </div>
         </div>
         {msg && <div style={{ fontSize: "var(--text-s)", color: msg.includes("✅") ? "var(--color-accent)" : "var(--color-error)" }}>{msg}</div>}
+        {linkMsg && <div style={{ fontSize: "var(--text-xs)", color: linkMsg.includes("✅") ? "var(--color-accent)" : "var(--color-text-secondary)", background: "var(--color-bg-secondary)", padding: "var(--space-s)", borderRadius: "var(--radius-m)" }}>{linkMsg}</div>}
         <div style={{ display: "flex", gap: "var(--space-s)" }}>
           <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? "Сохранение..." : (form.id ? "Обновить" : "Создать")}</button>
           <Link href="/admin/blueprints" className="btn btn-secondary" style={{ textDecoration: "none" }}>Отмена</Link>
+          {form.id && <button type="button" onClick={handleAutoLink} className="btn btn-secondary" disabled={linking} style={{ marginLeft: "auto" }}>{linking ? "Связывание..." : "🔄 Авто-связать"}</button>}
         </div>
       </form>
     </div>

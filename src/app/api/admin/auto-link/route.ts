@@ -137,23 +137,39 @@ function extractTechKeywords(bp: any): string[] {
   ].join(" ").toLowerCase();
 
   const techMap: Record<string, string[]> = {
-    "next.js": ["next.js", "nextjs", "next js"],
-    "react": ["react"],
-    "typescript": ["typescript", "type script"],
-    "tailwind": ["tailwind"],
-    "prisma": ["prisma"],
-    "postgresql": ["postgresql", "postgres", "pgvector"],
-    "openai": ["openai", "gpt-4", "gpt"],
-    "claude": ["claude", "anthropic"],
-    "telegram": ["telegram", "бот", "bot"],
-    "yookassa": ["yookassa", "юkassa", "юкасса", "платеж"],
-    "docker": ["docker"],
-    "vercel": ["vercel"],
+    // Frontend
+    "next.js": ["next.js", "nextjs", "next js", "next 14", "next 15"],
+    "react": ["react", "reactjs", "jsx"],
+    "typescript": ["typescript", "type script", "ts"],
+    "tailwind": ["tailwind", "tailwindcss", "tailwind css"],
+    // Backend / DB
+    "prisma": ["prisma", "prisma orm"],
+    "postgresql": ["postgresql", "postgres", "pg", "pgvector"],
+    "node.js": ["node.js", "nodejs", "node js", "node"],
+    // AI / ML
+    "openai": ["openai", "gpt-4", "gpt-4o", "gpt 4", "chatgpt"],
+    "claude": ["claude", "anthropic", "claude sonnet"],
+    "openrouter": ["openrouter", "open router"],
+    "deepseek": ["deepseek", "deep seek"],
+    "rag": ["rag", "retrieval", "embedding", "embeddings", "vector db", "vector database"],
+    // Messaging / Bots
+    "telegram": ["telegram", "бот", "bot", "tg bot", "телеграм"],
+    "python": ["python", "aiogram", "python-telegram"],
+    // Payments
+    "yookassa": ["yookassa", "юkassa", "юкасса", "yookassa", "платеж", "платежи", "оплата", "payments", "checkout"],
     "stripe": ["stripe"],
+    // Infra
+    "docker": ["docker", "docker compose"],
+    "vercel": ["vercel", "deploy"],
     "redis": ["redis"],
-    "nextauth": ["nextauth", "next auth"],
-    "python": ["python", "aiogram"],
-    "rag": ["rag", "retrieval", "embedding", "pgvector"],
+    "nextauth": ["nextauth", "next auth", "авторизация", "auth", "oauth"],
+    // E-commerce / Business
+    "crm": ["crm", "клиенты", "сделки", "воронка", "kanban", "канбан"],
+    "e-commerce": ["магазин", "ecommerce", "e-commerce", "каталог", "корзина", "cart"],
+    "marketplace": ["marketplace", "маркетплейс", "продавцы", "комиссия"],
+    "saas": ["saas", "подписки", "subscription", "личный кабинет"],
+    // Games
+    "gamedev": ["игра", "game", "unity", "godot", "phaser", "gamedev"],
   };
 
   for (const [key, patterns] of Object.entries(techMap)) {
