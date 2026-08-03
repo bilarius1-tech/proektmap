@@ -21,3 +21,23 @@ export async function GET() {
   });
   return NextResponse.json(comments);
 }
+
+// PATCH — approve / reject comment
+export async function PATCH(req: NextRequest) {
+  if (!(await checkAdmin())) return NextResponse.json({ error: Forbidden }, { status: 403 });
+  const { id, status } = await req.json();
+  if (!id || !status) return NextResponse.json({ error: id and status required }, { status: 400 });
+  const db = await getDb();
+  await db.blogComment.update({ where: { id }, data: { status } });
+  return NextResponse.json({ ok: true });
+}
+
+// DELETE — remove comment
+export async function DELETE(req: NextRequest) {
+  if (!(await checkAdmin())) return NextResponse.json({ error: Forbidden }, { status: 403 });
+  const id = req.nextUrl.searchParams.get(id);
+  if (!id) return NextResponse.json({ error: id required }, { status: 400 });
+  const db = await getDb();
+  await db.blogComment.delete({ where: { id } });
+  return NextResponse.json({ ok: true });
+}
