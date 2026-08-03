@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -90,6 +91,13 @@ export default function BlueprintsAdmin({ data }: { data: any[] }) {
               <span style={{ padding: "2px 8px", fontSize: 10, background: bp.isPublished ? "var(--color-accent-light)" : "var(--color-bg-secondary)", color: bp.isPublished ? "var(--color-accent)" : "var(--color-text-tertiary)", fontWeight: 600 }}>
                 {bp.isPublished ? "Опубликован" : "Черновик"}
               </span>
+              <Link href={'/admin/blueprints/' + bp.id} onClick={(e: any) => e.stopPropagation()} style={{
+                padding: "2px 10px", fontSize: 10, border: "1px solid var(--color-border)", background: "var(--color-bg-secondary)",
+                cursor: "pointer", fontFamily: "var(--font-body)", textDecoration: "none", color: "var(--color-text-secondary)",
+                fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 4,
+              }}>
+                ✏️ Ред.
+              </Link>
             </button>
 
             {expandedBp === bp.id && (
