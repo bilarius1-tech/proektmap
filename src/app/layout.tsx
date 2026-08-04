@@ -76,11 +76,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body suppressHydrationWarning style={{ display: "flex", flexDirection: "column", minHeight: "100dvh" }}>
+      <body suppressHydrationWarning className="flex flex-col min-h-dvh">
         <SessionProvider>
           <GlobalHeader />
           <StreakBanner />
-          <main style={{ flex: 1 }}>{children}</main>
+          <main className="flex-1">{children}</main>
           <BlueprintProgressBar />
           <GlobalFooter />
           <AssistantWrapper />

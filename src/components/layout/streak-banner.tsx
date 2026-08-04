@@ -24,11 +24,8 @@ export default function StreakBanner() {
   if (!show) return null;
 
   return (
-    <div style={{
-      background: "var(--color-accent)", color: "white", padding: "8px 16px",
-      textAlign: "center", fontSize: "var(--text-xs)", fontWeight: 600,
-    }}>
-      <Zap size={14} style={{ display: "inline", verticalAlign: "middle", marginRight: 6 }} />
+    <div className="bg-accent text-white py-xs px-m text-center text-xs font-semibold">
+      <Zap size={14} className="inline align-middle mr-[6px]" />
       {streak}-й день подряд! +{xpGained} XP 🎉
     </div>
   );
