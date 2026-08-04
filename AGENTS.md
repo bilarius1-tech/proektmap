@@ -64,7 +64,7 @@ git add -A && git commit -m "описание" && git push
 - Шрифт: Inter (Google Fonts)
 - Русский язык: ВЕСЬ интерфейс и документация на русском
 - Деньги: ЮKassa, 300₽/мес Pro подписка
-- Админ: bilariuss@yandex.ru, пароль bilariuss111111
+  - Admin: credentials in .env
 
 ### 10. Пользователь — Алексей
 - Не программист, AI-инженер

@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "next dev --port 3030",
     "build": "next build",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "start": "next start --port 3030"
   },
   "dependencies": {
@@ -46,10 +48,16 @@
     "three": "^0.185.1"
   },
   "devDependencies": {
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/bcryptjs": "^2.4.0",
     "@types/node": "^22.0.0",
     "@types/nodemailer": "^6.4.0",
     "@types/react": "^19.0.0",
-    "typescript": "^5.7.0"
+    "@vitejs/plugin-react": "^6.0.5",
+    "jsdom": "^29.1.1",
+    "typescript": "^5.7.0",
+    "vitest": "^4.1.10"
   }
 }
