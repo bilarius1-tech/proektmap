@@ -7,7 +7,7 @@ import VibecraftGuide from "@/components/blueprint/vibecraft-guide";
 import TourOverlay from "@/components/blueprint/tour-overlay";
 import AIToolsComparison from "@/components/blueprint/ai-tools-comparison";
 import BlueprintFlow from "@/components/blueprint/flow-view";
-import TechTreeView from "@/components/blueprint/tech-tree";
+import DecisionGraph from "@/components/blueprint/decision-graph";
 import { trackGoal, Goals } from "@/lib/metrika";
 import { useRouter } from "next/navigation";
 import SkillChips from "./skill-chips";
@@ -219,7 +219,6 @@ export default function BlueprintPageClient({
                 fontSize: "var(--text-s)", fontWeight: 700, cursor: "pointer",
                 display: "flex", alignItems: "center", gap: 6,
               }}>Начать путь <ArrowRight size={16} /></button>
-              <button onClick={() => setShowDecisionMap(true)} style={{ padding: "12px 28px", borderRadius: "var(--radius-m)", background: "#1e293b", color: "#f59e0b", border: "1px solid #334155", fontSize: "var(--text-s)", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>🌳 Tech Tree</button>
             </div>
             {(blueprint as any).goal && (
               <div style={{ marginBottom: "var(--space-l)", padding: "var(--space-m)", background: "var(--color-accent-light)", borderRadius: "var(--radius-s)", display: "flex", gap: 10 }}>
@@ -516,12 +515,10 @@ export default function BlueprintPageClient({
       </div>
 
       {/* Decision Map Modal */}
-      
-
-{showDecisionMap && (
+      {showDecisionMap && (
         <div style={{ position: "fixed", inset: 0, zIndex: 200, background: "var(--color-bg-secondary)" }}>
-          <TechTreeView
-            stages={(stages || []).map((st: any) => ({
+          <DecisionGraph
+            stages={stages.map((st: any) => ({
               title: st.title,
               slug: st.slug,
               decisions: (st.decisions || []).map((d: any) => ({
@@ -535,7 +532,8 @@ export default function BlueprintPageClient({
                 xpReward: d.xpReward || 0,
               })),
             }))}
-            onNodeClick={(decisionId: string) => {
+            relations={[]}
+            onDecisionClick={(decisionId: string) => {
               setShowDecisionMap(false);
               // Find which stage contains this decision
               for (const st of stages) {
