@@ -1357,3 +1357,19 @@ d8e572aa fix: page.tsx + билд
 - 9fe06bca revert: remove Tech Tree gamification
 
 ### Итого за день: 15 коммитов (с 04.08 утра)
+
+## 05.08.2026 — День: Design System Guide в Песочнице
+
+### Сделано
+- Новая страница: /sandbox/design-system — полный гайд по дизайн-системам
+- 11 разделов: от Atomic Design до AI-промптов
+- Раздел «Уникальность»: 6 приёмов как не делать клонов
+- Меню: пункт «🎨 Дизайн-система» в выпадающем списке Песочницы
+- Связь с Blueprint: решение «Дизайн-система» ссылается на гайд
+- Контент: токены, компоненты, Figma, Storybook, Style Dictionary, shadcn/ui
+
+### Коммиты
+- c7453c7b feat: Design System guide in Sandbox
+- 1aee4f41 feat: Design System guide — add Uniqueness section
+
+### Итого: 2 коммита
