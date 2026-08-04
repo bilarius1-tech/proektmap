@@ -1,6 +1,6 @@
 import { getDb } from "@/lib/db/index";
 import Link from "next/link";
-import { Bot, Globe, Shield, Zap, Cpu, Wrench, Lightbulb, BookOpen, Compass, Sparkles, ArrowRight, Eye, FileText, Layers, Grid3X3, Clock } from "lucide-react";
+import { Bot, Globe, Shield, Zap, Cpu, Wrench, Lightbulb, BookOpen, Compass, Sparkles, ArrowRight, Eye, FileText, Layers, Grid3X3, Clock, Palette } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 export const metadata = {
@@ -43,6 +43,7 @@ export default async function SandboxPage() {
     { slug: "blueprints", title: "Все Blueprint'ы", desc: "Готовые дорожные карты: сайт компании, SaaS, Telegram бот, игра. Выбери свой путь.", icon: Compass, size: "small" as const, stat: String(blueprintCount), statLabel: "Blueprint'ов", href: "/blueprints" },
     { slug: "ai-tools", title: "AI-инструменты", desc: `Каталог из ${toolCount} инструментов с русскими обзорами, рейтингами и гайдами.`, icon: Wrench, size: "small" as const, stat: String(toolCount), statLabel: "инструментов", href: "/ai-tools" },
     { slug: "solutions", title: "Готовые решения", desc: "Клонируй и запускай: бот-магазин, AI-консультант, приём заказов. Код на GitHub.", icon: Layers, size: "small" as const, stat: String(solutionCount), statLabel: "решений", href: "/solutions" },
+    { slug: "design-system", title: "Дизайн-система", desc: "Полный гайд: токены, компоненты, Atomic Design, Figma, Storybook. Почему AI-инженеру нужна дизайн-система и как её построить.", icon: Palette, size: "medium" as const, href: "/sandbox/design-system" },
     { slug: "blog", title: "Блог", desc: `Статьи об AI-разработке, новости индустрии, гайды и туториалы. ${postCount} статей, RSS, поиск.`, icon: FileText, size: "small" as const, stat: String(postCount), statLabel: "статей", href: "/blog" },
   ];
 
