@@ -15,57 +15,56 @@ export default async function GlobalFooter() {
   const footerLinks = await getFooterLinks();
 
   return (
-    <footer style={{
-      background: "var(--color-bg-primary)", borderTop: "1px solid var(--color-border-light)",
-      padding: "var(--space-xl) var(--space-m)", marginTop: "auto",
-    }}>
-      <div style={{ maxWidth: 1000, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px,1fr))", gap: "var(--space-xl)" }}>
+    <footer className="bg-bg-primary border-t border-border-light px-m py-xl mt-auto">
+      <div className="max-w-[1000px] mx-auto grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-xl">
+        {/* Brand */}
         <div>
-          <div style={{ fontWeight: 800, fontSize: "var(--text-m)", marginBottom: "var(--space-s)" }}>
-            Proekt<span style={{ color: "var(--color-accent)" }}>Map</span>
+          <div className="font-extrabold text-m mb-s">
+            Proekt<span className="text-accent">Map</span>
           </div>
-          <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", lineHeight: 1.6 }}>
+          <p className="text-xs text-text-tertiary leading-relaxed">
             Первая школа AI-инженеров в России. Научись создавать проекты с помощью AI.
           </p>
         </div>
 
+        {/* Project links */}
         <div>
-          <div style={{ fontWeight: 600, fontSize: "var(--text-xs)", marginBottom: "var(--space-s)", textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--color-text-tertiary)" }}>Проект</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-xs)" }}>
-            <Link href="/" style={fl}>Шаблоны</Link>
-            <Link href="/dashboard" style={fl}>Личный кабинет</Link>
-            <Link href="/auth" style={fl}>Войти</Link>
+          <div className="font-semibold text-xs mb-s uppercase tracking-[0.06em] text-text-tertiary">Проект</div>
+          <div className="flex flex-col gap-xs">
+            <Link href="/" className="text-s text-text-secondary no-underline">Шаблоны</Link>
+            <Link href="/dashboard" className="text-s text-text-secondary no-underline">Личный кабинет</Link>
+            <Link href="/auth" className="text-s text-text-secondary no-underline">Войти</Link>
           </div>
         </div>
 
+        {/* Documents */}
         <div>
-          <div style={{ fontWeight: 600, fontSize: "var(--text-xs)", marginBottom: "var(--space-s)", textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--color-text-tertiary)" }}>Документы</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-xs)" }}>
+          <div className="font-semibold text-xs mb-s uppercase tracking-[0.06em] text-text-tertiary">Документы</div>
+          <div className="flex flex-col gap-xs">
             {footerLinks.length > 0 ? (
               footerLinks.map(item => (
-                <Link key={item.id} href={item.href} style={fl}>{item.label}</Link>
+                <Link key={item.id} href={item.href} className="text-s text-text-secondary no-underline">{item.label}</Link>
               ))
             ) : (
               <>
-                <Link href="/privacy" style={fl}>Политика конфиденциальности</Link>
-                <Link href="/terms" style={fl}>Условия использования</Link>
-                <Link href="/sitemap" style={fl}>Карта сайта</Link>
-                <Link href="/pricing" style={fl}>Тарифы</Link>
-                <Link href="/offer" style={fl}>Оферта</Link>
+                <Link href="/privacy" className="text-s text-text-secondary no-underline">Политика конфиденциальности</Link>
+                <Link href="/terms" className="text-s text-text-secondary no-underline">Условия использования</Link>
+                <Link href="/sitemap" className="text-s text-text-secondary no-underline">Карта сайта</Link>
+                <Link href="/pricing" className="text-s text-text-secondary no-underline">Тарифы</Link>
+                <Link href="/offer" className="text-s text-text-secondary no-underline">Оферта</Link>
               </>
             )}
           </div>
         </div>
       </div>
 
-      <div style={{ maxWidth: 1000, margin: "var(--space-xl) auto 0", paddingTop: "var(--space-m)", borderTop: "1px solid var(--color-border-light)", textAlign: "center", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>
+      {/* Copyright */}
+      <div className="max-w-[1000px] mx-auto mt-xl pt-m border-t border-border-light text-center text-xs text-text-tertiary">
         © 2026 Карта роста. Школа AI-инженеров. ИП Тимофеев Алексей Геннадьевич, ИНН 532002912418.
-        <div style={{ marginTop: 4 }}>
-          <a href="/admin" style={{ color: "var(--color-text-tertiary)", fontSize: "10px", textDecoration: "none", opacity: 0.3 }}>админка</a>
+        <div className="mt-1">
+          <a href="/admin" className="text-text-tertiary text-[10px] no-underline opacity-30">админка</a>
         </div>
       </div>
     </footer>
   );
 }
-
-const fl: React.CSSProperties = { fontSize: "var(--text-s)", color: "var(--color-text-secondary)", textDecoration: "none" };
