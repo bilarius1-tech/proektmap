@@ -1,6 +1,6 @@
 "use client";
 
-import { Edit, Trash2, Eye } from "lucide-react";
+import { Edit, Trash2, Eye, ClipboardCheck } from "lucide-react";
 import Link from "next/link";
 import DataTable from "@/components/admin/data-table";
 
@@ -22,6 +22,7 @@ export default function BPTable({ blueprints }: { blueprints: any[] }) {
       actions={(r: any) => (
         <>
           <Link href={`/admin/blueprints/${r.id}`} className="btn btn-ghost" style={{ padding: "4px 8px" }}><Edit size={14} /></Link>
+          <Link href={`/admin/blueprints/${r.id}/checklist`} className="btn btn-ghost" style={{ padding: "4px 8px" }} title="Чек-лист"><ClipboardCheck size={14} /></Link>
           <a href={`/${r.slug}`} target="_blank" className="btn btn-ghost" style={{ padding: "4px 8px" }}><Eye size={14} /></a>
           <form onSubmit={async (e) => { e.preventDefault(); if (!confirm("Удалить?")) return; await fetch("/api/admin/blueprints?id=" + r.id, { method: "DELETE" }); location.reload(); }} style={{ display: "inline" }}>
             <button type="submit" className="btn btn-ghost" style={{ padding: "4px 8px", color: "var(--color-error)" }}><Trash2 size={14} /></button>
