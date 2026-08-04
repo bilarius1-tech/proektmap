@@ -1274,6 +1274,10 @@ d8e572aa fix: page.tsx + билд
 - d3246769 fix: /universe — hover, zoom, анимации
 - 3031a999 docs: UNIVERSE_PLAN v1→v4
 
+### Коммиты
+- 108dd1a0 docs: DEVLOG 04.08.2026
+- db6b8228 feat: CI/CD pipeline + daily DB backup
+
 ### Итого за день: 24 коммита
 
 ---
@@ -1308,4 +1312,8 @@ d8e572aa fix: page.tsx + билд
 - 6e0d0857 refactor: migrate layout components to Tailwind (Part 1)
 - 823a8d0b refactor: migrate footer + global-search to Tailwind (Part 2)
 
-### Итого за день: 3 коммита
+### Коммиты
+- 108dd1a0 docs: DEVLOG 04.08.2026
+- db6b8228 feat: CI/CD pipeline + daily DB backup
+
+### Итого за день: 5 коммитов
