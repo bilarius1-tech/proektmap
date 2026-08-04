@@ -180,7 +180,8 @@ export default function BlueprintPageClient({
 
   const currentStage = stages.find(s => s.slug === activeStage) || stages[0];
   const totalDone = completed.size;
-  const progress = Math.round((totalDone / blueprint.totalDecisions) * 100);
+  const totalDecisions = blueprint.totalDecisions || 1;
+  const progress = Math.min(100, Math.round((totalDone / totalDecisions) * 100));
   const canTrack = isLoggedIn;
 
   const steps = [
@@ -380,22 +381,41 @@ export default function BlueprintPageClient({
           </div>
         )}
 
-        {/* Project header */}
-        {projectContext && (
-          <div style={{
-            display: "flex", alignItems: "center", gap: "var(--space-s)", marginBottom: "var(--space-m)",
-            padding: "var(--space-s) var(--space-m)", background: "var(--color-bg-secondary)", borderRadius: "var(--radius-m)",
-            border: "1px solid var(--color-border-light)", fontSize: "var(--text-xs)",
-          }}>
-            <FolderOpen size={14} style={{ color: "var(--color-accent)", flexShrink: 0 }} />
-            <span style={{ fontWeight: 600 }}>{projectContext.name}</span>
-            {projectContext.niche && <span style={{ color: "var(--color-text-tertiary)" }}>· {projectContext.niche}</span>}
-            {projectContext.stack && <span style={{ color: "var(--color-text-tertiary)" }}>· {projectContext.stack}</span>}
+        {/* Sticky header: project + progress + stage */}
+        <div style={{
+          position: "sticky", top: 56, zIndex: 20,
+          background: "var(--color-bg-primary)", borderBottom: "1px solid var(--color-border-light)",
+          padding: "var(--space-s) var(--space-l)", marginBottom: "var(--space-m)",
+        }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 8, flexWrap: "wrap" }}>
+                <h1 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-m)", fontWeight: 800, margin: 0, letterSpacing: "-0.01em" }}>
+                  {blueprint.title}
+                </h1>
+                {projectContext && (
+                  <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", display: "flex", alignItems: "center", gap: 4 }}>
+                    <FolderOpen size={12} style={{ color: "var(--color-accent)" }} />
+                    {projectContext.name || "Проект"}
+                  </span>
+                )}
+              </div>
+              <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", marginTop: 2 }}>
+                Этап {stages.findIndex((s: any) => s.slug === activeStage) + 1 || 0}/{stages.length} · {stages.find((s: any) => s.slug === activeStage)?.title || ""}
+              </div>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+              <div style={{ textAlign: "right" }}>
+                <div style={{ fontSize: "var(--text-xs)", fontWeight: 700, color: progress === 100 ? "var(--color-accent)" : "var(--color-text-primary)" }}>
+                  {totalDone}/{totalDecisions}
+                </div>
+                <div style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>{progress}%</div>
+              </div>
+              <div style={{ width: 80, height: 6, borderRadius: 3, background: "var(--color-border-light)", overflow: "hidden" }}>
+                <div style={{ width: progress + "%", height: "100%", background: progress === 100 ? "var(--color-accent)" : "var(--color-accent)", borderRadius: 3, transition: "width 0.4s ease" }} />
+              </div>
+            </div>
           </div>
-        )}
-
-        <div style={{ height: 2, background: "var(--color-border)", borderRadius: 0, overflow: "hidden", marginBottom: "var(--space-m)" }}>
-          <div style={{ width: progress + "%", height: "100%", background: "var(--color-accent)", borderRadius: 2, transition: "width 0.4s ease" }} />
         </div>
 
         <h1 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-xl)", fontWeight: 700, marginBottom: "var(--space-xs)", letterSpacing: "-0.01em" }}>{currentStage?.title} {isStageLocked(stages.indexOf(currentStage)) && <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400, marginLeft: 8 }}>🔒 Pro</span>}</h1>
