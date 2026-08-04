@@ -76,7 +76,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body suppressHydrationWarning className="flex flex-col min-h-dvh">
+      <body className="flex flex-col min-h-dvh">
         <SessionProvider>
           <GlobalHeader />
           <StreakBanner />

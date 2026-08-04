@@ -104,7 +104,6 @@ export default function BlueprintPageClient({
   const [promptCopied, setPromptCopied] = useState<string | null>(null);
   const [totalXp, setTotalXp] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
   const FREE_STAGES = 3; // First 3 stages are free
   const isStageLocked = (index: number) => !isPro && index >= FREE_STAGES;
   const [showProjectModal, setShowProjectModal] = useState(false);
@@ -118,7 +117,6 @@ export default function BlueprintPageClient({
   const [notifications, setNotifications] = useState<Array<{id:number; msg:string; type:string}>>([]);
 
   useEffect(() => {
-    setIsMobile(window.innerWidth < 768);
     if (!isLoggedIn) return;
     fetch("/api/progress").then(r => r.json()).then(d => {
       setCompleted(new Set(d.completed));
@@ -251,14 +249,13 @@ export default function BlueprintPageClient({
         </div>
       )}
 
-      <div style={{ display: showOverview ? "none" : "flex", minHeight: "calc(100dvh - 56px)" }} suppressHydrationWarning>
-      {/* DESKTOP sidebar */}
-      {!isMobile && (
-        <aside style={{
-          width: 260, minWidth: 260, background: "var(--color-bg-primary)",
-          borderRight: "1px solid var(--color-border-light)",
-          position: "sticky", top: 56, height: "calc(100dvh - 56px)", overflowY: "auto",
-        }}>
+      <div style={{ display: showOverview ? "none" : "flex", minHeight: "calc(100dvh - 56px)" }}>
+      {/* DESKTOP sidebar — hidden on mobile via CSS */}
+      <aside className="hidden md:block" style={{
+        width: 260, minWidth: 260, background: "var(--color-bg-primary)",
+        borderRight: "1px solid var(--color-border-light)",
+        position: "sticky", top: 56, height: "calc(100dvh - 56px)", overflowY: "auto",
+      }}>
           <SidebarContent
             stages={stages} activeStage={activeStage} setActiveStage={setActiveStage}
             completed={completed} progress={progress} totalDone={totalDone} totalDecs={blueprint.totalDecisions}
@@ -271,10 +268,9 @@ export default function BlueprintPageClient({
             setShowDecisionMap={setShowDecisionMap}
           />
         </aside>
-      )}
 
-      {/* MOBILE */}
-      {isMobile && (
+      {/* MOBILE — visible on mobile via CSS */}
+      <div className="md:hidden">
         <>
           <button onClick={() => setSidebarOpen(true)} style={{
             position: "fixed", left: 16, bottom: 24, zIndex: 50,
@@ -314,7 +310,7 @@ export default function BlueprintPageClient({
             </>
           )}
         </>
-      )}
+      </div>
 
       {/* Main content */}
       {viewMode === "flow" && (
@@ -328,7 +324,7 @@ export default function BlueprintPageClient({
         </div>
       )}
 
-      {viewMode === "list" && <main suppressHydrationWarning style={{ flex: 1, padding: isMobile ? "var(--space-m)" : "var(--space-xl)", maxWidth: 1100 }}>
+      {viewMode === "list" && <main style={{ flex: 1, padding: "var(--space-m)", maxWidth: 1100 }}>
         {/* Registration banner */}
         {!isLoggedIn && (
           <div style={{
@@ -404,7 +400,7 @@ export default function BlueprintPageClient({
         <h1 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-xl)", fontWeight: 700, marginBottom: "var(--space-xs)", letterSpacing: "-0.01em" }}>{currentStage?.title} {isStageLocked(stages.indexOf(currentStage)) && <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400, marginLeft: 8 }}>🔒 Pro</span>}</h1>
         {activeStage === "ai-philosophy" && <AIRules />}
         {currentStage?.description && (
-          <p style={{ color: "var(--color-text-secondary)", marginBottom: isMobile ? "var(--space-m)" : "var(--space-l)", fontSize: "var(--text-s)" }}>
+          <p style={{ color: "var(--color-text-secondary)", marginBottom: "var(--space-m)", fontSize: "var(--text-s)" }}>
             {projectContext ? currentStage.description : currentStage.description}
           </p>
         )}
@@ -422,7 +418,7 @@ export default function BlueprintPageClient({
                 background: "white", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)",
               }}>
                 <div onClick={() => { if (canTrack) toggle(dec.id); }} style={{
-                  display: "flex", alignItems: "center", gap: "var(--space-s)", padding: isMobile ? "var(--space-m)" : "var(--space-m) var(--space-l)", cursor: canTrack ? "pointer" : "default",
+                  display: "flex", alignItems: "center", gap: "var(--space-s)", padding: "var(--space-m)", cursor: canTrack ? "pointer" : "default",
                 }}>
                   <div style={{
                     width: 24, height: 24, borderRadius: "50%", flexShrink: 0,
@@ -443,7 +439,7 @@ export default function BlueprintPageClient({
                 </div>
 
                 {expanded && !done && (
-                  <div style={{ borderTop: "1px solid var(--color-border-light)", padding: isMobile ? "var(--space-m)" : "var(--space-l)" }}>
+                  <div style={{ borderTop: "1px solid var(--color-border-light)", padding: "var(--space-m)" }}>
                     <div style={{ display: "flex", gap: 0, marginBottom: "var(--space-m)", borderBottom: "2px solid var(--color-border-light)", overflowX: "auto" }}>
                       {steps.map(s => (
                         <button key={s.key} onClick={() => {
