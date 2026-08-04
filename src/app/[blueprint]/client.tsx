@@ -516,7 +516,9 @@ export default function BlueprintPageClient({
       </div>
 
       {/* Decision Map Modal */}
-      {showDecisionMap && (
+      
+
+{showDecisionMap && (
         <div style={{ position: "fixed", inset: 0, zIndex: 200, background: "var(--color-bg-secondary)" }}>
           <TechTreeView
             stages={stages.map((st: any) => ({
