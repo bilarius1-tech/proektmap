@@ -7,7 +7,7 @@ import VibecraftGuide from "@/components/blueprint/vibecraft-guide";
 import TourOverlay from "@/components/blueprint/tour-overlay";
 import AIToolsComparison from "@/components/blueprint/ai-tools-comparison";
 import BlueprintFlow from "@/components/blueprint/flow-view";
-import DecisionGraph from "@/components/blueprint/decision-graph";
+import TechTreeView from "@/components/blueprint/tech-tree";
 import { trackGoal, Goals } from "@/lib/metrika";
 import { useRouter } from "next/navigation";
 import SkillChips from "./skill-chips";
@@ -517,7 +517,7 @@ export default function BlueprintPageClient({
       {/* Decision Map Modal */}
       {showDecisionMap && (
         <div style={{ position: "fixed", inset: 0, zIndex: 200, background: "var(--color-bg-secondary)" }}>
-          <DecisionGraph
+          <TechTreeView
             stages={stages.map((st: any) => ({
               title: st.title,
               slug: st.slug,
@@ -532,8 +532,7 @@ export default function BlueprintPageClient({
                 xpReward: d.xpReward || 0,
               })),
             }))}
-            relations={[]}
-            onDecisionClick={(decisionId: string) => {
+            onNodeClick={(decisionId: string) => {
               setShowDecisionMap(false);
               // Find which stage contains this decision
               for (const st of stages) {
