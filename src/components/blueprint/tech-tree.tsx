@@ -24,20 +24,12 @@ const STAGE_BG = [
 ];
 
 export default function TechTreeView({
-  stages = [],
-  stages = [],
   stages, onNodeClick, onUnlock,
 }: {
   stages: StageGroup[];
   onNodeClick?: (id: string) => void;
   onUnlock?: (id: string) => void;
 }) {
-  if (!stages || stages.length === 0) return null;
-
-  if (!stages || !Array.isArray(stages) || stages.length === 0) {
-    return <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#94a3b8", fontSize: 18, background: "#0f172a" }}>Loading tech tree...</div>;
-  }
-
   const { nodes, edges } = useMemo(() => {
     const nodes: Node[] = [];
     const edges: Edge[] = [];
@@ -53,7 +45,7 @@ export default function TechTreeView({
     let y = 0;
 
     stages.forEach((stage, si) => {
-      const decs = stage.decisions;
+      const decs = stage.decisions || [];
       const rows = Math.ceil(decs.length / MAX_COLS);
       const stageW = MAX_COLS * (NODE_W + GAP_X) + STAGE_PAD;
       const stageH = STAGE_HEADER_H + rows * (NODE_H + GAP_Y) + STAGE_PAD;
