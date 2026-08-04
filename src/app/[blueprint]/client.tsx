@@ -7,6 +7,7 @@ import VibecraftGuide from "@/components/blueprint/vibecraft-guide";
 import TourOverlay from "@/components/blueprint/tour-overlay";
 import AIToolsComparison from "@/components/blueprint/ai-tools-comparison";
 import BlueprintFlow from "@/components/blueprint/flow-view";
+import DecisionGraph from "@/components/blueprint/decision-graph";
 import { trackGoal, Goals } from "@/lib/metrika";
 import { useRouter } from "next/navigation";
 import SkillChips from "./skill-chips";
@@ -495,33 +496,44 @@ export default function BlueprintPageClient({
 
       {/* Decision Map Modal */}
       {showDecisionMap && (
-        <div onClick={() => setShowDecisionMap(false)} style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", justifyContent: "center", alignItems: "center", background: "rgba(0,0,0,0.4)" }}>
-          <div onClick={e => e.stopPropagation()} style={{ background: "white", borderRadius: "var(--radius-m)", maxWidth: 700, width: "90%", maxHeight: "80vh", overflow: "auto", padding: "var(--space-l)", boxShadow: "0 8px 40px rgba(0,0,0,0.15)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-m)" }}>
-              <div style={{ fontWeight: 800, fontSize: "var(--text-l)", color: "var(--color-accent)" }}>📋 Карта решений</div>
-              <button onClick={() => setShowDecisionMap(false)} style={{ padding: "4px 12px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "white", cursor: "pointer", fontSize: "var(--text-xs)" }}>✕</button>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-m)" }}>
-              {stages.map((st:any) => {
-                const stageDecs = (st.decisions || []).filter((d:any) => decisionChoices[d.id]);
-                if (stageDecs.length === 0) return null;
-                return (
-                  <div key={st.id}>
-                    <div style={{ fontWeight: 800, fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8, paddingLeft: 4 }}>{st.title}</div>
-                    {stageDecs.map((d:any) => (
-                      <div key={d.id} style={{ display: "flex", gap: 12, padding: "6px 4px", borderLeft: "3px solid var(--color-accent)", marginLeft: 8, marginBottom: 4, alignItems: "flex-start", flexWrap: "wrap" }}>
-                        <div style={{ fontSize: "var(--text-xs)", fontWeight: 600, color: "var(--color-text)" }}>{d.title}</div>
-                        <div style={{ fontSize: "var(--text-xs)", color: "var(--color-accent)", fontWeight: 700 }}>→ {decisionChoices[d.id].choice}</div>
-                        {d.impact && <div style={{ width: "100%", display: "flex", gap: 4, flexWrap: "wrap", marginLeft: 16, marginTop: 2 }}>{d.impact.split(",").map((tag:string) => <span key={tag} style={{ padding: "1px 6px", borderRadius: "var(--radius-s)", background: "var(--color-warning-light)", color: "var(--color-warning)", fontSize: 9, fontWeight: 600 }}>{tag.trim()}</span>)}</div>}
-                      </div>
-                    ))}
-                  </div>
-                );
-              })}
-            </div>
-            <button onClick={() => { const brief = stages.flatMap((s:any) => (s.decisions||[]).filter((d:any)=>decisionChoices[d.id])).map((d:any) => `⚡ ${d.title}: ${decisionChoices[d.id].choice}${decisionChoices[d.id].reason ? " — " + decisionChoices[d.id].reason : ""}`).join("\
-"); navigator.clipboard.writeText(brief); alert("✅ Бриф скопирован!"); }} style={{ marginTop: "var(--space-m)", width: "100%", padding: "10px", borderRadius: "var(--radius-s)", background: "var(--color-accent)", color: "white", border: "none", fontWeight: 700, fontSize: "var(--text-xs)", cursor: "pointer" }}>📋 Скопировать бриф</button>
-          </div>
+        <div style={{ position: "fixed", inset: 0, zIndex: 200, background: "var(--color-bg-secondary)" }}>
+          <DecisionGraph
+            stages={stages.map((st: any) => ({
+              title: st.title,
+              slug: st.slug,
+              decisions: (st.decisions || []).map((d: any) => ({
+                id: d.id,
+                title: d.title,
+                slug: d.slug,
+                stageTitle: st.title,
+                stageSlug: st.slug,
+                status: decisionChoices[d.id] ? "completed" : "pending",
+                userChoice: decisionChoices[d.id]?.choice || "",
+                xpReward: d.xpReward || 0,
+              })),
+            }))}
+            relations={[]}
+            onDecisionClick={(decisionId: string) => {
+              setShowDecisionMap(false);
+              // Find which stage contains this decision
+              for (const st of stages) {
+                const found = (st.decisions || []).find((d: any) => d.id === decisionId);
+                if (found) { setActiveStage(st.slug); break; }
+              }
+            }}
+          />
+          <button
+            onClick={() => setShowDecisionMap(false)}
+            style={{
+              position: "fixed", top: 16, right: 16, zIndex: 210,
+              padding: "8px 16px", borderRadius: "var(--radius-m)",
+              background: "var(--color-bg-primary)", border: "1px solid var(--color-border)",
+              cursor: "pointer", fontSize: "var(--text-s)", fontWeight: 600,
+              boxShadow: "var(--shadow-m)",
+            }}
+          >
+            ✕ Закрыть
+          </button>
         </div>
       )}
 
