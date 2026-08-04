@@ -132,26 +132,48 @@ export async function POST(req: Request) {
             } catch {}
           }
 
-          // AI translation via DeepSeek
-          const prompt = `Ты редактор блога об AI. Переведи и адаптируй новость на РУССКИЙ язык (200-300 слов).
+          // AI translation + SEO optimization via DeepSeek
+          const prompt = `Ты SEO-редактор блога о разработке и AI. Твоя задача — написать полезную статью на русском языке (300-500 слов), которая будет ранжироваться в Яндексе и Google.
 
-Оригинал: ${item.title}
-Источник: ${item.link}
+ИСТОЧНИК:
+Заголовок: ${item.title}
+Ссылка: ${item.link}
 
-ФОРМАТ ОТВЕТА:
-ЗАГОЛОВОК: <заголовок на русском, осмысленный, без английских слов>
-<текст заметки 2-3 абзаца>
+ФОРМАТ ОТВЕТА (строго соблюдай):
+
+ЗАГОЛОВОК: <50-70 символов, ключевое слово в начале, на русском>
+МЕТА: <мета-описание 130-150 символов с ключевым словом, призывом к чтению>
+
+## <подзаголовок H2 — почему это важно>
+<2-3 абзаца: объясни суть простым языком, избегай маркетинговых штампов>
+
+## <подзаголовок H2 — как это работает / что это меняет>
+<2-3 абзаца: технические детали, примеры использования, цифры если есть>
+
+## <подзаголовок H2 — кому это нужно / как применить>
+<1-2 абзаца: практическая польза для читателя, AI-инженера или разработчика>
+
 📎 [Источник](${item.link})
 
-Правила:
-- Заголовок — ТОЛЬКО русский язык
-- Не используй markdown кроме ссылок [текст](url)
-- Пиши живым языком, как для Telegram-канала`;
+ПРАВИЛА SEO:
+1. Заголовок — ключевое слово В НАЧАЛЕ, 50-70 знаков
+2. Первый абзац — сразу ответ на вопрос «о чём статья и зачем читать»
+3. Используй подзаголовки ## (H2), внутри абзацев — **жирный** для ключевых фраз
+4. Никаких «в последнее время», «в современном мире», «несомненно» — пиши конкретно
+5. Один термин на английском = ок (например, RAG, fine-tuning), но дублируй объяснение на русском
+6. Добавь 1-2 вопроса риторических для вовлечения
+7. Длина: 300-500 слов (не больше, не меньше)
+
+СТИЛЬ:
+- Как Хабр, но понятнее
+- Для аудитории: разработчики, AI-инженеры, продакты
+- Без воды, без рекламы, без «революционных прорывов»
+- Живой русский язык, можно «вы» к читателю`;
 
           const aiRes = await fetch("https://api.deepseek.com/v1/chat/completions", {
             method: "POST",
             headers: { "Content-Type": "application/json", "Authorization": `Bearer ${key}` },
-            body: JSON.stringify({ model: "deepseek-chat", messages: [{ role: "user", content: prompt }], max_tokens: 800, temperature: 0.6 }),
+            body: JSON.stringify({ model: "deepseek-chat", messages: [{ role: "user", content: prompt }], max_tokens: 1200, temperature: 0.6 }),
             signal: AbortSignal.timeout(30000),
           });
 
@@ -164,15 +186,29 @@ export async function POST(req: Request) {
           const fullText = aiData.choices?.[0]?.message?.content;
           if (!fullText) continue;
 
-          // Extract title
+          // Extract title and meta description from AI response
           let title = item.title;
           const tm = fullText.match(/ЗАГОЛОВОК:\s*(.+)/);
           if (tm) title = tm[1].trim();
 
           // Remove title line from content
           let content = fullText.replace(/ЗАГОЛОВОК:\s*.+(\n|$)/, "").trim();
+
+          // Extract meta description (SEO)
+          let metaDesc = "";
+          const mm = content.match(/МЕТА:\s*(.+)/);
+          if (mm) {
+            metaDesc = mm[1].trim().slice(0, 160);
+            content = content.replace(/МЕТА:\s*.+(\n|$)/, "").trim();
+          }
+
+          // Convert markdown to HTML: links, bold, headings
           content = content.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener" style="color:var(--color-accent)">$1</a>');
-          const excerpt = content.replace(/<[^>]+>/g, "").replace(/[#*\[\]()]/g, "").slice(0, 200).replace(/\n/g, " ");
+          content = content.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+          content = content.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+
+          // Fallback excerpt from content
+          const excerpt = metaDesc || content.replace(/<[^>]+>/g, "").replace(/[#*\[\]()]/g, "").slice(0, 200).replace(/\n/g, " ");
 
           const slug = cleanSlug(title);
           if (!slug) continue;
@@ -185,7 +221,7 @@ export async function POST(req: Request) {
             data: {
               title, slug, content, excerpt, coverImage,
               status: "published", authorId: admin.id, categoryId: cat.id,
-              tags: "AI,новости", aiGenerated: true, aiModel: "deepseek-chat",
+              tags: feed.category.replace(/[^a-zA-Zа-яА-ЯёЁ,]/g, "").split(",").filter(Boolean).join(",") || "AI,новости", aiGenerated: true, aiModel: "deepseek-chat",
               metaTitle: title + " — Карта роста", metaDesc: excerpt,
               publishedAt: new Date(),
             },

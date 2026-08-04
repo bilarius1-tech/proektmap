@@ -10,3 +10,4 @@ start.sh
 .env
 start.sh
 .next/
+public/uploads/
