@@ -219,6 +219,7 @@ export default function BlueprintPageClient({
                 fontSize: "var(--text-s)", fontWeight: 700, cursor: "pointer",
                 display: "flex", alignItems: "center", gap: 6,
               }}>Начать путь <ArrowRight size={16} /></button>
+              <button onClick={() => setShowDecisionMap(true)} style={{ padding: "12px 28px", borderRadius: "var(--radius-m)", background: "#1e293b", color: "#f59e0b", border: "1px solid #334155", fontSize: "var(--text-s)", fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>🌳 Tech Tree</button>
             </div>
             {(blueprint as any).goal && (
               <div style={{ marginBottom: "var(--space-l)", padding: "var(--space-m)", background: "var(--color-accent-light)", borderRadius: "var(--radius-s)", display: "flex", gap: 10 }}>
