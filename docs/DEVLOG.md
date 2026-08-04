@@ -1275,3 +1275,37 @@ d8e572aa fix: page.tsx + билд
 - 3031a999 docs: UNIVERSE_PLAN v1→v4
 
 ### Итого за день: 24 коммита
+
+---
+
+## 04.08.2026 — День: Критические фиксы + Tailwind-миграция
+
+### Сделано
+- [A] AGENTS.md: удалены учётные данные админа (строка 67 → заглушка)
+- [B] Пустые Blueprint'ы: подтверждено — 11 активных, пустые скрыты
+- [C] Тестирование: vitest + @testing-library/react + jsdom
+  - 8 тестов: 3 smoke (vitest/jsdom/React) + 5 API (/, /blueprints, /auth, /blog, /glossary)
+  - npm test / npm run test:watch — работают
+- [D] Tailwind-миграция: @theme в globals.css + 7 компонентов переписаны
+  - layout.tsx (body flex → Tailwind)
+  - streak-banner.tsx (100% Tailwind)
+  - theme-toggle.tsx (100% Tailwind)
+  - favorites-indicator.tsx (100% Tailwind)
+  - cookie-consent.tsx (80% Tailwind)
+  - footer.tsx (100% Tailwind, 21 style= → 0)
+  - global-search.tsx (100% Tailwind, 27 style= → 0)
+- docs/ANALYSIS-2026.md: полный анализ проекта (293 строки)
+- Правило SSH: использовать bash напрямую, не через PowerShell (ломает спецсимволы)
+
+### Стратегия Tailwind
+- Статические токены (spacing, шрифты, радиусы) → @theme
+- Динамические цвета → text-accent/bg-bg-primary через @theme vars
+- Layout → flex/grid утилиты Tailwind
+- boxShadow → пока inline (Tailwind 4 compat)
+
+### Коммиты
+- ee811028 fix: remove admin creds, add vitest tests, add analysis doc
+- 6e0d0857 refactor: migrate layout components to Tailwind (Part 1)
+- 823a8d0b refactor: migrate footer + global-search to Tailwind (Part 2)
+
+### Итого за день: 3 коммита
