@@ -521,7 +521,7 @@ export default function BlueprintPageClient({
 {showDecisionMap && (
         <div style={{ position: "fixed", inset: 0, zIndex: 200, background: "var(--color-bg-secondary)" }}>
           <TechTreeView
-            stages={stages.map((st: any) => ({
+            stages={(stages || []).map((st: any) => ({
               title: st.title,
               slug: st.slug,
               decisions: (st.decisions || []).map((d: any) => ({
