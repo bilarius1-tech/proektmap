@@ -578,18 +578,11 @@ function SidebarContent({ stages, activeStage, setActiveStage, completed, progre
             <span>📋 Карта решений</span>
             <span style={{fontSize:9, color:"var(--color-accent)", opacity:0.7}}>{Object.keys(decisionChoices).length}</span>
           </button>
-          <button onClick={() => { 
-            const brief = stages.flatMap((s:any) => (s.decisions||[]).filter((d:any)=>decisionChoices[d.id])).map((d:any) => 
-              `⚡ ${d.title}: ${decisionChoices[d.id].choice}${decisionChoices[d.id].reason ? " — " + decisionChoices[d.id].reason : ""}`
-            ).join("\
-"); 
-            navigator.clipboard.writeText(brief);
-            const toastMsg = "✅ Бриф скопирован! " + Object.keys(decisionChoices).length + " решений";
-            addNotification("📋 Бриф скопирован! " + Object.keys(decisionChoices).length + " решений", "info");
-          }}
-            style={{ width: "100%", padding: "8px 12px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "white", fontWeight: 600, fontSize: "var(--text-xs)", cursor: "pointer", color: "var(--color-accent)" }}>
-            📋 Собрать бриф
-          </button>
+          <a href={projectContext ? `/projects/${projectContext.id}/brief` : "#"}
+            style={{ width: "100%", padding: "8px 12px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-accent)", background: "var(--color-accent-light)", fontWeight: 600, fontSize: "var(--text-xs)", cursor: "pointer", color: "var(--color-accent)", textDecoration: "none", display: "block", textAlign: "center" }}
+            onClick={e => { if (!projectContext) { e.preventDefault(); onNewProject(); } }}>
+            📋 Открыть бриф
+          </a>
         </div>
       </>}
 
