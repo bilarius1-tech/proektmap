@@ -25,6 +25,24 @@ export default function BriefClient({ projectId, isLoggedIn }: { projectId: stri
   const [loading, setLoading] = useState(true);
   const [expandedDec, setExpandedDec] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  // Inject print styles
+  useEffect(() => {
+    const style = document.createElement("style");
+    style.id = "brief-print-style";
+    style.textContent = `
+      @media print {
+        body * { visibility: hidden; }
+        #brief-content, #brief-content * { visibility: visible; }
+        #brief-content { position: absolute; left: 0; top: 0; width: 100%; }
+        .no-print { display: none !important; }
+        a { color: inherit !important; text-decoration: none !important; }
+      }
+    `;
+    document.head.appendChild(style);
+    return () => { const s = document.getElementById("brief-print-style"); if (s) s.remove(); };
+  }, []);
+
+
 
   useEffect(() => {
     fetch(`/api/projects/${projectId}/brief`)
@@ -44,49 +62,14 @@ export default function BriefClient({ projectId, isLoggedIn }: { projectId: stri
     setTimeout(() => setCopied(false), 2000);
   }
 
-  async function exportPdf() {
-    const { default: jsPDF } = await import("jspdf");
-    const doc = new jsPDF({ unit: "mm", format: "a4" });
-    doc.setFont("helvetica", "normal");
-
-    let y = 15;
-    doc.setFontSize(18); doc.text(brief!.blueprint.title + " - Бриф проекта", 15, y); y += 8;
-    doc.setFontSize(10);
-    doc.text(`Проект: ${brief!.project.name || "Без названия"}`, 15, y); y += 5;
-    if (brief!.project.domain) { doc.text(`Домен: ${brief!.project.domain}`, 15, y); y += 5; }
-    if (brief!.project.stack) { doc.text(`Стек: ${brief!.project.stack}`, 15, y); y += 5; }
-    doc.text(`Прогресс: ${brief!.project.progress}% | Решений: ${brief!.stats.completedDecisions}/${brief!.stats.totalDecisions}`, 15, y); y += 8;
-
-    for (const stage of brief!.stages) {
-      if (y > 260) { doc.addPage(); y = 15; }
-      doc.setFontSize(13); doc.text(stage.stageTitle, 15, y); y += 6;
-
-      for (const d of stage.decisions) {
-        if (y > 265) { doc.addPage(); y = 15; }
-        doc.setFontSize(10);
-        const label = d.status === "completed" ? `[V] ${d.title}` : `[?] ${d.title}`;
-        doc.text(label, 18, y); y += 4;
-        if (d.userChoice) {
-          const choice = `Выбор: ${d.userChoice}`;
-          const lines = doc.splitTextToSize(choice, 170);
-          doc.text(lines, 22, y); y += lines.length * 4;
-        }
-        if (d.userReason) {
-          const reason = `Причина: ${d.userReason}`;
-          const lines = doc.splitTextToSize(reason, 170);
-          doc.text(lines, 22, y); y += lines.length * 4;
-        }
-        y += 3;
-      }
-      y += 4;
-    }
-
-    doc.save(`brief-${brief!.project.name || "project"}.pdf`);
+  function printBrief() {
+    window.print();
   }
 
   return (
     <div ref={briefRef} style={{ minHeight: "100dvh", background: "var(--color-bg-secondary)", fontFamily: "var(--font-body)" }}>
-      {/* Header */}
+      {/* Header — hidden during print */}
+      <div className="no-print">
       <div style={{ background: "var(--color-bg-primary)", borderBottom: "1px solid var(--color-border)", padding: "var(--space-m) var(--space-l)", position: "sticky", top: 0, zIndex: 10 }}>
         <div style={{ maxWidth: 900, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
           <div>
@@ -105,16 +88,18 @@ export default function BriefClient({ projectId, isLoggedIn }: { projectId: stri
               className="btn btn-ghost" style={{ padding: "8px 14px", fontSize: "var(--text-xs)", display: "flex", alignItems: "center", gap: 6 }}>
               <Copy size={14} /> {copied ? "Скопировано!" : "Копировать MD"}
             </button>
-            <button onClick={exportPdf}
+            <button onClick={printBrief}
               className="btn btn-primary" style={{ padding: "8px 14px", fontSize: "var(--text-xs)", display: "flex", alignItems: "center", gap: 6 }}>
-              <Download size={14} /> PDF
+              <Download size={14} /> Печать
             </button>
           </div>
         </div>
       </div>
 
+      </div>
+
       {/* Brief body */}
-      <div style={{ maxWidth: 900, margin: "0 auto", padding: "var(--space-xl) var(--space-m)" }}>
+      <div id="brief-content" style={{ maxWidth: 900, margin: "0 auto", padding: "var(--space-xl) var(--space-m)" }}>
         {/* Project overview */}
         <div className="card" style={{ padding: "var(--space-l)", marginBottom: "var(--space-l)" }}>
           <h2 style={{ fontSize: "var(--text-l)", fontWeight: 700, marginBottom: "var(--space-m)" }}>📌 О проекте</h2>
