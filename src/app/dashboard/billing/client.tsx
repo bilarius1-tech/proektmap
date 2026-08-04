@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { Crown, Check, ArrowRight, Shield } from "lucide-react";
+import { trackGoal, Goals } from "@/lib/metrika";
 
 export default function BillingClient({ isPro, isAdmin }: { isPro: boolean; isAdmin: boolean }) {
   const [loading, setLoading] = useState(false);
 
   async function startPayment() {
+    trackGoal(Goals.PRO_CLICK);
     setLoading(true);
     try {
       const res = await fetch("/api/billing/create-payment", { method: "POST" });

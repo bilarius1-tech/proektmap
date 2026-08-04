@@ -7,6 +7,7 @@ import VibecraftGuide from "@/components/blueprint/vibecraft-guide";
 import TourOverlay from "@/components/blueprint/tour-overlay";
 import AIToolsComparison from "@/components/blueprint/ai-tools-comparison";
 import BlueprintFlow from "@/components/blueprint/flow-view";
+import { trackGoal, Goals } from "@/lib/metrika";
 import { useRouter } from "next/navigation";
 import SkillChips from "./skill-chips";
 import { useState, useEffect } from "react";
@@ -212,7 +213,7 @@ export default function BlueprintPageClient({
                 <div style={{ fontSize: "var(--text-xs)", fontWeight: 700, color: "var(--color-accent)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 }}>Blueprint</div>
                 <h1 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-xxl)", fontWeight: 800, margin: 0, letterSpacing: "-0.02em" }}>{blueprint.title}</h1>
               </div>
-              <button onClick={() => setShowOverview(false)} style={{
+              <button onClick={() => { setShowOverview(false); trackGoal(Goals.BLUEPRINT_START, { blueprint: blueprint.slug }); }} style={{
                 padding: "12px 28px", borderRadius: "var(--radius-m)",
                 background: "var(--color-accent)", color: "white", border: "none",
                 fontSize: "var(--text-s)", fontWeight: 700, cursor: "pointer",

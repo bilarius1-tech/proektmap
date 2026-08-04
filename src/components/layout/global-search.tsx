@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Search, X, ArrowRight, FileText, FolderOpen, BookOpen, Factory } from "lucide-react";
 
+import { trackGoal, Goals } from "@/lib/metrika";
 interface SearchResult {
   type: string;
   id: string; title: string; subtitle?: string; slug?: string; href?: string;
@@ -53,6 +54,7 @@ export default function GlobalSearch() {
   }, []);
 
   function go(result: SearchResult) {
+    trackGoal(Goals.SEARCH_USE);
     setOpen(false);
     setQuery("");
     if (result.href) {

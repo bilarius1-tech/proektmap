@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { trackGoal, Goals } from "@/lib/metrika";
 
 export default function AuthPage() {
   const router = useRouter();
@@ -15,7 +16,7 @@ export default function AuthPage() {
   async function handleEmail(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true); setError("");
-    
+
     if (tab === "register") {
       const res = await fetch("/api/auth/register", {
         method: "POST",
@@ -27,9 +28,18 @@ export default function AuthPage() {
     }
 
     const result = await signIn("credentials", { email, password, redirect: false });
-    if (result?.error) setError("Неверный email или пароль");
-    else router.push("/dashboard");
-    setLoading(false);
+    if (result?.error) {
+      setError("Неверный email или пароль");
+      setLoading(false);
+    } else {
+      trackGoal(Goals.REGISTRATION, { method: "email" });
+      router.push("/dashboard");
+    }
+  }
+
+  async function handleYandex() {
+    trackGoal(Goals.REGISTRATION, { method: "yandex" });
+    await signIn("yandex", { callbackUrl: "/dashboard" });
   }
 
   return (
@@ -41,7 +51,6 @@ export default function AuthPage() {
           </div>
           <p style={{ fontSize: "var(--text-s)", color: "var(--color-text-tertiary)" }}>Войдите чтобы продолжить</p>
         </div>
-
 
         {/* Tabs */}
         <div style={{ display: "flex", marginBottom: "var(--space-m)", borderBottom: "1px solid var(--color-border-light)" }}>
@@ -70,6 +79,25 @@ export default function AuthPage() {
             {loading ? "..." : (tab === "login" ? "Войти" : "Зарегистрироваться")}
           </button>
         </form>
+
+        {/* Yandex OAuth */}
+        <div style={{ marginTop: "var(--space-m)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "var(--space-s)", marginBottom: "var(--space-s)" }}>
+            <div style={{ flex: 1, height: 1, background: "var(--color-border-light)" }} />
+            <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>или</span>
+            <div style={{ flex: 1, height: 1, background: "var(--color-border-light)" }} />
+          </div>
+          <button
+            onClick={handleYandex}
+            className="btn btn-ghost"
+            style={{ width: "100%", justifyContent: "center", padding: "10px", fontSize: "var(--text-s)" }}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#FC3F1D" style={{ marginRight: 8 }}>
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-11H13v6h2.5V9zm-5 0H8v6h2.5V9z" />
+            </svg>
+            Войти через Яндекс
+          </button>
+        </div>
       </div>
     </div>
   );
