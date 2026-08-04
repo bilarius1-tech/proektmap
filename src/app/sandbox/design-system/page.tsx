@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, Palette, Layers, Grid3X3, FileText, Zap, Box, BookOpen, Code, Figma, Globe } from "lucide-react";
+import { ArrowLeft, Palette, Layers, Grid3X3, FileText, Zap, Box, BookOpen, Code, Figma, Globe, Sparkles } from "lucide-react";
 
 export const metadata = {
   title: "Дизайн-система — полный гайд для AI-инженера",
@@ -476,7 +476,118 @@ export const AllVariants = {
           ))}
         </Section>
 
-        {/* Section 10 — Examples */}
+
+        {/* Section 9 — Uniqueness */}
+        <Section id="section-8" icon={<Sparkles size={20} />} title="Уникальность: как не делать клонов">
+          <P>
+            <strong>Главная проблема AI-разработки 2026:</strong> все проекты выглядят одинаково. Один и тот же Tailwind, один и тот же shadcn/ui, одни и те же синие кнопки и белые карточки. Пользователь заходит на сайт и думает: «Я это уже видел». Это убивает доверие и конверсию.
+          </P>
+
+          <H3>Почему AI генерирует одинаковый дизайн</H3>
+          <div style={{ background: "var(--color-bg-primary)", border: "1px solid var(--color-border)", padding: "var(--space-m)", margin: "var(--space-m) 0", fontSize: "var(--text-xs)" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {[
+                { problem: "Все используют дефолтные темы", detail: "Tailwind без кастомизации = синий, серый, белый. Shadcn/ui без темы = те же neutral/slate тона." },
+                { problem: "Одинаковые промпты", detail: "\"Создай лендинг с hero, features, pricing\" — AI выдаёт один и тот же шаблон, потому что его так обучили." },
+                { problem: "Страх отойти от системы", detail: "Разработчики боятся менять дизайн-систему. «Работает — не трогай». В итоге 100 сайтов выглядят как клоны." },
+                { problem: "Нет слоя бренда", detail: "Дизайн-система отвечает на «как», но не на «почему именно так». Бренд-айдентика остаётся за бортом." },
+              ].map(item => (
+                <div key={item.problem} style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
+                  <span style={{ color: "var(--color-error)", flexShrink: 0, marginTop: 1 }}>❌</span>
+                  <div>
+                    <div style={{ fontWeight: 700 }}>{item.problem}</div>
+                    <div style={{ color: "var(--color-text-secondary)" }}>{item.detail}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <H3>Решение: слой уникальности над дизайн-системой</H3>
+          <P>
+            Дизайн-система даёт фундамент. Но поверх неё нужен <strong>слой бренда</strong> — то, что делает проект узнаваемым. Это не противоречит системе — это её расширение.
+          </P>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 2, margin: "var(--space-l) 0" }}>
+            {[
+              { layer: "🎨 Бренд-токены", desc: "Уникальная палитра, типографика, радиусы, тени. Не дефолт Tailwind.", color: "#ec4899" },
+              { layer: "🧩 Компоненты", desc: "Те же Button/Card, но со стилем бренда. Не копия shadcn/ui.", color: "#0fb880" },
+              { layer: "📐 Дизайн-система", desc: "Токены, сетка, правила. Может быть общей для многих проектов.", color: "#3b82f6" },
+            ].map(item => (
+              <div key={item.layer} style={{
+                padding: "var(--space-m)", borderLeft: `4px solid ${item.color}`,
+                background: "var(--color-bg-primary)", border: "1px solid var(--color-border-light)",
+              }}>
+                <div style={{ fontSize: "var(--text-s)", fontWeight: 700, marginBottom: 2 }}>{item.layer}</div>
+                <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)" }}>{item.desc}</div>
+              </div>
+            ))}
+          </div>
+
+          <H3>6 приёмов для уникальности</H3>
+          {[
+            { num: "1", title: "Авторская палитра", desc: "Не берите дефолтный синий #3b82f6. Создайте свою палитру из 3-5 цветов. Используйте инструменты: Coolors.co, Huemint, AI-генераторы палитр. Пример: проект про экологию — зелёно-коричневая гамма, финтех — глубокий синий + золото." },
+            { num: "2", title: "Типографика с характером", desc: "Шрифт — это 50% характера. Не Inter (слишком популярен). Попробуйте: Onest (кириллица, современный), Unbounded (смелый), Raleway (элегантный). Используйте Display-шрифт для заголовков." },
+            { num: "3", title: "Геометрия и скругления", desc: "Радиусы создают настроение: 0px — строго, брутально; 4px — современно; 12px — мягко, дружелюбно; 9999px — pill-стиль. Смешивайте: карточки мягкие, кнопки жёсткие." },
+            { num: "4", title: "Микро-взаимодействия", desc: "AI не генерирует анимации. Добавьте их руками — это то, что отличает живой продукт от шаблона. Framer Motion, CSS transitions, кастомные easing-кривые." },
+            { num: "5", title: "Иллюстрации и иконки", desc: "Не используйте стандартные иконки без изменений. Добавьте свой стиль: duotone, обводка разной толщины, цветовые акценты. Для иллюстраций — единый стиль." },
+            { num: "6", title: "Тёмная тема с лицом", desc: "Не инвертируйте цвета механически. Тёмная тема — это шанс создать альтернативное настроение. Вместо чёрного фона — глубокий оттенок бренда." },
+          ].map(item => (
+            <div key={item.num} style={{ marginBottom: "var(--space-l)", background: "var(--color-bg-primary)", border: "1px solid var(--color-border)", overflow: "hidden" }}>
+              <div style={{ display: "flex", gap: "var(--space-m)", padding: "var(--space-m)", borderBottom: "1px solid var(--color-border-light)" }}>
+                <div style={{ width: 28, height: 28, borderRadius: "50%", background: "var(--color-accent)", color: "white", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 700, fontSize: "var(--text-xs)", flexShrink: 0 }}>{item.num}</div>
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: 4 }}>{item.title}</div>
+                  <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.6 }}>{item.desc}</div>
+                </div>
+              </div>
+            </div>
+          ))}
+
+          <H3>Промпт для AI: «Сделай уникально»</H3>
+          <P>Дайте AI-агенту контекст бренда. Не просто «создай компонент», а «создай компонент в стиле бренда X»:</P>
+          <CodeBlock>{`Ты — frontend-разработчик. Создай карточку товара.
+
+ДИЗАЙН-СИСТЕМА ПРОЕКТА (обязательно используй):
+- Цвета: var(--brand-primary), var(--brand-accent)
+- Радиусы: var(--radius-card) = 16px (мягкие)
+- Шрифты: var(--font-body) = "Onest"
+- Кнопки: variant="brand" (не primary/secondary из дефолта)
+
+УНИКАЛЬНОСТЬ БРЕНДА:
+- Мы — эко-маркетплейс. Никакого синего (#3b82f6).
+- Акцент — золотой на тёмно-зелёном.
+- Все карточки с мягкими углами (16px) и тёплыми тенями.
+- Между карточками — 20px (не стандартные 16).
+- Hover: карточка приподнимается на 4px с золотой тенью.
+
+НЕ ИСПОЛЬЗУЙ:
+- Дефолтные цвета Tailwind (blue-500, gray-100)
+- Стандартные радиусы (8px, 12px — у нас 16px)
+- Inter (у нас Onest)
+- Стандартные серые тени (у нас тёплые)`}</CodeBlock>
+
+          <H3>Чек-лист: твой проект уникален?</H3>
+          <div style={{ display: "flex", flexDirection: "column", gap: 4, fontSize: "var(--text-xs)" }}>
+            {[
+              "Цвета не из дефолтной палитры Tailwind/shadcn (твой accent — не #3b82f6?)",
+              "Шрифт не Inter/Roboto (хотя бы заголовки — уникальный)",
+              "Радиусы не 8px везде (разные для разных элементов)",
+              "Тени с характером (не дефолтный box-shadow)",
+              "Есть фирменные микро-анимации (хотя бы на кнопках)",
+              "Иконки стилизованы (stroke-width, цвет, duotone)",
+              "Тёмная тема — не механический инверт (свои оттенки)",
+              "Промпты для AI включают бренд-контекст (цвета, шрифты, правила)",
+            ].map((item, i) => (
+              <div key={i} style={{ display: "flex", gap: 8 }}>
+                <input type="checkbox" style={{ marginTop: 2 }} />
+                <span>{item}</span>
+              </div>
+            ))}
+          </div>
+        </Section>
+
+        {/* Section 11 — Examples */}
         <Section id="section-9" icon={<Globe size={20} />} title="Примеры: Material, Ant, shadcn/ui">
           <H3>Готовые дизайн-системы, которые стоит изучить</H3>
 
