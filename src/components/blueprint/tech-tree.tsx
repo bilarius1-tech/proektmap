@@ -1,16 +1,16 @@
 'use client';
 
 import { useMemo, useCallback } from 'react';
-import ReactFlow, { Node, Edge, Background, Controls, MarkerType, Handle, Position } from 'reactflow';
+import ReactFlow, { Node, Edge, Background, Controls, MarkerType } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { Lock, Unlock, CheckCircle, Sparkles, ArrowRight, Zap } from 'lucide-react';
+import { Lock, CheckCircle, Sparkles, Zap } from 'lucide-react';
 
 interface TechNode {
   id: string; title: string; stageTitle: string;
   status: 'locked' | 'available' | 'completed';
   xpReward: number;
   userChoice?: string;
-  dependsOn: string[]; // IDs of prerequisite decisions
+  dependsOn: string[];
 }
 
 interface StageGroup {
@@ -18,47 +18,46 @@ interface StageGroup {
   decisions: TechNode[];
 }
 
-const STAGE_BG = [
-  'rgba(15,184,128,0.04)', 'rgba(59,130,246,0.04)', 'rgba(245,158,11,0.04)',
-  'rgba(239,68,68,0.04)', 'rgba(139,92,246,0.04)', 'rgba(6,182,212,0.04)',
-];
+const NODE_W = 180;
+const NODE_H = 120;
+const GAP_X = 40;
+const GAP_Y = 60;
+const STAGE_HEADER_H = 45;
+const STAGE_PAD = 30;
+const MAX_COLS = 5;
 
 export default function TechTreeView({
-  stages, onNodeClick, onUnlock,
+  stages,
+  onNodeClick,
 }: {
-  stages: StageGroup[];
+  stages?: StageGroup[];
   onNodeClick?: (id: string) => void;
-  onUnlock?: (id: string) => void;
 }) {
+  const safeStages: StageGroup[] = Array.isArray(stages) ? stages : [];
+
   const { nodes, edges } = useMemo(() => {
     const nodes: Node[] = [];
     const edges: Edge[] = [];
 
-    const NODE_W = 180;
-    const NODE_H = 120;
-    const GAP_X = 40;
-    const GAP_Y = 60;
-    const STAGE_HEADER_H = 45;
-    const STAGE_PAD = 30;
-    const MAX_COLS = 5;
+    if (safeStages.length === 0) return { nodes, edges };
 
     let y = 0;
 
-    stages.forEach((stage, si) => {
-      const decs = stage.decisions || [];
+    safeStages.forEach((stage, si) => {
+      const decs = Array.isArray(stage.decisions) ? stage.decisions : [];
+      if (decs.length === 0) return;
+
       const rows = Math.ceil(decs.length / MAX_COLS);
       const stageW = MAX_COLS * (NODE_W + GAP_X) + STAGE_PAD;
-      const stageH = STAGE_HEADER_H + rows * (NODE_H + GAP_Y) + STAGE_PAD;
 
-      // Stage header
       const completed = decs.filter(d => d.status === 'completed').length;
       nodes.push({
-        id: `stage-hdr-${stage.slug}`,
+        id: `stage-hdr-${stage.slug || si}`,
         type: 'default',
         data: {
           label: (
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 16px' }}>
-              <span style={{ fontWeight: 800, fontSize: 14, color: 'var(--color-accent)' }}>{stage.title}</span>
+              <span style={{ fontWeight: 800, fontSize: 14, color: 'var(--color-accent)' }}>{stage.title || ''}</span>
               <span style={{
                 fontSize: 11, padding: '2px 8px', borderRadius: 99,
                 background: completed === decs.length ? 'var(--color-accent)' : 'var(--color-bg-tertiary)',
@@ -72,17 +71,12 @@ export default function TechTreeView({
           ),
         },
         position: { x: STAGE_PAD / 2, y },
-        style: {
-          width: stageW, height: STAGE_HEADER_H,
-          background: 'transparent', border: 'none',
-        },
-        draggable: false,
-        selectable: false,
+        style: { width: stageW, height: STAGE_HEADER_H, background: 'transparent', border: 'none' },
+        draggable: false, selectable: false,
       });
 
       y += STAGE_HEADER_H + 10;
 
-      // Decision nodes
       decs.forEach((dec, di) => {
         const col = di % MAX_COLS;
         const row = Math.floor(di / MAX_COLS);
@@ -93,11 +87,9 @@ export default function TechTreeView({
         const isLocked = dec.status === 'locked';
 
         nodes.push({
-          id: dec.id,
+          id: dec.id || `dec-${si}-${di}`,
           type: 'default',
-          data: {
-            label: <TechNodeCard node={dec} />,
-          },
+          data: { label: <TechNodeCard node={dec} /> },
           position: { x, y: ny },
           style: {
             width: NODE_W, height: NODE_H,
@@ -106,36 +98,25 @@ export default function TechTreeView({
               : isLocked
                 ? 'linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%)'
                 : 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
-            border: isCompleted
-              ? '2px solid #22c55e'
-              : isLocked
-                ? '1px dashed #cbd5e1'
-                : '1px solid #e2e8f0',
-            borderRadius: 0,
-            padding: 0,
+            border: isCompleted ? '2px solid #22c55e' : isLocked ? '1px dashed #cbd5e1' : '1px solid #e2e8f0',
+            borderRadius: 0, padding: 0,
             cursor: isLocked ? 'not-allowed' : 'pointer',
             opacity: isLocked ? 0.6 : 1,
-            boxShadow: isCompleted
-              ? '0 0 20px rgba(34,197,94,0.15)'
-              : isLocked
-                ? 'none'
-                : '0 1px 3px rgba(0,0,0,0.06)',
-            transition: 'all 0.3s ease',
+            boxShadow: isCompleted ? '0 0 20px rgba(34,197,94,0.15)' : isLocked ? 'none' : '0 1px 3px rgba(0,0,0,0.06)',
           },
           draggable: false,
         });
 
-        // Sequential edges
         if (di < decs.length - 1 && !isLocked) {
           edges.push({
-            id: `seq-${dec.id}`,
-            source: dec.id,
-            target: decs[di + 1].id,
+            id: `seq-${dec.id || di}`,
+            source: dec.id || '',
+            target: decs[di + 1]?.id || '',
             type: 'smoothstep',
             style: {
               stroke: isCompleted ? '#22c55e' : '#e2e8f0',
               strokeWidth: isCompleted ? 2 : 1,
-              strokeDasharray: isCompleted ? 'none' : '5,5',
+              strokeDasharray: isCompleted ? undefined : '5,5',
             },
             animated: isCompleted,
             markerEnd: isCompleted
@@ -144,12 +125,13 @@ export default function TechTreeView({
           });
         }
 
-        // Dependency edges
-        dec.dependsOn.forEach(depId => {
+        const deps = Array.isArray(dec.dependsOn) ? dec.dependsOn : [];
+        deps.forEach(depId => {
+          if (!depId) return;
           edges.push({
             id: `dep-${depId}-${dec.id}`,
             source: depId,
-            target: dec.id,
+            target: dec.id || '',
             type: 'smoothstep',
             style: { stroke: '#3b82f6', strokeWidth: 1.5, opacity: 0.5 },
             animated: false,
@@ -162,19 +144,30 @@ export default function TechTreeView({
     });
 
     return { nodes, edges };
-  }, [stages]);
+  }, [safeStages]);
 
   const onNodeClickHandler = useCallback((_e: any, node: Node) => {
-    if (node.id.startsWith('stage-hdr')) return;
+    if (node.id?.startsWith('stage-hdr')) return;
     onNodeClick?.(node.id);
   }, [onNodeClick]);
 
-  const totalDecs = stages.reduce((s, st) => s + st.decisions.length, 0);
-  const completed = stages.reduce((s, st) => s + st.decisions.filter(d => d.status === 'completed').length, 0);
+  const totalDecs = safeStages.reduce((s, st) => s + (Array.isArray(st.decisions) ? st.decisions.length : 0), 0);
+  const completed = safeStages.reduce((s, st) => s + (Array.isArray(st.decisions) ? st.decisions.filter(d => d.status === 'completed').length : 0), 0);
+
+  if (safeStages.length === 0) {
+    return (
+      <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f172a' }}>
+        <div style={{ textAlign: 'center', color: '#94a3b8' }}>
+          <Zap size={40} style={{ marginBottom: 16, opacity: 0.3 }} />
+          <div style={{ fontSize: 18, fontWeight: 600 }}>Нет данных</div>
+          <div style={{ fontSize: 12, marginTop: 8 }}>Начните проходить Blueprint чтобы увидеть Tech Tree</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column' }}>
-      {/* Game UI Header */}
       <div style={{
         background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
         color: 'white', padding: '12px 24px',
@@ -195,7 +188,6 @@ export default function TechTreeView({
         </div>
       </div>
 
-      {/* Graph */}
       <div style={{ flex: 1, background: '#0f172a' }}>
         <ReactFlow
           nodes={nodes}
@@ -210,10 +202,7 @@ export default function TechTreeView({
           proOptions={{ hideAttribution: true }}
         >
           <Background color="#1e293b" gap={24} size={1} />
-          <Controls
-            style={{ borderRadius: 0, background: '#1e293b', border: '1px solid #334155' }}
-            className="[&>button]:!bg-[#1e293b] [&>button]:!border-[#334155] [&>button]:!text-white"
-          />
+          <Controls style={{ borderRadius: 0, background: '#1e293b', border: '1px solid #334155' }} />
         </ReactFlow>
       </div>
     </div>
@@ -226,7 +215,6 @@ function TechNodeCard({ node }: { node: TechNode }) {
 
   return (
     <div style={{ padding: 10, height: '100%', display: 'flex', flexDirection: 'column' }}>
-      {/* Header row */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
         <div style={{
           width: 22, height: 22, borderRadius: 0,
@@ -236,29 +224,23 @@ function TechNodeCard({ node }: { node: TechNode }) {
         }}>
           {isCompleted
             ? <CheckCircle size={14} style={{ color: 'white' }} />
-            : isLocked
-              ? <Lock size={12} style={{ color: '#94a3b8' }} />
-              : <Unlock size={12} style={{ color: 'white' }} />}
+            : <Lock size={12} style={{ color: isLocked ? '#94a3b8' : 'white' }} />}
         </div>
         <span style={{
           fontSize: 9, fontWeight: 700, padding: '1px 6px', borderRadius: 99,
           background: isCompleted ? '#dcfce7' : isLocked ? '#f1f5f9' : 'var(--color-accent-light)',
           color: isCompleted ? '#16a34a' : isLocked ? '#94a3b8' : 'var(--color-accent)',
         }}>
-          +{node.xpReward} XP
+          +{node.xpReward || 0} XP
         </span>
       </div>
-
-      {/* Title */}
       <div style={{
         fontSize: 11, fontWeight: 600, lineHeight: 1.3,
         color: isLocked ? '#94a3b8' : '#1e293b',
         flex: 1, overflow: 'hidden',
       }}>
-        {isLocked ? '???' : node.title}
+        {isLocked ? '???' : (node.title || '')}
       </div>
-
-      {/* Choice */}
       {node.userChoice && (
         <div style={{
           marginTop: 4, fontSize: 9, color: '#16a34a', fontWeight: 600,
