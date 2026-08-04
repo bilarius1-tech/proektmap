@@ -1317,3 +1317,43 @@ d8e572aa fix: page.tsx + билд
 - db6b8228 feat: CI/CD pipeline + daily DB backup
 
 ### Итого за день: 5 коммитов
+
+---
+
+## 04.08.2026 — День (продолжение): Blueprint Depth + Автоматизация + UX
+
+### Сделано
+
+**Blueprint Depth Plan (4 шага):**
+- [x] Шаг 1: Бриф на выходе — API /api/projects/[id]/brief + страница + PDF/MD экспорт
+- [x] Шаг 2: UI 12 полей — редактор Decision с 3 уровнями глубины + индикатор X/12
+- [x] Шаг 3: Чек-лист качества — 20 критериев в админке (авто + ручные)
+- [x] Шаг 4: Граф связей — ReactFlow DecisionGraph с цветными стрелками
+
+**Автоматизация блога:**
+- Починен 504 Gateway Timeout (proxy_read_timeout 300s)
+- Cron: ежедневный автопостинг в 9:00 МСК
+- Wrapper-скрипт с lock-файлом, валидацией, ротацией логов
+- SEO-промпт: H2-структура, мета-описания, 300-500 слов, ключевые слова
+- 147 AI-постов сгенерировано
+
+**UX Blueprint:**
+- Progress fix: capped at 100% (Math.min)
+- Sticky header: проект + прогресс + текущий этап всегда на виду
+- План геймификации (Tech Tree) — прототип создан, откачен для доработки
+
+**Инфраструктура:**
+- CI/CD: GitHub Actions (build + test на push)
+- Автобэкап БД: cron daily 3:00, Docker pg_dump, 7 дней хранения
+- Nginx: proxy_read_timeout 300s
+
+### Коммиты
+- 22d2f02c feat: Project Brief — full decision summary with PDF export
+- c2aa05e5 feat: 12-field Decision editor with completeness tracker
+- cbe3cb5b feat: 20-point Blueprint quality checklist in admin
+- 7a0593c9 feat: Decision Graph — visual dependency map
+- 42d2671c fix: PDF Cyrillic — replace jsPDF with window.print()
+- b46e6a44 fix: Blueprint UX — sticky header + capped progress
+- 9fe06bca revert: remove Tech Tree gamification
+
+### Итого за день: 15 коммитов (с 04.08 утра)
