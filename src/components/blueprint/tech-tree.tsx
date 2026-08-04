@@ -24,12 +24,20 @@ const STAGE_BG = [
 ];
 
 export default function TechTreeView({
+  stages = [],
+  stages = [],
   stages, onNodeClick, onUnlock,
 }: {
   stages: StageGroup[];
   onNodeClick?: (id: string) => void;
   onUnlock?: (id: string) => void;
 }) {
+  if (!stages || stages.length === 0) return null;
+
+  if (!stages || !Array.isArray(stages) || stages.length === 0) {
+    return <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#94a3b8", fontSize: 18, background: "#0f172a" }}>Loading tech tree...</div>;
+  }
+
   const { nodes, edges } = useMemo(() => {
     const nodes: Node[] = [];
     const edges: Edge[] = [];
