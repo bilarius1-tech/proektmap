@@ -1373,3 +1373,45 @@ d8e572aa fix: page.tsx + билд
 - 1aee4f41 feat: Design System guide — add Uniqueness section
 
 ### Итого: 2 коммита
+
+## 11.08.2026 — День: Skills Library — запуск экосистемы
+
+### Сделано
+
+#### Skills Library — инфраструктура
+- Страница /skills — витрина публичных Skills (334 строки)
+- Два типа Skills: Reasonix (для AI-агентов) и Prisma (для людей)
+- Блок «Мост между мирами» — связь Prisma ↔ Reasonix
+- Ссылка в футере «Skills» в колонке «Проект»
+
+#### Система доверия 🟢🟡🔴
+- Трёхуровневая система проверки Skills
+- 🟢 Проверен ProektMap (ручная проверка, нет доступа к secrets, протестирован)
+- 🟡 Community (новый Skill, код открыт, ждёт проверки)
+- 🔴 Не рекомендуется (подозрительный код, обфускация)
+- Процесс: автоматическая → ручная → community → периодическая
+- TrustBadge на каждой карточке Skill
+- Блок «Система доверия» на /skills с критериями
+
+#### Skills — контент
+- visual-content (252 строки, ✅ verified) — методология визуального контента
+- yookassa-checkout (361 строка, ✅ verified) — образцовый Skill: архитектура → API → webhook → Prisma → тесты → деплой
+- 4 planned Skills: blueprint-builder, decision-coach, seo-analyzer, knowledge-clipper
+
+#### Документация
+- docs/SKILLS-LIBRARY-PLAN.md (150 строк) — 3 фазы: Ядро → Публикация → Экосистема
+- PHILOSOPHY.md: Skills — пятый столп экосистемы
+- AGENTS.md: Visual Content + Trust System + yookassa-checkout
+
+#### Инфраструктура
+- .reasonix/skills/visual-content/SKILL.md — локально и на сервере
+- .reasonix/skills/yookassa-checkout/SKILL.md — локально и на сервере
+
+### Ключевые решения
+- ProektMap = навигатор по проверенным Skills, а не океан как skills.sh
+- Фокус: российский стек, русский язык, безопасность
+- Бесплатные Skills → трафик → ProektMap → Pro-подписка
+- 10 образцовых Skills вместо 1000 некачественных
+- Система доверия как конкурентное преимущество (91.8% Skills в skills.sh — с дефектами)
+
+### Коммиты

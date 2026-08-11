@@ -32,6 +32,7 @@ export default async function GlobalFooter() {
           <div className="font-semibold text-xs mb-s uppercase tracking-[0.06em] text-text-tertiary">Проект</div>
           <div className="flex flex-col gap-xs">
             <Link href="/" className="text-s text-text-secondary no-underline">Шаблоны</Link>
+            <Link href="/skills" className="text-s text-text-secondary no-underline">Skills</Link>
             <Link href="/dashboard" className="text-s text-text-secondary no-underline">Личный кабинет</Link>
             <Link href="/auth" className="text-s text-text-secondary no-underline">Войти</Link>
           </div>
