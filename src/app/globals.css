@@ -466,3 +466,13 @@
   transform: translateY(-1px);
   transition: all var(--transition-normal);
 }
+
+/* Blog — 2-column card grid (responsive) */
+.blog-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-l);
+}
+@media (max-width: 980px) {
+  .blog-grid { grid-template-columns: 1fr; }
+}

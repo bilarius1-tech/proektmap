@@ -120,6 +120,12 @@ export default function PostPageClient({ post, relatedPosts, readMore, isAdmin: 
       </Link>
       {isAdmin && <a href={`/admin/blog?edit=${post.id}`} style={{ fontSize: "var(--text-xs)", color: "var(--color-accent)", textDecoration: "none", marginLeft: "var(--space-m)" }} title="Редактировать в админке">✏️</a>}
 
+      {post.coverImage && (
+        <div style={{ width: "100%", aspectRatio: "1200 / 630", borderRadius: "var(--radius-m)", overflow: "hidden", marginBottom: "var(--space-l)", background: "var(--color-bg-secondary)" }}>
+          <img src={(post.coverImage.startsWith("/uploads/") ? post.coverImage.replace("/uploads/", "/api/media/") : post.coverImage)} alt={post.title} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+        </div>
+      )}
+
       {post.category && (
         <div style={{ marginBottom: "var(--space-s)" }}>
           <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 99, background: "var(--color-accent-light)", color: "var(--color-accent)", fontWeight: 600 }}>{post.category.name}</span>

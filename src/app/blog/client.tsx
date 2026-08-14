@@ -12,7 +12,7 @@ export default function BlogPageClient({ posts, categories, total, page, perPage
   const totalPages = Math.ceil(total / perPage);
 
   return (
-    <div className="blog-layout" style={{ display: "flex", minHeight: "calc(100dvh - 56px)", maxWidth: 1200, margin: "0 auto" }}>
+    <div className="blog-layout" style={{ display: "flex", minHeight: "calc(100dvh - 56px)", maxWidth: 1360, margin: "0 auto" }}>
       {/* LEFT SIDEBAR — categories */}
       <aside className="blog-sidebar" style={{
         width: 220, minWidth: 220, padding: "var(--space-xl) var(--space-m)",
@@ -62,7 +62,7 @@ export default function BlogPageClient({ posts, categories, total, page, perPage
       </aside>
 
       {/* CENTER — posts */}
-      <main style={{ flex: 1, padding: "var(--space-xl) var(--space-l)", maxWidth: 700 }}>
+      <main style={{ flex: 1, padding: "var(--space-xl) var(--space-l)", maxWidth: 940 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 8 }}>
         <h1 style={{ fontSize: "var(--text-xxxl)", fontWeight: 800, marginBottom: "var(--space-xs)" }}>📝 Блог</h1>
         <div className="mobile-cat-menu" style={{ position: "relative", display: "none" }}>
@@ -99,39 +99,32 @@ export default function BlogPageClient({ posts, categories, total, page, perPage
           AI-инжиниринг, разработка, дизайн, SEO. Статьи от команды Карты роста.
         </p>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-l)" }}>
-          {posts.map((p: any) => (
+        <div className="blog-grid">
+          {posts.map((p: any) => {
+            const thumb = p.coverImage
+              ? (p.coverImage.includes("/api/og") ? p.coverImage + "&mode=thumb" : p.coverImage)
+              : `/api/og?mode=thumb&category=${encodeURIComponent(p.category?.name || "ProektMap")}&seed=${encodeURIComponent(p.slug)}`;
+            return (
             <Link key={p.id} href={`/blog/${p.slug}`} className="blog-card" style={{
-              display: "flex", gap: "var(--space-l)", padding: "var(--space-l)", background: "white",
-              borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", textDecoration: "none", color: "inherit",
+              display: "flex", flexDirection: "column", background: "white",
+              borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", textDecoration: "none", color: "inherit", overflow: "hidden",
             }}>
-              {/* Cover image placeholder */}
-              <div className="blog-card-image" style={{
-                width: 160, height: 120, borderRadius: "var(--radius-s)", flexShrink: 0,
-                background: p.coverImage ? `url(${p.coverImage}) center/cover` : "linear-gradient(135deg, var(--color-accent-light), var(--color-accent))",
-                display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: 28, fontWeight: 800,
-              }}>
-                {!p.coverImage && (p.category?.name || "📝").slice(0, 2)}
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
-                  <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 99, background: "var(--color-accent-light)", color: "var(--color-accent)", fontWeight: 600 }}>{p.category?.name || "Без категории"}</span>
-                </div>
-                <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-l)", fontWeight: 700, marginBottom: 4, lineHeight: 1.2, letterSpacing: "-0.01em" }}>{p.title}</h2>
-                <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.6, marginBottom: "var(--space-s)" }}>{p.excerpt}</p>
-                <div style={{ display: "flex", alignItems: "center", gap: "var(--space-m)", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>
-                  <span style={{ display: "flex", alignItems: "center", gap: 4 }}><User size={12} />{<Link href={`/blog/author/${p.author?.email}`} style={{color:"inherit",textDecoration:"none"}}>{p.author?.name || "Аноним"}</Link>}</span>
-                  <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Calendar size={12} />{new Date(p.publishedAt).toLocaleDateString("ru")}</span><span style={{ display: "flex", alignItems: "center", gap: 4, color: "var(--color-text-tertiary)", fontSize: 11 }}><Eye size={12} /> {p.viewCount || 0}</span>
-                  {(p.impactScore > 0) && <span style={{ display: "flex", alignItems: "center", gap: 2, color: "var(--color-accent)", fontSize: 11, fontWeight: 600 }}>🔥 {p.impactScore}</span>}
-                  <span style={{ display: "flex", alignItems: "center", gap: 4 }}><MessageCircle size={12} />{(p._count?.comments || 0)}</span>
-                  {(p.bookmarkCount > 0 || p.projectUseCount > 0) && <span style={{ display: "flex", alignItems: "center", gap: 4, color: "var(--color-text-tertiary)", fontSize: 11 }}>🔖{p.bookmarkCount || 0} 🚀{p.projectUseCount || 0}</span>}
+              <div style={{ width: "100%", aspectRatio: "16 / 9", flexShrink: 0, background: `url("${thumb}") center/cover` }} />
+              <div style={{ padding: "var(--space-m)", display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
+                <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 99, background: "var(--color-accent-light)", color: "var(--color-accent)", fontWeight: 600, alignSelf: "flex-start" }}>{p.category?.name || "Без категории"}</span>
+                <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-l)", fontWeight: 700, margin: 0, lineHeight: 1.25, letterSpacing: "-0.01em" }}>{p.title}</h2>
+                <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.6, margin: 0 }}>{p.excerpt}</p>
+                <div style={{ display: "flex", alignItems: "center", gap: "var(--space-m)", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", marginTop: "auto", paddingTop: "var(--space-s)" }}>
+                  <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Calendar size={12} />{new Date(p.publishedAt).toLocaleDateString("ru")}</span>
+                  <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Eye size={12} /> {p.viewCount || 0}</span>
+                  <span style={{ display: "flex", alignItems: "center", gap: 4 }}><MessageCircle size={12} />{p._count?.comments || 0}</span>
                 </div>
               </div>
             </Link>
-          ))}
+            );
+          })}
         </div>
-
-        {posts.length === 0 && <div style={{ textAlign: "center", padding: "var(--space-xl)", color: "var(--color-text-tertiary)" }}>Пока нет статей</div>}
+{posts.length === 0 && <div style={{ textAlign: "center", padding: "var(--space-xl)", color: "var(--color-text-tertiary)" }}>Пока нет статей</div>}
 
         {totalPages > 1 && (
           <div style={{ display: "flex", justifyContent: "center", gap: 8, marginTop: "var(--space-xl)" }}>

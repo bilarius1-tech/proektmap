@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import sharp from "sharp";
-import { buildSvg } from "@/lib/og/svg";
+import { buildSvg, buildThumbSvg } from "@/lib/og/svg";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -16,8 +16,12 @@ export async function GET(req: NextRequest) {
     .slice(0, 3);
   const author = searchParams.get("author") || "";
   const seed = searchParams.get("seed") || "";
+  const mode = searchParams.get("mode") || "full";
 
-  const svg = buildSvg({ title, category, tags, author, seed });
+  const svg =
+    mode === "thumb"
+      ? buildThumbSvg(category, seed || title)
+      : buildSvg({ title, category, tags, author, seed });
 
   try {
     const png = await sharp(Buffer.from(svg)).png().toBuffer();
