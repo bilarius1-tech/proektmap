@@ -55,6 +55,12 @@ function parseRss(xml: string): RssItem[] {
   return items;
 }
 
+async function postToChannels(bot: Bot, text: string): Promise<void> {
+  for (const ch of CONFIG.channels) {
+    await bot.api.sendMessage(ch, text, { link_preview_options: { is_disabled: false } });
+  }
+}
+
 async function poll(bot: Bot): Promise<void> {
   try {
     const res = await fetch(CONFIG.rssUrl, {
@@ -79,21 +85,32 @@ async function poll(bot: Bot): Promise<void> {
     }
 
     const fresh = items.filter((i) => !posted.has(i.guid));
-    for (const it of fresh) {
+    if (fresh.length === 0) return;
+
+    if (fresh.length === 1) {
+      // Один новый пост — публикуем как обычно (заголовок + excerpt + ссылка)
+      const it = fresh[0];
       const text = it.excerpt
         ? `📰 ${it.title}\n\n${it.excerpt}\n\nЧитать → ${it.link}`
         : `📰 ${it.title}\n\nЧитать → ${it.link}`;
-      for (const ch of CONFIG.channels) {
-        await bot.api.sendMessage(ch, text, {
-          link_preview_options: { is_disabled: false },
-        });
-      }
-      posted.add(it.guid);
+      await postToChannels(bot, text);
       console.log(`Опубликован пост: ${it.title}`);
-      await new Promise((r) => setTimeout(r, 1500));
+    } else {
+      // Несколько новых постов — одна сводка-дайджест вместо «скопа»
+      const shown = fresh.slice(0, 10);
+      const lines = shown.map((it, i) => `${i + 1}. ${it.title}\n   ${it.link}`);
+      const more = fresh.length - shown.length;
+      const text =
+        `📰 Новые статьи на ProektMap (${fresh.length}):\n\n` +
+        lines.join("\n\n") +
+        (more > 0 ? `\n\n…и ещё ${more}` : "") +
+        `\n\n→ https://proektmap.ru/blog`;
+      await postToChannels(bot, text);
+      console.log(`Опубликован дайджест: ${fresh.length} статей`);
     }
 
-    if (fresh.length > 0) saveState([...posted]);
+    for (const it of fresh) posted.add(it.guid);
+    saveState([...posted]);
   } catch (e) {
     console.error("RSS poll error:", (e as Error).message);
   }
