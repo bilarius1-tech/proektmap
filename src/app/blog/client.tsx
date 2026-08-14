@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, Calendar, User, Tag, ChevronLeft, ChevronRight, MessageCircle, FolderOpen, Rocket, Bookmark } from "lucide-react";
+import { cardCoverUrl } from "@/lib/og/card-url";
 
 export default function BlogPageClient({ posts, categories, total, page, perPage, currentCat }: any) {
   const [mobileCatOpen, setMobileCatOpen] = useState(false);
@@ -101,9 +102,12 @@ export default function BlogPageClient({ posts, categories, total, page, perPage
 
         <div className="blog-grid">
           {posts.map((p: any) => {
-            const thumb = p.coverImage
-              ? (p.coverImage.includes("/api/og") ? p.coverImage + "&mode=thumb" : p.coverImage)
-              : `/api/og?mode=thumb&category=${encodeURIComponent(p.category?.name || "ProektMap")}&seed=${encodeURIComponent(p.slug)}`;
+            const thumb = cardCoverUrl({
+              title: p.title,
+              summary: p.excerpt,
+              category: p.category?.name || "ProektMap",
+              seed: p.slug,
+            });
             return (
             <Link key={p.id} href={`/blog/${p.slug}`} className="blog-card" style={{
               display: "flex", flexDirection: "column", background: "white",

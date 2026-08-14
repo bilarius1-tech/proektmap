@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import sharp from "sharp";
-import { buildSvg, buildThumbSvg } from "@/lib/og/svg";
+import { buildCardSvg, buildSvg, buildThumbSvg } from "@/lib/og/svg";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -8,6 +8,7 @@ export const dynamic = "force-dynamic";
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const title = searchParams.get("title") || "Карта роста";
+  const summary = searchParams.get("summary") || "";
   const category = searchParams.get("category") || "";
   const tags = (searchParams.get("tags") || "")
     .split(",")
@@ -21,7 +22,9 @@ export async function GET(req: NextRequest) {
   const svg =
     mode === "thumb"
       ? buildThumbSvg(category, seed || title)
-      : buildSvg({ title, category, tags, author, seed });
+      : mode === "card"
+        ? buildCardSvg({ title, summary, category, tags, author, seed })
+        : buildSvg({ title, category, tags, author, seed });
 
   try {
     const png = await sharp(Buffer.from(svg)).png().toBuffer();

@@ -11,6 +11,7 @@ interface RssItem {
   title: string;
   link: string;
   excerpt: string;
+  image: string;
 }
 
 function loadState(): string[] {
@@ -50,7 +51,8 @@ function parseRss(xml: string): RssItem[] {
     const title = decodeEntities(block.match(/<title>([\s\S]*?)<\/title>/)?.[1] || "").trim();
     const link = block.match(/<link>([\s\S]*?)<\/link>/)?.[1]?.trim() || "";
     const excerpt = stripHtml(block.match(/<description>([\s\S]*?)<\/description>/)?.[1] || "").slice(0, 220);
-    if (guid && title) items.push({ guid, title, link, excerpt });
+    const image = decodeEntities(block.match(/<enclosure[^>]+url="([^"]+)"/)?.[1] || "").trim();
+    if (guid && title) items.push({ guid, title, link, excerpt, image });
   }
   return items;
 }
@@ -58,6 +60,21 @@ function parseRss(xml: string): RssItem[] {
 async function postToChannels(bot: Bot, text: string): Promise<void> {
   for (const ch of CONFIG.channels) {
     await bot.api.sendMessage(ch, text, { link_preview_options: { is_disabled: false } });
+  }
+}
+
+async function postWithCover(bot: Bot, item: RssItem, caption: string): Promise<void> {
+  for (const channel of CONFIG.channels) {
+    if (!item.image) {
+      await bot.api.sendMessage(channel, caption, { link_preview_options: { is_disabled: false } });
+      continue;
+    }
+    try {
+      await bot.api.sendPhoto(channel, item.image, { caption });
+    } catch (error) {
+      console.error(`Telegram cover failed for ${channel}:`, (error as Error).message);
+      await bot.api.sendMessage(channel, caption, { link_preview_options: { is_disabled: false } });
+    }
   }
 }
 
@@ -93,7 +110,7 @@ async function poll(bot: Bot): Promise<void> {
       const text = it.excerpt
         ? `📰 ${it.title}\n\n${it.excerpt}\n\nЧитать → ${it.link}`
         : `📰 ${it.title}\n\nЧитать → ${it.link}`;
-      await postToChannels(bot, text);
+      await postWithCover(bot, it, text);
       console.log(`Опубликован пост: ${it.title}`);
     } else {
       // Несколько новых постов — одна сводка-дайджест вместо «скопа»

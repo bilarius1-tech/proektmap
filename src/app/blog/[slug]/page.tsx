@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { highlightCodeBlocks } from "@/lib/blog/highlight";
 import PostPageClient from "./client";
 import { notFound } from "next/navigation";
+import { cardCoverUrl } from "@/lib/og/card-url";
 
 export const dynamic = "force-dynamic";
 
@@ -12,9 +13,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const post = await db.blogPost.findUnique({ where: { slug }, include: { category: true, author: true } });
   if (!post || post.status !== "published") return {};
 
-  const ogImage = post.coverImage?.startsWith("/")
-    ? `https://proektmap.ru${post.coverImage}`
-    : post.coverImage || `https://proektmap.ru/api/og?title=${encodeURIComponent(post.title)}&category=${encodeURIComponent(post.category?.name || "")}&author=${encodeURIComponent(post.author?.name || "")}`;
+  // Лента блога и Telegram используют одну редакционную обложку.
+  // Исходный coverImage остаётся hero-изображением внутри статьи.
+  const ogImage = cardCoverUrl({
+    title: post.title,
+    summary: post.excerpt,
+    category: post.category?.name || "ProektMap",
+    seed: post.slug,
+    baseUrl: "https://proektmap.ru",
+  });
 
   const tags = (post.tags || "").split(",").map((t: string) => t.trim()).filter(Boolean);
 

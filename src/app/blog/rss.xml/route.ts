@@ -1,4 +1,5 @@
 import { getDb } from "@/lib/db/index";
+import { cardCoverUrl } from "@/lib/og/card-url";
 
 export const dynamic = "force-dynamic";
 
@@ -18,12 +19,20 @@ export async function GET() {
   const items = posts.map(p => {
     const pubDate = p.publishedAt ? new Date(p.publishedAt).toUTCString() : now;
     const safeContent = (p.content || "").replace(/<script/gi, "<scr\"+\"ipt").replace(/<\/script>/gi, "</scr\"+\"ipt>");
+    const cardImage = cardCoverUrl({
+      title: p.title,
+      summary: p.excerpt,
+      category: p.category?.name || "ProektMap",
+      seed: p.slug,
+      baseUrl,
+    });
     return `<item>
       <title>${esc(p.title)}</title>
       <link>${baseUrl}/blog/${p.slug}</link>
       <guid isPermaLink="true">${baseUrl}/blog/${p.slug}</guid>
       <pubDate>${pubDate}</pubDate>
       <description>${esc(p.excerpt || "")}</description>
+      <enclosure url="${esc(cardImage)}" type="image/png" length="0"/>
       <content:encoded><![CDATA[${safeContent}]]></content:encoded>
       <dc:creator>${esc(p.author?.name || "ProektMap")}</dc:creator>
       <category>${esc(p.category?.name || "Без категории")}</category>
