@@ -1,6 +1,7 @@
 import { Bot } from "grammy";
 import { CONFIG } from "./src/config";
 import { startRssPolling } from "./src/rss";
+import { startSectionsPolling } from "./src/sections";
 import { startDigestSchedule, runDigest } from "./src/digest";
 import { registerAsk } from "./src/ask";
 import { registerNav } from "./src/nav";
@@ -20,7 +21,7 @@ const bot = new Bot(CONFIG.botToken);
 bot.command("start", (ctx) =>
   ctx.reply(
     `👋 Привет! Я бот ProektMap — «Карты роста».\n\n` +
-      `Я публикую новости блога и еженедельные итоги, а ещё умею:\n` +
+      `Я публикую новости блога, анонсы новых разделов и еженедельные итоги, а ещё умею:\n` +
       `• /ask — AI-консультант\n` +
       `• /decide — принять решение\n` +
       `• /quiz — вопрос дня\n` +
@@ -63,6 +64,7 @@ registerDecide(bot);
 registerQuiz(bot);
 
 startRssPolling(bot);
+startSectionsPolling(bot);
 startDigestSchedule(bot);
 
 bot.catch((err) => console.error("Bot error:", (err.error as Error)?.message || String(err)));

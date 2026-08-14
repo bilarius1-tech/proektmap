@@ -4,7 +4,7 @@ import { join } from "path";
 import { CONFIG } from "./config";
 
 const STATE_FILE = join(CONFIG.stateDir, "posted-guids.json");
-const POLL_INTERVAL_MS = 15 * 60 * 1000; // 15 минут
+const POLL_INTERVAL_MS = 3 * 60 * 1000; // 3 минуты
 
 interface RssItem {
   guid: string;
@@ -72,7 +72,6 @@ async function poll(bot: Bot): Promise<void> {
     const posted = new Set(loadState());
 
     // Baseline ТОЛЬКО при самом первом запуске (state-файла ещё нет).
-    // При рестарте файл уже есть — постим новые, ничего не проглатываем.
     if (!existsSync(STATE_FILE)) {
       saveState(items.map((i) => i.guid));
       console.log(`RSS baseline: зафиксировано ${items.length} постов`);
@@ -91,7 +90,6 @@ async function poll(bot: Bot): Promise<void> {
       }
       posted.add(it.guid);
       console.log(`Опубликован пост: ${it.title}`);
-      // Пауза, чтобы не упереться в лимиты Telegram
       await new Promise((r) => setTimeout(r, 1500));
     }
 
