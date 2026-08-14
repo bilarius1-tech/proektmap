@@ -1,5 +1,5 @@
 import { getDb } from "@/lib/db/index";
-import { cardCoverUrl } from "@/lib/og/card-url";
+import { blogCoverUrl } from "@/lib/og/card-url";
 
 export const dynamic = "force-dynamic";
 
@@ -19,12 +19,13 @@ export async function GET() {
   const items = posts.map(p => {
     const pubDate = p.publishedAt ? new Date(p.publishedAt).toUTCString() : now;
     const safeContent = (p.content || "").replace(/<script/gi, "<scr\"+\"ipt").replace(/<\/script>/gi, "</scr\"+\"ipt>");
-    const cardImage = cardCoverUrl({
+    const cardImage = blogCoverUrl({
       title: p.title,
       summary: p.excerpt,
       category: p.category?.name || "ProektMap",
       seed: p.slug,
       baseUrl,
+      coverImage: p.coverImage,
     });
     return `<item>
       <title>${esc(p.title)}</title>

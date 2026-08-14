@@ -1,9 +1,10 @@
 import { getDb } from "@/lib/db/index";
 import { auth } from "@/lib/auth";
 import { highlightCodeBlocks } from "@/lib/blog/highlight";
+import { linkGlossaryTerms } from "@/lib/blog/link-glossary";
 import PostPageClient from "./client";
 import { notFound } from "next/navigation";
-import { cardCoverUrl } from "@/lib/og/card-url";
+import { blogCoverUrl } from "@/lib/og/card-url";
 
 export const dynamic = "force-dynamic";
 
@@ -13,14 +14,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const post = await db.blogPost.findUnique({ where: { slug }, include: { category: true, author: true } });
   if (!post || post.status !== "published") return {};
 
-  // Лента блога и Telegram используют одну редакционную обложку.
-  // Исходный coverImage остаётся hero-изображением внутри статьи.
-  const ogImage = cardCoverUrl({
+  // Ручная обложка администратора имеет приоритет в статье, ленте, OG и Telegram.
+  const ogImage = blogCoverUrl({
     title: post.title,
     summary: post.excerpt,
     category: post.category?.name || "ProektMap",
     seed: post.slug,
     baseUrl: "https://proektmap.ru",
+    coverImage: post.coverImage,
   });
 
   const tags = (post.tags || "").split(",").map((t: string) => t.trim()).filter(Boolean);
@@ -69,11 +70,18 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
 
   // Related posts
   const postTags = (post.tags || "").split(",").map((t: string) => t.trim()).filter(Boolean);
-  const candidates = await db.blogPost.findMany({
-    where: { status: "published", id: { not: post.id } },
-    select: { id: true, title: true, slug: true, tags: true, excerpt: true, coverImage: true, category: { select: { name: true } } },
-    orderBy: { publishedAt: "desc" }, take: 20,
-  });
+  const [candidates, glossaryTerms] = await Promise.all([
+    db.blogPost.findMany({
+      where: { status: "published", id: { not: post.id } },
+      select: { id: true, title: true, slug: true, tags: true, excerpt: true, coverImage: true, category: { select: { name: true } } },
+      orderBy: { publishedAt: "desc" }, take: 20,
+    }),
+    db.glossaryTerm.findMany({
+      where: { isPublished: true },
+      select: { term: true, slug: true, simpleExplanation: true, definition: true },
+      orderBy: { term: "asc" },
+    }),
+  ]);
   const scored: any[] = candidates
     .map((p: any) => ({ ...p, score: (p.tags || "").split(",").filter((t: string) => postTags.includes(t.trim())).length }))
     .filter((p: any) => p.score > 0)
@@ -81,7 +89,15 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
     .slice(0, 3);
   const relatedPosts = scored.length >= 2 ? scored : candidates.slice(0, 3);
 
-  const highlightedContent = await highlightCodeBlocks(post.content);
+  const contentWithGlossary = linkGlossaryTerms(
+    post.content,
+    glossaryTerms.map((term) => ({
+      term: term.term,
+      slug: term.slug,
+      explanation: term.simpleExplanation || term.definition,
+    })),
+  );
+  const highlightedContent = await highlightCodeBlocks(contentWithGlossary);
   const plainText = highlightedContent.replace(/<[^>]*>/g, '');
   const readingTime = Math.max(1, Math.round(plainText.length / 1200));
 

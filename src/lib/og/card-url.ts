@@ -4,6 +4,7 @@ export interface CardCoverParams {
   category?: string;
   seed?: string;
   baseUrl?: string;
+  coverImage?: string;
 }
 
 export function cardCoverUrl({
@@ -18,4 +19,16 @@ export function cardCoverUrl({
   if (category) params.set("category", category);
   if (seed) params.set("seed", seed);
   return `${baseUrl}/api/og?${params.toString()}`;
+}
+
+export function blogCoverUrl(params: CardCoverParams): string {
+  const coverImage = params.coverImage?.trim();
+  if (!coverImage) return cardCoverUrl(params);
+
+  const normalized = coverImage.startsWith("/uploads/")
+    ? coverImage.replace("/uploads/", "/api/media/")
+    : coverImage;
+
+  if (/^https?:\/\//i.test(normalized)) return normalized;
+  return `${params.baseUrl || ""}${normalized.startsWith("/") ? normalized : `/${normalized}`}`;
 }

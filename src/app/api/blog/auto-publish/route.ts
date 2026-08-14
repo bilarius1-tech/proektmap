@@ -2,6 +2,16 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db/index";
 import { auth } from "@/lib/auth";
 import { resolveCover } from "@/lib/og/providers";
+import {
+  appendFaq,
+  buildSeoPrompt,
+  InternalLinkCandidate,
+  parseSeoArticle,
+  parseSeoKeywords,
+  sanitizeArticleHtml,
+  scoreSeoArticle,
+  SeoArticle,
+} from "@/lib/blog/seo-pipeline";
 
 function translit(text: string): string {
   const map: any = { а:"a",б:"b",в:"v",г:"g",д:"d",е:"e",ё:"yo",ж:"zh",з:"z",и:"i",й:"y",к:"k",л:"l",м:"m",н:"n",о:"o",п:"p",р:"r",с:"s",т:"t",у:"u",ф:"f",х:"h",ц:"ts",ч:"ch",ш:"sh",щ:"sch",ъ:"",ы:"y",ь:"",э:"e",ю:"yu",я:"ya" };
@@ -28,6 +38,91 @@ function cleanSlug(title: string): string {
   return translit(clean).replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 70);
 }
 
+function sourceMarker(url: string): string {
+  return `<!-- source:${encodeURIComponent(url)} -->`;
+}
+
+function seoCommentValue(value: string): string {
+  return encodeURIComponent(value).slice(0, 300);
+}
+
+function rankInternalLinks(candidates: InternalLinkCandidate[], query: string): InternalLinkCandidate[] {
+  const tokens = query.toLocaleLowerCase("ru").replace(/ё/g, "е").match(/[a-zа-я0-9]{3,}/g) || [];
+  return candidates
+    .map((candidate) => {
+      const haystack = `${candidate.title} ${candidate.description}`.toLocaleLowerCase("ru").replace(/ё/g, "е");
+      const score = tokens.reduce((sum, token) => sum + (haystack.includes(token) ? 1 : 0), 0);
+      return { candidate, score };
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 35)
+    .map(({ candidate }) => candidate);
+}
+
+async function getInternalLinkCatalog(db: any): Promise<InternalLinkCandidate[]> {
+  const [tools, glossary, blueprints, solutions, skills, patterns, posts] = await Promise.all([
+    db.aITool.findMany({ where: { isActive: true }, select: { name: true, slug: true, shortDescription: true }, take: 60 }),
+    db.glossaryTerm.findMany({ where: { isPublished: true }, select: { term: true, slug: true, simpleExplanation: true }, take: 60 }),
+    db.blueprint.findMany({ where: { isPublished: true }, select: { title: true, slug: true, description: true }, take: 40 }),
+    db.solution.findMany({ where: { isPublished: true }, select: { title: true, slug: true, summary: true }, take: 40 }),
+    db.skill.findMany({ where: { isPublished: true }, select: { title: true, slug: true, description: true }, take: 40 }),
+    db.buildPattern.findMany({ where: { isPublished: true }, select: { title: true, slug: true, description: true }, take: 40 }),
+    db.blogPost.findMany({ where: { status: "published" }, select: { title: true, slug: true, excerpt: true }, orderBy: { publishedAt: "desc" }, take: 40 }),
+  ]);
+
+  const candidates: InternalLinkCandidate[] = [
+    { title: "Каталог AI-инструментов", url: "/ai-tools", description: "Выбор AI-инструментов под задачу" },
+    { title: "Blueprint'ы", url: "/blueprints", description: "Пошаговые маршруты создания проектов" },
+    { title: "Библиотека промптов", url: "/prompts", description: "Готовые промпты и шаблоны запросов" },
+    ...tools.map((item: any) => ({ title: item.name, url: `/ai-tools/${item.slug}`, description: item.shortDescription })),
+    ...glossary.map((item: any) => ({ title: item.term, url: `/glossary/${item.slug}`, description: item.simpleExplanation })),
+    ...blueprints.map((item: any) => ({ title: item.title, url: `/blueprints/${item.slug}`, description: item.description || "" })),
+    ...solutions.map((item: any) => ({ title: item.title, url: `/solutions/${item.slug}`, description: item.summary })),
+    ...skills.map((item: any) => ({ title: item.title, url: `/skills/${item.slug}`, description: item.description })),
+    ...patterns.map((item: any) => ({ title: item.title, url: `/patterns/${item.slug}`, description: item.description })),
+    ...posts.map((item: any) => ({ title: item.title, url: `/blog/${item.slug}`, description: item.excerpt })),
+  ].filter((item) => item.title && item.url && !item.url.endsWith("/"));
+
+  return candidates;
+}
+
+async function generateSeoArticle(input: {
+  key: string;
+  model: string;
+  sourceTitle: string;
+  sourceDescription: string;
+  sourceUrl: string;
+  category: string;
+  siteKeywords: string[];
+  internalLinks: InternalLinkCandidate[];
+  revision?: { article: SeoArticle; check: ReturnType<typeof scoreSeoArticle> };
+}): Promise<SeoArticle> {
+  const aiRes = await fetch("https://api.deepseek.com/v1/chat/completions", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${input.key}` },
+    body: JSON.stringify({
+      model: input.model,
+      messages: [
+        {
+          role: "system",
+          content: "Ты создаёшь самостоятельные SEO-материалы из новостных источников. Отвечай только валидным JSON без Markdown.",
+        },
+        { role: "user", content: buildSeoPrompt(input) },
+      ],
+      max_tokens: 4000,
+      temperature: input.revision ? 0.25 : 0.4,
+    }),
+    signal: AbortSignal.timeout(60000),
+  });
+
+  if (!aiRes.ok) {
+    throw new Error(`DeepSeek API ${aiRes.status}: ${(await aiRes.text().catch(() => "")).slice(0, 100)}`);
+  }
+
+  const aiData = await aiRes.json();
+  return parseSeoArticle(aiData.choices?.[0]?.message?.content || "");
+}
+
 export async function POST(req: Request) {
   // Cron secret — bypasses auth for automated runs
   const cronSecret = req.headers.get('x-cron-secret') || new URL(req.url).searchParams.get('secret') || '';
@@ -46,10 +141,19 @@ export async function POST(req: Request) {
   const admin = await db.user.findFirst({ where: { role: "admin" } });
   if (!admin) return NextResponse.json({ error: "Админ не найден" }, { status: 500 });
 
-  let key = process.env.DEEPSEEK_API_KEY;
+  let key = process.env.DEEPSEEK_API_KEY || "";
+  let model = "deepseek-chat";
   let itemsPerFeed = 2;
-  try { const s = await db.siteSettings.findUnique({ where: { id: "main" } }); if (s?.deepseekApiKey) key = s.deepseekApiKey; if (s?.autoPublishItemsPerFeed) itemsPerFeed = s.autoPublishItemsPerFeed; } catch {}
+  let siteKeywords: string[] = [];
+  try {
+    const settings = await db.siteSettings.findUnique({ where: { id: "main" } });
+    if (settings?.deepseekApiKey) key = settings.deepseekApiKey;
+    if (settings?.deepseekModel) model = settings.deepseekModel;
+    if (settings?.autoPublishItemsPerFeed) itemsPerFeed = settings.autoPublishItemsPerFeed;
+    siteKeywords = parseSeoKeywords(settings?.seoKeywords || "");
+  } catch {}
   if (!key) return NextResponse.json({ error: "Нет DEEPSEEK_API_KEY" }, { status: 500 });
+  const internalLinkCatalog = await getInternalLinkCatalog(db);
 
   const results: any[] = [];
   let totalCreated = 0;
@@ -94,7 +198,7 @@ export async function POST(req: Request) {
       }
 
       // Filter out items with titles that are too short or just URLs
-      items = items.filter(i => i.title && i.title.length >= 10 && !/^https?:\/\//.test(i.title));
+      items = items.filter(i => i.title && i.title.length >= 10 && i.link && !/^https?:\/\//.test(i.title));
 
       if (items.length === 0) {
         results.push({ feed: feed.name, status: "empty" });
@@ -109,10 +213,18 @@ export async function POST(req: Request) {
           const slugExists = await db.blogPost.findUnique({ where: { slug: candidateSlug } });
           if (slugExists) continue;
 
-          const linkExists = await db.blogPost.findFirst({
-            where: { metaDesc: { contains: item.link ? item.link.slice(0, 80) : "" } }
-          });
-          if (linkExists) continue;
+          if (item.link) {
+            const linkExists = await db.blogPost.findFirst({
+              where: {
+                OR: [
+                  { content: { contains: sourceMarker(item.link) } },
+                  { content: { contains: `href="${item.link}"` } },
+                ],
+              },
+              select: { id: true },
+            });
+            if (linkExists) continue;
+          }
 
           // Обложка: RSS-thumbnail (2-й источник) → SVG-движок (фолбэк)
           let coverImage = `/api/og?title=${encodeURIComponent(item.title.slice(0, 80))}&category=${encodeURIComponent(feed.category)}`;
@@ -126,86 +238,57 @@ export async function POST(req: Request) {
             coverImage = cover.url;
           } catch {}
 
-          // AI translation + SEO optimization via DeepSeek
-          const prompt = `Ты SEO-редактор блога о разработке и AI. Твоя задача — написать полезную статью на русском языке (300-500 слов), которая будет ранжироваться в Яндексе и Google.
+          const internalLinks = rankInternalLinks(internalLinkCatalog, `${item.title} ${item.description} ${feed.category}`);
+          const allowedInternalUrls = internalLinks.map((link) => link.url);
 
-ИСТОЧНИК:
-Заголовок: ${item.title}
-Ссылка: ${item.link}
-
-ФОРМАТ ОТВЕТА (строго соблюдай):
-
-ЗАГОЛОВОК: <50-70 символов, ключевое слово в начале, на русском>
-МЕТА: <мета-описание 130-150 символов с ключевым словом, призывом к чтению>
-
-## <подзаголовок H2 — почему это важно>
-<2-3 абзаца: объясни суть простым языком, избегай маркетинговых штампов>
-
-## <подзаголовок H2 — как это работает / что это меняет>
-<2-3 абзаца: технические детали, примеры использования, цифры если есть>
-
-## <подзаголовок H2 — кому это нужно / как применить>
-<1-2 абзаца: практическая польза для читателя, AI-инженера или разработчика>
-
-📎 [Источник](${item.link})
-
-ПРАВИЛА SEO:
-1. Заголовок — ключевое слово В НАЧАЛЕ, 50-70 знаков
-2. Первый абзац — сразу ответ на вопрос «о чём статья и зачем читать»
-3. Используй подзаголовки ## (H2), внутри абзацев — **жирный** для ключевых фраз
-4. Никаких «в последнее время», «в современном мире», «несомненно» — пиши конкретно
-5. Один термин на английском = ок (например, RAG, fine-tuning), но дублируй объяснение на русском
-6. Добавь 1-2 вопроса риторических для вовлечения
-7. Длина: 300-500 слов (не больше, не меньше)
-
-СТИЛЬ:
-- Как Хабр, но понятнее
-- Для аудитории: разработчики, AI-инженеры, продакты
-- Без воды, без рекламы, без «революционных прорывов»
-- Живой русский язык, можно «вы» к читателю`;
-
-          const aiRes = await fetch("https://api.deepseek.com/v1/chat/completions", {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${key}` },
-            body: JSON.stringify({ model: "deepseek-chat", messages: [{ role: "user", content: prompt }], max_tokens: 1200, temperature: 0.6 }),
-            signal: AbortSignal.timeout(30000),
+          let article = await generateSeoArticle({
+            key,
+            model,
+            sourceTitle: item.title,
+            sourceDescription: item.description,
+            sourceUrl: item.link,
+            category: feed.category,
+            siteKeywords,
+            internalLinks,
           });
+          article.html = sanitizeArticleHtml(article.html);
+          let seoCheck = scoreSeoArticle(article, item.link, allowedInternalUrls, item.description);
 
-          if (!aiRes.ok) {
-            console.error(`DeepSeek API error ${aiRes.status}: ${await aiRes.text().catch(() => "")}`);
+          // Один редакторский проход: статья ниже 80/100 не публикуется автоматически.
+          if (seoCheck.score < 80) {
+            article = await generateSeoArticle({
+              key,
+              model,
+              sourceTitle: item.title,
+              sourceDescription: item.description,
+              sourceUrl: item.link,
+              category: feed.category,
+              siteKeywords,
+              internalLinks,
+              revision: { article, check: seoCheck },
+            });
+            article.html = sanitizeArticleHtml(article.html);
+            seoCheck = scoreSeoArticle(article, item.link, allowedInternalUrls, item.description);
+          }
+
+          if (seoCheck.score < 80) {
+            results.push({
+              feed: feed.name,
+              title: item.title.slice(0, 60),
+              status: "seo_rejected",
+              seoScore: seoCheck.score,
+              missing: seoCheck.missing,
+            });
             continue;
           }
 
-          const aiData = await aiRes.json();
-          const fullText = aiData.choices?.[0]?.message?.content;
-          if (!fullText) continue;
-
-          // Extract title and meta description from AI response
-          let title = item.title;
-          const tm = fullText.match(/ЗАГОЛОВОК:\s*(.+)/);
-          if (tm) title = tm[1].trim();
-
-          // Remove title line from content
-          let content = fullText.replace(/ЗАГОЛОВОК:\s*.+(\n|$)/, "").trim();
-
-          // Extract meta description (SEO)
-          let metaDesc = "";
-          const mm = content.match(/МЕТА:\s*(.+)/);
-          if (mm) {
-            metaDesc = mm[1].trim().slice(0, 160);
-            content = content.replace(/МЕТА:\s*.+(\n|$)/, "").trim();
-          }
-
-          // Convert markdown to HTML: links, bold, headings
-          content = content.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener" style="color:var(--color-accent)">$1</a>');
-          content = content.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-          content = content.replace(/^## (.+)$/gm, '<h2>$1</h2>');
-
-          // Fallback excerpt from content
-          const excerpt = metaDesc || content.replace(/<[^>]+>/g, "").replace(/[#*\[\]()]/g, "").slice(0, 200).replace(/\n/g, " ");
-
+          const title = article.title;
+          const metaDesc = article.metaDesc.slice(0, 170);
+          const content = `${sourceMarker(item.link)}<!-- seo-score:${seoCheck.score}; type:${seoCommentValue(article.contentType)}; intent:${seoCommentValue(article.intent)}; primary:${seoCommentValue(article.primaryKeyword)} -->${appendFaq(article.html, article.faq)}`;
+          const excerpt = metaDesc;
           const slug = cleanSlug(title);
           if (!slug) continue;
+          if (await db.blogPost.findUnique({ where: { slug }, select: { id: true } })) continue;
 
           // Ensure category exists
           let cat = await db.blogCategory.findFirst({ where: { name: feed.category } });
@@ -215,15 +298,25 @@ export async function POST(req: Request) {
             data: {
               title, slug, content, excerpt, coverImage,
               status: "published", authorId: admin.id, categoryId: cat.id,
-              tags: feed.category.replace(/[^a-zA-Zа-яА-ЯёЁ,]/g, "").split(",").filter(Boolean).join(",") || "AI,новости", aiGenerated: true, aiModel: "deepseek-chat",
-              metaTitle: title + " — Карта роста", metaDesc: excerpt,
+              tags: [feed.category, article.contentType, article.primaryKeyword, ...article.secondaryKeywords.slice(0, 5)].filter(Boolean).join(","),
+              aiGenerated: true, aiModel: model,
+              metaTitle: article.metaTitle, metaDesc,
               publishedAt: new Date(),
             },
           });
 
           feedCreated++;
           totalCreated++;
-          results.push({ feed: feed.name, title: title.slice(0, 60), slug, status: "published" });
+          results.push({
+            feed: feed.name,
+            title: title.slice(0, 60),
+            slug,
+            status: "published",
+            contentType: article.contentType,
+            primaryKeyword: article.primaryKeyword,
+            seoScore: seoCheck.score,
+            seoCheck: seoCheck.checks,
+          });
         } catch (itemErr: any) {
           results.push({ feed: feed.name, title: item.title?.slice(0, 40), status: "error", reason: itemErr.message?.slice(0, 60) });
         }

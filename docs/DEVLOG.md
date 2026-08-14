@@ -1545,3 +1545,38 @@ d8e572aa fix: page.tsx + билд
   - связь с Blueprint «AI Explorer»
 - Обновлена ссылка в `docs/TZ-AI-LAND.md`
 - Код не трогали — реализация Урока 1 не раньше 15.08.2026
+
+---
+
+## 14.08.2026 (ночь) — SEO-конвейер блога + обложки + глоссарий + ориентир графа знаний
+
+### Сделано
+
+#### Auto-publish → SEO-конвейер (не рерайт)
+- Новость = источник фактов; статья = ответ на поисковый интент
+- Типы: News / Explainer / Practical
+- Ключи из `SiteSettings.seoKeywords`, JSON-ответ DeepSeek
+- Whitelist внутренних ссылок (tools, glossary, blueprints, solutions, skills, patterns, blog)
+- FAQ, Title/Description/H1, deterministic SEO Score
+- Если score &lt; 80 → один retry; если снова &lt; 80 → **не публикуем** (`seo_rejected`)
+- Файлы: `src/lib/blog/seo-pipeline.ts`, `src/app/api/blog/auto-publish/route.ts`
+
+#### Обложки
+- Ручная обложка админа = одна для списка, статьи, OG и RSS (`blogCoverUrl`)
+- Векторная card — только fallback
+
+#### Глоссарий × блог
+- Первое вхождение термина → ссылка + пояснение при наведении
+- Не трогаем code/заголовки/уже существующие ссылки
+- `src/lib/blog/link-glossary.ts` + ContentHtml tooltip
+
+#### Ориентир развития
+- `docs/KNOWLEDGE-GRAPH-BLOG.md` — блог как архитектор базы знаний
+- Knowledge Value, типы NEWS/ENTITY/GUIDE/BLUEPRINT, приоритеты 40/30/20/10
+- Правило: публиковать только новую сущность / новый интент / усиление кластера
+
+### Ключевые решения
+- Текущий SEO Score — шаг 1; Knowledge Value и авто-обновление сущностей — следующий этап
+- Блог должен наращивать граф ProektMap, а не конкурировать с источниками новостей
+
+### Итого за ночь: SEO-конвейер на проде, обложки синхронизированы, глоссарий в статьях, ориентир записан. День закрыт. До завтра.

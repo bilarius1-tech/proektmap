@@ -1,5 +1,9 @@
 # ProektMap — SEO и AI-оптимизация
 
+> **Ориентир развития блога:** [`docs/KNOWLEDGE-GRAPH-BLOG.md`](KNOWLEDGE-GRAPH-BLOG.md) —  
+> блог как граф знаний (сущности → интент → кластер), не поток AI-рерайтов.  
+> Приоритет: Blueprints 40% · Guides 30% · Entities 20% · News 10%.
+
 ## Мета-теги (динамические)
 
 Каждая страница получает уникальные title/description:

@@ -371,6 +371,13 @@
 .blog-content a:hover {
   color: var(--color-accent-dark, #0a9e6e);
 }
+.blog-content a.glossary-term-link {
+  font-weight: 600;
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-decoration-thickness: 2px;
+  cursor: help;
+}
 .blog-content mark {
   background: #fef08a;
   padding: 0 3px;
