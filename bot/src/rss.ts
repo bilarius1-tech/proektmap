@@ -55,7 +55,7 @@ function parseRss(xml: string): RssItem[] {
   return items;
 }
 
-async function poll(bot: Bot, isFirstRun: boolean): Promise<void> {
+async function poll(bot: Bot): Promise<void> {
   try {
     const res = await fetch(CONFIG.rssUrl, {
       headers: { "User-Agent": "ProektMapBot/1.0" },
@@ -71,8 +71,9 @@ async function poll(bot: Bot, isFirstRun: boolean): Promise<void> {
 
     const posted = new Set(loadState());
 
-    // Первый запуск — только фиксируем baseline, старые посты не шлём
-    if (isFirstRun) {
+    // Baseline ТОЛЬКО при самом первом запуске (state-файла ещё нет).
+    // При рестарте файл уже есть — постим новые, ничего не проглатываем.
+    if (!existsSync(STATE_FILE)) {
       saveState(items.map((i) => i.guid));
       console.log(`RSS baseline: зафиксировано ${items.length} постов`);
       return;
@@ -101,6 +102,6 @@ async function poll(bot: Bot, isFirstRun: boolean): Promise<void> {
 }
 
 export function startRssPolling(bot: Bot): void {
-  poll(bot, true).catch(() => {});
-  setInterval(() => poll(bot, false).catch(() => {}), POLL_INTERVAL_MS);
+  poll(bot).catch(() => {});
+  setInterval(() => poll(bot).catch(() => {}), POLL_INTERVAL_MS);
 }
