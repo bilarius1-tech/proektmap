@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db/index";
 import { auth } from "@/lib/auth";
+import { resolveCover } from "@/lib/og/providers";
 
 function translit(text: string): string {
   const map: any = { а:"a",б:"b",в:"v",г:"g",д:"d",е:"e",ё:"yo",ж:"zh",з:"z",и:"i",й:"y",к:"k",л:"l",м:"m",н:"n",о:"o",п:"p",р:"r",с:"s",т:"t",у:"u",ф:"f",х:"h",ц:"ts",ч:"ch",ш:"sh",щ:"sch",ъ:"",ы:"y",ь:"",э:"e",ю:"yu",я:"ya" };
@@ -113,25 +114,17 @@ export async function POST(req: Request) {
           });
           if (linkExists) continue;
 
-          // Download cover image
-          let coverImage = `https://proektmap.ru/api/og?title=${encodeURIComponent(item.title.slice(0, 80))}&category=${encodeURIComponent(feed.category)}`;
-          if (item.image) {
-            try {
-              const imgRes = await fetch(item.image, { signal: AbortSignal.timeout(5000) });
-              if (imgRes.ok && imgRes.headers.get("content-type")?.startsWith("image")) {
-                const buffer = Buffer.from(await imgRes.arrayBuffer());
-                if (buffer.length > 0 && buffer.length < 5 * 1024 * 1024) { // < 5MB
-                  const ext = (item.image.split(".").pop()?.split("?")[0] || "jpg").replace(/[^a-z]/gi, "");
-                  const filename = `blog-${Date.now()}-${Math.random().toString(36).slice(2, 6)}.${ext}`;
-                  const { writeFile, mkdir } = await import("fs/promises");
-                  const { join } = await import("path");
-                  await mkdir(join(process.cwd(), "public", "uploads"), { recursive: true });
-                  await writeFile(join(process.cwd(), "public", "uploads", filename), buffer);
-                  coverImage = `/uploads/${filename}`;
-                }
-              }
-            } catch {}
-          }
+          // Обложка: RSS-thumbnail (2-й источник) → SVG-движок (фолбэк)
+          let coverImage = `/api/og?title=${encodeURIComponent(item.title.slice(0, 80))}&category=${encodeURIComponent(feed.category)}`;
+          try {
+            const cover = await resolveCover({
+              title: item.title.slice(0, 80),
+              category: feed.category,
+              tags: feed.category.replace(/[^a-zA-Zа-яА-ЯёЁ,]/g, "").split(",").filter(Boolean),
+              thumbnailUrl: item.image || undefined,
+            });
+            coverImage = cover.url;
+          } catch {}
 
           // AI translation + SEO optimization via DeepSeek
           const prompt = `Ты SEO-редактор блога о разработке и AI. Твоя задача — написать полезную статью на русском языке (300-500 слов), которая будет ранжироваться в Яндексе и Google.
