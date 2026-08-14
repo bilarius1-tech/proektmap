@@ -13,6 +13,7 @@ export default function BlogSettingsClient({ settings, stats }: any) {
     deepseekModel: settings.deepseekModel || "deepseek-chat",
     autoPublishEnabled: !!settings.autoPublishEnabled,
     autoPublishHour: settings.autoPublishHour || 9,
+    autoPublishItemsPerFeed: settings.autoPublishItemsPerFeed || 2,
   });
   const [saving, setSaving] = useState(false);
 
@@ -99,7 +100,7 @@ export default function BlogSettingsClient({ settings, stats }: any) {
         <div style={{ padding: "var(--space-l)", background: "white", borderRadius: "var(--radius-l)", border: "1px solid var(--color-border)" }}>
           <h2 style={{ fontSize: "var(--text-l)", fontWeight: 700, marginBottom: "var(--space-m)" }}>⏱️ Авто-публикация</h2>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-m)", marginBottom: "var(--space-m)", alignItems: "end" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "var(--space-m)", marginBottom: "var(--space-m)", alignItems: "end" }}>
             <div>
               <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "var(--text-s)", fontWeight: 600 }}>
                 <input type="checkbox" checked={form.autoPublishEnabled} onChange={e => setForm({ ...form, autoPublishEnabled: e.target.checked })}
@@ -113,6 +114,11 @@ export default function BlogSettingsClient({ settings, stats }: any) {
             <div>
               <label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Час запуска (0-23 МСК)</label>
               <input type="number" min={0} max={23} value={form.autoPublishHour} onChange={e => setForm({ ...form, autoPublishHour: parseInt(e.target.value) || 9 })}
+                style={{ width: "100%", padding: "10px 12px", fontSize: "var(--text-s)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none" }} />
+            </div>
+            <div>
+              <label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Статей с источника</label>
+              <input type="number" min={1} max={5} value={form.autoPublishItemsPerFeed} onChange={e => setForm({ ...form, autoPublishItemsPerFeed: parseInt(e.target.value) || 2 })}
                 style={{ width: "100%", padding: "10px 12px", fontSize: "var(--text-s)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none" }} />
             </div>
           </div>

@@ -454,6 +454,7 @@ model SiteSettings {
   deepseekModel         String   @default("deepseek-chat")
   autoPublishEnabled    Boolean  @default(false)
   autoPublishHour       Int      @default(9)
+  autoPublishItemsPerFeed Int    @default(2)
   mcpAutoScan           Boolean  @default(false)
   mcpScanDay            String   @default("monday")
   mcpScanHour           Int      @default(3)

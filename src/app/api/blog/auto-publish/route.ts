@@ -46,7 +46,8 @@ export async function POST(req: Request) {
   if (!admin) return NextResponse.json({ error: "Админ не найден" }, { status: 500 });
 
   let key = process.env.DEEPSEEK_API_KEY;
-  try { const s = await db.siteSettings.findUnique({ where: { id: "main" } }); if (s?.deepseekApiKey) key = s.deepseekApiKey; } catch {}
+  let itemsPerFeed = 2;
+  try { const s = await db.siteSettings.findUnique({ where: { id: "main" } }); if (s?.deepseekApiKey) key = s.deepseekApiKey; if (s?.autoPublishItemsPerFeed) itemsPerFeed = s.autoPublishItemsPerFeed; } catch {}
   if (!key) return NextResponse.json({ error: "Нет DEEPSEEK_API_KEY" }, { status: 500 });
 
   const results: any[] = [];
@@ -100,7 +101,7 @@ export async function POST(req: Request) {
       }
 
       let feedCreated = 0;
-      for (const item of items.slice(0, 2)) {
+      for (const item of items.slice(0, itemsPerFeed)) {
         try {
           // Better duplicate detection: check slug first, then link in metaDesc
           const candidateSlug = cleanSlug(item.title);
