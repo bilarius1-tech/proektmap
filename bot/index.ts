@@ -2,6 +2,10 @@ import { Bot } from "grammy";
 import { CONFIG } from "./src/config";
 import { startRssPolling } from "./src/rss";
 import { startDigestSchedule, runDigest } from "./src/digest";
+import { registerAsk } from "./src/ask";
+import { registerNav } from "./src/nav";
+import { registerDecide } from "./src/decide";
+import { registerQuiz } from "./src/quiz";
 
 if (!CONFIG.botToken) {
   console.error("✗ TELEGRAM_BOT_TOKEN не задан в bot/.env");
@@ -16,7 +20,11 @@ const bot = new Bot(CONFIG.botToken);
 bot.command("start", (ctx) =>
   ctx.reply(
     `👋 Привет! Я бот ProektMap — «Карты роста».\n\n` +
-      `Я публикую новости блога и еженедельные итоги проекта.\n\n` +
+      `Я публикую новости блога и еженедельные итоги, а ещё умею:\n` +
+      `• /ask — AI-консультант\n` +
+      `• /decide — принять решение\n` +
+      `• /quiz — вопрос дня\n` +
+      `• /search — поиск по базе знаний\n\n` +
       `Сайт → https://proektmap.ru`,
     { link_preview_options: { is_disabled: true } },
   ),
@@ -25,9 +33,15 @@ bot.command("start", (ctx) =>
 bot.command("help", (ctx) =>
   ctx.reply(
     `ℹ️ Команды:\n` +
-      `/start — приветствие\n` +
-      `/help — этот список\n` +
-      `/digest — запустить еженедельную выжимку (только админ)\n\n` +
+      `/ask <вопрос> — AI-консультант\n` +
+      `/decide — принять решение (decision-coach)\n` +
+      `/blueprint <slug> — карточка Blueprint\n` +
+      `/tool <название> — AI-инструмент\n` +
+      `/term <термин> — термин из глоссария\n` +
+      `/search <запрос> — поиск по базе знаний\n` +
+      `/quiz — вопрос дня\n` +
+      `/digest — еженедельная выжимка (админ)\n` +
+      `/cancel — отменить диалог\n\n` +
       `Каналы: ${CONFIG.channels.join(", ")}`,
     { link_preview_options: { is_disabled: true } },
   ),
@@ -43,7 +57,11 @@ bot.command("digest", async (ctx) => {
   if (!text) await ctx.reply("⚠️ Не удалось собрать выжимку, см. логи.");
 });
 
-// Расписания
+registerAsk(bot);
+registerNav(bot);
+registerDecide(bot);
+registerQuiz(bot);
+
 startRssPolling(bot);
 startDigestSchedule(bot);
 

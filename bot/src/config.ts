@@ -21,5 +21,6 @@ export const CONFIG = {
   autoApprove: (process.env.AUTO_APPROVE || "true").toLowerCase() !== "false",
   rssUrl: process.env.BLOG_RSS_URL || "https://proektmap.ru/blog/rss.xml",
   adminId: Number(process.env.ADMIN_ID) || 0,
+  siteUrl: process.env.SITE_URL || "https://proektmap.ru",
   stateDir: resolve(BOT_DIR, "state"),
 } as const;
