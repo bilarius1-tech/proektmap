@@ -61,7 +61,7 @@ export interface CompMeta {
 
 type Composition = (title: string, theme: CategoryTheme, seed: number, meta: CompMeta) => string;
 
-const FONT = "DejaVu Sans, Inter, sans-serif";
+const FONT = "Inter, DejaVu Sans, sans-serif";
 
 // ── 1. Сетка: текст слева, сетка узлов справа ──────────────────────────
 const gridComp: Composition = (title, theme, seed, meta) => {
