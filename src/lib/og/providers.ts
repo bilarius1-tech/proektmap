@@ -46,15 +46,17 @@ export const thumbnailProvider: ImageProvider = {
   async produce(req) {
     const url = req.thumbnailUrl as string;
     const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
-    if (!res.ok || !(res.headers.get("content-type") || "").startsWith("image")) {
+    const contentType = (res.headers.get("content-type") || "").split(";")[0].trim().toLowerCase();
+    if (!res.ok || !contentType.startsWith("image")) {
       throw new Error("thumbnail: не изображение");
     }
     const buffer = Buffer.from(await res.arrayBuffer());
-    if (buffer.length === 0 || buffer.length > 5 * 1024 * 1024) {
+    if (buffer.length < 10 * 1024 || buffer.length > 5 * 1024 * 1024) {
       throw new Error("thumbnail: некорректный размер");
     }
-    const ext = (url.split(".").pop()?.split("?")[0] || "jpg").replace(/[^a-z]/gi, "").slice(0, 5);
-    const filename = `blog-${Date.now()}-${Math.random().toString(36).slice(2, 6)}.${ext || "jpg"}`;
+    const extByType: Record<string, string> = { "image/png": "png", "image/jpeg": "jpg", "image/webp": "webp", "image/gif": "gif", "image/svg+xml": "svg", "image/avif": "avif" };
+    const ext = extByType[contentType] || "jpg";
+    const filename = `blog-${Date.now()}-${Math.random().toString(36).slice(2, 6)}.${ext}`;
     const { writeFile, mkdir } = await import("fs/promises");
     const { join } = await import("path");
     await mkdir(join(process.cwd(), "public", "uploads"), { recursive: true });

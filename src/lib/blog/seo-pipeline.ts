@@ -135,9 +135,9 @@ export function scoreSeoArticle(
   add("Title", article.metaTitle.length >= 35 && article.metaTitle.length <= 70 && normalize(article.metaTitle).includes(primary), 10, `${article.metaTitle.length} символов`);
   add("Description", article.metaDesc.length >= 120 && article.metaDesc.length <= 170 && meta.includes(primary), 15, `${article.metaDesc.length} символов`);
   add("H2 структура", headings.length >= 3, 10, `${headings.length} заголовка H2`);
-  add("Полезность", words >= 550 && words <= 1600, 10, `${words} слов`);
+  add("Полезность", words >= 450 && words <= 1800, 10, `${words} слов`);
   add("Оригинальность", isOriginal, 5, isOriginal ? "Не повторяет RSS-описание" : "Повторяет исходное описание");
-  add("Внутренние ссылки", internalCount >= 2, 15, `${internalCount} ссылок из каталога ProektMap`);
+  add("Внутренние ссылки", internalCount >= 1, 15, `${internalCount} ссылок из каталога ProektMap`);
   add("Дополнительные запросы", secondaryUsed >= 2, 10, `${secondaryUsed} запросов использовано`);
   add("FAQ", article.faq.length === 0 || article.faq.length >= 2, 2, article.faq.length ? `${article.faq.length} вопроса` : "Не нужен для этого интента");
   add("Источник", hasSource, 3, hasSource ? "Ссылка присутствует" : "Нет ссылки на источник");

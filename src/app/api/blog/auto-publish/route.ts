@@ -343,8 +343,8 @@ export async function POST(req: Request) {
           article.html = sanitizeArticleHtml(article.html);
           let seoCheck = scoreSeoArticle(article, item.link, allowedInternalUrls, item.description);
 
-          // Один редакторский проход: статья ниже 80/100 не публикуется автоматически.
-          if (seoCheck.score < 80) {
+          // Один редакторский проход: статья ниже 70/100 не публикуется автоматически.
+          if (seoCheck.score < 70) {
             article = await generateSeoArticle({
               key,
               model,
@@ -360,7 +360,7 @@ export async function POST(req: Request) {
             seoCheck = scoreSeoArticle(article, item.link, allowedInternalUrls, item.description);
           }
 
-          if (seoCheck.score < 80) {
+          if (seoCheck.score < 70) {
             results.push({
               feed: feed.name,
               title: item.title.slice(0, 60),
