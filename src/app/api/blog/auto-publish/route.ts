@@ -109,7 +109,7 @@ async function generateSeoArticle(input: {
         },
         { role: "user", content: buildSeoPrompt(input) },
       ],
-      max_tokens: 4000,
+      max_tokens: 8000,
       temperature: input.revision ? 0.25 : 0.4,
     }),
     signal: AbortSignal.timeout(60000),
@@ -121,6 +121,52 @@ async function generateSeoArticle(input: {
 
   const aiData = await aiRes.json();
   return parseSeoArticle(aiData.choices?.[0]?.message?.content || "");
+}
+
+function mskNow(): { hour: number; minute: number } {
+  const fmt = new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Moscow', hour: '2-digit', minute: '2-digit', hour12: false });
+  const parts = fmt.formatToParts(new Date());
+  const hour = Number(parts.find((x) => x.type === 'hour')?.value ?? '0') % 24;
+  const minute = Number(parts.find((x) => x.type === 'minute')?.value ?? '0');
+  return { hour, minute };
+}
+
+function buildReport(results: any[], totalCreated: number, startedAt: number): string {
+  const published = results.filter((r) => r.status === 'published');
+  const errors = results.filter((r) => r.status === 'error');
+  const rejected = results.filter((r) => r.status === 'seo_rejected');
+  const lines = [
+    '📰 Авто-публикация завершена',
+    'Опубликовано: ' + totalCreated,
+    'Ошибок источников: ' + errors.length,
+    'Отклонено по SEO: ' + rejected.length,
+    'Время: ' + ((Date.now() - startedAt) / 60000).toFixed(1) + ' мин',
+  ];
+  if (published.length) {
+    lines.push('', 'Новые статьи:');
+    for (const p of published.slice(0, 10)) lines.push('• ' + p.title);
+  }
+  if (errors.length) {
+    lines.push('', 'Ошибки:');
+    for (const e of errors.slice(0, 5)) lines.push('• ' + e.feed + ': ' + e.reason);
+  }
+  return lines.join(String.fromCharCode(10));
+}
+
+async function sendTelegramReport(text: string): Promise<void> {
+  const token = process.env.TELEGRAM_BOT_TOKEN || '';
+  const chatId = process.env.TELEGRAM_REPORT_CHAT_ID || process.env.TELEGRAM_ADMIN_CHAT_ID || '';
+  if (!token || !chatId) return;
+  try {
+    await fetch('https://api.telegram.org/bot' + token + '/sendMessage', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, text, disable_web_page_preview: true }),
+      signal: AbortSignal.timeout(10000),
+    });
+  } catch (e) {
+    console.error('[auto-publish] tg report:', e);
+  }
 }
 
 export async function POST(req: Request) {
@@ -137,9 +183,32 @@ export async function POST(req: Request) {
   }
 
   const db = await getDb();
+
+  let settings: any = null;
+  try { settings = await db.siteSettings.findUnique({ where: { id: 'main' } }); } catch (e) {}
+  if (settings?.autoPublishEnabled !== true) return NextResponse.json({ scheduled: false, reason: 'disabled' });
+  const now = mskNow();
+  if (now.hour !== (settings?.autoPublishHour ?? 9) && now.hour !== (settings?.autoPublishEveningHour ?? 20)) {
+    return NextResponse.json({ scheduled: false, reason: 'off-hours', hour: now.hour });
+  }
+  const lastRun = settings?.autoPublishLastRunAt;
+  if (lastRun && Date.now() - new Date(lastRun).getTime() < 45 * 60 * 1000) {
+    return NextResponse.json({ scheduled: false, reason: 'recent-run' });
+  }
+  const stale = new Date(Date.now() - 2 * 60 * 60 * 1000);
+  const claimed = await db.siteSettings.updateMany({
+    where: { id: 'main', OR: [{ autoPublishRunning: false }, { autoPublishLastRunAt: { lt: stale } }] },
+    data: { autoPublishRunning: true, autoPublishLastRunAt: new Date() },
+  });
+  if (claimed.count === 0) return NextResponse.json({ started: false, reason: 'already-running' });
+  const startedAt = Date.now();
+
+  void (async () => {
+  try {
+
   const feeds = await db.blogFeed.findMany({ where: { isActive: true } });
   const admin = await db.user.findFirst({ where: { role: "admin" } });
-  if (!admin) return NextResponse.json({ error: "Админ не найден" }, { status: 500 });
+    if (!admin) return;
 
   let key = process.env.DEEPSEEK_API_KEY || "";
   let model = "deepseek-chat";
@@ -152,7 +221,7 @@ export async function POST(req: Request) {
     if (settings?.autoPublishItemsPerFeed) itemsPerFeed = settings.autoPublishItemsPerFeed;
     siteKeywords = parseSeoKeywords(settings?.seoKeywords || "");
   } catch {}
-  if (!key) return NextResponse.json({ error: "Нет DEEPSEEK_API_KEY" }, { status: 500 });
+    if (!key) return;
   const internalLinkCatalog = await getInternalLinkCatalog(db);
 
   const results: any[] = [];
@@ -331,5 +400,14 @@ export async function POST(req: Request) {
     }
   }
 
-  return NextResponse.json({ results, totalCreated });
+  await sendTelegramReport(buildReport(results, totalCreated, startedAt));
+  } catch (e: any) {
+    console.error('[auto-publish] run:', e?.message || e);
+    await sendTelegramReport('📰 Авто-публикация: ошибка' + String.fromCharCode(10) + (e?.message || String(e)));
+  } finally {
+    try { await db.siteSettings.update({ where: { id: 'main' }, data: { autoPublishRunning: false } }); } catch (e) {}
+  }
+  })();
+
+  return NextResponse.json({ scheduled: true, started: true });
 }

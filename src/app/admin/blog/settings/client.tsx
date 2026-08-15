@@ -12,7 +12,8 @@ export default function BlogSettingsClient({ settings, stats }: any) {
     openrouterModel: settings.openrouterModel || "openai/gpt-4o-mini",
     deepseekModel: settings.deepseekModel || "deepseek-chat",
     autoPublishEnabled: !!settings.autoPublishEnabled,
-    autoPublishHour: settings.autoPublishHour || 9,
+    autoPublishHour: settings.autoPublishHour || 6,
+    autoPublishEveningHour: settings.autoPublishEveningHour || 20,
     autoPublishItemsPerFeed: settings.autoPublishItemsPerFeed || 2,
   });
   const [saving, setSaving] = useState(false);
@@ -100,7 +101,7 @@ export default function BlogSettingsClient({ settings, stats }: any) {
         <div style={{ padding: "var(--space-l)", background: "white", borderRadius: "var(--radius-l)", border: "1px solid var(--color-border)" }}>
           <h2 style={{ fontSize: "var(--text-l)", fontWeight: 700, marginBottom: "var(--space-m)" }}>⏱️ Авто-публикация</h2>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "var(--space-m)", marginBottom: "var(--space-m)", alignItems: "end" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "var(--space-m)", marginBottom: "var(--space-m)", alignItems: "end" }}>
             <div>
               <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "var(--text-s)", fontWeight: 600 }}>
                 <input type="checkbox" checked={form.autoPublishEnabled} onChange={e => setForm({ ...form, autoPublishEnabled: e.target.checked })}
@@ -112,9 +113,14 @@ export default function BlogSettingsClient({ settings, stats }: any) {
               </div>
             </div>
             <div>
-              <label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Час запуска (0-23 МСК)</label>
-              <input type="number" min={0} max={23} value={form.autoPublishHour} onChange={e => setForm({ ...form, autoPublishHour: parseInt(e.target.value) || 9 })}
+              <label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Утренний сбор (час МСК)</label>
+              <input type="number" min={0} max={23} value={form.autoPublishHour} onChange={e => setForm({ ...form, autoPublishHour: parseInt(e.target.value) || 6 })}
                 style={{ width: "100%", padding: "10px 12px", fontSize: "var(--text-s)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none" }} />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: 'var(--text-xs)', fontWeight: 600, marginBottom: 4 }}>Вечерний сбор (час МСК)</label>
+              <input type='number' min={0} max={23} value={form.autoPublishEveningHour} onChange={e => setForm({ ...form, autoPublishEveningHour: parseInt(e.target.value) || 20 })}
+                style={{ width: '100%', padding: '10px 12px', fontSize: 'var(--text-s)', borderRadius: 'var(--radius-s)', border: '1px solid var(--color-border)', outline: 'none' }} />
             </div>
             <div>
               <label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Статей с источника</label>
@@ -124,6 +130,13 @@ export default function BlogSettingsClient({ settings, stats }: any) {
           </div>
 
           <div style={{ display: "flex", gap: 8 }}>
+          <div style={{ padding: '12px 16px', borderRadius: 'var(--radius-m)', background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border)', marginBottom: 'var(--space-m)', fontSize: 'var(--text-xs)', lineHeight: 1.7, color: 'var(--color-text-secondary)' }}>
+            <strong>Рекомендации по настройке:</strong><br/>
+            • Утренний и вечерний сбор разводят по времени — блог пополняется дважды в день.<br/>
+            • «Статей с источника» — сколько постов берём с каждого активного RSS-источника (1–2 оптимально, чтобы не спамить).<br/>
+            • Модель: deepseek-chat — рекомендован. deepseek-reasoner сейчас отдаёт пустой ответ на длинных статьях (уходит в рассуждения).<br/>
+            • Сбор идёт по московскому времени; после прогона в Telegram придёт отчёт о публикациях.
+          </div>
             <button onClick={triggerAutoPublish} disabled={saving}
               style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 20px", borderRadius: "var(--radius-m)", background: "var(--color-accent)", color: "white", border: "none", fontSize: "var(--text-s)", fontWeight: 600, cursor: "pointer" }}>
               <Play size={14} /> Запустить сбор сейчас

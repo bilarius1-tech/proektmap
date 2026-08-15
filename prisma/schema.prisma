@@ -455,6 +455,10 @@ model SiteSettings {
   autoPublishEnabled    Boolean  @default(false)
   autoPublishHour       Int      @default(9)
   autoPublishItemsPerFeed Int    @default(2)
+  autoPublishEveningHour Int     @default(20)
+  autoPublishRunning    Boolean  @default(false)
+  autoPublishLastRunAt  DateTime?
+
   mcpAutoScan           Boolean  @default(false)
   mcpScanDay            String   @default("monday")
   mcpScanHour           Int      @default(3)
