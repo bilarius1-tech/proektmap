@@ -15,6 +15,7 @@ export default function BlogSettingsClient({ settings, stats }: any) {
     autoPublishHour: settings.autoPublishHour || 6,
     autoPublishEveningHour: settings.autoPublishEveningHour || 20,
     autoPublishItemsPerFeed: settings.autoPublishItemsPerFeed || 2,
+    autoPublishIntervalMin: settings.autoPublishIntervalMin || 45,
   });
   const [saving, setSaving] = useState(false);
 
@@ -127,6 +128,11 @@ export default function BlogSettingsClient({ settings, stats }: any) {
               <input type="number" min={1} max={5} value={form.autoPublishItemsPerFeed} onChange={e => setForm({ ...form, autoPublishItemsPerFeed: parseInt(e.target.value) || 2 })}
                 style={{ width: "100%", padding: "10px 12px", fontSize: "var(--text-s)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none" }} />
             </div>
+            <div>
+              <label style={{ display: 'block', fontSize: 'var(--text-xs)', fontWeight: 600, marginBottom: 4 }}>Интервал публикации (мин)</label>
+              <input type='number' min={15} max={240} value={form.autoPublishIntervalMin} onChange={e => setForm({ ...form, autoPublishIntervalMin: parseInt(e.target.value) || 45 })}
+                style={{ width: '100%', padding: '10px 12px', fontSize: 'var(--text-s)', borderRadius: 'var(--radius-s)', border: '1px solid var(--color-border)', outline: 'none' }} />
+            </div>
           </div>
 
           <div style={{ display: "flex", gap: 8 }}>
@@ -134,8 +140,9 @@ export default function BlogSettingsClient({ settings, stats }: any) {
             <strong>Рекомендации по настройке:</strong><br/>
             • Утренний и вечерний сбор разводят по времени — блог пополняется дважды в день.<br/>
             • «Статей с источника» — сколько постов берём с каждого активного RSS-источника (1–2 оптимально, чтобы не спамить).<br/>
-            • Модель: deepseek-chat — рекомендован. deepseek-reasoner сейчас отдаёт пустой ответ на длинных статьях (уходит в рассуждения).<br/>
-            • Сбор идёт по московскому времени; после прогона в Telegram придёт отчёт о публикациях.
+            • Модель: deepseek-v4-flash — рекомендован (быстрый и дешёвый). deepseek-chat — запасной.<br/>
+            • Сбор идёт по московскому времени; после прогона в Telegram придёт отчёт о публикациях.<br/>
+            • «Интервал публикации» — статьи выходят по одной через N минут (логическая очередь), а не скопом.
           </div>
             <button onClick={triggerAutoPublish} disabled={saving}
               style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 20px", borderRadius: "var(--radius-m)", background: "var(--color-accent)", color: "white", border: "none", fontSize: "var(--text-s)", fontWeight: 600, cursor: "pointer" }}>

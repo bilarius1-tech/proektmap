@@ -458,6 +458,9 @@ model SiteSettings {
   autoPublishEveningHour Int     @default(20)
   autoPublishRunning    Boolean  @default(false)
   autoPublishLastRunAt  DateTime?
+  autoPublishIntervalMin Int     @default(45)
+  lastDripPublishedAt    DateTime?
+
 
   mcpAutoScan           Boolean  @default(false)
   mcpScanDay            String   @default("monday")

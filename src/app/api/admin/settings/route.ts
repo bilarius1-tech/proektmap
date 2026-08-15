@@ -15,7 +15,7 @@ export async function PATCH(req: NextRequest) {
   const fields = [
     "proPrice", "yookassaShopId", "yookassaSecretKey",
     "deepseekApiKey", "openrouterApiKey", "openrouterModel", "deepseekModel",
-    "autoPublishEnabled", "autoPublishHour", "autoPublishEveningHour", "autoPublishItemsPerFeed",
+    "autoPublishEnabled", "autoPublishHour", "autoPublishEveningHour", "autoPublishItemsPerFeed", "autoPublishIntervalMin",
     "yandexMetrikaId", "yandexWebmasterId", "googleAnalyticsId",
     "seoTitle", "seoDescription", "seoKeywords",
     "headerCode", "footerCode",

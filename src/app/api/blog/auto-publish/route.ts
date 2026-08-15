@@ -132,19 +132,19 @@ function mskNow(): { hour: number; minute: number } {
 }
 
 function buildReport(results: any[], totalCreated: number, startedAt: number): string {
-  const published = results.filter((r) => r.status === 'published');
+  const queued = results.filter((r) => r.status === 'queued');
   const errors = results.filter((r) => r.status === 'error');
   const rejected = results.filter((r) => r.status === 'seo_rejected');
   const lines = [
-    '📰 Авто-публикация завершена',
-    'Опубликовано: ' + totalCreated,
+    '📰 Авто-сбор завершён — статьи в очереди',
+    'В очередь: ' + totalCreated,
     'Ошибок источников: ' + errors.length,
     'Отклонено по SEO: ' + rejected.length,
     'Время: ' + ((Date.now() - startedAt) / 60000).toFixed(1) + ' мин',
   ];
-  if (published.length) {
+  if (queued.length) {
     lines.push('', 'Новые статьи:');
-    for (const p of published.slice(0, 10)) lines.push('• ' + p.title);
+    for (const p of queued.slice(0, 10)) lines.push('• ' + p.title);
   }
   if (errors.length) {
     lines.push('', 'Ошибки:');
@@ -186,21 +186,41 @@ export async function POST(req: Request) {
 
   let settings: any = null;
   try { settings = await db.siteSettings.findUnique({ where: { id: 'main' } }); } catch (e) {}
-  if (settings?.autoPublishEnabled !== true) return NextResponse.json({ scheduled: false, reason: 'disabled' });
+
+  let dripResult: any = { published: false, reason: 'none' };
+  try {
+    const intervalMin = settings?.autoPublishIntervalMin ?? 45;
+    const lastDrip = settings?.lastDripPublishedAt;
+    if (!lastDrip || Date.now() - new Date(lastDrip).getTime() >= intervalMin * 60 * 1000) {
+      const nextPost = await db.blogPost.findFirst({ where: { status: 'queued' }, orderBy: { createdAt: 'asc' } });
+      if (nextPost) {
+        await db.blogPost.update({ where: { id: nextPost.id }, data: { status: 'published', publishedAt: new Date() } });
+        await db.siteSettings.update({ where: { id: 'main' }, data: { lastDripPublishedAt: new Date() } });
+        dripResult = { published: true, slug: nextPost.slug, title: nextPost.title };
+      } else {
+        dripResult = { published: false, reason: 'empty-queue' };
+      }
+    } else {
+      dripResult = { published: false, reason: 'interval-not-elapsed' };
+    }
+  } catch (e) {
+    dripResult = { published: false, reason: 'error' };
+  }
+  if (settings?.autoPublishEnabled !== true) return NextResponse.json({ drip: dripResult, collection: { scheduled: false, reason: 'disabled' } });
   const now = mskNow();
   if (now.hour !== (settings?.autoPublishHour ?? 9) && now.hour !== (settings?.autoPublishEveningHour ?? 20)) {
-    return NextResponse.json({ scheduled: false, reason: 'off-hours', hour: now.hour });
+    return NextResponse.json({ drip: dripResult, collection: { scheduled: false, reason: 'off-hours', hour: now.hour } });
   }
   const lastRun = settings?.autoPublishLastRunAt;
   if (lastRun && Date.now() - new Date(lastRun).getTime() < 45 * 60 * 1000) {
-    return NextResponse.json({ scheduled: false, reason: 'recent-run' });
+    return NextResponse.json({ drip: dripResult, collection: { scheduled: false, reason: 'recent-run' } });
   }
   const stale = new Date(Date.now() - 2 * 60 * 60 * 1000);
   const claimed = await db.siteSettings.updateMany({
     where: { id: 'main', OR: [{ autoPublishRunning: false }, { autoPublishLastRunAt: { lt: stale } }] },
     data: { autoPublishRunning: true, autoPublishLastRunAt: new Date() },
   });
-  if (claimed.count === 0) return NextResponse.json({ started: false, reason: 'already-running' });
+  if (claimed.count === 0) return NextResponse.json({ drip: dripResult, collection: { started: false, reason: 'already-running' } });
   const startedAt = Date.now();
 
   void (async () => {
@@ -366,11 +386,10 @@ export async function POST(req: Request) {
           await db.blogPost.create({
             data: {
               title, slug, content, excerpt, coverImage,
-              status: "published", authorId: admin.id, categoryId: cat.id,
+              status: "queued", authorId: admin.id, categoryId: cat.id,
               tags: [feed.category, article.contentType, article.primaryKeyword, ...article.secondaryKeywords.slice(0, 5)].filter(Boolean).join(","),
               aiGenerated: true, aiModel: model,
               metaTitle: article.metaTitle, metaDesc,
-              publishedAt: new Date(),
             },
           });
 
@@ -380,7 +399,7 @@ export async function POST(req: Request) {
             feed: feed.name,
             title: title.slice(0, 60),
             slug,
-            status: "published",
+            status: "queued",
             contentType: article.contentType,
             primaryKeyword: article.primaryKeyword,
             seoScore: seoCheck.score,
@@ -409,5 +428,5 @@ export async function POST(req: Request) {
   }
   })();
 
-  return NextResponse.json({ scheduled: true, started: true });
+  return NextResponse.json({ drip: dripResult, collection: { scheduled: true, started: true } });
 }
