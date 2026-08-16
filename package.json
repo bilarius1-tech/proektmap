@@ -7,7 +7,11 @@
     "build": "next build",
     "test": "vitest run",
     "test:watch": "vitest",
-    "start": "next start --port 3030"
+    "start": "next start --port 3030",
+    "voice:setup": "bash scripts/vaibik-voice/setup.sh",
+    "voice:test": "bash scripts/vaibik-voice/run.sh test",
+    "voice:generate": "bash scripts/vaibik-voice/run.sh all",
+    "voice:check": "node scripts/vaibik-voice/check.mjs"
   },
   "dependencies": {
     "@codesandbox/sandpack-react": "^2.20.0",

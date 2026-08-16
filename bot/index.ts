@@ -3,6 +3,7 @@ import { CONFIG } from "./src/config";
 import { startRssPolling } from "./src/rss";
 import { startSectionsPolling } from "./src/sections";
 import { startDigestSchedule, runDigest } from "./src/digest";
+import { startNewsDigestSchedule, runNewsDigest } from "./src/news-digest";
 import { registerAsk } from "./src/ask";
 import { registerNav } from "./src/nav";
 import { registerDecide } from "./src/decide";
@@ -41,7 +42,8 @@ bot.command("help", (ctx) =>
       `/term <термин> — термин из глоссария\n` +
       `/search <запрос> — поиск по базе знаний\n` +
       `/quiz — вопрос дня\n` +
-      `/digest — еженедельная выжимка (админ)\n` +
+      `/digest — итоги проекта за неделю (админ)\n` +
+      `/newsdigest — пятничный дайджест новостей (админ)\n` +
       `/cancel — отменить диалог\n\n` +
       `Каналы: ${CONFIG.channels.join(", ")}`,
     { link_preview_options: { is_disabled: true } },
@@ -58,6 +60,15 @@ bot.command("digest", async (ctx) => {
   if (!text) await ctx.reply("⚠️ Не удалось собрать выжимку, см. логи.");
 });
 
+bot.command("newsdigest", async (ctx) => {
+  if (CONFIG.adminId && ctx.from?.id !== CONFIG.adminId) {
+    return ctx.reply("⛔ Команда доступна только администратору.");
+  }
+  await ctx.reply("⏳ Собираю дайджест новостей…");
+  const text = await runNewsDigest(bot);
+  if (!text) await ctx.reply("За неделю нет новых статей или не удалось собрать дайджест.");
+});
+
 registerAsk(bot);
 registerNav(bot);
 registerDecide(bot);
@@ -66,6 +77,7 @@ registerQuiz(bot);
 startRssPolling(bot);
 startSectionsPolling(bot);
 startDigestSchedule(bot);
+startNewsDigestSchedule(bot);
 
 bot.catch((err) => console.error("Bot error:", (err.error as Error)?.message || String(err)));
 

@@ -28,7 +28,7 @@ export default function BlogPageClient({ posts, categories, total, page, perPage
             padding: "8px 12px", borderRadius: "var(--radius-s)", border: "none", background: !currentCat ? "var(--color-accent-light)" : "transparent",
             color: !currentCat ? "var(--color-accent)" : "var(--color-text-secondary)", cursor: "pointer", textAlign: "left",
             fontSize: "var(--text-s)", fontWeight: !currentCat ? 700 : 500,
-          }}>Все посты</button>
+          }}>Все материалы</button>
           {categories.map((c: any) => (
             <button key={c.slug} onClick={() => router.push(`/blog?cat=${c.slug}`)} style={{
               padding: "8px 12px", borderRadius: "var(--radius-s)", border: "none", background: currentCat === c.slug ? "var(--color-accent-light)" : "transparent",
@@ -65,7 +65,7 @@ export default function BlogPageClient({ posts, categories, total, page, perPage
       {/* CENTER — posts */}
       <main style={{ flex: 1, padding: "var(--space-xl) var(--space-l)", maxWidth: 940 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 8 }}>
-        <h1 style={{ fontSize: "var(--text-xxxl)", fontWeight: 800, marginBottom: "var(--space-xs)" }}>📝 Блог</h1>
+        <h1 style={{ fontSize: "var(--text-xxxl)", fontWeight: 800, marginBottom: "var(--space-xs)" }}>Блог для продавцов</h1>
         <div className="mobile-cat-menu" style={{ position: "relative", display: "none" }}>
           <button onClick={() => setMobileCatOpen(!mobileCatOpen)} style={{
             display: "flex", alignItems: "center", gap: 4, padding: "8px 14px", borderRadius: "var(--radius-s)",
@@ -84,7 +84,7 @@ export default function BlogPageClient({ posts, categories, total, page, perPage
                 display: "block", width: "100%", padding: "10px 14px", border: "none", background: !currentCat ? "var(--color-accent-light)" : "white",
                 color: !currentCat ? "var(--color-accent)" : "var(--color-text-secondary)",
                 fontSize: "var(--text-xs)", fontWeight: !currentCat ? 700 : 500, cursor: "pointer", textAlign: "left",
-              }}>Все посты</button>
+              }}>Все материалы</button>
               {categories.map((c: any) => (
                 <button key={c.slug} onClick={() => { router.push(`/blog?cat=${c.slug}`); setMobileCatOpen(false); }} style={{
                   display: "block", width: "100%", padding: "10px 14px", border: "none", background: currentCat === c.slug ? "var(--color-accent-light)" : "white",
@@ -97,7 +97,7 @@ export default function BlogPageClient({ posts, categories, total, page, perPage
         </div>
       </div>
         <p style={{ color: "var(--color-text-secondary)", fontSize: "var(--text-s)", marginBottom: "var(--space-xl)" }}>
-          AI-инжиниринг, разработка, дизайн, SEO. Статьи от команды Карты роста.
+          Авито, Ozon, Wildberries, AI и автоматизация продаж — только применимые шаги для продавца.
         </p>
 
         <div className="blog-grid">

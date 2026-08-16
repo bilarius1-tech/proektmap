@@ -141,8 +141,9 @@ export default function BlogSettingsClient({ settings, stats }: any) {
             • Утренний и вечерний сбор разводят по времени — блог пополняется дважды в день.<br/>
             • «Статей с источника» — сколько постов берём с каждого активного RSS-источника (1–2 оптимально, чтобы не спамить).<br/>
             • Модель: deepseek-v4-flash — рекомендован (быстрый и дешёвый). deepseek-chat — запасной.<br/>
-            • Сбор идёт по московскому времени; после прогона в Telegram придёт отчёт о публикациях.<br/>
-            • «Интервал публикации» — статьи выходят по одной через N минут (логическая очередь), а не скопом.
+            • Сбор идёт по московскому времени. Если в очередь попали статьи — придёт короткий отчёт без ошибок лент.<br/>
+            • В публичный канал статьи не сыпятся: раз в неделю (пятница 18:00) уходит дайджест.<br/>
+            • «Интервал публикации» — статьи выходят на сайте по одной через N минут.
           </div>
             <button onClick={triggerAutoPublish} disabled={saving}
               style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 20px", borderRadius: "var(--radius-m)", background: "var(--color-accent)", color: "white", border: "none", fontSize: "var(--text-s)", fontWeight: 600, cursor: "pointer" }}>

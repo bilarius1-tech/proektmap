@@ -16,12 +16,12 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
       : `${baseUrl}/blog`;
 
   return {
-    title: cat ? `Блог: ${cat} — Карта роста` : "Блог — Карта роста",
-    description: "AI-инжиниринг, разработка, дизайн, SEO. Статьи от команды Карты роста.",
+    title: cat ? `Блог: ${cat} — Карта роста` : "Автоматизация продаж и маркетплейсов — Карта роста",
+    description: "Практические материалы для продавцов: Авито, Ozon, Wildberries, AI, CRM, боты и автоматизация продаж в России.",
     alternates: { canonical },
     openGraph: {
-      title: "Блог — Карта роста",
-      description: "AI-инжиниринг, разработка, дизайн, SEO.",
+      title: "AI и автоматизация продаж — Карта роста",
+      description: "Авито, Ozon, Wildberries и практические инструменты для продавцов в России.",
       images: [{ url: `${baseUrl}/api/og?title=Блог&category=ProektMap`, width: 1200, height: 630 }],
     },
   };

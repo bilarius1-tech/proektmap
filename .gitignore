@@ -11,3 +11,5 @@ start.sh
 start.sh
 .next/
 public/uploads/
+.voice-venv/
+.voice-cache/

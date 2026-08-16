@@ -12,16 +12,20 @@ import {
   scoreSeoArticle,
   SeoArticle,
 } from "@/lib/blog/seo-pipeline";
+import { DEFAULT_SEO_KEYWORDS, EditorialRubric, judgeRelevance } from "@/lib/blog/relevance";
+import { buildPublishReport, isTransientFeedFailure } from "@/lib/blog/publish-report";
+import { ensureBlogCategory } from "@/lib/blog/categories";
+
+type FeedRow = { id: string; name: string; url: string; type: string; category: string };
+type FeedItem = { title: string; link: string; description: string; image?: string };
 
 function translit(text: string): string {
   const map: any = { а:"a",б:"b",в:"v",г:"g",д:"d",е:"e",ё:"yo",ж:"zh",з:"z",и:"i",й:"y",к:"k",л:"l",м:"m",н:"n",о:"o",п:"p",р:"r",с:"s",т:"t",у:"u",ф:"f",х:"h",ц:"ts",ч:"ch",ш:"sh",щ:"sch",ъ:"",ы:"y",ь:"",э:"e",ю:"yu",я:"ya" };
   return text.toLowerCase().split("").map((c: string) => map[c] || c).join("");
 }
 
-// Parse RSS/XML properly using simple regex that handles CDATA
-function parseXmlItems(xml: string): { title: string; link: string; description: string }[] {
-  const items: any[] = [];
-  // Try <item> tags (RSS) first, then <entry> (Atom)
+function parseXmlItems(xml: string): FeedItem[] {
+  const items: FeedItem[] = [];
   const blocks = xml.match(/<item>[\s\S]*?<\/item>/g) || xml.match(/<entry>[\s\S]*?<\/entry>/g) || [];
   for (const block of blocks.slice(0, 5)) {
     const title = (block.match(/<title[^>]*>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/title>/i)?.[1] || "").replace(/\s+/g, " ").trim();
@@ -32,7 +36,30 @@ function parseXmlItems(xml: string): { title: string; link: string; description:
   return items;
 }
 
-// Clean slug: keep only latin, digits, hyphens
+function parseJsonItems(raw: string): FeedItem[] {
+  try {
+    const json = JSON.parse(raw);
+    if (json.hits) {
+      return json.hits.map((h: any) => ({ title: h.title || h.story_title || "", link: h.url || `https://news.ycombinator.com/item?id=${h.objectID}`, description: (h.story_text || h.comment_text || "").slice(0, 500) }));
+    }
+    if (json.data?.children) {
+      return json.data.children.map((c: any) => {
+        const d = c.data;
+        return { title: d.title, link: `https://reddit.com${d.permalink}`, description: (d.selftext || "").slice(0, 500), image: d.thumbnail?.startsWith("http") ? d.thumbnail : d.preview?.images?.[0]?.source?.url?.replace(/&amp;/g, "&") };
+      });
+    }
+    if (json.items) {
+      return json.items.slice(0, 5).map((i: any) => ({ title: i.full_name || i.name, link: i.html_url || i.url, description: (i.description || "").slice(0, 500), image: i.owner?.avatar_url || null }));
+    }
+    if (Array.isArray(json)) {
+      return json.slice(0, 5).map((i: any) => ({ title: i.title || i.name || "", link: i.url || i.link || "", description: (i.description || i.summary || "").slice(0, 500) }));
+    }
+  } catch {
+    return [];
+  }
+  return [];
+}
+
 function cleanSlug(title: string): string {
   const clean = title.replace(/[^a-zа-я0-9\s-]/gi, "").trim();
   return translit(clean).replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 70);
@@ -124,57 +151,64 @@ async function generateSeoArticle(input: {
 }
 
 function mskNow(): { hour: number; minute: number } {
-  const fmt = new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Moscow', hour: '2-digit', minute: '2-digit', hour12: false });
+  const fmt = new Intl.DateTimeFormat("en-US", { timeZone: "Europe/Moscow", hour: "2-digit", minute: "2-digit", hour12: false });
   const parts = fmt.formatToParts(new Date());
-  const hour = Number(parts.find((x) => x.type === 'hour')?.value ?? '0') % 24;
-  const minute = Number(parts.find((x) => x.type === 'minute')?.value ?? '0');
+  const hour = Number(parts.find((x) => x.type === "hour")?.value ?? "0") % 24;
+  const minute = Number(parts.find((x) => x.type === "minute")?.value ?? "0");
   return { hour, minute };
 }
 
-function buildReport(results: any[], totalCreated: number, startedAt: number): string {
-  const queued = results.filter((r) => r.status === 'queued');
-  const errors = results.filter((r) => r.status === 'error');
-  const rejected = results.filter((r) => r.status === 'seo_rejected');
-  const lines = [
-    '📰 Авто-сбор завершён — статьи в очереди',
-    'В очередь: ' + totalCreated,
-    'Ошибок источников: ' + errors.length,
-    'Отклонено по SEO: ' + rejected.length,
-    'Время: ' + ((Date.now() - startedAt) / 60000).toFixed(1) + ' мин',
-  ];
-  if (queued.length) {
-    lines.push('', 'Новые статьи:');
-    for (const p of queued.slice(0, 10)) lines.push('• ' + p.title);
-  }
-  if (errors.length) {
-    lines.push('', 'Ошибки:');
-    for (const e of errors.slice(0, 5)) lines.push('• ' + e.feed + ': ' + e.reason);
-  }
-  return lines.join(String.fromCharCode(10));
-}
-
 async function sendTelegramReport(text: string): Promise<void> {
-  const token = process.env.TELEGRAM_BOT_TOKEN || '';
-  const chatId = process.env.TELEGRAM_REPORT_CHAT_ID || process.env.TELEGRAM_ADMIN_CHAT_ID || '';
-  if (!token || !chatId) return;
+  const token = process.env.TELEGRAM_BOT_TOKEN || "";
+  const chatId = process.env.TELEGRAM_REPORT_CHAT_ID || process.env.TELEGRAM_ADMIN_CHAT_ID || "";
+  if (!token || !chatId || !text) return;
   try {
-    await fetch('https://api.telegram.org/bot' + token + '/sendMessage', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    await fetch("https://api.telegram.org/bot" + token + "/sendMessage", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ chat_id: chatId, text, disable_web_page_preview: true }),
       signal: AbortSignal.timeout(10000),
     });
   } catch (e) {
-    console.error('[auto-publish] tg report:', e);
+    console.error("[auto-publish] tg report:", e);
+  }
+}
+
+function humanizeFailure(reason: string): string {
+  if (isTransientFeedFailure(reason)) return "timeout";
+  const text = (reason || "").toLowerCase();
+  if (text.includes("unique") || text.includes("prisma")) return "category-conflict";
+  if (text.includes("json")) return "ai-json";
+  return (reason || "unknown").slice(0, 80);
+}
+
+async function fetchOneFeed(feed: FeedRow): Promise<{
+  feed: FeedRow;
+  items: FeedItem[];
+  status: "ok" | "empty" | "skipped";
+  reason?: string;
+}> {
+  try {
+    const res = await fetch(feed.url, {
+      headers: { Accept: feed.type === "xml" ? "application/xml,text/xml" : "application/json", "User-Agent": "ProektMap/1.0" },
+      signal: AbortSignal.timeout(12000),
+    });
+    if (!res.ok) return { feed, items: [], status: "skipped", reason: `HTTP ${res.status}` };
+    const raw = await res.text();
+    if (!raw || raw.length < 50) return { feed, items: [], status: "empty" };
+    const items = (feed.type === "json" ? parseJsonItems(raw) : parseXmlItems(raw))
+      .filter((i) => i.title && i.title.length >= 10 && i.link && !/^https?:\/\//.test(i.title));
+    if (items.length === 0) return { feed, items: [], status: "empty" };
+    return { feed, items, status: "ok" };
+  } catch (e: any) {
+    return { feed, items: [], status: "skipped", reason: humanizeFailure(e?.message || "timeout") };
   }
 }
 
 export async function POST(req: Request) {
-  // Cron secret — bypasses auth for automated runs
-  const cronSecret = req.headers.get('x-cron-secret') || new URL(req.url).searchParams.get('secret') || '';
+  const cronSecret = req.headers.get("x-cron-secret") || new URL(req.url).searchParams.get("secret") || "";
   const isCron = cronSecret === process.env.CRON_SECRET && process.env.CRON_SECRET;
 
-  // Auth check (skip for cron)
   if (!isCron) {
     const session = await auth();
     if (!session?.user || (session.user as any).role !== "admin") {
@@ -185,247 +219,205 @@ export async function POST(req: Request) {
   const db = await getDb();
 
   let settings: any = null;
-  try { settings = await db.siteSettings.findUnique({ where: { id: 'main' } }); } catch (e) {}
+  try { settings = await db.siteSettings.findUnique({ where: { id: "main" } }); } catch {}
 
-  let dripResult: any = { published: false, reason: 'none' };
+  let dripResult: any = { published: false, reason: "none" };
   try {
     const intervalMin = settings?.autoPublishIntervalMin ?? 45;
     const lastDrip = settings?.lastDripPublishedAt;
     if (!lastDrip || Date.now() - new Date(lastDrip).getTime() >= intervalMin * 60 * 1000) {
-      const nextPost = await db.blogPost.findFirst({ where: { status: 'queued' }, orderBy: { createdAt: 'asc' } });
+      const nextPost = await db.blogPost.findFirst({ where: { status: "queued" }, orderBy: { createdAt: "asc" } });
       if (nextPost) {
-        await db.blogPost.update({ where: { id: nextPost.id }, data: { status: 'published', publishedAt: new Date() } });
-        await db.siteSettings.update({ where: { id: 'main' }, data: { lastDripPublishedAt: new Date() } });
+        await db.blogPost.update({ where: { id: nextPost.id }, data: { status: "published", publishedAt: new Date() } });
+        await db.siteSettings.update({ where: { id: "main" }, data: { lastDripPublishedAt: new Date() } });
         dripResult = { published: true, slug: nextPost.slug, title: nextPost.title };
       } else {
-        dripResult = { published: false, reason: 'empty-queue' };
+        dripResult = { published: false, reason: "empty-queue" };
       }
     } else {
-      dripResult = { published: false, reason: 'interval-not-elapsed' };
+      dripResult = { published: false, reason: "interval-not-elapsed" };
     }
-  } catch (e) {
-    dripResult = { published: false, reason: 'error' };
+  } catch {
+    dripResult = { published: false, reason: "error" };
   }
-  if (settings?.autoPublishEnabled !== true) return NextResponse.json({ drip: dripResult, collection: { scheduled: false, reason: 'disabled' } });
+
+  if (settings?.autoPublishEnabled !== true) return NextResponse.json({ drip: dripResult, collection: { scheduled: false, reason: "disabled" } });
   const now = mskNow();
   if (now.hour !== (settings?.autoPublishHour ?? 9) && now.hour !== (settings?.autoPublishEveningHour ?? 20)) {
-    return NextResponse.json({ drip: dripResult, collection: { scheduled: false, reason: 'off-hours', hour: now.hour } });
+    return NextResponse.json({ drip: dripResult, collection: { scheduled: false, reason: "off-hours", hour: now.hour } });
   }
   const lastRun = settings?.autoPublishLastRunAt;
   if (lastRun && Date.now() - new Date(lastRun).getTime() < 45 * 60 * 1000) {
-    return NextResponse.json({ drip: dripResult, collection: { scheduled: false, reason: 'recent-run' } });
+    return NextResponse.json({ drip: dripResult, collection: { scheduled: false, reason: "recent-run" } });
   }
   const stale = new Date(Date.now() - 2 * 60 * 60 * 1000);
   const claimed = await db.siteSettings.updateMany({
-    where: { id: 'main', OR: [{ autoPublishRunning: false }, { autoPublishLastRunAt: { lt: stale } }] },
+    where: { id: "main", OR: [{ autoPublishRunning: false }, { autoPublishLastRunAt: { lt: stale } }] },
     data: { autoPublishRunning: true, autoPublishLastRunAt: new Date() },
   });
-  if (claimed.count === 0) return NextResponse.json({ drip: dripResult, collection: { started: false, reason: 'already-running' } });
-  const startedAt = Date.now();
+  if (claimed.count === 0) return NextResponse.json({ drip: dripResult, collection: { started: false, reason: "already-running" } });
 
   void (async () => {
-  try {
-
-  const feeds = await db.blogFeed.findMany({ where: { isActive: true } });
-  const admin = await db.user.findFirst({ where: { role: "admin" } });
-    if (!admin) return;
-
-  let key = process.env.DEEPSEEK_API_KEY || "";
-  let model = "deepseek-chat";
-  let itemsPerFeed = 2;
-  let siteKeywords: string[] = [];
-  try {
-    const settings = await db.siteSettings.findUnique({ where: { id: "main" } });
-    if (settings?.deepseekApiKey) key = settings.deepseekApiKey;
-    if (settings?.deepseekModel) model = settings.deepseekModel;
-    if (settings?.autoPublishItemsPerFeed) itemsPerFeed = settings.autoPublishItemsPerFeed;
-    siteKeywords = parseSeoKeywords(settings?.seoKeywords || "");
-  } catch {}
-    if (!key) return;
-  const internalLinkCatalog = await getInternalLinkCatalog(db);
-
-  const results: any[] = [];
-  let totalCreated = 0;
-
-  for (const feed of feeds) {
     try {
-      const res = await fetch(feed.url, {
-        headers: { "Accept": feed.type === "xml" ? "application/xml,text/xml" : "application/json", "User-Agent": "ProektMap/1.0" },
-        signal: AbortSignal.timeout(15000),
-      });
-      if (!res.ok) {
-        results.push({ feed: feed.name, status: "error", reason: `HTTP ${res.status}` });
-        continue;
-      }
+      const feeds: FeedRow[] = await db.blogFeed.findMany({ where: { isActive: true } });
+      const admin = await db.user.findFirst({ where: { role: "admin" } });
+      if (!admin) return;
 
-      const raw = await res.text();
-      if (!raw || raw.length < 50) {
-        results.push({ feed: feed.name, status: "empty" });
-        continue;
-      }
+      let key = process.env.DEEPSEEK_API_KEY || "";
+      let model = "deepseek-chat";
+      let itemsPerFeed = 2;
+      let siteKeywords: string[] = [];
+      try {
+        const live = await db.siteSettings.findUnique({ where: { id: "main" } });
+        if (live?.deepseekApiKey) key = live.deepseekApiKey;
+        if (live?.deepseekModel) model = live.deepseekModel;
+        if (live?.autoPublishItemsPerFeed) itemsPerFeed = live.autoPublishItemsPerFeed;
+        siteKeywords = parseSeoKeywords(live?.seoKeywords || "");
+      } catch {}
+      if (!siteKeywords.length) siteKeywords = DEFAULT_SEO_KEYWORDS;
+      if (!key) return;
 
-      let items: { title: string; link: string; description: string; image?: string }[] = [];
+      const internalLinkCatalog = await getInternalLinkCatalog(db);
+      const results: any[] = [];
+      const fetched = await Promise.all(feeds.map((feed) => fetchOneFeed(feed)));
 
-      if (feed.type === "json") {
-        try {
-          const json = JSON.parse(raw);
-          if (json.hits) {
-            items = json.hits.map((h: any) => ({ title: h.title || h.story_title || "", link: h.url || `https://news.ycombinator.com/item?id=${h.objectID}`, description: (h.story_text || h.comment_text || "").slice(0, 500) }));
-          } else if (json.data?.children) {
-            items = json.data.children.map((c: any) => { const d = c.data; return { title: d.title, link: `https://reddit.com${d.permalink}`, description: (d.selftext || "").slice(0, 500), image: d.thumbnail?.startsWith("http") ? d.thumbnail : d.preview?.images?.[0]?.source?.url?.replace(/&amp;/g, "&") }; });
-          } else if (json.items) {
-            items = json.items.slice(0, 5).map((i: any) => ({ title: i.full_name || i.name, link: i.html_url || i.url, description: (i.description || "").slice(0, 500), image: i.owner?.avatar_url || null }));
-          } else if (Array.isArray(json)) {
-            items = json.slice(0, 5).map((i: any) => ({ title: i.title || i.name || "", link: i.url || i.link || "", description: (i.description || i.summary || "").slice(0, 500) }));
-          }
-        } catch (e: any) {
-          results.push({ feed: feed.name, status: "error", reason: "JSON parse: " + (e.message?.slice(0, 50) || "unknown") });
+      for (const pack of fetched) {
+        if (pack.status !== "ok") {
+          console.warn("[auto-publish] feed", pack.feed.name, pack.status, pack.reason || "");
+          results.push({ feed: pack.feed.name, status: pack.status, reason: pack.reason });
           continue;
         }
-      } else {
-        items = parseXmlItems(raw);
-      }
 
-      // Filter out items with titles that are too short or just URLs
-      items = items.filter(i => i.title && i.title.length >= 10 && i.link && !/^https?:\/\//.test(i.title));
-
-      if (items.length === 0) {
-        results.push({ feed: feed.name, status: "empty" });
-        continue;
-      }
-
-      let feedCreated = 0;
-      for (const item of items.slice(0, itemsPerFeed)) {
-        try {
-          // Better duplicate detection: check slug first, then link in metaDesc
-          const candidateSlug = cleanSlug(item.title);
-          const slugExists = await db.blogPost.findUnique({ where: { slug: candidateSlug } });
-          if (slugExists) continue;
-
-          if (item.link) {
-            const linkExists = await db.blogPost.findFirst({
-              where: {
-                OR: [
-                  { content: { contains: sourceMarker(item.link) } },
-                  { content: { contains: `href="${item.link}"` } },
-                ],
-              },
-              select: { id: true },
-            });
-            if (linkExists) continue;
+        let feedCreated = 0;
+        const candidates: { item: FeedItem; rubric: EditorialRubric; angle: string }[] = [];
+        for (const item of pack.items) {
+          const relevance = judgeRelevance(item.title, item.description, pack.feed.category);
+          if (!relevance.ok) {
+            results.push({ feed: pack.feed.name, title: item.title.slice(0, 60), status: "skipped", reason: relevance.reason });
+            continue;
           }
+          candidates.push({ item, rubric: relevance.rubric, angle: relevance.angle });
+        }
 
-          // Обложка: RSS-thumbnail (2-й источник) → SVG-движок (фолбэк)
-          let coverImage = `/api/og?title=${encodeURIComponent(item.title.slice(0, 80))}&category=${encodeURIComponent(feed.category)}`;
+        for (const candidate of candidates.slice(0, itemsPerFeed)) {
+          const { item, rubric: editorialCategory, angle } = candidate;
           try {
-            const cover = await resolveCover({
-              title: item.title.slice(0, 80),
-              category: feed.category,
-              tags: feed.category.replace(/[^a-zA-Zа-яА-ЯёЁ,]/g, "").split(",").filter(Boolean),
-              thumbnailUrl: item.image || undefined,
-            });
-            coverImage = cover.url;
-          } catch {}
+            const candidateSlug = cleanSlug(item.title);
+            if (await db.blogPost.findUnique({ where: { slug: candidateSlug } })) continue;
 
-          const internalLinks = rankInternalLinks(internalLinkCatalog, `${item.title} ${item.description} ${feed.category}`);
-          const allowedInternalUrls = internalLinks.map((link) => link.url);
+            if (item.link) {
+              const linkExists = await db.blogPost.findFirst({
+                where: {
+                  OR: [
+                    { content: { contains: sourceMarker(item.link) } },
+                    { content: { contains: `href="${item.link}"` } },
+                  ],
+                },
+                select: { id: true },
+              });
+              if (linkExists) continue;
+            }
 
-          let article = await generateSeoArticle({
-            key,
-            model,
-            sourceTitle: item.title,
-            sourceDescription: item.description,
-            sourceUrl: item.link,
-            category: feed.category,
-            siteKeywords,
-            internalLinks,
-          });
-          article.html = sanitizeArticleHtml(article.html);
-          let seoCheck = scoreSeoArticle(article, item.link, allowedInternalUrls, item.description);
+            let coverImage = `/api/og?title=${encodeURIComponent(item.title.slice(0, 80))}&category=${encodeURIComponent(editorialCategory)}`;
+            try {
+              const cover = await resolveCover({
+                title: item.title.slice(0, 80),
+                category: editorialCategory,
+                tags: [editorialCategory, "автоматизация продаж"],
+                thumbnailUrl: item.image || undefined,
+              });
+              coverImage = cover.url;
+            } catch {}
 
-          // Один редакторский проход: статья ниже 70/100 не публикуется автоматически.
-          if (seoCheck.score < 70) {
-            article = await generateSeoArticle({
-              key,
-              model,
+            const internalLinks = rankInternalLinks(
+              internalLinkCatalog,
+              `${item.title} ${item.description} ${editorialCategory} ${angle}`,
+            );
+            const allowedInternalUrls = internalLinks.map((link) => link.url);
+
+            let article = await generateSeoArticle({
+              key, model,
               sourceTitle: item.title,
               sourceDescription: item.description,
               sourceUrl: item.link,
-              category: feed.category,
+              category: editorialCategory,
               siteKeywords,
               internalLinks,
-              revision: { article, check: seoCheck },
             });
             article.html = sanitizeArticleHtml(article.html);
-            seoCheck = scoreSeoArticle(article, item.link, allowedInternalUrls, item.description);
-          }
+            let seoCheck = scoreSeoArticle(article, item.link, allowedInternalUrls, item.description);
 
-          if (seoCheck.score < 70) {
-            results.push({
-              feed: feed.name,
-              title: item.title.slice(0, 60),
-              status: "seo_rejected",
-              seoScore: seoCheck.score,
-              missing: seoCheck.missing,
+            if (seoCheck.score < 70) {
+              article = await generateSeoArticle({
+                key, model,
+                sourceTitle: item.title,
+                sourceDescription: item.description,
+                sourceUrl: item.link,
+                category: editorialCategory,
+                siteKeywords,
+                internalLinks,
+                revision: { article, check: seoCheck },
+              });
+              article.html = sanitizeArticleHtml(article.html);
+              seoCheck = scoreSeoArticle(article, item.link, allowedInternalUrls, item.description);
+            }
+
+            if (seoCheck.score < 70) {
+              results.push({ feed: pack.feed.name, title: item.title.slice(0, 60), status: "seo_rejected", seoScore: seoCheck.score });
+              continue;
+            }
+
+            const title = article.title;
+            const metaDesc = article.metaDesc.slice(0, 170);
+            const content = `${sourceMarker(item.link)}<!-- seo-score:${seoCheck.score}; type:${seoCommentValue(article.contentType)}; intent:${seoCommentValue(article.intent)}; primary:${seoCommentValue(article.primaryKeyword)} -->${appendFaq(article.html, article.faq)}`;
+            const slug = cleanSlug(title);
+            if (!slug) continue;
+            if (await db.blogPost.findUnique({ where: { slug }, select: { id: true } })) continue;
+
+            const cat = await ensureBlogCategory(db, editorialCategory);
+            if (!cat) continue;
+
+            await db.blogPost.create({
+              data: {
+                title, slug, content, excerpt: metaDesc, coverImage,
+                status: "queued", authorId: admin.id, categoryId: cat.id,
+                tags: [editorialCategory, "продавцы", "автоматизация продаж", article.contentType, article.primaryKeyword, ...article.secondaryKeywords.slice(0, 5)].filter(Boolean).join(","),
+                aiGenerated: true, aiModel: model,
+                metaTitle: article.metaTitle, metaDesc,
+              },
             });
-            continue;
+
+            feedCreated++;
+            results.push({
+              feed: pack.feed.name,
+              title: title.slice(0, 80),
+              slug,
+              status: "queued",
+              contentType: article.contentType,
+              rubric: editorialCategory,
+              seoScore: seoCheck.score,
+            });
+          } catch (itemErr: any) {
+            const reason = humanizeFailure(itemErr?.message || "");
+            console.warn("[auto-publish] item", pack.feed.name, reason, item.title?.slice(0, 40));
+            results.push({ feed: pack.feed.name, title: item.title?.slice(0, 40), status: "skipped", reason });
           }
+        }
 
-          const title = article.title;
-          const metaDesc = article.metaDesc.slice(0, 170);
-          const content = `${sourceMarker(item.link)}<!-- seo-score:${seoCheck.score}; type:${seoCommentValue(article.contentType)}; intent:${seoCommentValue(article.intent)}; primary:${seoCommentValue(article.primaryKeyword)} -->${appendFaq(article.html, article.faq)}`;
-          const excerpt = metaDesc;
-          const slug = cleanSlug(title);
-          if (!slug) continue;
-          if (await db.blogPost.findUnique({ where: { slug }, select: { id: true } })) continue;
-
-          // Ensure category exists
-          let cat = await db.blogCategory.findFirst({ where: { name: feed.category } });
-          if (!cat) cat = await db.blogCategory.create({ data: { name: feed.category, slug: feed.category.toLowerCase().replace(/[^a-zа-я0-9]+/g, "-").slice(0, 50) } });
-
-          await db.blogPost.create({
-            data: {
-              title, slug, content, excerpt, coverImage,
-              status: "queued", authorId: admin.id, categoryId: cat.id,
-              tags: [feed.category, article.contentType, article.primaryKeyword, ...article.secondaryKeywords.slice(0, 5)].filter(Boolean).join(","),
-              aiGenerated: true, aiModel: model,
-              metaTitle: article.metaTitle, metaDesc,
-            },
-          });
-
-          feedCreated++;
-          totalCreated++;
-          results.push({
-            feed: feed.name,
-            title: title.slice(0, 60),
-            slug,
-            status: "queued",
-            contentType: article.contentType,
-            primaryKeyword: article.primaryKeyword,
-            seoScore: seoCheck.score,
-            seoCheck: seoCheck.checks,
-          });
-        } catch (itemErr: any) {
-          results.push({ feed: feed.name, title: item.title?.slice(0, 40), status: "error", reason: itemErr.message?.slice(0, 60) });
+        await db.blogFeed.update({ where: { id: pack.feed.id }, data: { lastFetched: new Date() } });
+        if (feedCreated === 0) {
+          results.push({ feed: pack.feed.name, status: "dup", reason: "all skipped or duplicates" });
         }
       }
 
-      await db.blogFeed.update({ where: { id: feed.id }, data: { lastFetched: new Date() } });
-      if (feedCreated === 0 && results.filter(r => r.feed === feed.name && r.status === "error").length === 0) {
-        results.push({ feed: feed.name, status: "dup", reason: "all duplicates" });
-      }
-    } catch (feedErr: any) {
-      results.push({ feed: feed.name, status: "error", reason: (feedErr.message || "unknown").slice(0, 80) });
+      const queued = results.filter((r) => r.status === "queued");
+      const report = buildPublishReport(queued);
+      if (report) await sendTelegramReport(report);
+    } catch (e: any) {
+      console.error("[auto-publish] run:", e?.message || e);
+    } finally {
+      try { await db.siteSettings.update({ where: { id: "main" }, data: { autoPublishRunning: false } }); } catch {}
     }
-  }
-
-  await sendTelegramReport(buildReport(results, totalCreated, startedAt));
-  } catch (e: any) {
-    console.error('[auto-publish] run:', e?.message || e);
-    await sendTelegramReport('📰 Авто-публикация: ошибка' + String.fromCharCode(10) + (e?.message || String(e)));
-  } finally {
-    try { await db.siteSettings.update({ where: { id: 'main' }, data: { autoPublishRunning: false } }); } catch (e) {}
-  }
   })();
 
   return NextResponse.json({ drip: dripResult, collection: { scheduled: true, started: true } });

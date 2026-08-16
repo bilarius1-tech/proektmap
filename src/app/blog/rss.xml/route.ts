@@ -46,9 +46,9 @@ export async function GET() {
   xmlns:content="http://purl.org/rss/1.0/modules/content/"
   xmlns:dc="http://purl.org/dc/elements/1.1/">
   <channel>
-    <title>Карта роста — Блог</title>
+    <title>Карта роста — AI и автоматизация продаж</title>
     <link>${baseUrl}/blog</link>
-    <description>AI-инжиниринг, разработка, дизайн, SEO. Статьи от команды Карты роста.</description>
+    <description>Авито, Ozon, Wildberries, AI, CRM, боты и автоматизация продаж для продавцов в России.</description>
     <language>ru</language>
     <lastBuildDate>${lastBuild}</lastBuildDate>
     <atom:link href="${baseUrl}/blog/rss.xml" rel="self" type="application/rss+xml"/>
