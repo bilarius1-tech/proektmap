@@ -19,6 +19,7 @@ const FLOW = [
   {
     phase: "Выбор",
     modules: [
+      { id: "resheniya", title: "Готовые решения AI", href: "/resheniya", icon: Play, desc: "Маршрут от цели до проверенного результата: решение, действие, артефакт и проверка.", links: ["patterns", "blueprint", "glossary"] },
       { id: "patterns", title: "Паттерны", href: "/patterns", icon: Package, desc: "7 готовых бизнес-схем. Стек, сущности, эволюция, стоимость запуска, типичные ошибки.", links: ["blueprint", "prompts", "mcp"] },
       { id: "architecture", title: "Карта метро", href: "/architecture", icon: Train, desc: "Визуальная схема 6 фаз разработки. От идеи до запуска — все этапы перед глазами.", links: ["blueprint", "patterns"] },
     ],
@@ -72,7 +73,7 @@ export default function SitemapClient() {
           Карта экосистемы ProektMap
         </h1>
         <p style={{ fontSize: "var(--text-m)", color: "var(--color-text-secondary)", maxWidth: 600, margin: "0 auto", lineHeight: 1.7 }}>
-          14 модулей, 5 фаз — от идеи до запуска AI-продукта.
+          15 модулей, 5 фаз — от идеи до запуска AI-продукта.
           Каждый модуль решает конкретную задачу на пути инженера.
         </p>
       </div>

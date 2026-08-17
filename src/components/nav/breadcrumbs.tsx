@@ -24,6 +24,9 @@ const ROUTE_LABELS: Record<string, string> = {
   contacts: 'Контакты',
   auth: 'Вход',
   blueprints: 'Blueprints',
+  resheniya: 'Готовые решения',
+  'saas-product': 'SaaS-продукт',
+  workspace: 'Рабочая зона',
 };
 
 export default function Breadcrumbs({ pathname, pageTitle }: { pathname: string; pageTitle?: string }) {

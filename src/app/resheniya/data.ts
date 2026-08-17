@@ -29,13 +29,17 @@ export type SolutionPhase = {
 export const ecosystemResources: SolutionResource[] = [
   { href: "/sandbox", label: "Песочница", description: "Исследовать идеи и сценарии до старта", kind: "Исследование" },
   { href: "/glossary", label: "Глоссарий", description: "Понять термины текущего этапа", kind: "Знания" },
+  { href: "/decisions", label: "Методология решений", description: "Зафиксировать выбор: понять → выбрать → проверить", kind: "Методика" },
+  { href: "/architect", label: "AI-Архитектор", description: "Собрать сущности, стек и план из описания продукта", kind: "Проектирование" },
   { href: "/models", label: "AI-модели", description: "Сравнить модели по цене и возможностям", kind: "Выбор" },
   { href: "/ai-tools", label: "AI-инструменты", description: "Подобрать сервисы для выполнения задачи", kind: "Инструменты" },
   { href: "/skills", label: "Skills", description: "Подключить готовые навыки AI-агента", kind: "Действие" },
   { href: "/patterns", label: "Паттерны", description: "Использовать проверенную архитектуру", kind: "Архитектура" },
   { href: "/prompts", label: "Промпты", description: "Запустить работу в Cursor или Claude Code", kind: "Разработка" },
   { href: "/mcp", label: "MCP-каталог", description: "Связать агента с внешними системами", kind: "Интеграции" },
+  { href: "/russian-ai", label: "Российский AI", description: "Каталог LLM, image и business-сервисов без VPN", kind: "Локализация" },
   { href: "/russian-ai-stack", label: "Российский AI-стек", description: "Выбрать сервисы без VPN и зарубежных карт", kind: "Инфраструктура" },
+  { href: "/ai-without-vpn", label: "AI без VPN", description: "Оплата в ₽, хостинг в РФ и рабочие замены западных сервисов", kind: "Доступ" },
   { href: "/ai-workshop", label: "AI Цех", description: "Посмотреть реальные проекты и реализации", kind: "Примеры" },
 ];
 
@@ -73,7 +77,7 @@ export const saasPhases: SolutionPhase[] = [
       "Три человека подтвердили проблему своими словами",
       "Зафиксирован существующий способ решения",
     ],
-    resources: resources("Песочница", "Глоссарий", "AI Цех"),
+    resources: resources("Песочница", "Глоссарий", "Методология решений", "AI Цех"),
   },
   {
     slug: "mvp",
@@ -105,7 +109,7 @@ export const saasPhases: SolutionPhase[] = [
       "Каждая функция относится к главному сценарию",
       "Есть список отложенных возможностей",
     ],
-    resources: resources("Паттерны", "Глоссарий", "Промпты"),
+    resources: resources("Паттерны", "Методология решений", "Глоссарий", "Промпты"),
   },
   {
     slug: "model",
@@ -137,7 +141,7 @@ export const saasPhases: SolutionPhase[] = [
       "Учтена переменная стоимость AI",
       "Оффер понятен без объяснения разработчика",
     ],
-    resources: resources("AI-модели", "Российский AI-стек", "Глоссарий"),
+    resources: resources("AI-модели", "Российский AI", "AI без VPN", "Глоссарий"),
   },
   {
     slug: "experience",
@@ -201,7 +205,7 @@ export const saasPhases: SolutionPhase[] = [
       "Определены границы доступа к данным",
       "Для каждой интеграции есть запасной сценарий",
     ],
-    resources: resources("AI-модели", "MCP-каталог", "Паттерны", "Российский AI-стек"),
+    resources: resources("AI-Архитектор", "Паттерны", "MCP-каталог", "Российский AI-стек"),
   },
   {
     slug: "vertical-slice",
@@ -297,7 +301,7 @@ export const saasPhases: SolutionPhase[] = [
       "Ошибки и платежные события наблюдаемы",
       "Получен первый внешний сигнал ценности",
     ],
-    resources: resources("AI Цех", "Глоссарий", "Российский AI-стек", "AI-инструменты"),
+    resources: resources("AI Цех", "AI без VPN", "Российский AI-стек", "AI-инструменты"),
   },
 ];
 
