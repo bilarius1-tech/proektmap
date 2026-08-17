@@ -1,0 +1,34 @@
+---
+description: Правила продукта /resheniya — готовые AI-решения с проверяемым прогрессом
+globs: src/app/resheniya/**
+alwaysApply: false
+---
+
+# /resheniya — правила для агентов
+
+## Центр продукта
+
+`/resheniya` («Готовые решения AI») — главный путь от цели до проверенного результата.
+Старые Blueprint живут отдельно. `/solutions` — другая сущность (библиотека архитектур).
+
+## Модель
+
+Цель → Этап → Решение → Действие → Артефакт → Проверка → следующий этап.
+
+Прогресс растёт только после проверенного результата.
+
+## При работе с этими файлами
+
+1. Читай `docs/RESHENIYA-V1.md` и пилот `saas-product`.
+2. Создаёшь/расширяешь маршрут → skill **`resheniya-author`**.
+3. Перед публикацией → skill **`resheniya-auditor`** (желательно другой агент).
+4. Не ломай `/blueprints` и `/[blueprint]` без явной просьбы.
+5. Не смешивай URL/модель с `/solutions`.
+6. Каждый этап: решение + действие + артефакт + checks.
+7. Mobile-first: 375px без overflow, CTA ≥52px.
+8. После кода: `rm -rf .next && npx next build` (+ `pm2 restart proektmap` на сервере).
+9. Новые Skills: `trust: community` до аудита.
+
+## Эталон
+
+`src/app/resheniya/data.ts` + workspace SaaS — образец структуры и UX.

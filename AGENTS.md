@@ -4,6 +4,9 @@
 **ProektMap (Карта роста)** — платформа для обучения AI-инжинирингу.
 Сайт: https://proektmap.ru | Сервер: 109.196.165.106
 
+**Центр продукта:** `/resheniya` — «Готовые решения AI» (результат → этапы → артефакт → проверка).
+Старые Blueprint (`/blueprints`) — legacy. `/solutions` — другая сущность, не путать.
+
 ## Стек
 Next.js 16 + TypeScript + Prisma 7 + PostgreSQL + Tailwind CSS
 Деплой: PM2 на порту 3030, nginx reverse proxy
@@ -38,7 +41,11 @@ rm -rf .next && npx next build && pm2 restart proektmap
 - `src/lib/` — утилиты (auth, db, project-context)
 - `prisma/schema.prisma` — модель БД
 - `prisma/seed.ts` — ПОЛНЫЙ посев (защита от сброса)
-- `docs/` — документация (DEVLOG, BUGS, ARCHITECTURE)
+- `docs/` — документация (DEVLOG, BUGS, ARCHITECTURE, PHILOSOPHY, RESHENIYA-V1)
+- `src/app/resheniya/` — готовые AI-решения (каталог, обзор, workspace)
+- `.cursor/skills/` — Skills для Cursor-агентов
+- `.cursor/rules/` — правила по путям файлов
+- `.reasonix/skills/` — библиотека Skills проекта
 
 ### 6. Важные API эндпоинты
 - `/api/ai/ask` — AI-консультант (требуется Pro)
@@ -96,6 +103,17 @@ ProektMap не должен быть стеной текста.
 Skill: .reasonix/skills/visual-content/SKILL.md
 Skill: .reasonix/skills/yookassa-checkout/SKILL.md
 
+### /resheniya — обязательные Skills агентов
+
+| Задача | Skill | Путь |
+|--------|-------|------|
+| Создать/расширить маршрут | `resheniya-author` | `.cursor/skills/resheniya-author/SKILL.md` |
+| Проверить до публикации | `resheniya-auditor` | `.cursor/skills/resheniya-auditor/SKILL.md` |
+
+Правило (auto на `src/app/resheniya/**`): `.cursor/rules/resheniya.mdc`
+
+Автор и аудитор — разные роли. Автор не объявляет маршрут готовым без аудита.
+
 ## Trust System
 
 ProektMap использует трёхуровневую систему проверки Skills:
@@ -107,4 +125,4 @@ ProektMap использует трёхуровневую систему про�
 При создании новых Skills ставь trust: community до прохождения аудита.
 
 ## Философия проекта
-См. docs/PHILOSOPHY.md — Decision-Driven Development.
+См. `docs/PHILOSOPHY.md` (v3) и `docs/RESHENIYA-V1.md`.
