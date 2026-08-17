@@ -169,7 +169,7 @@ export default function PostPageClient({ post, relatedPosts, readMore, isAdmin: 
         </div>
       </div>
 
-      <div style={{ fontSize: "var(--text-s)", lineHeight: 1.8, color: "var(--color-text-primary)",  marginBottom: "var(--space-xl)" }}>
+      <div className="blog-article-body" style={{ color: "var(--color-text-primary)", marginBottom: "var(--space-xl)" }}>
         <ContentHtml content={post.content} tocHeadings={tocHeadings} />
       </div>
 
