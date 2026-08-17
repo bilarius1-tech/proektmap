@@ -38,9 +38,15 @@ export default async function GlobalHeader() {
       </div>
 
       <div className="header-right" style={{ display: "flex", alignItems: "center", gap: "var(--space-s)" }}>
-        <KnowledgeButtons />
-        <FavoritesIndicator initialCount={0} />
-        <ThemeToggle />
+        <div className="header-knowledge">
+          <KnowledgeButtons />
+        </div>
+        <div className="header-favorites">
+          <FavoritesIndicator initialCount={0} />
+        </div>
+        <div className="header-theme">
+          <ThemeToggle />
+        </div>
         <AuthBlock />
       </div>
     </header>
