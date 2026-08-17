@@ -43,19 +43,21 @@ export default function AuthPage() {
   }
 
   return (
-    <div style={{ fontFamily: "Inter, sans-serif", background: "var(--color-bg-secondary)", minHeight: "100dvh", display: "flex", alignItems: "center", justifyContent: "center", padding: "var(--space-m)" }}>
-      <div style={{ width: "100%", maxWidth: 380, background: "var(--color-bg-primary)", borderRadius: "var(--radius-xl)", padding: "var(--space-xl)", border: "1px solid var(--color-border-light)" }}>
-        <div style={{ textAlign: "center", marginBottom: "var(--space-l)" }}>
-          <div style={{ fontSize: 22, fontWeight: 800, marginBottom: "var(--space-xs)" }}>
+    <div className="auth-page-shell" style={{ fontFamily: "Inter, sans-serif", background: "var(--color-bg-secondary)", minHeight: "100dvh", display: "flex", alignItems: "center", justifyContent: "center", padding: "var(--space-m)" }}>
+      <div className="auth-card" style={{ width: "100%", maxWidth: 380, background: "var(--color-bg-primary)", borderRadius: "var(--radius-xl)", padding: "var(--space-xl)", border: "1px solid var(--color-border-light)" }}>
+        <div className="auth-card-header" style={{ textAlign: "center", marginBottom: "var(--space-l)" }}>
+          <div className="auth-brand" style={{ fontSize: 22, fontWeight: 800, marginBottom: "var(--space-xs)" }}>
             Proekt<span style={{ color: "var(--color-accent)" }}>Map</span>
           </div>
-          <p style={{ fontSize: "var(--text-s)", color: "var(--color-text-tertiary)" }}>Войдите чтобы продолжить</p>
+          <p className="auth-subtitle" style={{ fontSize: "var(--text-s)", color: "var(--color-text-tertiary)" }}>
+            {tab === "login" ? "Войдите, чтобы продолжить" : "Создайте аккаунт для сохранения прогресса"}
+          </p>
         </div>
 
         {/* Tabs */}
-        <div style={{ display: "flex", marginBottom: "var(--space-m)", borderBottom: "1px solid var(--color-border-light)" }}>
+        <div className="auth-tabs" role="tablist" aria-label="Способ авторизации" style={{ display: "flex", marginBottom: "var(--space-m)", borderBottom: "1px solid var(--color-border-light)" }}>
           {(["login", "register"] as const).map(t => (
-            <button key={t} onClick={() => setTab(t)} style={{
+            <button key={t} onClick={() => setTab(t)} className="auth-tab" role="tab" aria-selected={tab === t} style={{
               flex: 1, padding: "var(--space-s)", border: "none", background: "transparent",
               cursor: "pointer", fontWeight: tab === t ? 700 : 400,
               color: tab === t ? "var(--color-accent)" : "var(--color-text-tertiary)",
@@ -68,28 +70,34 @@ export default function AuthPage() {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleEmail} style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)" }}>
-          <input className="input" type="email" value={email} onChange={e => setEmail(e.target.value)}
-            placeholder="Email" required style={{ padding: "12px" }} />
-          <input className="input" type="password" value={password} onChange={e => setPassword(e.target.value)}
-            placeholder="Пароль" required style={{ padding: "12px" }} />
-          {error && <div style={{ fontSize: "var(--text-xs)", color: "var(--color-error)", padding: "var(--space-s)", background: "var(--color-error-light)", borderRadius: "var(--radius-m)" }}>{error}</div>}
+        <form className="auth-form" onSubmit={handleEmail} style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)" }}>
+          <label className="auth-field">
+            <span>Email</span>
+            <input className="input auth-input" type="email" value={email} onChange={e => setEmail(e.target.value)}
+              placeholder="name@example.ru" autoComplete="email" required style={{ padding: "12px" }} />
+          </label>
+          <label className="auth-field">
+            <span>Пароль</span>
+            <input className="input auth-input" type="password" value={password} onChange={e => setPassword(e.target.value)}
+              placeholder="Введите пароль" autoComplete={tab === "login" ? "current-password" : "new-password"} required style={{ padding: "12px" }} />
+          </label>
+          {error && <div className="auth-error" role="alert" style={{ fontSize: "var(--text-xs)", color: "var(--color-error)", padding: "var(--space-s)", background: "var(--color-error-light)", borderRadius: "var(--radius-m)" }}>{error}</div>}
           <button type="submit" disabled={loading}
-            className="btn btn-primary" style={{ padding: "12px", justifyContent: "center", fontSize: "var(--text-m)" }}>
+            className="btn btn-primary auth-submit" style={{ padding: "12px", justifyContent: "center", fontSize: "var(--text-m)" }}>
             {loading ? "..." : (tab === "login" ? "Войти" : "Зарегистрироваться")}
           </button>
         </form>
 
         {/* Yandex OAuth */}
-        <div style={{ marginTop: "var(--space-m)" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "var(--space-s)", marginBottom: "var(--space-s)" }}>
+        <div className="auth-oauth" style={{ marginTop: "var(--space-m)" }}>
+          <div className="auth-divider" style={{ display: "flex", alignItems: "center", gap: "var(--space-s)", marginBottom: "var(--space-s)" }}>
             <div style={{ flex: 1, height: 1, background: "var(--color-border-light)" }} />
             <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>или</span>
             <div style={{ flex: 1, height: 1, background: "var(--color-border-light)" }} />
           </div>
           <button
             onClick={handleYandex}
-            className="btn btn-ghost"
+            className="btn btn-ghost auth-yandex"
             style={{ width: "100%", justifyContent: "center", padding: "10px", fontSize: "var(--text-s)" }}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="#FC3F1D" style={{ marginRight: 8 }}>

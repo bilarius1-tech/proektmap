@@ -416,6 +416,157 @@
     text-align: center;
   }
 }
+
+/* Authorization and pricing */
+.auth-card,
+.auth-input,
+.auth-submit,
+.auth-yandex,
+.pricing-card,
+.pricing-cta {
+  box-sizing: border-box;
+}
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.auth-input {
+  width: 100%;
+}
+
+@media (max-width: 480px) {
+  .auth-page-shell {
+    min-height: calc(100dvh - 56px) !important;
+    align-items: flex-start !important;
+    padding: 24px 12px calc(var(--bottom-chrome, 56px) + 24px) !important;
+  }
+  .auth-card {
+    max-width: 380px !important;
+    padding: 20px !important;
+  }
+  .auth-card-header {
+    margin-bottom: 20px !important;
+  }
+  .auth-brand {
+    font-size: 24px !important;
+  }
+  .auth-subtitle {
+    margin: 6px 0 0;
+    font-size: 15px !important;
+    line-height: 1.45;
+  }
+  .auth-tabs {
+    margin-bottom: 18px !important;
+  }
+  .auth-tab {
+    min-height: 48px;
+    padding: 10px 8px !important;
+    font-size: 15px !important;
+  }
+  .auth-form {
+    gap: 14px !important;
+  }
+  .auth-field {
+    font-size: 14px;
+  }
+  .auth-input {
+    min-height: 50px;
+    padding: 12px 14px !important;
+    font-size: 16px !important;
+  }
+  .auth-error {
+    font-size: 14px !important;
+    line-height: 1.4;
+  }
+  .auth-submit,
+  .auth-yandex {
+    min-height: 50px;
+    font-size: 16px !important;
+  }
+  .auth-oauth {
+    margin-top: 18px !important;
+  }
+  .auth-divider {
+    margin-bottom: 12px !important;
+  }
+  .pricing-hero {
+    padding: 32px 16px !important;
+  }
+  .pricing-title {
+    font-size: 32px !important;
+    line-height: 1.1;
+  }
+  .pricing-lead {
+    font-size: 16px !important;
+    line-height: 1.6;
+  }
+  .pricing-container {
+    padding: 32px 12px !important;
+  }
+  .pricing-grid {
+    grid-template-columns: 1fr !important;
+    gap: 32px !important;
+  }
+  .pricing-card {
+    width: 100%;
+    padding: 20px !important;
+    border-radius: var(--radius-l) !important;
+  }
+  .pricing-plan-name,
+  .pricing-cancel-note {
+    font-size: 13px !important;
+  }
+  .pricing-price {
+    font-size: 40px !important;
+    line-height: 1.15;
+  }
+  .pricing-period {
+    font-size: 18px !important;
+  }
+  .pricing-features {
+    gap: 12px !important;
+    margin-bottom: 20px !important;
+    font-size: 15px !important;
+  }
+  .pricing-feature {
+    align-items: flex-start !important;
+    line-height: 1.45;
+  }
+  .pricing-feature svg {
+    width: 18px;
+    height: 18px;
+    margin-top: 1px;
+  }
+  .pricing-cta {
+    min-height: 52px;
+    padding: 14px 16px !important;
+    border-radius: var(--radius-m) !important;
+    font-size: 16px !important;
+  }
+  .pricing-recommended {
+    top: -13px !important;
+    padding: 6px 16px !important;
+    border-radius: var(--radius-full) !important;
+    font-size: 12px !important;
+    white-space: nowrap;
+  }
+  .pricing-back {
+    padding: 0 12px calc(var(--bottom-chrome, 56px) + 24px) !important;
+  }
+  .pricing-back a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    font-size: 14px !important;
+  }
+}
+
 .blog-post-meta {
   display: flex;
   align-items: center;
