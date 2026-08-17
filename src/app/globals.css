@@ -304,6 +304,9 @@
 .blog-post-meta-label {
   color: var(--color-text-secondary);
 }
+.blog-post-date-short {
+  display: none;
+}
 .blog-post-meta-group-label {
   color: var(--color-text-secondary);
   font-size: 11px;
@@ -520,13 +523,25 @@
     font-size: 13px;
   }
   .blog-post-meta-facts {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 14px;
   }
   .blog-post-meta-facts > span {
     min-width: 0;
-    align-items: flex-start;
+    max-width: 100%;
+    white-space: nowrap;
+  }
+  .blog-post-meta-facts > span:first-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .blog-post-meta-label-date,
+  .blog-post-date-full {
+    display: none;
+  }
+  .blog-post-date-short {
+    display: inline;
   }
   .blog-post-tags {
     flex-wrap: nowrap;

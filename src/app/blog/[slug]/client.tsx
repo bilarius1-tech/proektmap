@@ -9,6 +9,10 @@ function formatDate(d: string) {
   return new Date(d).toLocaleDateString("ru", { day: "numeric", month: "long", year: "numeric" });
 }
 
+function formatDateShort(d: string) {
+  return new Date(d).toLocaleDateString("ru", { day: "2-digit", month: "2-digit", year: "numeric" });
+}
+
 export default function PostPageClient({ post, relatedPosts, readMore, isAdmin: serverIsAdmin, readingTime, tocHeadings, linkedSkills, linkedSolutions }: any) {
   const [isAdmin, setIsAdmin] = useState(false);
   useEffect(() => {
@@ -137,7 +141,7 @@ export default function PostPageClient({ post, relatedPosts, readMore, isAdmin: 
       <div className="blog-post-meta">
         <div className="blog-post-meta-facts">
           <span><User size={15} /><span className="blog-post-meta-label">Автор:</span>{post.author ? <Link href={`/blog/author/${post.author.email}`}>{post.author.name}</Link> : "Аноним"}</span>
-          <span><Calendar size={15} /><span className="blog-post-meta-label">Опубликовано:</span>{formatDate(post.publishedAt)}</span>
+          <span><Calendar size={15} /><span className="blog-post-meta-label blog-post-meta-label-date">Опубликовано:</span><span className="blog-post-date-full">{formatDate(post.publishedAt)}</span><span className="blog-post-date-short">{formatDateShort(post.publishedAt)}</span></span>
           <span><Clock size={15} /><span className="blog-post-meta-label">Чтение:</span>{readingTime || 1} мин</span>
           <span><Eye size={15} /><span className="blog-post-meta-label">Просмотры:</span>{post.viewCount}</span>
           <span><MessageCircle size={15} /><span className="blog-post-meta-label">Комментарии:</span>{post.comments?.length || 0}</span>
