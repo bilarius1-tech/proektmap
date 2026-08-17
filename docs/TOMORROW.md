@@ -1,62 +1,44 @@
-# План на 12.08.2026 — Skills Library: Фаза 1 продолжается
+# План на 18.08.2026 — Graphify в проект
 
-## Главная цель: расширить ядро Skills, усилить витрину
+Решение Алексея вечером 17.08: **завтра внедряем Graphify в ProektMap.**
 
----
-
-## Задача 1: Skill — Telegram Bot Builder (2-3 часа)
-
-**Файл:** 
-
-**Содержание:**
-- Архитектура Telegram-бота: aiogram / grammy / Telegraf
-- Структура: команды, клавиатуры, инлайн-режим
-- База данных: PostgreSQL + Prisma
-- Платежи: Telegram Stars + ЮKassa
-- Mini App: WebApp интеграция
-- Деплой: VPS + webhook vs polling
-- Тестирование: тестовый бот + ngrok
-- Пример: бот-магазин с корзиной и оплатой
-
-**Критерии:**
-- trust: verified
-- tested_with: [Reasonix, Cursor]
-- 8+ разделов, код на TypeScript
-- Ссылка на Blueprint «Telegram Bot» на proektmap.ru
-
-## Задача 2: Страница /skills — фильтрация и поиск (1-2 часа)
-
-- Фильтр по trust: 🟢 / 🟡 / все
-- Фильтр по статусу: готов / план
-- Поиск по названию и описанию
-- Сортировка: по статусу (verified сначала)
-
-## Задача 3: Добавить Skills в главное меню (30 мин)
-
-- Через админку:  → новый пункт «🧩 Skills» → href: /skills
-- Проверить на мобильной и десктопной версии
-
-## Задача 4: Блог-пост «Как мы упаковали ЮKassa в Skill» (1-2 часа)
-
-- Формат: историю создания skill, методология, код
-- Промо: ссылка на /skills, ссылка на ЮKassa Checkout
-- SEO: «интеграция ЮKassa», «приём платежей Next.js»
+Источник: https://github.com/Graphify-Labs/graphify
 
 ---
 
-## Бэклог (если останется время)
+## Сначала (не пропускать)
 
-- Skill: russian-ai-stack (подбор российского AI-стека)
-- Skill: glossary-enricher (обогащение текста терминами)
-- Skill: decision-coach (Decision-Driven Development)
-- GitHub-зеркало для 
-- Счётчик установок Skills (Google Analytics events на /skills)
+Проверить утренний автосбор 09:00 МСК. Если сломан — сначала починить его, Graphify вторым.
+
+- Telegram: «Авто-сбор 09:00 МСК», «В очередь: N»
+- Лог: `[auto-publish] done { queued, timeouts, jsonErrors, seoRejected }`
+- Не включать thinking у `deepseek-v4-flash`
 
 ---
 
-## Критерии готовности дня
-- [ ] +1 новый verified Skill (telegram-bot-builder)
-- [ ] Фильтрация и поиск на /skills
-- [ ] Пункт в главном меню
-- [ ] Блог-пост про Skills
-- [ ] Всё задеплоено, 200 OK
+## Главная задача дня: Graphify
+
+Это **инструмент для агента в Cursor**, не новая публичная страница сайта.
+
+Не путать с `/graph` и `/universe` — там граф знаний для ученика (Blueprint, инструменты, термины). Graphify — карта кода, docs и Prisma-схемы, чтобы агент не читал весь репозиторий.
+
+### Что сделать
+
+1. Поставить CLI на сервер проекта: `uv tool install graphifyy` (или актуальная команда из README).
+2. Подключить к Cursor: `graphify cursor install` → правило `.cursor/rules/graphify.mdc`.
+3. Построить граф из корня проекта: `/graphify .`
+4. Проверить артефакты: `graphify-out/graph.html`, `GRAPH_REPORT.md`, `graph.json`.
+5. Коротко описать в `docs/` как пользоваться (для Алексея простыми словами).
+6. Если граф большой — не коммитить тяжёлый `graph.html` без нужды; правило и инструкция — да.
+
+### Чего не делать
+
+- Не делать из Graphify публичный раздел proektmap.ru
+- Не подменять `/resheniya`, `/graph`, `/universe`
+- Не вешать MCP Graphify на порт 3030
+- Не ломать вектор готовых маршрутов
+
+### Критерий готовности
+
+Агент в новой сессии может спросить «что связано с автосбором блога?» и ответить по графу Graphify, а не grep по всему репозиторию.
+После работы: DEVLOG, билд только если менялся код сайта, git commit + push.

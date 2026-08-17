@@ -1712,3 +1712,12 @@ d8e572aa fix: page.tsx + билд
 - `queued: 2`, `timeouts: 0`, `jsonErrors: 0`, `seoRejected: 0`
 - В очереди: подработка на Авито и комиссии Ozon/Wildberries
 
+## 17.08.2026 — Решение на завтра: Graphify
+
+Алексей решил: **18.08 внедряем Graphify в проект.**
+Репозиторий: https://github.com/Graphify-Labs/graphify
+План: `docs/TOMORROW.md`
+
+Смысл: карта кода для Cursor-агента. Не публичная страница. Не замена `/graph` и `/universe`.
+Сначала проверка автосбора 09:00 МСК, затем установка Graphify.
+
