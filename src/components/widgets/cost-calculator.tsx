@@ -43,12 +43,12 @@ export default function CostCalculator() {
   const selectedItems = options.filter(o => selected.has(o.id));
 
   return (
-    <div style={{
+    <div className="home-widget-card home-cost-calculator" style={{
       background: "var(--color-bg-primary)", border: "1px solid var(--color-border)",
       borderRadius: "var(--radius-l)", overflow: "hidden", maxWidth: 640, margin: "0 auto",
     }}>
       {/* Header */}
-      <div style={{
+      <div className="home-widget-header" style={{
         padding: "var(--space-l) var(--space-xl)",
         background: "linear-gradient(135deg, #fef3c7, var(--color-bg-primary))",
         borderBottom: "1px solid var(--color-border)",
@@ -59,15 +59,15 @@ export default function CostCalculator() {
           <h3 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-m)", fontWeight: 700, margin: 0 }}>
             Калькулятор стоимости
           </h3>
-          <p style={{ fontSize: 11, color: "var(--color-text-secondary)", margin: "2px 0 0" }}>
+          <p className="home-widget-subtitle" style={{ fontSize: 11, color: "var(--color-text-secondary)", margin: "2px 0 0" }}>
             Выбери что нужно — увидишь итоговую цену в месяц
           </p>
         </div>
       </div>
 
-      <div style={{ padding: "var(--space-xl)" }}>
+      <div className="home-widget-content" style={{ padding: "var(--space-xl)" }}>
         {/* Checkboxes */}
-        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-xs)", marginBottom: "var(--space-xl)" }}>
+        <div className="home-cost-options" style={{ display: "flex", flexDirection: "column", gap: "var(--space-xs)", marginBottom: "var(--space-xl)" }}>
           {options.map(opt => {
             const Icon = opt.icon;
             const isSelected = selected.has(opt.id);
@@ -75,6 +75,8 @@ export default function CostCalculator() {
               <button
                 key={opt.id}
                 onClick={() => toggle(opt.id)}
+                className="home-cost-option"
+                aria-pressed={isSelected}
                 style={{
                   display: "flex", alignItems: "center", gap: 12,
                   padding: "12px 16px", borderRadius: "var(--radius-m)",
@@ -94,11 +96,11 @@ export default function CostCalculator() {
                   {isSelected && <Check size={14} style={{ color: "#fff" }} />}
                 </div>
                 <Icon size={18} style={{ color: isSelected ? "var(--color-accent)" : "var(--color-text-secondary)", flexShrink: 0 }} />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: "var(--text-xs)", fontWeight: 600 }}>{opt.label}</div>
-                  <div style={{ fontSize: 11, color: "var(--color-text-secondary)" }}>{opt.desc}</div>
+                <div className="home-cost-option-copy" style={{ flex: 1, minWidth: 0 }}>
+                  <div className="home-cost-option-title" style={{ fontSize: "var(--text-xs)", fontWeight: 600 }}>{opt.label}</div>
+                  <div className="home-cost-option-description" style={{ fontSize: 11, color: "var(--color-text-secondary)" }}>{opt.desc}</div>
                 </div>
-                <div style={{ fontSize: "var(--text-xs)", fontWeight: 700, color: "var(--color-accent)", flexShrink: 0, textAlign: "right" }}>
+                <div className="home-cost-option-price" style={{ fontSize: "var(--text-xs)", fontWeight: 700, color: "var(--color-accent)", flexShrink: 0, textAlign: "right" }}>
                   {opt.price > 0 ? `${opt.price} ${opt.period}` : opt.period}
                 </div>
               </button>
@@ -107,11 +109,11 @@ export default function CostCalculator() {
         </div>
 
         {/* Total */}
-        <div style={{
+        <div className="home-cost-total" style={{
           background: "var(--color-bg-secondary)", borderRadius: "var(--radius-l)",
           padding: "var(--space-xl)", border: "1px solid var(--color-border)",
         }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-m)" }}>
+          <div className="home-cost-total-heading" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-m)" }}>
             <div style={{ fontSize: "var(--text-s)", fontWeight: 600, fontFamily: "var(--font-heading)" }}>
               Итого в месяц
             </div>
@@ -124,7 +126,7 @@ export default function CostCalculator() {
           {selectedItems.length > 0 && (
             <div style={{ display: "flex", flexDirection: "column", gap: 4, marginBottom: "var(--space-m)" }}>
               {selectedItems.map(opt => (
-                <div key={opt.id} style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "var(--color-text-secondary)" }}>
+                <div key={opt.id} className="home-cost-breakdown-row" style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "var(--color-text-secondary)" }}>
                   <span>{opt.label}</span>
                   <span style={{ fontWeight: 600 }}>{opt.price > 0 ? `${opt.price} ₽` : opt.period}</span>
                 </div>
@@ -133,12 +135,12 @@ export default function CostCalculator() {
           )}
 
           {/* Note */}
-          <p style={{ fontSize: 11, color: "var(--color-text-secondary)", lineHeight: 1.5, margin: "0 0 var(--space-m)" }}>
+          <p className="home-cost-note" style={{ fontSize: 11, color: "var(--color-text-secondary)", lineHeight: 1.5, margin: "0 0 var(--space-m)" }}>
             Это базовая оценка. Реальные затраты зависят от нагрузки, трафика и выбранных тарифов.
             Комиссия ЮKassa (3.5%) не включена — зависит от оборота.
           </p>
 
-          <Link href="/blueprints" style={{
+          <Link href="/blueprints" className="home-cost-cta" style={{
             display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
             padding: "14px 24px", borderRadius: "var(--radius-m)",
             background: "var(--color-accent)", color: "#fff",

@@ -135,12 +135,12 @@ export default function BlueprintQuiz() {
   }
 
   return (
-    <div style={{
+    <div className="home-widget-card home-quiz-card" style={{
       background: "var(--color-bg-primary)", border: "1px solid var(--color-border)",
       borderRadius: "var(--radius-l)", overflow: "hidden", maxWidth: 640, margin: "0 auto",
     }}>
       {/* Header */}
-      <div style={{
+      <div className="home-widget-header" style={{
         padding: "var(--space-l) var(--space-xl)",
         background: "linear-gradient(135deg, var(--color-accent-light), var(--color-bg-primary))",
         borderBottom: "1px solid var(--color-border)",
@@ -151,7 +151,7 @@ export default function BlueprintQuiz() {
           <h3 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-m)", fontWeight: 700, margin: 0 }}>
             {done ? "Твой Blueprint" : "Какой Blueprint тебе нужен?"}
           </h3>
-          <p style={{ fontSize: 11, color: "var(--color-text-secondary)", margin: "2px 0 0" }}>
+          <p className="home-widget-subtitle" style={{ fontSize: 11, color: "var(--color-text-secondary)", margin: "2px 0 0" }}>
             {done ? "На основе твоих ответов" : `${step + 1} из ${questions.length} вопросов`}
           </p>
         </div>
@@ -169,16 +169,16 @@ export default function BlueprintQuiz() {
       )}
 
       {/* Content */}
-      <div style={{ padding: "var(--space-xl)" }}>
+      <div className="home-widget-content" style={{ padding: "var(--space-xl)" }}>
         {!done ? (
           <>
-            <p style={{
+            <p className="home-quiz-question" style={{
               fontSize: "var(--text-m)", fontWeight: 600, fontFamily: "var(--font-heading)",
               marginBottom: "var(--space-l)", lineHeight: 1.4,
             }}>
               {questions[step].q}
             </p>
-            <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)" }}>
+            <div className="home-quiz-options" style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)" }}>
               {questions[step].options.map((opt) => {
                 const Icon = opt.icon;
                 return (
@@ -193,7 +193,7 @@ export default function BlueprintQuiz() {
                       color: "var(--color-text-primary)", textAlign: "left",
                       transition: "all 0.15s", width: "100%",
                     }}
-                    className="card-hover"
+                    className="card-hover home-quiz-option"
                   >
                     {Icon && <Icon size={20} style={{ color: "var(--color-accent)", flexShrink: 0 }} />}
                     {opt.label}
@@ -220,7 +220,7 @@ export default function BlueprintQuiz() {
         ) : (
           <div>
             {/* Result card */}
-            <div style={{
+            <div className="home-quiz-result" style={{
               background: "var(--color-accent-light)", borderRadius: "var(--radius-m)",
               padding: "var(--space-xl)", textAlign: "center", marginBottom: "var(--space-l)",
             }}>
@@ -228,7 +228,7 @@ export default function BlueprintQuiz() {
               <div style={{ fontSize: "var(--text-l)", fontWeight: 800, fontFamily: "var(--font-heading)", marginBottom: 4 }}>
                 {result.title}
               </div>
-              <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.6, margin: 0 }}>
+              <p className="home-quiz-result-description" style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.6, margin: 0 }}>
                 {result.desc}
               </p>
             </div>
@@ -236,7 +236,7 @@ export default function BlueprintQuiz() {
             {/* Action links */}
             <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)" }}>
               {result.links.map((link: any, i: number) => (
-                <Link key={i} href={link.href} style={{
+                <Link key={i} href={link.href} className="home-quiz-result-link" style={{
                   display: "flex", alignItems: "center", justifyContent: "space-between",
                   padding: "14px 18px", borderRadius: "var(--radius-m)",
                   background: i === 0 ? "var(--color-accent)" : "var(--color-bg-secondary)",

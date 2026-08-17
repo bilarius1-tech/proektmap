@@ -2,7 +2,7 @@
 
 export default function AnimatedHero({ children }: { children: React.ReactNode }) {
   return (
-    <div style={{ position: "relative", overflow: "hidden", minHeight: 460, background: "var(--color-bg-primary)" }}>
+    <div className="home-animated-hero" style={{ position: "relative", overflow: "hidden", minHeight: 460, background: "var(--color-bg-primary)" }}>
       {/* Blob 1 — green */}
       <div style={{
         position: "absolute", zIndex: 0, pointerEvents: "none",
