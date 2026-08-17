@@ -27,7 +27,7 @@ export default function MobileMenu({ items }: { items: MenuItem[] }) {
         aria-label={open ? "Закрыть меню" : "Открыть меню"}
         aria-expanded={open}
         style={{
-        background: "none", border: "none", padding: 8, cursor: "pointer",
+        width: 48, height: 48, background: "none", border: "none", padding: 8, cursor: "pointer",
         color: "var(--color-text-primary)",
       }}>
         {open ? <X size={22} /> : <Menu size={22} />}
@@ -45,7 +45,7 @@ export default function MobileMenu({ items }: { items: MenuItem[] }) {
               <div style={{ fontSize: 18, fontWeight: 800 }}>
                 Proekt<span style={{ color: "var(--color-accent)" }}>Map</span>
               </div>
-              <button aria-label="Закрыть меню" onClick={() => setOpen(false)} style={{ background: "none", border: "none", padding: 8, cursor: "pointer", color: "var(--color-text-tertiary)" }}>
+              <button aria-label="Закрыть меню" onClick={() => setOpen(false)} style={{ width: 48, height: 48, background: "none", border: "none", padding: 8, cursor: "pointer", color: "var(--color-text-tertiary)" }}>
                 <X size={20} />
               </button>
             </div>
@@ -77,6 +77,7 @@ export default function MobileMenu({ items }: { items: MenuItem[] }) {
                     </>
                   ) : (
                     <Link href={item.href} onClick={() => setOpen(false)}
+                      className={item.href === "/resheniya" ? "mobile-solutions-link" : undefined}
                       style={{ display: "block", padding: "12px", color: "var(--color-text-primary)", textDecoration: "none", fontSize: "var(--text-m)", fontWeight: 600 }}>
                       {item.label}
                     </Link>

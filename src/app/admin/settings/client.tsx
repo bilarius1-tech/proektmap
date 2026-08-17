@@ -112,8 +112,8 @@ export default function SettingsClient({ settings }: any) {
           <Row label="DeepSeek API Key"><input type="password" value={form.deepseekApiKey} onChange={e => setForm({ ...form, deepseekApiKey: e.target.value })} className="input" placeholder="sk-..." /></Row>
           <Row label="DeepSeek модель">
             <select value={form.deepseekModel} onChange={e => setForm({ ...form, deepseekModel: e.target.value })} className="input">
-              <option value="deepseek-chat">DeepSeek Chat (дешёвый)</option>
-              <option value="deepseek-reasoner">DeepSeek Reasoner (логика)</option>
+              <option value="deepseek-v4-flash">DeepSeek V4 Flash (рекомендуем)</option>
+              <option value="deepseek-chat">DeepSeek Chat (запасной)</option>
             </select>
           </Row>
           <Row label="OpenRouter API Key"><input type="password" value={form.openrouterApiKey} onChange={e => setForm({ ...form, openrouterApiKey: e.target.value })} className="input" placeholder="sk-or-v1-..." /></Row>

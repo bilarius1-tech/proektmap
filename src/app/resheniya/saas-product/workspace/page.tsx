@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import SolutionWorkspace from "./workspace";
+import GuidedSaasWorkspace from "./guided-workspace";
 
 export const metadata: Metadata = {
-  title: "Рабочая зона SaaS-маршрута",
-  description: "Интерактивный UX-прототип выполнения готового AI-решения: решение, действие, артефакт и проверка.",
+  title: "Создать SaaS — готовый инженерный маршрут",
+  description: "12 готовых шагов: Cursor, AI-модели, GitHub, Next.js, PostgreSQL, авторизация, AI, ЮKassa и deploy на VPS.",
   robots: { index: false, follow: true },
 };
 
 export default function SaasWorkspacePage() {
-  return <SolutionWorkspace />;
+  return <GuidedSaasWorkspace />;
 }

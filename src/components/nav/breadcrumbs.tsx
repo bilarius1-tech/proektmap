@@ -26,6 +26,7 @@ const ROUTE_LABELS: Record<string, string> = {
   blueprints: 'Blueprints',
   resheniya: 'Готовые решения',
   'saas-product': 'SaaS-продукт',
+      'telegram-bot': 'Telegram-бот',
   workspace: 'Рабочая зона',
 };
 

@@ -12,7 +12,7 @@ export default function BlogSettingsClient({ settings, stats }: any) {
     openrouterModel: settings.openrouterModel || "openai/gpt-4o-mini",
     deepseekModel: settings.deepseekModel || "deepseek-chat",
     autoPublishEnabled: !!settings.autoPublishEnabled,
-    autoPublishHour: settings.autoPublishHour || 6,
+    autoPublishHour: settings.autoPublishHour ?? 9,
     autoPublishEveningHour: settings.autoPublishEveningHour || 20,
     autoPublishItemsPerFeed: settings.autoPublishItemsPerFeed || 2,
     autoPublishIntervalMin: settings.autoPublishIntervalMin || 45,
@@ -35,8 +35,8 @@ export default function BlogSettingsClient({ settings, stats }: any) {
     setSaving(true);
     const res = await fetch("/api/blog/auto-publish", { method: "POST" });
     const data = await res.json();
-    const count = data.results?.filter((r: any) => r.status === "draft").length || 0;
-    alert(`📝 Создано ${count} черновиков`);
+    const started = data.collection?.started || data.collection?.scheduled;
+    alert(started ? "Сбор запущен в фоне. Отчёт придёт в Telegram." : `Сбор не стартовал: ${data.collection?.reason || "unknown"}`);
     router.refresh();
     setSaving(false);
   }
@@ -91,8 +91,8 @@ export default function BlogSettingsClient({ settings, stats }: any) {
               <label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>DeepSeek модель</label>
               <select value={form.deepseekModel} onChange={e => setForm({ ...form, deepseekModel: e.target.value })}
                 style={{ width: "100%", padding: "10px 12px", fontSize: "var(--text-s)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none" }}>
-                <option value="deepseek-chat">DeepSeek Chat (дешёвый)</option>
-                <option value="deepseek-reasoner">DeepSeek Reasoner (логика)</option>
+                <option value="deepseek-v4-flash">DeepSeek V4 Flash (рекомендуем)</option>
+                <option value="deepseek-chat">DeepSeek Chat (запасной)</option>
               </select>
             </div>
           </div>
@@ -115,7 +115,7 @@ export default function BlogSettingsClient({ settings, stats }: any) {
             </div>
             <div>
               <label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Утренний сбор (час МСК)</label>
-              <input type="number" min={0} max={23} value={form.autoPublishHour} onChange={e => setForm({ ...form, autoPublishHour: parseInt(e.target.value) || 6 })}
+              <input type="number" min={0} max={23} value={form.autoPublishHour} onChange={e => setForm({ ...form, autoPublishHour: parseInt(e.target.value) || 9 })}
                 style={{ width: "100%", padding: "10px 12px", fontSize: "var(--text-s)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none" }} />
             </div>
             <div>
@@ -140,8 +140,8 @@ export default function BlogSettingsClient({ settings, stats }: any) {
             <strong>Рекомендации по настройке:</strong><br/>
             • Утренний и вечерний сбор разводят по времени — блог пополняется дважды в день.<br/>
             • «Статей с источника» — сколько постов берём с каждого активного RSS-источника (1–2 оптимально, чтобы не спамить).<br/>
-            • Модель: deepseek-v4-flash — рекомендован (быстрый и дешёвый). deepseek-chat — запасной.<br/>
-            • Сбор идёт по московскому времени. Если в очередь попали статьи — придёт короткий отчёт без ошибок лент.<br/>
+            • Модель: deepseek-v4-flash. Reasoner для сбора не используем — он не успевает вернуть JSON.<br/>
+            • Сбор идёт по московскому времени. После каждого окна приходит короткий отчёт: очередь и сколько AI не успел.<br/>
             • В публичный канал статьи не сыпятся: раз в неделю (пятница 18:00) уходит дайджест.<br/>
             • «Интервал публикации» — статьи выходят на сайте по одной через N минут.
           </div>

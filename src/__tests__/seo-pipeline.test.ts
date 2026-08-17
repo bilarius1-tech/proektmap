@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   appendFaq,
+  containsKeyword,
   parseSeoArticle,
   parseSeoKeywords,
   sanitizeArticleHtml,
@@ -19,6 +20,12 @@ describe("SEO pipeline", () => {
 \`\`\``);
     expect(article.contentType).toBe("Explainer");
     expect(article.primaryKeyword).toBe("Cursor X");
+  });
+
+  it("finds the primary keyword even when Russian words are declined", () => {
+    expect(containsKeyword("Обновления Авито для продавцов: что проверить", "обновление Авито для продавца")).toBe(true);
+    expect(containsKeyword("Ozon пересчитал комиссии продавцам", "Ozon комиссия")).toBe(true);
+    expect(containsKeyword("Wildberries меняет логистику", "Ozon комиссия")).toBe(false);
   });
 
   it("removes executable HTML and appends a useful FAQ", () => {
@@ -49,5 +56,22 @@ describe("SEO pipeline", () => {
     const result = scoreSeoArticle(article, sourceUrl, ["/ai-tools/cursor", "/prompts"]);
     expect(result.score).toBeGreaterThanOrEqual(80);
     expect(result.missing).toEqual([]);
+  });
+
+  it("passes a shorter article against the relaxed 60-point gate", () => {
+    const sourceUrl = "https://example.com/news";
+    const article: SeoArticle = {
+      title: "Ozon комиссия: что пересчитать продавцу",
+      metaTitle: "Ozon комиссия: что пересчитать продавцу",
+      metaDesc: "Ozon комиссия изменилась для продавцов: как пересчитать цены, где проверить тариф и какой шаг сделать сегодня.",
+      contentType: "News",
+      intent: "понять изменение комиссии Ozon",
+      primaryKeyword: "Ozon комиссия",
+      secondaryKeywords: ["тариф Ozon"],
+      html: `<p>${"Практический разбор Ozon комиссия для продавца. ".repeat(20)}</p><h2>Что изменилось</h2><p>Коротко о тарифе Ozon.</p><h2>Что сделать сегодня</h2><p><a href="/ai-tools">Инструменты</a></p><p><a href="${sourceUrl}">Источник</a></p>`,
+      faq: [],
+    };
+    const result = scoreSeoArticle(article, sourceUrl, ["/ai-tools"]);
+    expect(result.score).toBeGreaterThanOrEqual(60);
   });
 });

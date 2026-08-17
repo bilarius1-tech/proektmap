@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { getDb } from "@/lib/db/index";
 import { auth } from "@/lib/auth";
 import { resolveCover } from "@/lib/og/providers";
@@ -13,7 +13,7 @@ import {
   SeoArticle,
 } from "@/lib/blog/seo-pipeline";
 import { DEFAULT_SEO_KEYWORDS, EditorialRubric, judgeRelevance } from "@/lib/blog/relevance";
-import { buildPublishReport, isTransientFeedFailure } from "@/lib/blog/publish-report";
+import { buildPublishReport, isAiJsonError, isAiTimeout, isTransientFeedFailure } from "@/lib/blog/publish-report";
 import { ensureBlogCategory } from "@/lib/blog/categories";
 
 type FeedRow = { id: string; name: string; url: string; type: string; category: string };
@@ -124,30 +124,51 @@ async function generateSeoArticle(input: {
   internalLinks: InternalLinkCandidate[];
   revision?: { article: SeoArticle; check: ReturnType<typeof scoreSeoArticle> };
 }): Promise<SeoArticle> {
-  const aiRes = await fetch("https://api.deepseek.com/v1/chat/completions", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${input.key}` },
-    body: JSON.stringify({
-      model: input.model,
-      messages: [
-        {
-          role: "system",
-          content: "Ты создаёшь самостоятельные SEO-материалы из новостных источников. Отвечай только валидным JSON без Markdown.",
-        },
-        { role: "user", content: buildSeoPrompt(input) },
-      ],
-      max_tokens: 8000,
-      temperature: input.revision ? 0.25 : 0.4,
-    }),
-    signal: AbortSignal.timeout(60000),
-  });
+  const model = input.model === "deepseek-reasoner" ? "deepseek-v4-flash" : input.model;
+  const payload = {
+    model,
+    messages: [
+      {
+        role: "system",
+        content: "Ты создаёшь самостоятельные SEO-материалы из новостных источников. Отвечай только валидным JSON без Markdown.",
+      },
+      { role: "user", content: buildSeoPrompt(input) },
+    ],
+    max_tokens: 3500,
+    temperature: input.revision ? 0.2 : 0.3,
+    thinking: { type: "disabled" },
+  };
 
-  if (!aiRes.ok) {
-    throw new Error(`DeepSeek API ${aiRes.status}: ${(await aiRes.text().catch(() => "")).slice(0, 100)}`);
+  async function call(body: Record<string, unknown>) {
+    const aiRes = await fetch("https://api.deepseek.com/v1/chat/completions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${input.key}` },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(90000),
+    });
+    if (!aiRes.ok) {
+      throw new Error(`DeepSeek API ${aiRes.status}: ${(await aiRes.text().catch(() => "")).slice(0, 100)}`);
+    }
+    const aiData = await aiRes.json();
+    const content = aiData.choices?.[0]?.message?.content || "";
+    if (!content.trim()) {
+      throw new Error("AI вернул пустой JSON: thinking съел лимит токенов");
+    }
+    return parseSeoArticle(content);
   }
 
-  const aiData = await aiRes.json();
-  return parseSeoArticle(aiData.choices?.[0]?.message?.content || "");
+  try {
+    return await call({ ...payload, response_format: { type: "json_object" } });
+  } catch (error: any) {
+    const msg = String(error?.message || "");
+    if (!msg.includes("DeepSeek API 400")) throw error;
+    try {
+      const { thinking: _thinking, ...withoutThinking } = payload as Record<string, unknown> & { thinking?: unknown };
+      return await call({ ...withoutThinking, response_format: { type: "json_object" } });
+    } catch {
+      return await call(payload);
+    }
+  }
 }
 
 function mskNow(): { hour: number; minute: number } {
@@ -161,14 +182,20 @@ function mskNow(): { hour: number; minute: number } {
 async function sendTelegramReport(text: string): Promise<void> {
   const token = process.env.TELEGRAM_BOT_TOKEN || "";
   const chatId = process.env.TELEGRAM_REPORT_CHAT_ID || process.env.TELEGRAM_ADMIN_CHAT_ID || "";
-  if (!token || !chatId || !text) return;
+  if (!token || !chatId || !text) {
+    console.error("[auto-publish] tg report skipped: missing", !token ? "token" : !chatId ? "chat" : "text");
+    return;
+  }
   try {
-    await fetch("https://api.telegram.org/bot" + token + "/sendMessage", {
+    const res = await fetch("https://api.telegram.org/bot" + token + "/sendMessage", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ chat_id: chatId, text, disable_web_page_preview: true }),
       signal: AbortSignal.timeout(10000),
     });
+    if (!res.ok) {
+      console.error("[auto-publish] tg report HTTP", res.status, (await res.text().catch(() => "")).slice(0, 120));
+    }
   } catch (e) {
     console.error("[auto-publish] tg report:", e);
   }
@@ -243,12 +270,15 @@ export async function POST(req: Request) {
 
   if (settings?.autoPublishEnabled !== true) return NextResponse.json({ drip: dripResult, collection: { scheduled: false, reason: "disabled" } });
   const now = mskNow();
-  if (now.hour !== (settings?.autoPublishHour ?? 9) && now.hour !== (settings?.autoPublishEveningHour ?? 20)) {
-    return NextResponse.json({ drip: dripResult, collection: { scheduled: false, reason: "off-hours", hour: now.hour } });
-  }
-  const lastRun = settings?.autoPublishLastRunAt;
-  if (lastRun && Date.now() - new Date(lastRun).getTime() < 45 * 60 * 1000) {
-    return NextResponse.json({ drip: dripResult, collection: { scheduled: false, reason: "recent-run" } });
+  const force = !isCron || new URL(req.url).searchParams.get("force") === "1";
+  if (!force) {
+    if (now.hour !== (settings?.autoPublishHour ?? 9) && now.hour !== (settings?.autoPublishEveningHour ?? 20)) {
+      return NextResponse.json({ drip: dripResult, collection: { scheduled: false, reason: "off-hours", hour: now.hour } });
+    }
+    const lastRun = settings?.autoPublishLastRunAt;
+    if (lastRun && Date.now() - new Date(lastRun).getTime() < 45 * 60 * 1000) {
+      return NextResponse.json({ drip: dripResult, collection: { scheduled: false, reason: "recent-run" } });
+    }
   }
   const stale = new Date(Date.now() - 2 * 60 * 60 * 1000);
   const claimed = await db.siteSettings.updateMany({
@@ -257,11 +287,19 @@ export async function POST(req: Request) {
   });
   if (claimed.count === 0) return NextResponse.json({ drip: dripResult, collection: { started: false, reason: "already-running" } });
 
-  void (async () => {
+  after(async () => {
     try {
-      const feeds: FeedRow[] = await db.blogFeed.findMany({ where: { isActive: true } });
+      const sellerFirst = ["Авито", "Ozon", "Wildberries", "Автоматизация продаж", "Маркетплейсы"];
+      const feeds: FeedRow[] = (await db.blogFeed.findMany({ where: { isActive: true } })).sort((a, b) => {
+        const ai = sellerFirst.indexOf(a.category);
+        const bi = sellerFirst.indexOf(b.category);
+        return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+      });
       const admin = await db.user.findFirst({ where: { role: "admin" } });
-      if (!admin) return;
+      if (!admin) {
+        await sendTelegramReport("Авто-сбор не запустился: нет пользователя-админа");
+        return;
+      }
 
       let key = process.env.DEEPSEEK_API_KEY || "";
       let model = "deepseek-chat";
@@ -274,14 +312,23 @@ export async function POST(req: Request) {
         if (live?.autoPublishItemsPerFeed) itemsPerFeed = live.autoPublishItemsPerFeed;
         siteKeywords = parseSeoKeywords(live?.seoKeywords || "");
       } catch {}
+      if (model === "deepseek-reasoner") model = "deepseek-v4-flash";
       if (!siteKeywords.length) siteKeywords = DEFAULT_SEO_KEYWORDS;
-      if (!key) return;
+      if (!key) {
+        await sendTelegramReport("Авто-сбор не запустился: нет ключа DeepSeek");
+        return;
+      }
 
       const internalLinkCatalog = await getInternalLinkCatalog(db);
       const results: any[] = [];
       const fetched = await Promise.all(feeds.map((feed) => fetchOneFeed(feed)));
+      const maxArticles = 2;
+      let aiAttempts = 0;
+      const maxAiAttempts = 4;
+      let stopRun = false;
 
       for (const pack of fetched) {
+        if (stopRun) break;
         if (pack.status !== "ok") {
           console.warn("[auto-publish] feed", pack.feed.name, pack.status, pack.reason || "");
           results.push({ feed: pack.feed.name, status: pack.status, reason: pack.reason });
@@ -335,6 +382,11 @@ export async function POST(req: Request) {
             );
             const allowedInternalUrls = internalLinks.map((link) => link.url);
 
+            if (aiAttempts >= maxAiAttempts) {
+              stopRun = true;
+              break;
+            }
+            aiAttempts += 1;
             let article = await generateSeoArticle({
               key, model,
               sourceTitle: item.title,
@@ -347,7 +399,7 @@ export async function POST(req: Request) {
             article.html = sanitizeArticleHtml(article.html);
             let seoCheck = scoreSeoArticle(article, item.link, allowedInternalUrls, item.description);
 
-            if (seoCheck.score < 70) {
+            if (seoCheck.score < 60) {
               article = await generateSeoArticle({
                 key, model,
                 sourceTitle: item.title,
@@ -362,7 +414,7 @@ export async function POST(req: Request) {
               seoCheck = scoreSeoArticle(article, item.link, allowedInternalUrls, item.description);
             }
 
-            if (seoCheck.score < 70) {
+            if (seoCheck.score < 60) {
               results.push({ feed: pack.feed.name, title: item.title.slice(0, 60), status: "seo_rejected", seoScore: seoCheck.score });
               continue;
             }
@@ -397,10 +449,18 @@ export async function POST(req: Request) {
               rubric: editorialCategory,
               seoScore: seoCheck.score,
             });
+            if (results.filter((r) => r.status === "queued").length >= maxArticles) {
+              stopRun = true;
+              break;
+            }
           } catch (itemErr: any) {
             const reason = humanizeFailure(itemErr?.message || "");
             console.warn("[auto-publish] item", pack.feed.name, reason, item.title?.slice(0, 40));
             results.push({ feed: pack.feed.name, title: item.title?.slice(0, 40), status: "skipped", reason });
+            if (aiAttempts >= maxAiAttempts) {
+              stopRun = true;
+              break;
+            }
           }
         }
 
@@ -411,14 +471,29 @@ export async function POST(req: Request) {
       }
 
       const queued = results.filter((r) => r.status === "queued");
-      const report = buildPublishReport(queued);
-      if (report) await sendTelegramReport(report);
+      const timeouts = results.filter((r) => isAiTimeout(r.reason || "")).length;
+      const jsonErrors = results.filter((r) => isAiJsonError(r.reason || "")).length;
+      const seoRejected = results.filter((r) => r.status === "seo_rejected").length;
+      console.error("[auto-publish] done", { queued: queued.length, timeouts, jsonErrors, seoRejected, items: results.length });
+      const report = buildPublishReport(queued, {
+        queued: queued.length,
+        timeouts,
+        jsonErrors,
+        seoRejected,
+        hour: now.hour,
+      });
+      await sendTelegramReport(report);
     } catch (e: any) {
       console.error("[auto-publish] run:", e?.message || e);
+      await sendTelegramReport("Авто-сбор оборвался. Повторю в следующий час.");
     } finally {
       try { await db.siteSettings.update({ where: { id: "main" }, data: { autoPublishRunning: false } }); } catch {}
     }
-  })();
+  });
 
-  return NextResponse.json({ drip: dripResult, collection: { scheduled: true, started: true } });
+  return NextResponse.json({
+    drip: dripResult,
+    collection: { scheduled: true, started: true },
+    telegram: Boolean(process.env.TELEGRAM_BOT_TOKEN && (process.env.TELEGRAM_REPORT_CHAT_ID || process.env.TELEGRAM_ADMIN_CHAT_ID)),
+  });
 }

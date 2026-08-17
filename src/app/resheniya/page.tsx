@@ -12,7 +12,9 @@ import {
   Route,
   Sparkles,
 } from "lucide-react";
-import { ecosystemResources, saasSolution } from "./data";
+import { ecosystemResources } from "./data";
+import { guidedSaasSolution } from "./guided-data";
+import { guidedTelegramSolution } from "./telegram-guided-data";
 
 export const metadata: Metadata = {
   title: "Готовые решения AI — от идеи до работающего продукта",
@@ -22,15 +24,15 @@ export const metadata: Metadata = {
 
 const futureSolutions = [
   {
-    title: "Запустить Telegram-бота",
-    description: "От сценария и команд до платежей, Mini App и публикации.",
-    icon: Bot,
-    label: "Следующий маршрут",
-  },
-  {
     title: "Создать корпоративный сайт",
     description: "От структуры и контента до заявок, аналитики и SEO.",
     icon: Layers3,
+    label: "В разработке",
+  },
+  {
+    title: "Собрать CRM-систему",
+    description: "От сущностей и воронки до заявок, статусов и уведомлений.",
+    icon: Boxes,
     label: "В разработке",
   },
 ];
@@ -44,23 +46,23 @@ export default function ResheniyaPage() {
             <div className="solutions-eyebrow"><Sparkles size={16} /> Новый центр ProektMap</div>
             <h1>Готовые решения AI</h1>
             <p className="solutions-hero-lead">
-              Не курс и не список статей. Профессиональный маршрут, который ведёт от идеи
-              до проверенного результата — через решения, действия, артефакты и контрольные точки.
+              Мы уже выбрали основной стек, программы, модели и порядок действий.
+              Выберите продукт, выполняйте готовые инструкции и доведите его до интернета.
             </p>
             <div className="solutions-hero-actions">
               <Link href="/resheniya/saas-product" className="solutions-button solutions-button-primary">
-                Посмотреть маршрут SaaS <ArrowRight size={18} />
+                Маршрут SaaS <ArrowRight size={18} />
               </Link>
-              <a href="#how-it-works" className="solutions-button solutions-button-secondary">
-                Как это работает
-              </a>
+              <Link href="/resheniya/telegram-bot" className="solutions-button solutions-button-secondary">
+                Маршрут Telegram-бота
+              </Link>
             </div>
           </div>
 
           <div className="solutions-model-card" aria-label="Модель прохождения готового решения">
             <div className="solutions-model-card-title"><Route size={18} /> Одна ясная модель прогресса</div>
             <div className="solutions-model-flow">
-              {["Цель", "Решение", "Действие", "Артефакт", "Проверка"].map((item, index) => (
+              {["Продукт", "Рекомендация", "Команда", "Результат", "Проверка"].map((item, index) => (
                 <div className="solutions-model-step" key={item}>
                   <span>{index + 1}</span>
                   <strong>{item}</strong>
@@ -68,43 +70,68 @@ export default function ResheniyaPage() {
                 </div>
               ))}
             </div>
-            <p>Процент растёт только после проверенного результата, а не после чтения карточки.</p>
+            <p>Один главный путь вместо анкеты и десяти равноправных вариантов.</p>
           </div>
         </div>
       </section>
 
       <main className="solutions-shell solutions-main">
-        <section className="solutions-section" aria-labelledby="pilot-title">
+        <section className="solutions-section" aria-labelledby="available-title">
           <div className="solutions-section-heading">
             <div>
-              <span className="solutions-kicker">Пилотный маршрут</span>
-              <h2 id="pilot-title">Первое готовое решение</h2>
+              <span className="solutions-kicker">Можно начать сейчас</span>
+              <h2 id="available-title">Доступные готовые решения</h2>
             </div>
-            <span className="solutions-status-badge">UX-прототип</span>
+            <span className="solutions-status-badge">2 маршрута</span>
           </div>
 
-          <Link href="/resheniya/saas-product" className="solutions-feature-card">
-            <div className="solutions-feature-main">
-              <div className="solutions-feature-icon"><Rocket size={30} /></div>
-              <div>
-                <span className="solutions-kicker">Для основателя и AI-инженера</span>
-                <h3>{saasSolution.title}</h3>
-                <p>{saasSolution.description}</p>
+          <div className="solutions-feature-list">
+            <Link href="/resheniya/saas-product" className="solutions-feature-card">
+              <div className="solutions-feature-main">
+                <div className="solutions-feature-icon"><Rocket size={30} /></div>
+                <div>
+                  <span className="solutions-kicker">Для основателя и AI-инженера</span>
+                  <h3>Запустить SaaS-продукт</h3>
+                  <p>Готовый путь от установки Cursor и выбора моделей до авторизации, AI, оплаты и production.</p>
+                </div>
               </div>
-            </div>
 
-            <div className="solutions-feature-result">
-              <span>Результат маршрута</span>
-              <strong>{saasSolution.result}</strong>
-            </div>
+              <div className="solutions-feature-result">
+                <span>Результат маршрута</span>
+                <strong>{guidedSaasSolution.result}</strong>
+              </div>
 
-            <div className="solutions-feature-meta">
-              <span><Route size={16} /> {saasSolution.phases.length} этапов</span>
-              <span><Clock3 size={16} /> {saasSolution.duration}</span>
-              <span><Boxes size={16} /> 8 итоговых артефактов</span>
-              <span className="solutions-feature-link">Открыть решение <ArrowRight size={16} /></span>
-            </div>
-          </Link>
+              <div className="solutions-feature-meta">
+                <span><Route size={16} /> {guidedSaasSolution.steps.length} готовых шагов</span>
+                <span><Clock3 size={16} /> {guidedSaasSolution.duration}</span>
+                <span><Boxes size={16} /> стек и промпты выбраны</span>
+                <span className="solutions-feature-link">Открыть решение <ArrowRight size={16} /></span>
+              </div>
+            </Link>
+
+            <Link href="/resheniya/telegram-bot" className="solutions-feature-card">
+              <div className="solutions-feature-main">
+                <div className="solutions-feature-icon"><Bot size={30} /></div>
+                <div>
+                  <span className="solutions-kicker">Для бизнеса, специалиста и AI-инженера</span>
+                  <h3>Запустить Telegram-бота</h3>
+                  <p>Готовый путь от BotFather и grammY до рабочей команды /start и запуска на VPS.</p>
+                </div>
+              </div>
+
+              <div className="solutions-feature-result">
+                <span>Результат маршрута</span>
+                <strong>{guidedTelegramSolution.result}</strong>
+              </div>
+
+              <div className="solutions-feature-meta">
+                <span><Route size={16} /> {guidedTelegramSolution.steps.length} готовых шагов</span>
+                <span><Clock3 size={16} /> {guidedTelegramSolution.duration}</span>
+                <span><Boxes size={16} /> стек и команды выбраны</span>
+                <span className="solutions-feature-link">Открыть решение <ArrowRight size={16} /></span>
+              </div>
+            </Link>
+          </div>
         </section>
 
         <section className="solutions-section" id="how-it-works" aria-labelledby="process-title">
@@ -116,10 +143,10 @@ export default function ResheniyaPage() {
           </div>
           <div className="solutions-process-grid">
             {[
-              { icon: Compass, title: "Фиксируем финиш", text: "До старта определяем измеримый результат продукта." },
-              { icon: Route, title: "Идём по этапам", text: "На экране одна текущая миссия, а не сорок открытых карточек." },
-              { icon: Boxes, title: "Собираем продукт", text: "Каждый этап оставляет файл, схему, URL или работающую функцию." },
-              { icon: CheckCircle2, title: "Доказываем готовность", text: "Проверки и доказательства открывают следующий этап." },
+              { icon: Compass, title: "Выбираем продукт", text: "SaaS или Telegram-бот — без проектирования собственного маршрута." },
+              { icon: Route, title: "Следуем рекомендации", text: "ProektMap уже выбрал программу, модели, стек и порядок." },
+              { icon: Boxes, title: "Копируем и запускаем", text: "На каждом шаге есть точная команда или готовый промпт." },
+              { icon: CheckCircle2, title: "Проверяем результат", text: "Следующий шаг открывается после понятного наблюдаемого результата." },
             ].map(({ icon: Icon, title, text }, index) => (
               <article className="solutions-process-card" key={title}>
                 <div className="solutions-process-number">{index + 1}</div>
@@ -140,8 +167,8 @@ export default function ResheniyaPage() {
                 Глоссарий, модели, инструменты и Skills не живут отдельно. Маршрут показывает
                 нужную ветку именно тогда, когда она помогает принять решение или выполнить действие.
               </p>
-              <Link href="/resheniya/saas-product/workspace" className="solutions-text-link">
-                Посмотреть рабочую зону <ArrowRight size={16} />
+              <Link href="#available-title" className="solutions-text-link">
+                Открыть доступные маршруты <ArrowRight size={16} />
               </Link>
             </div>
             <div className="solutions-ecosystem-map">

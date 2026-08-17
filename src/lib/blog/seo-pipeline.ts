@@ -39,6 +39,26 @@ function wordCount(html: string): number {
   return text ? text.split(/\s+/).length : 0;
 }
 
+/**
+ * Русский текст склоняется, поэтому дословное совпадение ключа даёт ложные отказы.
+ * Считаем ключ найденным, если каждое значимое слово присутствует с точностью до окончания.
+ */
+export function containsKeyword(haystack: string, keyword: string): boolean {
+  const text = normalize(haystack);
+  const key = normalize(keyword);
+  if (!key || !text) return false;
+  if (text.includes(key)) return true;
+
+  const words = key.split(" ").filter((word) => word.length >= 3);
+  if (words.length === 0) return false;
+
+  const textWords = text.split(" ");
+  return words.every((word) => {
+    const stem = word.slice(0, Math.max(4, word.length - 2));
+    return textWords.some((candidate) => candidate.startsWith(stem));
+  });
+}
+
 export function parseSeoKeywords(value: string): string[] {
   return [...new Set(value.split(/[,;\n]/).map((keyword) => keyword.trim()).filter((keyword) => keyword.length >= 2))].slice(0, 120);
 }
@@ -123,22 +143,21 @@ export function scoreSeoArticle(
   const words = wordCount(article.html);
   const internalCount = [...new Set(allowedInternalUrls.filter((url) => article.html.includes(`href="${url}"`) || article.html.includes(`href='${url}'`)))].length;
   const secondaryUsed = article.secondaryKeywords.filter((keyword) => {
-    const normalized = normalize(keyword);
-    return normalized.length >= 2 && (body.includes(normalized) || headings.some((heading) => heading.includes(normalized)));
+    return normalize(keyword).length >= 2 && (containsKeyword(body, keyword) || headings.some((heading) => containsKeyword(heading, keyword)));
   }).length;
   const hasSource = article.html.includes(sourceUrl);
   const normalizedSource = normalize(stripHtml(sourceDescription));
   const isOriginal = normalizedSource.length < 80 || !body.includes(normalizedSource.slice(0, Math.min(220, normalizedSource.length)));
 
-  add("Основной запрос", primary.length >= 2 && title.includes(primary), 15, primary ? `«${article.primaryKeyword}» в H1` : "Не выбран");
+  add("Основной запрос", primary.length >= 2 && containsKeyword(title, primary), 15, primary ? `«${article.primaryKeyword}» в H1` : "Не выбран");
   add("Поисковый интент", article.intent.length >= 4 && CONTENT_TYPES.has(article.contentType), 5, `${article.contentType}: ${article.intent}`);
-  add("Title", article.metaTitle.length >= 35 && article.metaTitle.length <= 70 && normalize(article.metaTitle).includes(primary), 10, `${article.metaTitle.length} символов`);
-  add("Description", article.metaDesc.length >= 120 && article.metaDesc.length <= 170 && meta.includes(primary), 15, `${article.metaDesc.length} символов`);
-  add("H2 структура", headings.length >= 3, 10, `${headings.length} заголовка H2`);
-  add("Полезность", words >= 450 && words <= 1800, 10, `${words} слов`);
+  add("Title", article.metaTitle.length >= 30 && article.metaTitle.length <= 80 && containsKeyword(article.metaTitle, primary), 10, `${article.metaTitle.length} символов`);
+  add("Description", article.metaDesc.length >= 90 && article.metaDesc.length <= 180 && containsKeyword(meta, primary), 15, `${article.metaDesc.length} символов`);
+  add("H2 структура", headings.length >= 2, 10, `${headings.length} заголовка H2`);
+  add("Полезность", words >= 220 && words <= 1400, 10, `${words} слов`);
   add("Оригинальность", isOriginal, 5, isOriginal ? "Не повторяет RSS-описание" : "Повторяет исходное описание");
   add("Внутренние ссылки", internalCount >= 1, 15, `${internalCount} ссылок из каталога ProektMap`);
-  add("Дополнительные запросы", secondaryUsed >= 2, 10, `${secondaryUsed} запросов использовано`);
+  add("Дополнительные запросы", secondaryUsed >= 1, 10, `${secondaryUsed} запросов использовано`);
   add("FAQ", article.faq.length === 0 || article.faq.length >= 2, 2, article.faq.length ? `${article.faq.length} вопроса` : "Не нужен для этого интента");
   add("Источник", hasSource, 3, hasSource ? "Ссылка присутствует" : "Нет ссылки на источник");
 
@@ -158,72 +177,36 @@ export function buildSeoPrompt(input: {
   internalLinks: InternalLinkCandidate[];
   revision?: { article: SeoArticle; check: SeoCheck };
 }): string {
-  const links = input.internalLinks.map((item) => `- ${item.title} | ${item.url} | ${item.description.slice(0, 120)}`).join("\n");
+  const links = input.internalLinks.slice(0, 8).map((item) => `- ${item.title} | ${item.url}`).join("\n");
   const revision = input.revision
-    ? `\nПРЕДЫДУЩАЯ ВЕРСИЯ НЕ ПРОШЛА SEO CHECK (${input.revision.check.score}/100).\nИсправь: ${input.revision.check.missing.join("; ")}.\nПредыдущий JSON:\n${JSON.stringify(input.revision.article)}\n`
+    ? `\nИсправь SEO (${input.revision.check.score}/100): ${input.revision.check.missing.join("; ")}.`
     : "";
 
-  return `Ты — коммерческий SEO-редактор ProektMap. Редакционная линия: продавец / авитолог first.
+  return `Ты SEO-редактор ProektMap для продавцов, авитологов и селлеров в России.
+Источник — только факты. Не выдумывай цифры. Если новость зарубежная — переведи в сценарий для РФ.
+Каждая статья даёт один практический шаг: карточка, заявки, цена, остатки, CRM, оплата или меньше ручной работы.
 
-АУДИТОРИЯ:
-1) Продавцы и авитологи на Авито.
-2) Селлеры Ozon и Wildberries.
-3) Владельцы интернет-магазинов и специалисты по продажам в России.
-4) Разработчики, которые создают для них CRM, ботов, интеграции и AI-автоматизацию.
-
-ГЛАВНАЯ ФИЛОСОФИЯ:
-Каждая статья должна двигать продавца на один измеримый шаг вперёд: улучшить карточку, получить больше заявок, повысить конверсию, сократить ручной труд, снизить расходы или риски.
-НЕ переписывай и НЕ перефразируй новость. Используй её только как фактологический источник и повод создать самостоятельный поисковый материал.
-Не выдумывай факты, цены, даты, функции и результаты тестов. Если данных нет — честно обозначь ограничение.
-Если источник про Amazon, Shopify или мировой e-commerce — обязательно переведи опыт в применимый сценарий для России. Не утверждай, что зарубежная функция доступна в РФ, если источник этого не подтверждает.
-Если источник про Авито, Ozon или Wildberries — пиши для продавца, а не про корпоративные новости площадки.
-
-ИСТОЧНИК:
-Заголовок: ${input.sourceTitle}
-Описание RSS: ${input.sourceDescription || "(нет описания)"}
+ИСТОЧНИК: ${input.sourceTitle}
+ОПИСАНИЕ: ${input.sourceDescription || "(нет)"}
 URL: ${input.sourceUrl}
-Категория: ${input.category}
+РУБРИКА: ${input.category}
+КЛЮЧИ: ${input.siteKeywords.slice(0, 12).join(", ") || "автоматизация продаж"}
+ССЫЛКИ (1–2 штуки, только из списка):
+${links || "- /ai-tools | AI-инструменты"}
 
-SEO-КЛЮЧИ PROEKTMAP (используй только релевантные, можно добавить точные запросы по теме):
-${input.siteKeywords.join(", ") || "(список пуст — сформируй запросы из темы)"}
+ФОРМАТ: News, Explainer или Practical.
 
-РАЗРЕШЁННЫЕ ВНУТРЕННИЕ ССЫЛКИ:
-${links || "- /ai-tools | AI-инструменты\n- /blueprints | Blueprint'ы\n- /prompts | Промпты"}
+ОБЯЗАТЕЛЬНО, иначе статья отбраковывается:
+1. primaryKeyword — короткая фраза 2–4 слова.
+2. Эта фраза дословно входит в title, metaTitle и metaDesc — скопируй её без изменений и без склонения.
+3. metaTitle 35–70 символов, metaDesc 100–165 символов.
+4. html: 300–450 слов, 2–3 <h2>, чек-лист из 3–5 <li>.
+5. Каждое слово из secondaryKeywords дословно встречается в тексте html.
+6. В html минимум одна ссылка вида <a href="/ai-tools">…</a> строго из списка выше, URL копируй символ в символ.
+7. Последний абзац html — <a href="${input.sourceUrl}">Источник</a>.
 
-КОНВЕЙЕР:
-1. Сформулируй конкретную задачу продавца и результат после прочтения.
-2. Определи поисковый интент и 5–15 реальных коммерческих запросов.
-3. Выбери основной запрос, который реально вводит продавец, селлер или авитолог.
-4. Выбери ОДИН формат:
-   - News: что произошло → что изменилось → кому важно;
-   - Explainer: что такое X → как работает → кому пригодится → ограничения;
-   - Practical: как использовать X → пошагово → пример → ошибки.
-5. Обязательные смысловые блоки: «Что это меняет для продавца», «Как применить», «Ограничения и риски в России».
-6. Дай конкретный чек-лист из 3–7 действий. Не обещай рост продаж без данных.
-7. Добавь 2–4 ссылки ТОЛЬКО из разрешённого списка, естественными анкорами. Не придумывай URL.
-8. FAQ добавляй только если он реально отвечает на отдельные вопросы поиска; тогда 2–5 вопросов.
-9. В конце HTML добавь: <p>Источник: <a href="${input.sourceUrl}" target="_blank" rel="noopener">${input.sourceTitle}</a></p>
-
-ТРЕБОВАНИЯ:
-- русский язык, понятный продавцам, авитологам и селлерам в России;
-- 550–1200 слов; первый абзац сразу отвечает, что это и зачем читать;
-- минимум 3 содержательных <h2>, при необходимости <h3>, списки и таблицы;
-- основной запрос естественно в H1/title, meta description и вступлении;
-- заголовок обещает конкретную пользу, но не содержит кликбейта и неподтверждённых цифр;
-- без переспама, воды, маркетинговых штампов и риторических вопросов ради вовлечения;
-- metaTitle 35–70 символов; metaDesc 120–170 символов;
-- чистый безопасный HTML без Markdown, <h1>, <script>, <style> и inline-стилей.
+Без Markdown, <h1>, script и стилей.
 ${revision}
-Верни ТОЛЬКО валидный JSON:
-{
-  "title": "H1 статьи без HTML",
-  "metaTitle": "SEO Title",
-  "metaDesc": "Meta Description",
-  "contentType": "News|Explainer|Practical",
-  "intent": "краткое описание интента",
-  "primaryKeyword": "основной запрос",
-  "secondaryKeywords": ["5–15 дополнительных запросов"],
-  "html": "<p>...</p><h2>...</h2>...",
-  "faq": [{"question": "...", "answer": "..."}]
-}`;
+Верни ТОЛЬКО JSON:
+{"title":"...","metaTitle":"...","metaDesc":"...","contentType":"News","intent":"...","primaryKeyword":"...","secondaryKeywords":["...","..."],"html":"<p>...</p>","faq":[]}`;
 }

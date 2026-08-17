@@ -36,7 +36,7 @@ export default function FeedsClient({ feeds }: any) {
     setSaving(true);
     const res = await fetch("/api/blog/auto-publish", { method: "POST" });
     const data = await res.json();
-    alert(`Создано черновиков: ${data.results?.filter((r: any) => r.status === "draft").length || 0}`);
+    alert(data.collection?.started ? "Сбор запущен в фоне. Отчёт придёт в Telegram." : `Сбор не стартовал: ${data.collection?.reason || "unknown"}`);
     router.refresh();
     setSaving(false);
   }

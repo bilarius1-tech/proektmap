@@ -49,22 +49,25 @@ describe("relevance filter", () => {
 });
 
 describe("publish report", () => {
-  it("returns null when queue is empty — no Telegram noise", () => {
-    expect(buildPublishReport([])).toBeNull();
+  it("still reports an empty queue without source dumps", () => {
+    const text = buildPublishReport([], { queued: 0, hour: 9, timeouts: 2 });
+    expect(text).toContain("В очередь: 0");
+    expect(text).toContain("AI не успел: 2");
+    expect(text.toLowerCase()).not.toContain("ошибок источников");
+    expect(text.toLowerCase()).not.toContain("prisma");
   });
 
-  it("never mentions source errors or Prisma", () => {
-    const text = buildPublishReport([{ title: "VibeCraft от Яндекса" }]) || "";
-    expect(text).toContain("статьи в очереди");
+  it("never mentions Prisma or raw timeouts", () => {
+    const text = buildPublishReport([{ title: "VibeCraft от Яндекса" }], { queued: 1, hour: 9 });
     expect(text).toContain("VibeCraft");
-    expect(text.toLowerCase()).not.toContain("ошибок");
+    expect(text.toLowerCase()).not.toContain("ошибок источников");
     expect(text.toLowerCase()).not.toContain("prisma");
-    expect(text.toLowerCase()).not.toContain("timeout");
+    expect(text.toLowerCase()).not.toContain("aborted");
   });
 
   it("treats timeouts as transient, not as a report-worthy crash", () => {
     expect(isTransientFeedFailure("The operation was aborted due to timeout")).toBe(true);
-    expect(isTransientFeedFailure("AI не вернул JSON")).toBe(true);
+    expect(isTransientFeedFailure("AI не вернул JSON")).toBe(false);
     expect(isTransientFeedFailure("HTTP 500")).toBe(false);
   });
 });
