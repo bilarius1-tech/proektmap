@@ -20,8 +20,8 @@ export default function CookieConsent() {
   if (!mounted || !visible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[1000] flex items-center justify-between gap-m flex-wrap bg-bg-primary border-t border-border px-l py-m text-xs"
-      style={{ boxShadow: "0 -4px 20px rgba(0,0,0,0.08)" }}>
+    <div className="cookie-banner fixed left-0 right-0 z-[1000] flex items-center justify-between gap-m flex-wrap bg-bg-primary border-t border-border px-l py-m text-xs"
+      style={{ boxShadow: "0 -4px 20px rgba(0,0,0,0.08)", bottom: "var(--bottom-chrome, 56px)" }}>
       <div className="flex-1 min-w-[200px] text-text-secondary leading-relaxed">
         🍪 Мы используем cookies для авторизации и аналитики (Яндекс.Метрика).
         Продолжая использовать сайт, вы соглашаетесь с{" "}

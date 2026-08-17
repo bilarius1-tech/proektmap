@@ -50,10 +50,13 @@ export default function BlueprintProgressBar() {
       <div style={{
         position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 999,
         background: "var(--color-bg-primary)", borderTop: "1px solid var(--color-border)",
-        padding: minimized ? "4px 0" : "10px var(--space-l)",
+        paddingTop: minimized ? 4 : 10,
+        paddingBottom: minimized ? 4 : 10,
+        paddingLeft: "var(--space-m)",
+        paddingRight: 72,
         fontFamily: "var(--font-body)",
         transition: "padding 0.2s",
-      }}>
+      }} className="bottom-progress-bar">
         {minimized ? (
           <div style={{ display: "flex", justifyContent: "center" }}>
             <button onClick={() => setMinimized(false)} style={{
@@ -115,10 +118,13 @@ export default function BlueprintProgressBar() {
       position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 999,
       background: "var(--color-bg-primary)", borderTop: "1px solid var(--color-border)",
       boxShadow: "0 -2px 12px rgba(0,0,0,0.04)",
-      padding: minimized ? "4px 0" : "10px var(--space-l)",
+      paddingTop: minimized ? 4 : 10,
+      paddingBottom: minimized ? 4 : 10,
+      paddingLeft: "var(--space-m)",
+      paddingRight: 72,
       fontFamily: "var(--font-body)",
       transition: "padding 0.2s",
-    }}>
+    }} className="bottom-progress-bar">
       {minimized ? (
         <div style={{ display: "flex", justifyContent: "center" }}>
           <button onClick={() => setMinimized(false)} style={{

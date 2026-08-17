@@ -240,7 +240,7 @@ export default async function Home() {
       </div>
 
       {/* Виджеты */}
-      <div style={{ maxWidth: 960, margin: "0 auto", padding: "0 var(--space-m) var(--space-xl)", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(380px, 1fr))", gap: "var(--space-xl)" }}>
+      <div className="home-widgets-grid" style={{ maxWidth: 960, margin: "0 auto", padding: "0 var(--space-m) var(--space-xl)", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap: "var(--space-xl)" }}>
         <BlueprintQuiz />
         <CostCalculator />
       </div>

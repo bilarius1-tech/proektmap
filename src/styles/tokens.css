@@ -76,6 +76,10 @@
 /* Reset */
 *, *::before, *::after { box-sizing: border-box; }
 
+html {
+  overflow-x: clip;
+}
+
 body {
   margin: 0;
   font-family: var(--font-sans);
@@ -83,8 +87,23 @@ body {
   line-height: var(--line-height);
   color: var(--color-text-primary);
   background: var(--color-bg-secondary);
-  padding-bottom: 56px;
+  padding-bottom: calc(var(--bottom-chrome, 56px) + 16px);
+  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
+}
+
+img, video, svg, canvas, iframe {
+  max-width: 100%;
+  height: auto;
+}
+
+table {
+  max-width: 100%;
+}
+
+pre {
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 h1, h2, h3, h4 { margin: 0; font-weight: 700; line-height: var(--line-height-heading); }
@@ -115,8 +134,7 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
 .btn-secondary { background: var(--color-bg-tertiary); color: var(--color-text-primary); }
 .btn-secondary:hover { background: var(--color-border); }
 .btn-ghost { background: transparent; color: var(--color-text-secondary); border: 1px solid var(--color-border); }
-.btn-ghost:hover { background: var(--color-bg-secondary);
-  padding-bottom: 56px; }
+.btn-ghost:hover { background: var(--color-bg-secondary); }
 .btn-danger { background: var(--color-error); color: white; }
 .badge {
   display: inline-flex; align-items: center; gap: 4px;
@@ -136,21 +154,32 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
 .input:focus { border-color: var(--color-accent); }
 
 /* ═══════════════════════════════════════════
-   MOBILE — адаптивность
+   MOBILE — адаптивность (breakpoints: 480 / 768 / 960)
    ═══════════════════════════════════════════ */
+
+:root {
+  --bp-phone: 480px;
+  --bp-tablet: 768px;
+  --bp-desktop: 960px;
+  --bottom-chrome: 56px;
+}
+
+/* Desktop by default: hamburger hidden */
+.mobile-only { display: none !important; }
+.hide-mobile { display: flex; }
 
 @media (max-width: 768px) {
   :root {
-  --font-heading: "Onest", "Inter", sans-serif;
-  --font-body: "Inter", sans-serif;
-  --font-mono: "JetBrains Mono", "Fira Code", monospace;
     --text-xl: 24px;
-    --text-xxl: 30px;
+    --text-xxl: clamp(26px, 7vw, 30px);
   }
 
-  /* Sidebar скрыт на мобильных — показываем как выпадающее */
   .sidebar-mobile {
     display: none;
+  }
+
+  .home-widgets-grid {
+    grid-template-columns: 1fr !important;
   }
 }
 
@@ -159,12 +188,16 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
     --space-xl: 20px;
     --space-l: 16px;
     --space-m: 12px;
+    /* body ≥16px — не уменьшаем --text-m */
+    --text-l: 18px;
+    --text-xl: clamp(22px, 6.5vw, 26px);
+    --text-xxl: clamp(24px, 7vw, 28px);
   }
 }
 
 /* Touch-friendly: увеличиваем зону нажатия */
 @media (pointer: coarse) {
-  button, a, [role="button"] {
+  button, a.btn, [role="button"] {
     min-height: 44px;
     min-width: 44px;
   }
@@ -174,8 +207,8 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
    HEADER RESPONSIVE — каскадная адаптация
    ═══════════════════════════════════════════ */
 
-/* Laptop compact: 960–1150px — tighter spacing, smaller font */
-@media (max-width: 1150px) {
+/* Laptop compact: 961–1150px — tighter nav before hamburger */
+@media (max-width: 1150px) and (min-width: 961px) {
   .header-nav {
     gap: 1px !important;
   }
@@ -184,20 +217,40 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
     font-size: 12px !important;
     padding: 4px 7px !important;
   }
-  .header-right {
-    gap: 4px !important;
-  }
-  .header-logo {
-    font-size: 15px !important;
-  }
 }
 
-/* Tablet: <960px — hamburger menu */
+/* Tablet/phone: ≤960 — hamburger menu */
 @media (max-width: 960px) {
   .hide-mobile { display: none !important; }
   .mobile-only { display: flex !important; }
   .header-logo {
     margin-left: 0 !important;
+  }
+  .header-right {
+    gap: 4px !important;
+  }
+}
+
+/* Bottom chrome: progress / cookie / assistant */
+.bottom-progress-bar {
+  padding-right: 72px;
+}
+.assistant-fab-root {
+  position: fixed;
+  bottom: calc(var(--bottom-chrome, 56px) + 12px);
+  right: 12px;
+  z-index: 1000;
+}
+.cookie-banner {
+  bottom: var(--bottom-chrome, 56px);
+}
+@media (max-width: 480px) {
+  .assistant-chat-panel {
+    width: min(340px, calc(100vw - 24px)) !important;
+    right: 0 !important;
+  }
+  .assistant-bubble {
+    max-width: min(280px, calc(100vw - 48px)) !important;
   }
 }
 
@@ -236,8 +289,8 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
   --shadow-l: 0 4px 16px rgba(0,0,0,0.5);
 }
 
-/* Mobile responsive */
-@media (max-width: 860px) {
+/* Blog layout — tablet and below (aligned to 768) */
+@media (max-width: 768px) {
   .blog-layout { flex-direction: column; }
   .blog-sidebar { display: none; }
   .mobile-cat-menu { display: block; }

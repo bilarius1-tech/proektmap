@@ -274,8 +274,8 @@ export default function BlueprintPageClient({
       {/* MOBILE — visible on mobile via CSS */}
       <div className="md:hidden">
         <>
-          <button onClick={() => setSidebarOpen(true)} style={{
-            position: "fixed", left: 16, bottom: 24, zIndex: 50,
+          <button onClick={() => setSidebarOpen(true)} className="blueprint-mobile-fab" style={{
+            position: "fixed", left: 16, bottom: "calc(var(--bottom-chrome, 56px) + 16px)", zIndex: 50,
             width: 48, height: 48, borderRadius: "50%",
             background: "var(--color-accent)", color: "white",
             border: "none", boxShadow: "0 4px 16px rgba(15,184,128,0.4)",

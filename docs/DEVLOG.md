@@ -1631,3 +1631,16 @@ d8e572aa fix: page.tsx + билд
 
 ### Итого
 - Seller-first фильтр и рубрики на проде, Telegram без спама, день закрыт
+
+## 17.08.2026 — Mobile foundation (день 1)
+
+План: `docs/MOBILE-DAY-PLAN-2026-08-17.md`. Светлая тема — основная.
+
+Сделано:
+- Этап 0: baseline 375px — `/`, `/blog`, `/pricing` без горизонтального overflow; список дефектов в плане
+- Foundation: breakpoints 480/768/960; `.mobile-only` скрыт на desktop; `overflow-x: clip`; body ≥16px; img/pre/table max-width
+- Shell: progress bar + FAB + cookie через `--bottom-chrome`; padding-right 72 у бара; Architect input стак на mobile
+- P0: главная `minmax(min(100%, 280px))`; Blueprint mobile FAB над chrome
+- Билд + `pm2 restart proektmap`
+
+Вне скоупа: Graph/Universe/Admin, полный отказ от dark.
