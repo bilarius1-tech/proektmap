@@ -134,36 +134,46 @@ export default function PostPageClient({ post, relatedPosts, readMore, isAdmin: 
 
       <h1 className="blog-post-title" style={{ fontFamily: "var(--font-heading)", fontWeight: 800, lineHeight: 1.1, letterSpacing: "-0.02em", marginBottom: "var(--space-m)" }}>{post.title}</h1>
 
-      <div style={{ display: "flex", alignItems: "center", gap: "var(--space-m)", flexWrap: "wrap", marginBottom: "var(--space-xl)", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>
-        <span style={{ display: "flex", alignItems: "center", gap: 4 }}><User size={14} />{post.author ? <Link href={`/blog/author/${post.author.email}`} style={{ color: "inherit", textDecoration: "none" }}>{post.author.name}</Link> : "Аноним"}</span>
-        <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Calendar size={14} />{formatDate(post.publishedAt)}</span>
-        <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Clock size={14} />≈ {readingTime || 1} мин</span>
-        <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Eye size={14} />{post.viewCount}</span>
-        <span style={{ display: "flex", alignItems: "center", gap: 4 }}><MessageCircle size={14} />{post.comments?.length || 0}</span>
-        {post.tags && post.tags.split(",").map((t: string) => (
-          <span key={t} style={{ display: "flex", alignItems: "center", gap: 4, padding: "2px 8px", borderRadius: 99, background: "var(--color-bg-secondary)" }}>
-            <Tag size={10} />{t.trim()}
-          </span>
-        ))}
-        <div style={{ marginLeft: "auto", display: "flex", gap: 4 }}>
+      <div className="blog-post-meta">
+        <div className="blog-post-meta-facts">
+          <span><User size={15} /><span className="blog-post-meta-label">Автор:</span>{post.author ? <Link href={`/blog/author/${post.author.email}`}>{post.author.name}</Link> : "Аноним"}</span>
+          <span><Calendar size={15} /><span className="blog-post-meta-label">Опубликовано:</span>{formatDate(post.publishedAt)}</span>
+          <span><Clock size={15} /><span className="blog-post-meta-label">Чтение:</span>{readingTime || 1} мин</span>
+          <span><Eye size={15} /><span className="blog-post-meta-label">Просмотры:</span>{post.viewCount}</span>
+          <span><MessageCircle size={15} /><span className="blog-post-meta-label">Комментарии:</span>{post.comments?.length || 0}</span>
+        </div>
+
+        {post.tags && (
+          <div className="blog-post-tags" aria-label="Теги статьи">
+            <span className="blog-post-meta-group-label">Теги</span>
+            {post.tags.split(",").map((t: string) => t.trim()).filter(Boolean).map((tag: string) => (
+              <span className="blog-post-tag" key={tag}>
+                <Tag size={12} />{tag}
+              </span>
+            ))}
+          </div>
+        )}
+
+        <div className="blog-post-share">
+          <span className="blog-post-meta-group-label">Поделиться</span>
           <button onClick={() => {
             const url = encodeURIComponent(window.location.href);
             const title = encodeURIComponent(post.title);
             window.open(`https://t.me/share/url?url=${url}&text=${title}`, "_blank", "width=600,height=400");
-          }} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-tertiary)", padding: 4, display: "flex", alignItems: "center", gap: 3, fontSize: 10 }} title="Поделиться в Telegram">
+          }} className="blog-post-share-button" title="Поделиться в Telegram" aria-label="Поделиться в Telegram">
             <span style={{ fontWeight: 700, color: "#2AABEE" }}>TG</span>
           </button>
           <button onClick={() => {
             const url = encodeURIComponent(window.location.href);
             const title = encodeURIComponent(post.title);
             window.open(`https://vk.com/share.php?url=${url}&title=${title}`, "_blank", "width=600,height=400");
-          }} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-tertiary)", padding: 4, display: "flex", alignItems: "center", gap: 3, fontSize: 10 }} title="Поделиться ВКонтакте">
+          }} className="blog-post-share-button" title="Поделиться ВКонтакте" aria-label="Поделиться ВКонтакте">
             <span style={{ fontWeight: 700, color: "#0077FF" }}>VK</span>
           </button>
           <button onClick={() => {
             navigator.clipboard.writeText(window.location.href);
             alert("Ссылка скопирована!");
-          }} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-tertiary)", padding: 4 }} title="Скопировать ссылку">
+          }} className="blog-post-share-button" title="Скопировать ссылку" aria-label="Скопировать ссылку">
             <Share2 size={14} />
           </button>
         </div>
