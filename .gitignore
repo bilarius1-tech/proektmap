@@ -13,3 +13,4 @@ start.sh
 public/uploads/
 .voice-venv/
 .voice-cache/
+graphify-out/
