@@ -1761,3 +1761,53 @@ d8e572aa fix: page.tsx + билд
 - Не добавлены без живого URL: SellAvi, ViPost, AvitoBot; VitoSAP отложен как слабый по отзывам
 - Сверка зафиксирована в `docs/AVITO-MASTER-LIST.md`
 
+
+## 21.08.2026 — Меню только через админку
+
+- Убран хардкод «Готовые решения / Авито / Карта сайта» из `header.tsx` — шапка читает только `MenuItem` из БД
+- Пункты upsert в БД: `header-resheniya`, `header-avito`, `header-sitemap`; legacy Blueprint в шапке деактивированы
+- Скрипт: `scripts/sync-header-menu.ts`
+- API `/api/admin/menu` и `/reorder` — только admin-сессия
+- Правило агентов: `.cursor/rules/menu.mdc` + раздел в `AGENTS.md`
+- Подсказка в `/admin/menu`: не править меню в коде
+
+
+## 21.08.2026 — Лаборатория Авито: экосистема под задачу
+
+- Позиционирование: не рейтинг аналитики, а подбор под задачу авитолога
+- 10 разделов (как в ТЗ Алексея) + фильтр цены + сценарии «Мне нужно…»
+- В каталог: LikeStats (+ extension), Авитоматика, AviBOX HUB, Авифлоу, Parser24, AutoAnswersBot, Ave Blacklist
+- Avito Blacklist = Ave Blacklist (тот же Chrome id)
+- Docs: AVITO-MASTER-LIST, TZ, TOMORROW под курс на базу 100+
+
+
+## 21.08.2026 — Master-list: волна обзоров 2026
+
+- UX `/avito` не меняли — копим очередь в `docs/AVITO-MASTER-LIST.md`
+- Добавлены пласты: парсеры (ParsingMaster… Web-Data-Extractor, Diggernaut, A-Parser, Zennoposter), массовый постинг (Markoos, AviForce, Massposting…), AI (Intly, avChat, AvBot, Umnico, OkoCRM, ADVIZ, AIX…)
+- План 11-го раздела: «🧰 Универсальные для авитолога» (цепочки задач, не только SaaS Авито)
+- Правило: не удалять нишевые; официальная Автозагрузка — точка сравнения
+
+
+## 21.08.2026 — Вайбик: Миссия №1 на ProektMap
+
+- Перенесён VibeCraft-проект в `/vaibik` (меню, квест, about, contacts)
+- Ассеты в `public/vaibik/assets/`; zip бэкап в `/root/backups/vaibik/`
+- Связка: песочница, карта сайта, меню, CTA в статье «ИИ для детей»
+- Docs: `docs/VAIBIK-MISSION.md`
+
+
+## 21.08.2026 — Вайбик: кнопка «На главную» + MP3-голос
+
+- Кнопка возврата на proektmap.ru в меню и слева сверху в игре
+- Озвучка: сначала MP3 из `public/audio/vaibik/`, иначе Web Speech
+- Философия: дети + ИИ = будущее; миссия ложится в продукт
+
+
+## 21.08.2026 — Вечер: отладка консоли + закрытие дня
+
+- `Unexpected token '<'`: в `headerCode` лежал HTML `<meta google-site-verification>` внутри `<script>` — очистили БД, в `analytics.tsx` HTML больше не кладём в script
+- Шум 401 у гостя: `/api/collection` и `/api/user/streak` вызывались из шапки без сессии — теперь только после входа (`favorites-indicator`, `streak-banner`)
+- Голос Вайбика (MP3 vs TTS / autoplay) — отложили на следующий заход
+- День закрыт: DEVLOG + commit + push
+

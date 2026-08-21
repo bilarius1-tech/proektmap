@@ -47,6 +47,12 @@ rm -rf .next && npx next build && pm2 restart proektmap
 - `.cursor/rules/` — правила по путям файлов
 - `.reasonix/skills/` — библиотека Skills проекта
 
+### 5.1. Меню сайта (обязательно)
+Пункты шапки и футера **только** через админку https://proektmap.ru/admin/menu (таблица `MenuItem`).
+**Не хардкодить** ссылки в `header.tsx` / `footer.tsx`.
+Агенту: править через БД/`scripts/sync-header-menu.ts` или API `/api/admin/menu` (нужна сессия admin).
+Правило: `.cursor/rules/menu.mdc`
+
 ### 6. Важные API эндпоинты
 - `/api/ai/ask` — AI-консультант (требуется Pro)
 - `/api/blog/auto-publish` — авто-публикация новостей

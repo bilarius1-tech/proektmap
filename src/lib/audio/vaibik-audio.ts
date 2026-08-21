@@ -8,7 +8,7 @@ export type VaibikAction = "stars" | "aliens" | "score";
 export type VaibikIterationItem = "stars" | "crystals" | "coins";
 
 export function hasVaibikAudio(id: string): id is VaibikAudioId {
-  return Object.hasOwn(VAIBIK_AUDIO, id);
+  return Object.prototype.hasOwnProperty.call(VAIBIK_AUDIO, id);
 }
 
 export function getLabActionPromptId(

@@ -82,8 +82,13 @@ class VaibikAudioManager {
     for (const listener of this.listeners) listener(this.state);
   }
 
+  private onEndCallback: (() => void) | null = null;
+
   private finish = () => {
+    const cb = this.onEndCallback;
+    this.onEndCallback = null;
     this.update({ id: null, subtitle: null, status: "idle" });
+    cb?.();
   };
 
   private handleError = () => {
@@ -106,19 +111,47 @@ class VaibikAudioManager {
     return this.state;
   }
 
-  async playVoice(id: VaibikAudioId | string, subtitle?: string) {
+  async unlockPlayback(): Promise<void> {
+    const audio = this.ensureAudio();
+    if (!audio) return;
+    // Короткий muted play в жесте пользователя снимает NotAllowedError для следующих MP3.
+    const sample = VAIBIK_AUDIO["mission1.welcome" as VaibikAudioId];
+    if (!sample) return;
+    const wasMuted = audio.muted;
+    try {
+      audio.muted = true;
+      audio.src = sample;
+      await audio.play();
+      audio.pause();
+      audio.currentTime = 0;
+    } catch {
+      // Браузер всё равно мог разблокировать элемент после попытки.
+    } finally {
+      audio.muted = wasMuted || this.state.muted;
+    }
+  }
+
+  async playVoice(
+    id: VaibikAudioId | string,
+    subtitle?: string,
+    onEnd?: () => void,
+  ) {
     if (!hasVaibikAudio(id)) {
-      if (process.env.NODE_ENV === "development") {
-        console.warn(`[VaibikAudio] Неизвестный audio ID: ${id}`);
-      }
+      console.warn(`[VaibikAudio] Нет MP3 для id: ${id}`);
       return false;
     }
 
     const audio = this.ensureAudio();
     if (!audio) return false;
-    this.stopVoice();
-    audio.src = VAIBIK_AUDIO[id];
-    audio.currentTime = 0;
+
+    // Не делаем removeAttribute+load — это ломает последующий play в Safari/Chrome.
+    this.onEndCallback = null;
+    audio.pause();
+    this.onEndCallback = onEnd ?? null;
+    audio.muted = false;
+    if (this.state.muted) audio.muted = true;
+    const url = VAIBIK_AUDIO[id];
+    audio.src = url;
     const resolvedSubtitle = subtitle ?? getQuestLineText(id);
     this.update({
       id,
@@ -127,28 +160,52 @@ class VaibikAudioManager {
     });
 
     try {
+      // Дождаться данных, иначе play() иногда падает сразу после смены src.
+      if (audio.readyState < 2) {
+        await new Promise<void>((resolve, reject) => {
+          const ok = () => {
+            cleanup();
+            resolve();
+          };
+          const fail = () => {
+            cleanup();
+            reject(new Error(`load failed: ${url}`));
+          };
+          const cleanup = () => {
+            audio.removeEventListener("canplay", ok);
+            audio.removeEventListener("error", fail);
+          };
+          audio.addEventListener("canplay", ok, { once: true });
+          audio.addEventListener("error", fail, { once: true });
+          audio.load();
+        });
+      }
       await audio.play();
       if (this.state.id === id) this.update({ status: "playing" });
       return true;
     } catch (error) {
-      if (process.env.NODE_ENV === "development") {
-        console.warn(
-          `[VaibikAudio] Воспроизведение ${id} заблокировано или недоступно`,
-          error,
-        );
+      console.warn(`[VaibikAudio] play() не удался для ${id}`, error);
+      if (this.state.id === id) {
+        this.onEndCallback = null;
+        this.update({ id: null, subtitle: null, status: "idle" });
       }
-      if (this.state.id === id) this.finish();
       return false;
     }
   }
 
-  stopVoice() {
+  stopVoice(opts?: { silent?: boolean }) {
+    this.onEndCallback = null;
     if (this.audio) {
       this.audio.pause();
-      this.audio.removeAttribute("src");
-      this.audio.load();
+      // Не сбрасываем src через load() — оставляем элемент «тёплым» для следующего play.
     }
-    if (this.state.status !== "idle") this.finish();
+    if (this.state.status !== "idle") {
+      if (opts?.silent) {
+        this.update({ id: null, subtitle: null, status: "idle" });
+      } else {
+        this.finish();
+      }
+    }
   }
 
   pauseVoice() {

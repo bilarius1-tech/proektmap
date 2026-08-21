@@ -1,15 +1,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 
 export default function FavoritesIndicator({ initialCount }: { initialCount: number }) {
+  const { status } = useSession();
   const [count, setCount] = useState(initialCount);
 
   useEffect(() => {
-    fetch("/api/collection").then(r => r.json()).then(d => {
-      if (Array.isArray(d)) setCount(d.length);
-    });
-  }, []);
+    if (status !== "authenticated") return;
+    fetch("/api/collection")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (Array.isArray(d)) setCount(d.length);
+      })
+      .catch(() => {});
+  }, [status]);
 
   const active = count > 0;
 

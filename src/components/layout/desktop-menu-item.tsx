@@ -50,12 +50,17 @@ export default function DesktopMenuItem({ item }: { item: MenuItem }) {
   }
 
   if (!hasChildren) {
+    const linkClass =
+      item.href === "/resheniya"
+        ? "header-solutions-link"
+        : item.href === "/avito"
+          ? "header-avito-link"
+          : item.href === "/sitemap"
+            ? "header-sitemap-link"
+            : "header-menu-link";
+
     return (
-      <Link href={item.href || "#"} style={{
-        color: "var(--color-text-secondary)", fontSize: "var(--text-s)", textDecoration: "none",
-        padding: "6px 12px", borderRadius: "var(--radius-s)", transition: "background 0.1s",
-        whiteSpace: "nowrap",
-      }}>
+      <Link href={item.href || "#"} className={linkClass}>
         {item.label}
       </Link>
     );

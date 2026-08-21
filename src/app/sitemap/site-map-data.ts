@@ -55,6 +55,7 @@ export const SITE_TREE: SiteTreeGroup[] = [
         title: "Практические пути",
         children: [
           { title: "Новичок: первый проект", href: "/quest/beginner" },
+          { title: "Вайбик: Миссия №1", href: "/vaibik" },
           { title: "AI Land", href: "/quest/ai-land" },
           { title: "Сайт услуг", href: "/quest/services-site" },
           { title: "Vibe Coding", href: "/vibecraft" },
