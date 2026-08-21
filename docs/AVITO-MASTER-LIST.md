@@ -18,9 +18,9 @@ BananLab, AvToolsPro, LikeStats, Bitrix24, amoCRM, набор «Авитолог
 ### Добавили в каталог после сверки
 | Инструмент | Источник | Заметка |
 |---|---|---|
-| AviTool | оба обзора | desktop масспостинг · серая зона |
-| Av-Poster | OtzyvMarketing | desktop · серая зона |
-| Автопостинг Авито | Timeweb | официальный |
+| AviTool | оба обзора | Windows-десктоп, разовая лицензия, без trial · серая зона |
+| Av-Poster (XML Avito) | OtzyvMarketing | готовит XML/архивы для официальной Автозагрузки · ≈500 ₽ разово |
+| Автозагрузка Авито | Timeweb | официальный инструмент площадки · нужен «Расширенный»/«Максимальный» |
 | BotMan | Timeweb | автоответы через API · официальный |
 | Пачка | OtzyvMarketing | чаты |
 | Jivo | OtzyvMarketing | CRM/мессенджер |
