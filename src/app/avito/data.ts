@@ -12,6 +12,10 @@ export type AvitoTool = {
   api: "official" | "unofficial" | "none";
   /** серая зона — нарушает правила Авито, риск блокировки аккаунта */
   risk: boolean;
+  /** премиальная витрина наверху каталога */
+  featured?: boolean;
+  /** короткий слоган для featured-блока */
+  highlight?: string;
 };
 
 export type AvitoCategory = {
@@ -35,6 +39,24 @@ export const avitoCategories: AvitoCategory[] = [
 ];
 
 export const avitoTools: AvitoTool[] = [
+  // ── Премиум-партнёр ───────────────────────────────────────
+  {
+    slug: "bananlab",
+    name: "BananLab",
+    types: ["SaaS"],
+    categories: ["autoposting", "avitolog", "analytics", "design"],
+    description:
+      "Автозагрузка и републикация объявлений, уникализация фото и текста, статистика по клиентам, чат Авито в Telegram. Для авитологов и компаний.",
+    price: "от 500 ₽ / аккаунт · 14 дней бесплатно",
+    website: "https://bananlab.ru/",
+    status: "active",
+    lastChecked: "2026-08-21",
+    api: "unofficial",
+    risk: true,
+    featured: true,
+    highlight: "Профессиональная автозагрузка для авитологов — премиум в каталоге ProektMap",
+  },
+
   // ── Аналитика ──────────────────────────────────────────────
   {
     slug: "yandex-wordstat",
