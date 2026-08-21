@@ -31,11 +31,8 @@ export default function AvitoCatalog({ tools, categories }: { tools: AvitoTool[]
     return tools.filter((t) => {
       if (t.featured) return false;
       const inCat = category === "all" || t.categories.includes(category);
-      const inQuery =
-        !q ||
-        t.name.toLowerCase().includes(q) ||
-        t.description.toLowerCase().includes(q) ||
-        t.types.join(" ").toLowerCase().includes(q);
+      const hay = `${t.name} ${t.description} ${t.types.join(" ")} ${(t.links || []).map((l) => l.label).join(" ")}`.toLowerCase();
+      const inQuery = !q || hay.includes(q);
       return inCat && inQuery;
     });
   }, [tools, query, category]);
@@ -217,6 +214,18 @@ function ToolCard({ tool: t, categories }: { tool: AvitoTool; categories: AvitoC
         {t.description}
       </p>
 
+      {t.links && t.links.length > 0 && (
+        <ol style={{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 6 }}>
+          {t.links.map((link) => (
+            <li key={link.url} style={{ fontSize: "var(--text-s)", lineHeight: 1.4 }}>
+              <a href={link.url} target="_blank" rel="noopener noreferrer" style={{ color: "var(--color-accent)", fontWeight: 600, textDecoration: "none" }}>
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ol>
+      )}
+
       <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
         {t.categories.map((c) => (
           <span key={c} style={{ fontSize: "var(--text-xs)", padding: "2px 10px", borderRadius: "var(--radius-full)", background: "var(--color-bg-tertiary)", color: "var(--color-text-secondary)" }}>
@@ -249,7 +258,7 @@ function ToolCard({ tool: t, categories }: { tool: AvitoTool; categories: AvitoC
           rel="noopener noreferrer"
           style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: "var(--text-s)", fontWeight: 700, color: "var(--color-accent)", textDecoration: "none" }}
         >
-          Открыть сервис <ExternalLink size={14} />
+          {t.links?.length ? "Канал в Telegram" : "Открыть сервис"} <ExternalLink size={14} />
         </a>
       </div>
     </div>

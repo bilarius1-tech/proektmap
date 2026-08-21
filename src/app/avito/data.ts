@@ -16,6 +16,8 @@ export type AvitoTool = {
   featured?: boolean;
   /** короткий слоган для featured-блока */
   highlight?: string;
+  /** дополнительные ссылки внутри одной карточки (набор инструментов) */
+  links?: { label: string; url: string }[];
 };
 
 export type AvitoCategory = {
@@ -214,11 +216,11 @@ export const avitoTools: AvitoTool[] = [
     name: "AvToolsPro",
     types: ["Расширение"],
     categories: ["extensions", "analytics", "avitolog"],
-    description: "Аналитика объявлений, продавцов и поисковых запросов прямо в браузере.",
+    description: "Аналитика объявлений, продавцов и поисковых запросов прямо в браузере на Авито.",
     price: "Freemium",
-    website: "https://chromewebstore.google.com/search/avtoolspro",
+    website: "https://chromewebstore.google.com/detail/cnppacflkmijmiknhacgdllcakjpdhga",
     status: "active",
-    lastChecked: "2026-08-18",
+    lastChecked: "2026-08-21",
     api: "none",
     risk: false,
   },
@@ -227,13 +229,34 @@ export const avitoTools: AvitoTool[] = [
     name: "LikeStats",
     types: ["Расширение"],
     categories: ["extensions", "analytics"],
-    description: "Анализ выдачи, спроса и конкурентов на Авито.",
+    description: "Анализ выдачи, спроса и конкурентов на Авито прямо на страницах площадки.",
     price: "Freemium",
-    website: "https://chromewebstore.google.com/search/likestats",
+    website: "https://chromewebstore.google.com/detail/efjdhfpogpilmdljhiinfmfhoppeklel",
     status: "active",
-    lastChecked: "2026-08-18",
+    lastChecked: "2026-08-21",
     api: "none",
     risk: false,
+  },
+  {
+    slug: "avitolog-bez-prikras-kit",
+    name: "Набор «Авитолог без прикрас»",
+    types: ["Telegram", "Расширение", "Скрипт"],
+    categories: ["crm", "extensions", "promotion", "avitolog"],
+    description:
+      "Четыре рабочих инструмента из канала: Telegram-бот ответов на Авито с автоответами по времени; браузерное приложение (выдача, конкуренты, «Могу сегодня», старые ×2); бесплатный бидер для оплаты за просмотр (до 3 объявлений); скрипт переименования файлов на Яндекс Диске под таблицу.",
+    price: "Бесплатно · ИИ-продавец отдельно платно",
+    website: "https://t.me/avitolog_bez_prikras",
+    status: "active",
+    lastChecked: "2026-08-21",
+    api: "unofficial",
+    risk: true,
+    links: [
+      { label: "1. Telegram-бот ответов + автоответы по времени", url: "https://t.me/avitolog_bez_prikras/710" },
+      { label: "Результаты ИИ-продавца (платно)", url: "https://t.me/avitologi_help/18689" },
+      { label: "2. Расширение: выдача, конкуренты, «Могу сегодня», ×2", url: "https://t.me/avitolog_bez_prikras/686" },
+      { label: "3. Бесплатный бидер (до 3 объявлений)", url: "https://t.me/avitolog_bez_prikras/831" },
+      { label: "4. Переименование файлов на Яндекс Диске", url: "https://t.me/avitolog_bez_prikras/360" },
+    ],
   },
 
   // ── CRM и чаты ────────────────────────────────────────────
