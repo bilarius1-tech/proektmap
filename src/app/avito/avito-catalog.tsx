@@ -1,8 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Search, ExternalLink, AlertTriangle, ShieldCheck, FlaskConical, Star } from "lucide-react";
+import { Search, ExternalLink, AlertTriangle, ShieldCheck, FlaskConical, Star, Info } from "lucide-react";
 import type { AvitoTool, AvitoCategory } from "./data";
+
+const RISK_LABEL = "серая зона";
+const RISK_HINT =
+  "Может нарушать правила Авито (парсинг, автодействия, мультиаккаунт). Работайте аккуратно: возможен бан аккаунта. Мы предупреждаем честно, а не запрещаем.";
 
 const CATEGORY_ICON: Record<string, string> = {
   analytics: "📊",
@@ -165,11 +169,7 @@ function FeaturedCard({ tool: t, categories }: { tool: AvitoTool; categories: Av
               {CATEGORY_ICON[c]} {categories.find((x) => x.slug === c)?.name}
             </span>
           ))}
-          {t.risk && (
-            <span style={{ ...badge, color: "#ffd28a", background: "rgba(245,158,11,0.22)" }}>
-              <AlertTriangle size={12} /> риск блокировки
-            </span>
-          )}
+          {t.risk && <RiskBadge tone="dark" />}
         </div>
 
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 12, marginTop: 4 }}>
@@ -243,11 +243,7 @@ function ToolCard({ tool: t, categories }: { tool: AvitoTool; categories: AvitoC
             <ShieldCheck size={12} style={{ verticalAlign: "-2px" }} /> официальный Avito API
           </span>
         )}
-        {t.risk && (
-          <span style={{ ...badge, color: "#9a5b00", background: "rgba(245,158,11,0.14)" }}>
-            <AlertTriangle size={12} style={{ verticalAlign: "-2px" }} /> риск блокировки
-          </span>
-        )}
+        {t.risk && <RiskBadge tone="light" />}
       </div>
 
       <div style={{ marginTop: "auto", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
@@ -262,6 +258,56 @@ function ToolCard({ tool: t, categories }: { tool: AvitoTool; categories: AvitoC
         </a>
       </div>
     </div>
+  );
+}
+
+function RiskBadge({ tone }: { tone: "light" | "dark" }) {
+  const [open, setOpen] = useState(false);
+  const light = tone === "light";
+
+  return (
+    <span style={{ position: "relative", display: "inline-flex" }}>
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-label={`${RISK_LABEL}. ${RISK_HINT}`}
+        title={RISK_HINT}
+        onClick={() => setOpen((v) => !v)}
+        onBlur={() => setOpen(false)}
+        style={{
+          ...badge,
+          border: "none",
+          cursor: "help",
+          fontSize: "var(--text-xs)",
+          color: light ? "#8a5a00" : "#ffd28a",
+          background: light ? "rgba(245,158,11,0.14)" : "rgba(245,158,11,0.22)",
+        }}
+      >
+        <AlertTriangle size={12} /> {RISK_LABEL} <Info size={12} />
+      </button>
+      {open && (
+        <span
+          role="tooltip"
+          style={{
+            position: "absolute",
+            left: 0,
+            bottom: "calc(100% + 8px)",
+            zIndex: 20,
+            width: "min(280px, 75vw)",
+            padding: "10px 12px",
+            borderRadius: "var(--radius-m)",
+            background: "#1a1a2e",
+            color: "#fff",
+            fontSize: 12,
+            lineHeight: 1.45,
+            fontWeight: 500,
+            boxShadow: "0 8px 24px rgba(0,0,0,0.25)",
+          }}
+        >
+          {RISK_HINT}
+        </span>
+      )}
+    </span>
   );
 }
 

@@ -10,7 +10,7 @@ export type AvitoTool = {
   lastChecked: string;
   /** official = работает через официальный Avito API; unofficial = сторонний доступ; none = не относится */
   api: "official" | "unofficial" | "none";
-  /** серая зона — нарушает правила Авито, риск блокировки аккаунта */
+  /** серая зона правил Авито (парсинг, автодействия, мультиаккаунт) */
   risk: boolean;
   /** премиальная витрина наверху каталога */
   featured?: boolean;

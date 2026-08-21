@@ -10,7 +10,7 @@
 
 | Инструмент | Статус | Заметки |
 |---|---|---|
-| BananLab | ✅ featured | https://bananlab.ru/ · риск блокировки |
+| BananLab | ✅ featured | https://bananlab.ru/ · серая зона |
 | Яндекс Вордстат | ✅ | |
 | Google Trends | ✅ | |
 | Keys.so | ✅ | |
