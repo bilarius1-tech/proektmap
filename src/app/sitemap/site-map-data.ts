@@ -80,6 +80,11 @@ export const SITE_TREE: SiteTreeGroup[] = [
           { title: "Telegram-хаб", href: "/telegram" },
         ],
       },
+      {
+        title: "Лаборатория Авито",
+        href: "/avito",
+        description: "Каталог сервисов, расширений и инструментов для продавцов на Авито",
+      },
     ],
   },
   {

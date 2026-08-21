@@ -8,7 +8,7 @@ function pagePriority(href: string) {
   if (href === "/") return 1;
   if (href === "/resheniya") return 0.9;
   if (href.startsWith("/resheniya/")) return href.includes("workspace") ? 0.6 : 0.8;
-  if (["/blog", "/ai-tools", "/mcp", "/telegram", "/ai-without-vpn"].includes(href)) return 0.8;
+  if (["/blog", "/ai-tools", "/mcp", "/telegram", "/avito", "/ai-without-vpn"].includes(href)) return 0.8;
   if (["/terms", "/privacy", "/offer", "/refund", "/contacts"].includes(href)) return 0.4;
   if (href === "/auth") return 0.3;
   return 0.7;
