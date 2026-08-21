@@ -1754,3 +1754,10 @@ d8e572aa fix: page.tsx + билд
 - Одна карточка «Набор Авитолог без прикрас»: бот ответов, расширение, бидер, переименование на Яндекс Диске + ссылка на ИИ-продавца
 - В карточке список внутренних ссылок (`links[]`)
 
+## 21.08.2026 — Сверка с OtzyvMarketing и Timeweb
+
+- Источники: otzyvmarketing.ru (ТОП-12) и timeweb.com (5 инструментов)
+- В каталог добавлены: AviTool, Av-Poster, Автопостинг Авито, BotMan, Пачка, Jivo, EnvyBox, коллтрекинг Авито, Calltouch, Roistat, Avito Filter/Blacklist/Comment Adder, Multiaccount
+- Не добавлены без живого URL: SellAvi, ViPost, AvitoBot; VitoSAP отложен как слабый по отзывам
+- Сверка зафиксирована в `docs/AVITO-MASTER-LIST.md`
+

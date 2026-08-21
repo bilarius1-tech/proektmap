@@ -6,58 +6,67 @@
 
 ---
 
+## Сверка с обзорами (21.08)
+
+Источники:
+- [OtzyvMarketing — ТОП-12 программ](https://otzyvmarketing.ru/articles/programmy-dlya-raboty-s-avito/)
+- [Timeweb — 5 инструментов](https://timeweb.com/ru/community/articles/soft-dlya-avito-5-instrumentov-kotorye-snimut-s-vas-rutinu)
+
+### Уже были у нас
+BananLab, AvToolsPro, LikeStats, Bitrix24, amoCRM, набор «Авитолог без прикрас», официальный API/продвижение.
+
+### Добавили в каталог после сверки
+| Инструмент | Источник | Заметка |
+|---|---|---|
+| AviTool | оба обзора | desktop масспостинг · серая зона |
+| Av-Poster | OtzyvMarketing | desktop · серая зона |
+| Автопостинг Авито | Timeweb | официальный |
+| BotMan | Timeweb | автоответы через API · официальный |
+| Пачка | OtzyvMarketing | чаты |
+| Jivo | OtzyvMarketing | CRM/мессенджер |
+| EnvyBox | OtzyvMarketing | CRM-мессенджер |
+| Коллтрекинг Авито | OtzyvMarketing | официальный |
+| Calltouch | OtzyvMarketing | сквозная аналитика |
+| Roistat | Timeweb | сквозная аналитика |
+| Avito Filter | OtzyvMarketing | расширение |
+| Avito Blacklist | OtzyvMarketing | расширение |
+| Avito Comment Adder | OtzyvMarketing | расширение |
+| Multiaccount | OtzyvMarketing | расширение · серая зона |
+
+### В обзорах есть, в каталог НЕ кладём (пока)
+| Инструмент | Почему |
+|---|---|
+| SellAvi / Sellavi PRO | сайт sellavi.pro недоступен; sellavi.com — другой продукт (e-commerce конструктор) |
+| ViPost | сайт недоступен на момент проверки |
+| VitoSAP | в обзоре сами пишут про устаревший UI и слабый спрос |
+| AvitoBot | сайт недоступен |
+
+Их держим в очереди ниже — вернём, когда найдём живой URL.
+
+---
+
 ## Уже в каталоге (проверено)
 
-| Инструмент | Статус | Заметки |
-|---|---|---|
-| BananLab | ✅ featured | https://bananlab.ru/ · серая зона |
-| Яндекс Вордстат | ✅ | |
-| Google Trends | ✅ | |
-| Keys.so | ✅ | |
-| MPStats | ✅ | |
-| Apify | ✅ | риск |
-| Octoparse | ✅ | риск |
-| Avito Business API | ✅ | официальный |
-| GigaChat / YandexGPT / Шедеврум / ChatGPT | ✅ | |
-| AvToolsPro | ✅ | точная ссылка Chrome Store |
-| LikeStats | ✅ | точная ссылка Chrome Store |
-| Набор «Авитолог без прикрас» | ✅ | 4 инструмента в одной карточке + ссылка на ИИ-продавца |
-| amoCRM / Bitrix24 / RetailCRM | ✅ | |
-| Photoroom / Canva / remove.bg | ✅ | |
-| Авито Продвижение | ✅ | |
-| Albato / n8n | ✅ | |
-| Авитолог (avitolog.ru) | ✅ | |
+См. `src/app/avito/data.ts`. Премиум: BananLab.
 
----
-
-## Добавлено из заметок Алексея (21.08)
-
-Источник канала: [@avitolog_bez_prikras](https://t.me/avitolog_bez_prikras)
-
-1. **Telegram-бот ответов на Авито** + автоответы по времени — https://t.me/avitolog_bez_prikras/710  
-   Платный ИИ-продавец / результаты — https://t.me/avitologi_help/18689
-2. **Браузерное приложение**: выдача, конкуренты, «Могу сегодня», старые ×2 — https://t.me/avitolog_bez_prikras/686
-3. **Бесплатный бидер** (оплата за просмотр, до 3 объявлений) — https://t.me/avitolog_bez_prikras/831
-4. **Скрипт переименования** файлов на Яндекс Диске в браузере — https://t.me/avitolog_bez_prikras/360
-
-Решение: все четыре объединены в одну карточку `avitolog-bez-prikras-kit`.
-
----
-
-## Очередь на проверку (ещё не в каталоге)
-
-Сюда дописывать кандидатов из заметок / чатов. Формат:
-
-```
-- Название — URL — категория — заметка — риск? да/нет
-```
-
-- [ ] …
-- [ ] …
-
----
-
-## Chrome Web Store (точные URL)
-
+Chrome Web Store (точные URL):
 - AvToolsPro: https://chromewebstore.google.com/detail/cnppacflkmijmiknhacgdllcakjpdhga
 - LikeStats: https://chromewebstore.google.com/detail/efjdhfpogpilmdljhiinfmfhoppeklel
+- Avito Filter: https://chromewebstore.google.com/detail/nahkjkioimodegoeoklgclokbjocbpgk
+- Avito Blacklist: https://chromewebstore.google.com/detail/jhobdoodiicgomhcmcdapbdehndbhkfj
+- Avito Comment Adder: https://chromewebstore.google.com/detail/hpoolpnhodapahmeifnlmookojkiaoai
+- Multiaccount: https://chromewebstore.google.com/detail/bjhogabbcklgmknmpkcibognokhlebkn
+
+---
+
+## Очередь на проверку
+
+```
+- Название — URL — категория — заметка — серая зона? да/нет
+```
+
+- [ ] SellAvi — найти живой URL (не sellavi.com)
+- [ ] ViPost — найти живой URL
+- [ ] AvitoBot — найти живой URL
+- [ ] VitoSAP — решить: архив или не брать
+- [ ] …
