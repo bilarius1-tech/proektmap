@@ -107,20 +107,25 @@ proektmap.ru/
 ├── docs/                  ← Документация (читать первой!)
 │   ├── MANIFEST.md        ← Конституция
 │   ├── ARCHITECTURE.md    ← Архитектура
+│   ├── SCROLL-FILM.md     ← Scroll-лендинг / сайт-фильм (демо)
 │   ├── AI_PLAYBOOK.md     ← Этот файл
 │   ├── DECISIONS/         ← ADR'ы
 │   └── BLUEPRINTS/        ← Шаблоны Blueprint'ов
 ├── src/
 │   ├── app/               ← Next.js App Router
+│   │   └── demo/scroll-film/ ← демо сайт-фильма
 │   ├── content/blueprints/← MDX файлы Blueprint'ов
 │   ├── lib/
 │   │   ├── db/            ← Prisma клиент
 │   │   ├── game/          ← XP-система
 │   │   └── ai/            ← OpenRouter клиент
 │   └── components/        ← React компоненты
+│       └── demo/ScrollFilm.tsx
 ├── prisma/schema.prisma   ← Модель данных
 └── .env                   ← Переменные окружения
 ```
+
+Scroll-фильм: читать [SCROLL-FILM.md](./SCROLL-FILM.md). Живой URL: `/demo/scroll-film`.
 
 ---
 

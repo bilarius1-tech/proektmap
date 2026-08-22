@@ -38,7 +38,8 @@ rm -rf .next && npx next build && pm2 restart proektmap
 - `src/lib/` — утилиты (auth, db, project-context)
 - `prisma/schema.prisma` — модель БД
 - `prisma/seed.ts` — ПОЛНЫЙ посев (защита от сброса)
-- `docs/` — документация (DEVLOG, BUGS, ARCHITECTURE)
+- `docs/` — документация (DEVLOG, BUGS, ARCHITECTURE, **SCROLL-FILM**)
+- `docs/SCROLL-FILM.md` — канон по scroll-лендингу (`/demo/scroll-film`)
 
 ### 6. Важные API эндпоинты
 - `/api/ai/ask` — AI-консультант (требуется Pro)

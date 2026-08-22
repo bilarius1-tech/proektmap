@@ -47,3 +47,4 @@ ProektMap = платформа для сборки AI-бизнесов. «GitHub
 - Готовые AI-бизнесы
 - Архитектурные схемы
 - Reverse Engineering
+- **Scroll-лендинги («сайт-фильм»)** — направление: демо `/demo/scroll-film`, канон `docs/SCROLL-FILM.md`

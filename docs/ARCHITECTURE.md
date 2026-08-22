@@ -75,10 +75,15 @@ model Decision {
 /[blueprint]              — Страница Blueprint'а
 /[blueprint]/[card]       — Карточка с AI
 /profile                  — Профиль пользователя
+/demo/scroll-film         — Scroll-фильм (сайт-фильм), демо GSAP+Lenis
+/demo/swiss               — демо стиля Swiss Editorial
+/demo/win98               — демо стиля Win98
 /api/auth/...             — NextAuth (Magic Link)
 /api/ai/ask               — OpenRouter прокси
 /api/progress              — Обновление прогресса
 ```
+
+Подробно про scroll-лендинг: [SCROLL-FILM.md](./SCROLL-FILM.md).
 
 ## 3. API
 

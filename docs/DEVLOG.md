@@ -1039,3 +1039,16 @@ dfeb819f Prompts v3
 ### План на завтра
 - SOLUTIONS-LIBRARY.md — Архитектор → коллективная база решений
 
+
+## 22.08.2026 — scroll-film демо (сайт-фильм)
+
+### Сделано
+- Страница **https://proektmap.ru/demo/scroll-film** — 5 сцен, скролл = пульт камеры
+- Стек: Next.js + **GSAP ScrollTrigger** + **Lenis** (без Three.js)
+- Компонент `src/components/demo/ScrollFilm.tsx`, роут `src/app/demo/scroll-film/`
+- Зависимости: `gsap`, `lenis` (install с `--legacy-peer-deps`)
+- Документация: **`docs/SCROLL-FILM.md`** (канон), ссылки в ARCHITECTURE / AI_PLAYBOOK / AGENTS / ROADMAP
+- Билд + `pm2 restart proektmap`, URL → 200
+
+### Зачем
+Направление scroll-лендингов («сайт-фильм») развиваем на ProektMap: раскадровка → анимация → CTA.
