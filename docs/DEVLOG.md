@@ -1839,3 +1839,25 @@ d8e572aa fix: page.tsx + билд
 - `AGENTS.md` §0 — правило одной линии истории
 - `.cursor/rules/git-branches.mdc` (alwaysApply) — агенты не разъезжают ветки
 
+
+## 23.08.2026 — Креативная библиотека + оформление GitHub (закрытие дня)
+
+### Креативная библиотека вайбкодера
+- Live: https://proektmap.ru/sandbox/creative-library
+- ~37 инструментов, Tier 1–3, раздел Performance / FPS Killers
+- **Стеки-рецепты** как главный вход: задача → один стек → проще/сложнее → бриф агенту
+- Пространственная тройка: виртуальные галереи (Photo Sphere), карты (Яндекс / Leaflet / MapLibre), туры (Driver.js)
+- Философия v4.1: принципы библиотеки в Песочнице (`docs/PHILOSOPHY.md`)
+- Канон: `docs/VIBECODER-CREATIVE-LIBRARY.md`
+
+### GitHub как лицо продукта
+- Публичный README на русском: продукт, `/resheniya`, библиотека, стек, main=master
+- CI на ветках `main` и `master`
+- Push: `main` и `master` на один commit
+- Репо: https://github.com/bilarius1-tech/proektmap (public)
+
+### Не в этот коммит
+- `docs/DESIGN-SKILLS.md` — черновик идеи, реализация отложена (не путать с Prisma Skill)
+
+### День закрыт
+DEVLOG + commit + push. Центр продукта по-прежнему `/resheniya`.
