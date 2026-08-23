@@ -7,6 +7,7 @@ import {
   CREATIVE_TOOLS,
   difficultyLabel,
   mobileLabel,
+  tierLabel,
   type CreativeTool,
 } from "@/lib/creative-library/data";
 
@@ -49,6 +50,7 @@ export default function CreativeToolDetailClient({ tool }: { tool: CreativeTool 
             {tool.tagline}
           </p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            <Meta>{tierLabel(tool.tier)}</Meta>
             <Meta>{difficultyLabel(tool.difficulty)}</Meta>
             <Meta>{mobileLabel(tool.mobile)}</Meta>
             <Meta>{tool.price}</Meta>

@@ -2,14 +2,20 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Search, Sparkles } from "lucide-react";
+import { ArrowRight, Search, Sparkles, AlertTriangle, Zap, Copy, Check, Layers } from "lucide-react";
 import {
   CREATIVE_TOOLS,
-  SCENARIOS,
+  PERFORMANCE_KILLERS,
+  STACK_RECIPES,
   TASK_FILTERS,
+  TIER_META,
   difficultyLabel,
+  getCreativeTool,
   mobileLabel,
+  tierLabel,
   type CreativeDifficulty,
+  type CreativeTier,
+  type StackRecipe,
 } from "@/lib/creative-library/data";
 
 const DIFF_FILTERS: { id: "all" | CreativeDifficulty; label: string }[] = [
@@ -19,59 +25,256 @@ const DIFF_FILTERS: { id: "all" | CreativeDifficulty; label: string }[] = [
   { id: "hard", label: "Тяжело" },
 ];
 
+const TIER_FILTERS: { id: "all" | CreativeTier; label: string }[] = [
+  { id: "all", label: "Все уровни" },
+  { id: 1, label: TIER_META[1].short },
+  { id: 2, label: TIER_META[2].short },
+  { id: 3, label: TIER_META[3].short },
+];
+
+const NOCODE_SLUGS = new Set([
+  "spline",
+  "rive",
+  "lottie",
+  "vanta",
+  "model-viewer",
+  "autoanimate",
+  "mesh-gradient",
+  "view-transitions",
+]);
+
 export default function CreativeLibraryClient() {
   const [task, setTask] = useState("all");
   const [diff, setDiff] = useState<"all" | CreativeDifficulty>("all");
+  const [tier, setTier] = useState<"all" | CreativeTier>("all");
   const [q, setQ] = useState("");
   const [entry, setEntry] = useState<"all" | "code" | "nocode">("all");
+  const [recipeId, setRecipeId] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const activeRecipe = recipeId ? STACK_RECIPES.find((r) => r.id === recipeId) ?? null : null;
+
+  const recipeSlugSet = useMemo(() => {
+    if (!activeRecipe) return null;
+    return new Set([...activeRecipe.stack, ...activeRecipe.easier.slugs, ...activeRecipe.harder.slugs]);
+  }, [activeRecipe]);
 
   const filtered = useMemo(() => {
     return CREATIVE_TOOLS.filter((t) => {
+      if (recipeSlugSet && !recipeSlugSet.has(t.slug)) return false;
       if (task !== "all" && !t.tasks.includes(task)) return false;
       if (diff !== "all" && t.difficulty !== diff) return false;
-      if (entry === "nocode" && !["spline", "rive", "lottie"].includes(t.slug)) return false;
-      if (entry === "code" && ["spline", "rive"].includes(t.slug)) return false;
+      if (tier !== "all" && t.tier !== tier) return false;
+      if (entry === "nocode" && !NOCODE_SLUGS.has(t.slug)) return false;
+      if (entry === "code" && NOCODE_SLUGS.has(t.slug) && t.slug !== "rive") return false;
       if (q) {
         const hay = `${t.name} ${t.tagline} ${t.category} ${t.designDNA}`.toLowerCase();
         if (!hay.includes(q.toLowerCase())) return false;
       }
       return true;
-    }).sort((a, b) => a.sortOrder - b.sortOrder);
-  }, [task, diff, q, entry]);
+    }).sort((a, b) => {
+      if (activeRecipe) {
+        const ai = activeRecipe.stack.indexOf(a.slug);
+        const bi = activeRecipe.stack.indexOf(b.slug);
+        const aIn = ai >= 0 ? ai : 100;
+        const bIn = bi >= 0 ? bi : 100;
+        if (aIn !== bIn) return aIn - bIn;
+      }
+      return a.tier - b.tier || a.sortOrder - b.sortOrder;
+    });
+  }, [task, diff, tier, q, entry, recipeSlugSet, activeRecipe]);
+
+  function selectRecipe(r: StackRecipe) {
+    if (recipeId === r.id) {
+      setRecipeId(null);
+      setTask("all");
+      setTier("all");
+      return;
+    }
+    setRecipeId(r.id);
+    setTask("all");
+    setDiff("all");
+    setTier("all");
+    setEntry("all");
+    setQ("");
+  }
+
+  async function copyBrief(text: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* ignore */
+    }
+  }
 
   return (
     <div>
-      {/* Scenarios */}
+      {/* Stack recipes — главный вход */}
+      <section style={{ marginBottom: "var(--space-xl)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+          <Layers size={16} style={{ color: "var(--color-accent)" }} />
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-text-tertiary)" }}>
+            Стеки-рецепты — начни отсюда
+          </div>
+        </div>
+        <p style={{ fontSize: 13, color: "var(--color-text-secondary)", lineHeight: 1.55, margin: "0 0 var(--space-s)", maxWidth: 640 }}>
+          Не выбирай из 32 библиотек. Выбери задачу — получи один рекомендованный стек, проще и сложнее альтернативы.
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 0, border: "1px solid var(--color-border)", background: "var(--color-border)" }}>
+          {STACK_RECIPES.map((r) => {
+            const active = recipeId === r.id;
+            return (
+              <button
+                key={r.id}
+                type="button"
+                onClick={() => selectRecipe(r)}
+                style={{
+                  textAlign: "left",
+                  padding: "var(--space-m)",
+                  background: active ? "var(--color-accent-light)" : "var(--color-bg-primary)",
+                  border: "none",
+                  cursor: "pointer",
+                  outline: "1px solid var(--color-border)",
+                  outlineOffset: -1,
+                }}
+                className="cl-scenario"
+              >
+                <div style={{ fontFamily: "var(--font-heading)", fontWeight: 800, fontSize: "var(--text-s)", marginBottom: 4, color: active ? "var(--color-accent)" : "inherit" }}>
+                  {r.title}
+                </div>
+                <div style={{ fontSize: 12, color: "var(--color-text-secondary)", lineHeight: 1.5, marginBottom: 8 }}>{r.desc}</div>
+                <div style={{ fontSize: 11, color: "var(--color-accent)", fontWeight: 600 }}>
+                  {r.stack.map((slug) => getCreativeTool(slug)?.name).filter(Boolean).join(" + ")}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {activeRecipe && (
+          <div
+            style={{
+              marginTop: 0,
+              border: "1px solid var(--color-border)",
+              borderTop: "none",
+              padding: "var(--space-l)",
+              background: "var(--color-bg-secondary)",
+            }}
+          >
+            <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: 12, marginBottom: "var(--space-m)" }}>
+              <div>
+                <div style={{ fontFamily: "var(--font-heading)", fontWeight: 800, fontSize: "var(--text-m)", marginBottom: 6 }}>{activeRecipe.title}</div>
+                <p style={{ fontSize: 13, color: "var(--color-text-secondary)", lineHeight: 1.6, margin: 0, maxWidth: 560 }}>{activeRecipe.why}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => copyBrief(activeRecipe.agentBrief)}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  padding: "10px 14px",
+                  fontSize: 12,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  border: "1px solid var(--color-accent)",
+                  background: "var(--color-accent)",
+                  color: "#fff",
+                  alignSelf: "flex-start",
+                }}
+              >
+                {copied ? <Check size={14} /> : <Copy size={14} />}
+                {copied ? "Скопировано" : "Копировать бриф агенту"}
+              </button>
+            </div>
+
+            <div style={{ marginBottom: "var(--space-m)" }}>
+              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--color-text-tertiary)", marginBottom: 8 }}>
+                Рекомендованный стек
+              </div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                {activeRecipe.stack.map((slug) => {
+                  const t = getCreativeTool(slug);
+                  if (!t) return null;
+                  return (
+                    <Link
+                      key={slug}
+                      href={`/sandbox/creative-library/${slug}`}
+                      style={{
+                        textDecoration: "none",
+                        padding: "8px 12px",
+                        border: "1px solid var(--color-accent)",
+                        background: "var(--color-bg-primary)",
+                        color: "var(--color-accent)",
+                        fontSize: 13,
+                        fontWeight: 700,
+                      }}
+                    >
+                      {t.name} · {tierLabel(t.tier)}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "var(--space-m)", marginBottom: "var(--space-m)" }}>
+              <AltBlock label={activeRecipe.easier.label} slugs={activeRecipe.easier.slugs} />
+              <AltBlock label={activeRecipe.harder.label} slugs={activeRecipe.harder.slugs} />
+            </div>
+
+            <div
+              style={{
+                display: "flex",
+                gap: 10,
+                padding: "var(--space-m)",
+                background: "var(--color-bg-primary)",
+                border: "1px solid var(--color-border)",
+                fontSize: 13,
+                lineHeight: 1.55,
+                color: "var(--color-text-secondary)",
+              }}
+            >
+              <AlertTriangle size={16} style={{ color: "var(--color-warning)", flexShrink: 0, marginTop: 2 }} />
+              <div>
+                <strong style={{ color: "var(--color-text-primary)" }}>FPS / мобилка:</strong> {activeRecipe.fpsNote}
+              </div>
+            </div>
+          </div>
+        )}
+      </section>
+
+      {/* Tiers explainer */}
       <section style={{ marginBottom: "var(--space-xl)" }}>
         <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "var(--color-text-tertiary)", marginBottom: "var(--space-s)" }}>
-          Мне нужно…
+          Уровни — если листаешь каталог
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 0, border: "1px solid var(--color-border)", background: "var(--color-border)" }}>
-          {SCENARIOS.map((s) => (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 0, border: "1px solid var(--color-border)", background: "var(--color-border)" }}>
+          {([1, 2, 3] as CreativeTier[]).map((t) => (
             <button
-              key={s.title}
+              key={t}
               type="button"
               onClick={() => {
-                const first = s.recommend[0];
-                const tool = CREATIVE_TOOLS.find((t) => t.slug === first);
-                if (tool?.tasks[0]) setTask(tool.tasks[0]);
-                setDiff("all");
+                setRecipeId(null);
+                setTier(tier === t ? "all" : t);
               }}
               style={{
                 textAlign: "left",
                 padding: "var(--space-m)",
-                background: "var(--color-bg-primary)",
+                background: tier === t && !recipeId ? "var(--color-accent-light)" : "var(--color-bg-primary)",
                 border: "none",
                 cursor: "pointer",
                 outline: "1px solid var(--color-border)",
                 outlineOffset: -1,
               }}
-              className="cl-scenario"
             >
-              <div style={{ fontFamily: "var(--font-heading)", fontWeight: 800, fontSize: "var(--text-s)", marginBottom: 4 }}>{s.title}</div>
-              <div style={{ fontSize: 12, color: "var(--color-text-secondary)", lineHeight: 1.5, marginBottom: 8 }}>{s.desc}</div>
-              <div style={{ fontSize: 11, color: "var(--color-accent)", fontWeight: 600 }}>
-                {s.recommend.map((slug) => CREATIVE_TOOLS.find((t) => t.slug === slug)?.name).filter(Boolean).join(" · ")}
+              <div style={{ fontFamily: "var(--font-heading)", fontWeight: 800, fontSize: "var(--text-s)", marginBottom: 4, color: tier === t && !recipeId ? "var(--color-accent)" : "inherit" }}>
+                {TIER_META[t].label}
+              </div>
+              <div style={{ fontSize: 12, color: "var(--color-text-secondary)", lineHeight: 1.5 }}>{TIER_META[t].desc}</div>
+              <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", marginTop: 8 }}>
+                {CREATIVE_TOOLS.filter((x) => x.tier === t).length} инструментов
               </div>
             </button>
           ))}
@@ -85,7 +288,7 @@ export default function CreativeLibraryClient() {
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Поиск: GSAP, 3D, игра…"
+            placeholder="Поиск: GSAP, шейдеры, AR…"
             style={{
               width: "100%",
               padding: "10px 12px 10px 32px",
@@ -98,68 +301,114 @@ export default function CreativeLibraryClient() {
             }}
           />
         </div>
-        <span style={{ fontSize: 12, color: "var(--color-text-tertiary)" }}>{filtered.length} из {CREATIVE_TOOLS.length}</span>
+        <span style={{ fontSize: 12, color: "var(--color-text-tertiary)" }}>
+          {filtered.length} из {CREATIVE_TOOLS.length}
+          {activeRecipe ? ` · рецепт «${activeRecipe.title}»` : ""}
+        </span>
+        {recipeId && (
+          <button
+            type="button"
+            onClick={() => setRecipeId(null)}
+            style={{ fontSize: 11, fontWeight: 600, padding: "6px 10px", cursor: "pointer", border: "1px solid var(--color-border)", background: "var(--color-bg-primary)", color: "var(--color-text-secondary)" }}
+          >
+            Сбросить рецепт
+          </button>
+        )}
       </div>
 
       <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 8 }}>
+        {TIER_FILTERS.map((f) => (
+          <Chip
+            key={String(f.id)}
+            active={tier === f.id && !recipeId}
+            onClick={() => {
+              setRecipeId(null);
+              setTier(f.id);
+            }}
+          >
+            {f.label}
+          </Chip>
+        ))}
+      </div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 8 }}>
         {TASK_FILTERS.map((f) => (
-          <Chip key={f.id} active={task === f.id} onClick={() => setTask(f.id)}>{f.label}</Chip>
+          <Chip
+            key={f.id}
+            active={task === f.id}
+            onClick={() => {
+              setRecipeId(null);
+              setTask(f.id);
+            }}
+          >
+            {f.label}
+          </Chip>
         ))}
       </div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: "var(--space-l)" }}>
         {DIFF_FILTERS.map((f) => (
-          <Chip key={f.id} active={diff === f.id} onClick={() => setDiff(f.id)}>{f.label}</Chip>
+          <Chip key={f.id} active={diff === f.id} onClick={() => setDiff(f.id)}>
+            {f.label}
+          </Chip>
         ))}
-        <Chip active={entry === "all"} onClick={() => setEntry("all")}>Любой вход</Chip>
-        <Chip active={entry === "nocode"} onClick={() => setEntry("nocode")}>No-code вход</Chip>
-        <Chip active={entry === "code"} onClick={() => setEntry("code")}>Код + агент</Chip>
+        <Chip active={entry === "all"} onClick={() => setEntry("all")}>
+          Любой вход
+        </Chip>
+        <Chip active={entry === "nocode"} onClick={() => setEntry("nocode")}>
+          Low-code вход
+        </Chip>
+        <Chip active={entry === "code"} onClick={() => setEntry("code")}>
+          Код + агент
+        </Chip>
       </div>
 
       {/* Grid */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 0, border: "1px solid var(--color-border)", background: "var(--color-border)" }}>
-        {filtered.map((t) => (
-          <Link
-            key={t.slug}
-            href={`/sandbox/creative-library/${t.slug}`}
-            style={{
-              textDecoration: "none",
-              color: "inherit",
-              background: t.featured ? "var(--color-bg-secondary)" : "var(--color-bg-primary)",
-              padding: "var(--space-l)",
-              outline: "1px solid var(--color-border)",
-              outlineOffset: -1,
-              display: "flex",
-              flexDirection: "column",
-              minHeight: 220,
-            }}
-            className="cl-card"
-          >
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, marginBottom: 8 }}>
-              <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--color-text-tertiary)" }}>
-                {t.category}
-              </span>
-              {t.featured && (
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 10, fontWeight: 700, color: "var(--color-accent)" }}>
-                  <Sparkles size={12} /> Эталон
+        {filtered.map((t) => {
+          const inStack = activeRecipe?.stack.includes(t.slug);
+          return (
+            <Link
+              key={t.slug}
+              href={`/sandbox/creative-library/${t.slug}`}
+              style={{
+                textDecoration: "none",
+                color: "inherit",
+                background: inStack ? "var(--color-accent-light)" : t.featured ? "var(--color-bg-secondary)" : "var(--color-bg-primary)",
+                padding: "var(--space-l)",
+                outline: "1px solid var(--color-border)",
+                outlineOffset: -1,
+                display: "flex",
+                flexDirection: "column",
+                minHeight: 230,
+              }}
+              className="cl-card"
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 8, marginBottom: 8 }}>
+                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--color-text-tertiary)" }}>
+                  {inStack ? "В стеке рецепта" : t.category}
                 </span>
-              )}
-            </div>
-            <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-l)", fontWeight: 800, margin: "0 0 8px", letterSpacing: "-0.02em" }}>
-              {t.name}
-            </h2>
-            <p style={{ fontSize: 13, color: "var(--color-text-secondary)", lineHeight: 1.55, margin: "0 0 auto", flex: 1 }}>
-              {t.tagline}
-            </p>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 14 }}>
-              <Tag>{difficultyLabel(t.difficulty)}</Tag>
-              <Tag>{mobileLabel(t.mobile)}</Tag>
-              <Tag>{t.price}</Tag>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 14, fontSize: 12, fontWeight: 700, color: "var(--color-accent)" }}>
-              Открыть карточку <ArrowRight size={14} />
-            </div>
-          </Link>
-        ))}
+                <span style={{ fontSize: 10, fontWeight: 700, color: t.tier === 3 ? "var(--color-warning)" : t.tier === 1 ? "var(--color-accent)" : "var(--color-text-secondary)" }}>
+                  {tierLabel(t.tier)}
+                </span>
+              </div>
+              <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-l)", fontWeight: 800, margin: "0 0 8px", letterSpacing: "-0.02em" }}>
+                {t.name}
+                {t.featured && (
+                  <span style={{ marginLeft: 8, fontSize: 10, fontWeight: 700, color: "var(--color-accent)", verticalAlign: "middle" }}>
+                    <Sparkles size={12} style={{ display: "inline", verticalAlign: -1 }} /> эталон
+                  </span>
+                )}
+              </h2>
+              <p style={{ fontSize: 13, color: "var(--color-text-secondary)", lineHeight: 1.55, margin: "0 0 auto", flex: 1 }}>{t.tagline}</p>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 14 }}>
+                <Tag>{difficultyLabel(t.difficulty)}</Tag>
+                <Tag>{mobileLabel(t.mobile)}</Tag>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 14, fontSize: 12, fontWeight: 700, color: "var(--color-accent)" }}>
+                Открыть карточку <ArrowRight size={14} />
+              </div>
+            </Link>
+          );
+        })}
       </div>
 
       {filtered.length === 0 && (
@@ -168,9 +417,76 @@ export default function CreativeLibraryClient() {
         </div>
       )}
 
+      {/* Performance / FPS Killers */}
+      <section style={{ marginTop: "var(--space-xl)" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: "var(--space-s)" }}>
+          <AlertTriangle size={18} style={{ color: "var(--color-warning)" }} />
+          <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-l)", fontWeight: 800, margin: 0, letterSpacing: "-0.01em" }}>
+            Performance / FPS Killers
+          </h2>
+        </div>
+        <p style={{ fontSize: 13, color: "var(--color-text-secondary)", lineHeight: 1.6, margin: "0 0 var(--space-m)", maxWidth: 640 }}>
+          Вайб умирает, если телефон греется и скролл лагает. Прочитай до того, как повесишь Three.js на весь сайт.
+        </p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 0, border: "1px solid var(--color-border)" }}>
+          {PERFORMANCE_KILLERS.map((item) => (
+            <div
+              key={item.title}
+              style={{
+                padding: "var(--space-m)",
+                background: "var(--color-bg-primary)",
+                borderBottom: "1px solid var(--color-border)",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 10, marginBottom: 6 }}>
+                <Zap size={16} style={{ color: "var(--color-warning)", flexShrink: 0, marginTop: 2 }} />
+                <div style={{ fontFamily: "var(--font-heading)", fontWeight: 800, fontSize: "var(--text-s)" }}>{item.title}</div>
+              </div>
+              <div style={{ fontSize: 13, color: "var(--color-error)", lineHeight: 1.55, marginBottom: 6, paddingLeft: 26 }}>
+                <strong>Опасно:</strong> {item.danger}
+              </div>
+              <div style={{ fontSize: 13, color: "var(--color-text-secondary)", lineHeight: 1.55, paddingLeft: 26 }}>
+                <strong style={{ color: "var(--color-accent)" }}>Делай так:</strong> {item.doInstead}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <style>{`
         .cl-card:hover, .cl-scenario:hover { background: var(--color-bg-tertiary) !important; }
       `}</style>
+    </div>
+  );
+}
+
+function AltBlock({ label, slugs }: { label: string; slugs: string[] }) {
+  return (
+    <div>
+      <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--color-text-tertiary)", marginBottom: 8 }}>{label}</div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+        {slugs.map((slug) => {
+          const t = getCreativeTool(slug);
+          if (!t) return null;
+          return (
+            <Link
+              key={slug}
+              href={`/sandbox/creative-library/${slug}`}
+              style={{
+                textDecoration: "none",
+                padding: "6px 10px",
+                border: "1px solid var(--color-border)",
+                background: "var(--color-bg-primary)",
+                color: "var(--color-text-secondary)",
+                fontSize: 12,
+                fontWeight: 600,
+              }}
+            >
+              {t.name}
+            </Link>
+          );
+        })}
+      </div>
     </div>
   );
 }

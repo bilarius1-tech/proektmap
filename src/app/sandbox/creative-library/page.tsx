@@ -6,10 +6,10 @@ import { CREATIVE_TOOLS } from "@/lib/creative-library/data";
 export const metadata = {
   title: "Креативная библиотека вайбкодера — Песочница | ProektMap",
   description:
-    "15 инструментов для необычных проектов: GSAP, Three.js, Phaser, Spline, Rive. Не список ссылок — карточки решений с промптом для AI-агента.",
+    "Стеки-рецепты: сайт-фильм, вирт. галереи, карты, туры + инструменты Tier 1–3 и FPS Killers.",
   openGraph: {
     title: "Креативная библиотека вайбкодера",
-    description: "GSAP, Phaser, Three.js и другие — когда брать и что сказать агенту.",
+    description: "Рецепты стеков: галереи, карты, туры, scroll-фильм — когда брать и что сказать агенту.",
     images: [
       {
         url: "https://proektmap.ru/api/og?title=Креативная+библиотека&category=Песочница&author=Вайбкодинг",
@@ -55,7 +55,7 @@ export default function CreativeLibraryPage() {
             Креативная библиотека вайбкодера
           </h1>
           <p style={{ fontSize: "var(--text-m)", lineHeight: 1.65, opacity: 0.85, maxWidth: 560, margin: 0 }}>
-            Не очередной awesome-list. Карточки решений: что это, когда брать, когда не брать и что сказать AI-агенту — чтобы сайт не выглядел как все остальные.
+            Не awesome-list. Сначала стек-рецепт под задачу, потом карточки Tier 1–3: когда брать, что сказать агенту, как не убить FPS.
           </p>
         </div>
       </div>
