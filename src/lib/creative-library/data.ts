@@ -93,7 +93,18 @@ export const PERFORMANCE_KILLERS: { title: string; danger: string; doInstead: st
     doInstead:
       "Панорамы 2–4K, lazy соседних сцен, кластер маркеров, статичный fallback. Карту не анимируй на каждый scroll-тик.",
   },
+  {
+    title: "AI / WebGL «осторожно на мобиле» без fallback",
+    danger:
+      "Curtains, ml5, Transformers.js, тяжёлый WebGL на iPhone SE → краш вкладки, нагрев, съеденная батарея.",
+    doInstead:
+      "Тест на слабом устройстве. matchMedia + детект мощности/WebGL. Фоллбэк на статику. Камера/модели — только opt-in.",
+  },
 ];
+
+/** Типичная ошибка для всех карточек mobile: careful / desktop */
+export const MOBILE_PERF_MISTAKE =
+  "Не проверил производительность на iPhone SE. WebGL и AI-модели могут убить батарею или вызвать краш. Всегда делай фоллбэк на статику через matchMedia или детект мощности устройства.";
 
 export const TASK_FILTERS = [
   { id: "all", label: "Все задачи" },
@@ -102,10 +113,12 @@ export const TASK_FILTERS = [
   { id: "typography", label: "Типографика" },
   { id: "atmosphere", label: "Фон / атмосфера" },
   { id: "transitions", label: "Переходы страниц" },
+  { id: "shaders", label: "Шейдеры" },
   { id: "3d", label: "3D / AR" },
   { id: "game", label: "2D-игра" },
   { id: "illustration", label: "Иллюстрации" },
   { id: "generative", label: "Генератив" },
+  { id: "client-ai", label: "AI на клиенте" },
   { id: "sound", label: "Звук" },
   { id: "ai-interact", label: "AI / трекинг" },
   { id: "physics", label: "Физика" },
@@ -263,6 +276,46 @@ Mobile fallback (картинка/CSS). Feature detect WebGL. dispose при unm
     agentBrief: `Собери product tour на Driver.js: 5–7 шагов, spotlight, кнопка «пропустить».
 Показ один раз (localStorage). AutoAnimate — опционально на списках рядом.
 Не смешивай с 360-галереей и тяжёлым scroll-фильмом в одном MVP.`,
+  },
+  {
+    id: "page-morph",
+    title: "Страницы перетекают",
+    desc: "Сайт как одна комната: клик меняет декорации, не перезагружает мир",
+    stack: ["barba", "gsap"],
+    why: "Barba перехватывает навигацию; GSAP даёт кинематографичный leave/enter. Для Next App Router чаще хватит View Transitions.",
+    easier: { label: "Нативно проще", slugs: ["view-transitions"] },
+    harder: { label: "+ шейдер на уходе", slugs: ["curtains", "theatre"] },
+    fpsNote: "Лёгкие fade/slide. Не грузи Curtains на каждый переход. reduced-motion → мгновенно.",
+    agentBrief: `Нужен сайт-портфолио/лукбук: страницы перетекают через Barba.js + лёгкий GSAP leave/enter.
+Сохрани состояние плеера/скролла где нужно. Re-init скриптов после перехода.
+Если стек Next App Router — сначала оцени View Transitions; Barba только если нужен полный контроль MPA.
+Mobile: короткие анимации. Не путай с Lenis (внутристраничный скролл).`,
+  },
+  {
+    id: "camera-gestures",
+    title: "Сайт видит жесты",
+    desc: "Управление камерой/позой/звуком — интерактив за пределами мыши",
+    stack: ["ml5"],
+    why: "ml5.js — креативный ML в браузере поверх вебки. MediaPipe — если нужен более «инженерный» трекинг.",
+    easier: { label: "Без камеры", slugs: ["driver-js", "motion"] },
+    harder: { label: "Точнее / тяжелее", slugs: ["mediapipe", "transformers-js"] },
+    fpsNote: "Только opt-in (кнопка «включить камеру»). На mobile — низкий FPS модели, статичный fallback без камеры.",
+    agentBrief: `Собери opt-in интерактив на ml5.js (поза или классификация с камеры).
+Кнопка разрешения, стоп при hidden tab, fallback без камеры.
+Не грузи модель на каждый гостя автоматически. Тест на слабом телефоне.`,
+  },
+  {
+    id: "doodle-bg",
+    title: "Фон на 2 Кб",
+    desc: "Уникальный генеративный паттерн без WebGL и без частиц",
+    stack: ["css-doodle"],
+    why: "CSS Doodle рисует сетку правилами CSS — вау без батареи. Vanta/tsParticles — если нужен WebGL-атмосфера.",
+    easier: { label: "Ещё легче", slugs: ["mesh-gradient"] },
+    harder: { label: "WebGL-атмосфера", slugs: ["vanta", "tsparticles"] },
+    fpsNote: "Ограничь плотность ячеек на mobile. Без бесконечных тяжёлых анимаций каждой клетки.",
+    agentBrief: `Сделай hero-фон на CSS Doodle: одна css-doodle сетка, уникальный паттерн, ~минимальный вес.
+Mobile: меньше ячеек / статичный вариант. reduced-motion → без анимации паттерна.
+Не подключай Three/Vanta «на всякий случай».`,
   },
 ];
 
@@ -847,31 +900,43 @@ Mute по умолчанию или только после клика.
   {
     slug: "curtains",
     name: "Curtains.js",
-    tagline: "HTML → WebGL-плоскости: шейдеры на div и картинках",
-    category: "WebGL / шейдеры",
-    tasks: ["atmosphere", "typography", "ui", "3d"],
-    difficulty: "hard",
+    tagline: "WebGL-искажения на обычных HTML-элементах — без целого 3D-мира",
+    category: "Шейдеры / WebGL",
+    tasks: ["shaders", "atmosphere", "typography", "ui"],
+    difficulty: "medium",
     tier: 3,
     stack: "JavaScript + WebGL",
     price: "free (MIT)",
     mobile: "careful",
-    designDNA: "Обычные блоки сайта становятся тканью с искажениями — Awwwards без полного Three-мира.",
+    designDNA:
+      "Магия WebGL без построения целого 3D-мира. Мы не создаём сцену — превращаем скучный <img> или <div> в жидкий, реагирующий на мышь холст.",
     can: [
-      "Plane из DOM-элемента/изображения",
-      "Кастомные фрагментные шейдеры",
-      "Эффекты на hero, галереях, тексте",
+      "Натягивать фрагментные шейдеры на DOM-элементы",
+      "Мышь / скролл → wave, displacement, RGB shift",
+      "Hero, галереи, «жидкая» картинка при hover",
     ],
-    cannot: ["Не полноценный 3D-движок", "Без fallback — чёрный квадрат на слабых устройствах"],
-    whenYes: ["Шейдерный distortion на фото/тексте", "Креативный лендинг"],
-    whenNo: ["Простой UI → CSS/Motion", "Сложная 3D-сцена → Three/R3F"],
-    pairsWith: ["GSAP", "SplitType", "Lenis"],
+    cannot: [
+      "Не сложная 3D-логика с коллизиями и освещением (нужен Three.js)",
+      "Без fallback — чёрный квадрат на слабых устройствах",
+    ],
+    whenYes: [
+      "Эффект «жидкой» картинки при наведении",
+      "Искажение текста/фото при скролле, шум на фоне",
+    ],
+    whenNo: ["Простой UI → CSS/Motion", "Полноценная 3D-сцена → Three/R3F"],
+    pairsWith: ["GSAP", "SplitType", "Lenis", "Barba"],
     alternatives: ["Three.js", "OGL", "CSS filters"],
-    mistakes: ["Curtains на всё без feature detect", "Забыть static fallback"],
+    mistakes: [
+      "Curtains на всё без feature detect",
+      "Забыть static fallback",
+      MOBILE_PERF_MISTAKE,
+    ],
     agentPrompt: `Сделай одну Curtains.js plane на hero-изображении или блоке.
-Простой distortion-шейдер. Feature detect WebGL + картинка-fallback.
-Mobile: отключить или сильно упростить. reduced-motion → статичное фото.
-Dispose при unmount.`,
+Простой distortion-шейдер (wave / displacement / RGB shift). AI может написать шейдер — держи его коротким.
+Feature detect WebGL + картинка-fallback. Mobile: отключить или сильно упростить.
+prefers-reduced-motion → статичное фото. Dispose при unmount. Не строй Three-мир.`,
     demos: [{ label: "curtainsjs.com", href: "https://www.curtainsjs.com" }],
+    featured: true,
     sortOrder: 20,
   },
   {
@@ -998,26 +1063,49 @@ prefers-reduced-motion → статичный градиент. Не ставь 
   {
     slug: "barba",
     name: "Barba.js",
-    tagline: "Переходы между страницами с ощущением SPA",
+    tagline: "Плавные переходы между страницами — SPA-вайб без React/Vue",
     category: "Переходы страниц",
     tasks: ["transitions"],
     difficulty: "medium",
     tier: 2,
-    stack: "Vanilla / с любым MPA",
+    stack: "Vanilla / любой MPA (не обязателен React/Vue)",
     price: "free (MIT)",
     mobile: "ok",
-    designDNA: "Кликнул ссылку — страница не «моргнула белым», а мягко перетекла в следующий экран.",
-    can: ["PJAX-переходы", "Хуки leave/enter", "Связка с GSAP timelines"],
-    cannot: ["Не замена Next.js App Router", "Сложнее отладка с тяжёлым SSR"],
-    whenYes: ["Мультистраничный креативный сайт", "Нужен контроль leave/enter"],
-    whenNo: ["Уже Next App Router + View Transitions", "Простой лендинг из одной страницы"],
-    pairsWith: ["GSAP", "View Transitions API", "Lenis"],
+    designDNA:
+      "Сайт — это одна бесконечная комната. Клик по ссылке не перезагружает мир, а меняет декорации с кинематографичным переходом.",
+    can: [
+      "Перехватывать навигацию (PJAX)",
+      "Анимировать уход старого контейнера и приход нового",
+      "Сохранять состояние (плеер, скролл) между переходами",
+      "Связка с GSAP timelines на leave/enter",
+    ],
+    cannot: [
+      "Не анимирует внутристраничный скролл (нужен Lenis / ScrollTrigger)",
+      "Не замена Next.js App Router «из коробки»",
+    ],
+    whenYes: [
+      "Сайт-портфолио или лукбук, где страницы перетекают друг в друга",
+      "Нужен полный контроль leave → enter на мультистраничнике",
+    ],
+    whenNo: [
+      "Сложный e-commerce / админка с частой сменой состояния корзины",
+      "Уже Next App Router + View Transitions хватает",
+      "Одна страница без переходов",
+    ],
+    pairsWith: ["GSAP", "View Transitions API", "Lenis (скролл отдельно)"],
     alternatives: ["Native View Transitions", "Next.js transitions", "Swup"],
-    mistakes: ["Двойные инициализации скриптов после transition", "Игнор accessibility focus"],
-    agentPrompt: `Оцени: нужен Barba или хватит View Transitions / Next.
-Если Barba — минимальный leave/enter с GSAP, без поломки аналитики и скриптов.
-Сохрани focus и reduced-motion. Документируй re-init компонентов после смены страницы.`,
+    mistakes: [
+      "Двойные инициализации скриптов после transition",
+      "Игнор accessibility focus",
+      "Путать с Lenis (это другой слой)",
+    ],
+    agentPrompt: `Нужны плавные переходы между страницами (портфолио/лукбук) через Barba.js.
+Минимальный leave/enter (лучше с лёгким GSAP). Сохрани нужное состояние (плеер/скролл).
+Документируй re-init компонентов после смены страницы. Focus + prefers-reduced-motion.
+Если проект на Next App Router — сначала оцени View Transitions; Barba только если нужен полный контроль MPA.
+Не используй Barba для внутристраничного скролла — для этого Lenis.`,
     demos: [{ label: "barba.js.org", href: "https://barba.js.org" }],
+    featured: true,
     sortOrder: 25,
   },
   {
@@ -1385,6 +1473,184 @@ API-ключ из env, ограничь по HTTP Referrer. Mobile — жест�
     featured: true,
     sortOrder: 37,
   },
+  {
+    slug: "zdog",
+    name: "Zdog",
+    tagline: "Милое псевдо-3D (2.5D) для иллюстраций и маскотов",
+    category: "Иллюстрации / 2.5D",
+    tasks: ["illustration", "3d", "ui"],
+    difficulty: "easy",
+    tier: 1,
+    stack: "JavaScript (canvas/SVG), лёгкий бандл",
+    price: "free (MIT)",
+    mobile: "ok",
+    designDNA:
+      "3D, который выглядит как дорогая векторная иллюстрация. Не фотореализм — чистый мультяшный стиль с плоскими цветами и жирными обводками.",
+    can: [
+      "Фигуры, тексты и иконки в псевдо-3D",
+      "Вращение по скроллу или мыши",
+      "Экспорт / отрисовка в PNG/SVG-духе",
+    ],
+    cannot: [
+      "Не реальное освещение, тени и сложные .gltf",
+      "Не игровой движок с физикой",
+    ],
+    whenYes: [
+      "Интерактивный маскот или иконка за курсором",
+      "Стилизованная 3D-сцена без тяжести Three.js",
+    ],
+    whenNo: [
+      "Фотореализм / PBR → Three/R3F",
+      "AR товара → model-viewer",
+    ],
+    pairsWith: ["GSAP", "Motion", "CSS Doodle (фон рядом)"],
+    alternatives: ["Spline (no-code)", "Rive", "Three.js"],
+    mistakes: [
+      "Тащить Three «потому что 3D», когда хватит Zdog",
+      "Слишком много мешей → теряется лёгкость",
+    ],
+    agentPrompt: `Собери милый псевдо-3D маскот/иконку на Zdog.
+Плоские цвета, жирные обводки, лёгкое вращение от мыши или скролла.
+Не подключай Three.js. Mobile ок — держи сцену простой.
+reduced-motion → статичный ракурс.`,
+    demos: [{ label: "zzz.dog", href: "https://zzz.dog" }],
+    featured: true,
+    sortOrder: 38,
+  },
+  {
+    slug: "transformers-js",
+    name: "Transformers.js",
+    tagline: "AI-модели Hugging Face прямо в браузере — без бэкенда",
+    category: "AI на клиенте",
+    tasks: ["client-ai", "ai-interact"],
+    difficulty: "hard",
+    tier: 3,
+    stack: "JS / WebAssembly / WebGPU (Hugging Face)",
+    price: "free (Apache 2.0)",
+    mobile: "careful",
+    designDNA:
+      "Нейросеть работает на устройстве клиента. Никаких API-ключей в рантайме инференса, меньше сетевых задержек, приватность данных на устройстве.",
+    can: [
+      "Классификация изображений, NLP, speech — в браузере",
+      "Удаление фона / small vision-модели",
+      "Инференс через WASM / WebGPU",
+    ],
+    cannot: [
+      "Не замена Midjourney / тяжёлых генеративных моделей",
+      "Только оптимизированные small-модели",
+    ],
+    whenYes: [
+      "Приватная обработка на клиенте (тональность, локальный анализ)",
+      "Интерактив с камерой без отправки видео на сервер",
+    ],
+    whenNo: [
+      "Нужен мощный cloud LLM / image gen → API",
+      "Простой UI без ML → не тащи",
+    ],
+    pairsWith: ["ml5.js", "MediaPipe", "Web Workers"],
+    alternatives: ["ml5.js", "MediaPipe", "серверный API"],
+    mistakes: [
+      "Грузить модель всем гостям без opt-in",
+      "Блокировать main thread без Worker",
+      MOBILE_PERF_MISTAKE,
+    ],
+    agentPrompt: `Подключи Transformers.js для одной узкой задачи (например классификация или sentiment) на клиенте.
+Модель small, lazy-load после действия пользователя, Web Worker если тяжело.
+Покажи прогресс загрузки. Mobile: предупреждение + fallback без модели.
+Не обещай качество Midjourney. Не клади секреты API — инференс локальный.`,
+    demos: [
+      { label: "huggingface.co/docs/transformers.js", href: "https://huggingface.co/docs/transformers.js" },
+    ],
+    featured: true,
+    sortOrder: 39,
+  },
+  {
+    slug: "css-doodle",
+    name: "CSS Doodle",
+    tagline: "Генеративные фоны и паттерны на чистом CSS (~2 Кб вайба)",
+    category: "Генератив / фон",
+    tasks: ["generative", "atmosphere"],
+    difficulty: "easy",
+    tier: 1,
+    stack: "Web Component + CSS",
+    price: "free (MIT)",
+    mobile: "ok",
+    designDNA:
+      "CSS как язык программирования для рисования. Сетка сама генерируется по правилам, а не клепается вручную.",
+    can: [
+      "Повторяющиеся паттерны и анимированные сетки",
+      "Псевдо-случайные визуальные эффекты минимальным кодом",
+      "Лёгкий hero-фон без WebGL",
+    ],
+    cannot: [
+      "Не игровые механики и сложная логика",
+      "Не замена полноценному canvas/WebGL-арт",
+    ],
+    whenYes: [
+      "Уникальный «живой» фон hero, который почти ничего не весит",
+      "Генеративный паттерн без tsParticles/Vanta",
+    ],
+    whenNo: [
+      "Интерактивная игра → Phaser/p5",
+      "Шейдерная жидкость → Curtains",
+    ],
+    pairsWith: ["AutoAnimate", "Motion", "Zdog"],
+    alternatives: ["mesh-gradient", "Vanta", "tsParticles", "p5.js"],
+    mistakes: [
+      "Слишком плотная сетка на mobile",
+      "Анимировать каждую клетку без меры",
+    ],
+    agentPrompt: `Сделай уникальный hero-фон на CSS Doodle: одна css-doodle, генеративный паттерн, минимум веса.
+Mobile: меньше ячеек или статичный кадр. prefers-reduced-motion → без анимации.
+Не подключай WebGL/particles параллельно «для красоты».`,
+    demos: [{ label: "css-doodle.com", href: "https://css-doodle.com" }],
+    featured: true,
+    sortOrder: 40,
+  },
+  {
+    slug: "ml5",
+    name: "ml5.js",
+    tagline: "Креативный Machine Learning в браузере: вебка, позы, звук",
+    category: "AI / креативный ML",
+    tasks: ["client-ai", "ai-interact", "generative"],
+    difficulty: "medium",
+    tier: 2,
+    stack: "JS (+ часто p5.js), камера/микрофон",
+    price: "free (MIT)",
+    mobile: "careful",
+    designDNA:
+      "Сайт видит и слышит пользователя. Интерактив выходит за пределы курсора и клавиатуры.",
+    can: [
+      "Позы (PoseNet и др.), классификация изображений",
+      "Работа с аудио-моделями",
+      "Связка с p5.js или vanilla JS",
+    ],
+    cannot: [
+      "Не 100% точность enterprise-моделей",
+      "Зависит от качества камеры пользователя",
+    ],
+    whenYes: [
+      "Арт-проекты, инсталляции, управление жестом/звуком",
+      "Демо «сайт реагирует на тело»",
+    ],
+    whenNo: [
+      "Нужен промышленный трекинг → MediaPipe / cloud",
+      "Обычный лендинг без сенсоров",
+    ],
+    pairsWith: ["p5.js", "Transformers.js", "Tone.js", "Howler"],
+    alternatives: ["MediaPipe", "Transformers.js", "TensorFlow.js"],
+    mistakes: [
+      "Включать камеру без явного opt-in",
+      "Нет UI «остановить» / pause при hidden tab",
+      MOBILE_PERF_MISTAKE,
+    ],
+    agentPrompt: `Собери креативный ML-демо на ml5.js: одна модель (поза или image classifier), только после кнопки «включить камеру».
+Покажи статус, кнопку стоп, fallback без камеры. Pause при document.hidden.
+Mobile: предупреди про батарею, упрости. Не путай с product tour (Driver.js) и не грузи Transformers.js параллельно без нужды.`,
+    demos: [{ label: "ml5js.org", href: "https://ml5js.org" }],
+    featured: true,
+    sortOrder: 41,
+  },
 ];
 
 export function getCreativeTool(slug: string) {
@@ -1405,4 +1671,11 @@ export function mobileLabel(m: CreativeMobile) {
 
 export function tierLabel(t: CreativeTier) {
   return TIER_META[t].short;
+}
+
+/** Для mobile careful/desktop всегда добавляем предупреждение про слабые устройства. */
+export function toolMistakes(tool: CreativeTool): string[] {
+  if (tool.mobile === "ok") return tool.mistakes;
+  if (tool.mistakes.includes(MOBILE_PERF_MISTAKE)) return tool.mistakes;
+  return [...tool.mistakes, MOBILE_PERF_MISTAKE];
 }

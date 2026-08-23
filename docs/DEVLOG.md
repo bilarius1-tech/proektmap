@@ -1861,3 +1861,18 @@ d8e572aa fix: page.tsx + билд
 
 ### День закрыт
 DEVLOG + commit + push. Центр продукта по-прежнему `/resheniya`.
+
+## 23.08.2026 — Вечер: экзотика студий в креативной библиотеке
+
+### Добавлено / усилено
+- Карточки: **Barba.js**, **Curtains.js** (обновлены Design DNA), **Zdog**, **Transformers.js**, **CSS Doodle**, **ml5.js**
+- Фильтры: Шейдеры, AI на клиенте (+ Генератив / Переходы уже были)
+- Рецепты: «Страницы перетекают», «Сайт видит жесты», «Фон на 2 Кб»
+- `MOBILE_PERF_MISTAKE` + `toolMistakes()` — предупреждение про iPhone SE для careful/desktop
+- FPS Killer: AI/WebGL без fallback на мобиле
+
+### Итог библиотеки
+~41 инструмент, 13 стеков-рецептов. Live: /sandbox/creative-library
+
+### День закрыт (повторно)
+DEVLOG + commit + push. main = master.

@@ -8,6 +8,7 @@ import {
   difficultyLabel,
   mobileLabel,
   tierLabel,
+  toolMistakes,
   type CreativeTool,
 } from "@/lib/creative-library/data";
 
@@ -133,7 +134,7 @@ export default function CreativeToolDetailClient({ tool }: { tool: CreativeTool 
           </div>
         </Block>
 
-        <ListBlock title="Типичные ошибки" items={tool.mistakes} tone="warn" />
+        <ListBlock title="Типичные ошибки" items={toolMistakes(tool)} tone="warn" />
 
         <Block title="Демо и ссылки">
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>

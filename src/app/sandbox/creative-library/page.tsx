@@ -6,10 +6,10 @@ import { CREATIVE_TOOLS } from "@/lib/creative-library/data";
 export const metadata = {
   title: "Креативная библиотека вайбкодера — Песочница | ProektMap",
   description:
-    "Стеки-рецепты: сайт-фильм, вирт. галереи, карты, туры + инструменты Tier 1–3 и FPS Killers.",
+    "Стеки-рецепты и экзотика студий: Barba, Curtains, Zdog, Transformers.js, CSS Doodle, ml5 + Tier 1–3 и FPS Killers.",
   openGraph: {
     title: "Креативная библиотека вайбкодера",
-    description: "Рецепты стеков: галереи, карты, туры, scroll-фильм — когда брать и что сказать агенту.",
+    description: "От CSS Doodle до ml5 и Curtains — рецепты стеков и промпты для AI-агента.",
     images: [
       {
         url: "https://proektmap.ru/api/og?title=Креативная+библиотека&category=Песочница&author=Вайбкодинг",
