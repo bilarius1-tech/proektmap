@@ -1,0 +1,26 @@
+---
+description: Не разъезжать main и master — инцидент 22–23.08.2026 (/resheniya 404)
+alwaysApply: true
+---
+
+# Git branches — ProektMap
+
+## Инцидент (не повторять)
+
+22–23.08.2026 прод оказался на `main` без августовского кода. `/resheniya`, `/vaibik`, `/avito` были только на `master`. Меню в БД уже вело на эти URL → **404 на живом сайте**.
+
+## Обязательно
+
+1. Работай и деплой с **`main`**: `git checkout main && git pull`.
+2. После коммита на `main` сразу выровняй `master`:
+   ```bash
+   git checkout master && git merge main && git checkout main
+   ```
+3. Перед `next build` / `pm2 restart`:
+   ```bash
+   test "$(git rev-parse main)" = "$(git rev-parse master)" || (echo "main≠master — СТОП" && exit 1)
+   ```
+4. Не оставляй прод-фичи только на `master`.
+5. После деплоя: HTTP 200 на `/resheniya`, `/vaibik`, `/avito`.
+
+Подробности: корневой `AGENTS.md`, правило §0.

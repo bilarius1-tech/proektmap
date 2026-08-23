@@ -10,6 +10,11 @@ Next.js 16 + TypeScript + Prisma 7 + PostgreSQL + Tailwind CSS
 
 ## ⚠️ КРИТИЧЕСКИЕ ПРАВИЛА
 
+### 0. GIT: main и master = один commit
+Инцидент 22–23.08.2026: прод на `main` без `/resheniya`/`/vaibik` (они были на `master`) → 404.
+Полные правила: корневой `AGENTS.md` §0 и `.cursor/rules/git-branches.mdc`.
+Перед деплоем: `test "$(git rev-parse main)" = "$(git rev-parse master)"`.
+
 ### 1. НИКОГДА не делай `prisma db push --force-reset`
 Это удаляет ВСЕ данные из БД. Используй `prisma db push` (без флагов) для обновления схемы.
 

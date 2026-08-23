@@ -1824,3 +1824,18 @@ d8e572aa fix: page.tsx + билд
 
 ### Зачем
 Направление scroll-лендингов («сайт-фильм») развиваем на ProektMap: раскадровка → анимация → CTA.
+
+## 23.08.2026 — Восстановление августа: main ↔ master
+
+### Инцидент
+Прод работал с ветки `main` без августовского кода. `/resheniya`, `/vaibik`, `/avito` жили только на `master`. Меню в БД уже ссылалось на эти URL → 404 на сайте (+ шум Chrome про preload CSS).
+
+### Исправление
+- Merge `master` → `main` (коммит restore), сохранён scroll-film
+- Билд + `pm2 restart`; HTTP 200: `/resheniya`, `/vaibik`, `/avito`, `/sandbox`, `/demo/scroll-film`
+- `main` и `master` выровнены на один commit
+
+### Защита на будущее
+- `AGENTS.md` §0 — правило одной линии истории
+- `.cursor/rules/git-branches.mdc` (alwaysApply) — агенты не разъезжают ветки
+
