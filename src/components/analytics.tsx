@@ -58,10 +58,18 @@ export default async function AnalyticsScripts() {
         </>
       )}
 
-      {/* Custom header code */}
-      {headerCode && (
+      {/* Custom header code — только JS. HTML (<meta> и т.п.) нельзя класть в <script>. */}
+      {headerCode && !headerCode.trim().startsWith("<") && !headerCode.includes("<meta") ? (
         <script dangerouslySetInnerHTML={{ __html: headerCode }} />
-      )}
+      ) : null}
+      {headerCode && (headerCode.trim().startsWith("<") || headerCode.includes("<meta")) ? (
+        // Сырой HTML из админки (meta/link) — без обёртки script, иначе SyntaxError: Unexpected token '<'
+        <div
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: headerCode }}
+          style={{ display: "none" }}
+        />
+      ) : null}
     </>
   );
 }

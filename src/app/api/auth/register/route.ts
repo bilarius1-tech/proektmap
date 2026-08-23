@@ -17,7 +17,8 @@ export async function POST(req: NextRequest) {
   if (existing) return NextResponse.json({ error: "Пользователь с таким email уже существует" }, { status: 400 });
 
   const passwordHash = await hash(password, 10);
-  await db.user.create({ data: { email: email.toLowerCase(), passwordHash } });
+  const displayName = email.split("@")[0];
+  await db.user.create({ data: { email: email.toLowerCase(), passwordHash, name: displayName, avatar: `/api/avatar?name=${encodeURIComponent(displayName)}` } });
 
   await db.$disconnect();
   return NextResponse.json({ ok: true });

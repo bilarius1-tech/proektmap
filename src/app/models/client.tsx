@@ -13,6 +13,13 @@ export default function ModelsClient() {
   const [updated, setUpdated] = useState("");
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const requestedSearch = params.get("search");
+    const requestedSort = params.get("sort");
+    if (requestedSearch) setSearch(requestedSearch);
+    if (["intel", "code", "price", "ctx", "arena"].includes(requestedSort || "")) {
+      setSort(requestedSort!);
+    }
     fetch("/api/models").then(r => r.json()).then(d => {
       setModels(d.models || []);
       setUpdated(d.updated);

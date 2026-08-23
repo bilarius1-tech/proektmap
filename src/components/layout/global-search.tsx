@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Search, X, ArrowRight, FileText, FolderOpen, BookOpen } from "lucide-react";
+import { Search, X, ArrowRight, FileText, FolderOpen, BookOpen, Factory } from "lucide-react";
 
+import { trackGoal, Goals } from "@/lib/metrika";
 interface SearchResult {
-  type: "stage" | "decision" | "prompt";
-  id: string; title: string; subtitle: string | null; slug: string; stage?: string;
+  type: string;
+  id: string; title: string; subtitle?: string; slug?: string; href?: string;
+  snippet?: string; typeLabel?: string; stage?: string; category?: string; language?: string;
 }
 
 export default function GlobalSearch() {
@@ -52,8 +54,13 @@ export default function GlobalSearch() {
   }, []);
 
   function go(result: SearchResult) {
+    trackGoal(Goals.SEARCH_USE);
     setOpen(false);
     setQuery("");
+    if (result.href) {
+      window.location.href = result.href;
+      return;
+    }
     if (result.type === "prompt") {
       window.location.href = "/prompts";
       return;
@@ -62,65 +69,77 @@ export default function GlobalSearch() {
       window.location.href = `/corporate-website?stage=${result.stage}`;
       return;
     }
+    if (result.type === "tool") {
+      window.location.href = "/ai-tools";
+      return;
+    }
     window.location.href = "/corporate-website";
   }
 
-  const icons: Record<string, any> = {
-    stage: <FolderOpen size={14} style={{ color: "var(--color-accent)" }} />,
-    decision: <FileText size={14} style={{ color: "var(--color-accent)" }} />,
-    prompt: <BookOpen size={14} style={{ color: "var(--color-accent)" }} />,
+  const typeIcons: Record<string, any> = {
+    glossary: <BookOpen size={14} className="text-accent" />,
+    pattern: <FolderOpen size={14} className="text-accent" />,
+    mcp: <FileText size={14} className="text-accent" />,
+    tool: <FileText size={14} className="text-accent" />,
+    blog: <FileText size={14} className="text-accent" />,
+    decision: <FileText size={14} className="text-accent" />,
+    prompt: <BookOpen size={14} className="text-accent" />,
+    aiProject: <Factory size={14} className="text-accent" />,
   };
 
   return (
-    <div ref={ref} style={{ position: "relative" }}>
-      <button onClick={() => { setOpen(!open); setTimeout(() => inputRef.current?.focus(), 50); }} style={{
-        display: "flex", alignItems: "center", gap: 6, padding: "6px 12px",
-        borderRadius: "var(--radius-m)", border: "1px solid var(--color-border)",
-        background: "var(--color-bg-secondary)", cursor: "pointer",
-        fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)",
-        minWidth: 180,
-      }}>
+    <div ref={ref} className="relative">
+      {/* Search trigger button */}
+      <button
+        onClick={() => { setOpen(!open); setTimeout(() => inputRef.current?.focus(), 50); }}
+        className="flex items-center gap-1.5 py-[6px] px-3 rounded-m border border-border bg-bg-secondary cursor-pointer text-xs text-text-tertiary min-w-[180px]"
+      >
         <Search size={14} />
-        <span style={{ flex: 1, textAlign: "left" }}>Поиск...</span>
-        <kbd style={{ fontSize: 10, background: "var(--color-border-light)", padding: "1px 5px", borderRadius: 3 }}>⌘K</kbd>
+        <span className="flex-1 text-left">Поиск...</span>
+        <kbd className="text-[10px] bg-border-light px-[5px] py-px rounded-[3px]">⌘K</kbd>
       </button>
 
+      {/* Dropdown */}
       {open && (
-        <div style={{
-          position: "absolute", top: "100%", right: 0,
-          marginTop: 6, width: 440, maxWidth: "90vw", background: "white",
-          borderRadius: "var(--radius-l)", boxShadow: "0 12px 40px rgba(0,0,0,0.15)",
-          border: "1px solid var(--color-border)", zIndex: 300, overflow: "hidden",
-        }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", borderBottom: "1px solid var(--color-border-light)" }}>
-            <Search size={14} style={{ color: "var(--color-text-tertiary)", flexShrink: 0 }} />
+        <div className="absolute top-full right-0 mt-1.5 w-[440px] max-w-[90vw] bg-white rounded-l border border-border z-[300] overflow-hidden"
+          style={{ boxShadow: "0 12px 40px rgba(0,0,0,0.15)" }}>
+          {/* Search input */}
+          <div className="flex items-center gap-2 px-[14px] py-[10px] border-b border-border-light">
+            <Search size={14} className="text-text-tertiary shrink-0" />
             <input
               ref={inputRef}
               value={query} onChange={e => setQuery(e.target.value)}
-              placeholder="Поиск по этапам, решениям, промптам..."
-              style={{ flex: 1, border: "none", outline: "none", fontSize: "var(--text-s)", background: "transparent" }}
+              placeholder="Поиск по всему сайту..."
+              className="flex-1 border-0 outline-none text-s bg-transparent"
             />
-            {query && <button onClick={() => setQuery("")} style={{ background: "none", border: "none", cursor: "pointer", padding: 2 }}><X size={14} style={{ color: "var(--color-text-tertiary)" }} /></button>}
-          </div>
-          <div style={{ maxHeight: 360, overflowY: "auto" }}>
-            {loading && <div style={{ padding: "var(--space-m)", textAlign: "center", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>Поиск...</div>}
-            {!loading && results.length === 0 && query.length >= 2 && (
-              <div style={{ padding: "var(--space-m)", textAlign: "center", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>Ничего не найдено</div>
+            {query && (
+              <button onClick={() => setQuery("")} className="bg-transparent border-0 cursor-pointer p-0.5">
+                <X size={14} className="text-text-tertiary" />
+              </button>
             )}
-            {results.map(r => (
-              <div key={r.id} onClick={() => go(r)} style={{
-                display: "flex", alignItems: "center", gap: "var(--space-s)", padding: "10px 14px",
-                cursor: "pointer", borderBottom: "1px solid var(--color-border-light)",
-              }}>
-                {icons[r.type]}
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: "var(--text-s)", fontWeight: 600 }}>{r.title}</div>
-                  {r.subtitle && <div style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>{r.subtitle}</div>}
+          </div>
+
+          {/* Results */}
+          <div className="max-h-[360px] overflow-y-auto">
+            {loading && <div className="p-m text-center text-xs text-text-tertiary">Поиск...</div>}
+            {!loading && results.length === 0 && query.length >= 2 && (
+              <div className="p-m text-center text-xs text-text-tertiary">Ничего не найдено</div>
+            )}
+            {results.map((r, i) => (
+              <div
+                key={r.id || i}
+                onClick={() => go(r)}
+                className="flex items-center gap-s px-[14px] py-[10px] cursor-pointer border-b border-border-light"
+              >
+                {typeIcons[r.type] || <FileText size={14} className="text-text-tertiary" />}
+                <div className="flex-1 min-w-0">
+                  <div className="text-s font-semibold">{r.title}</div>
+                  {r.subtitle && <div className="text-[10px] text-text-tertiary">{r.subtitle}</div>}
                 </div>
-                <span style={{ fontSize: 9, padding: "2px 6px", borderRadius: 99, background: "var(--color-bg-secondary)", color: "var(--color-text-tertiary)", flexShrink: 0 }}>
-                  {r.type === "decision" ? "Решение" : r.type === "stage" ? "Этап" : "Промпт"}
+                <span className="text-[9px] px-1.5 py-0.5 rounded-[99px] bg-bg-secondary text-text-tertiary shrink-0">
+                  {r.typeLabel || r.type}
                 </span>
-                <ArrowRight size={12} style={{ color: "var(--color-text-tertiary)", flexShrink: 0 }} />
+                <ArrowRight size={12} className="text-text-tertiary shrink-0" />
               </div>
             ))}
           </div>

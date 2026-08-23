@@ -2,6 +2,7 @@ import { getDb } from "@/lib/db";
 export const dynamic = "force-dynamic";
 import { notFound } from "next/navigation";
 import BlueprintPageClient from "./client";
+import RelatedToolsBlock from "@/components/layout/related-tools-block";
 import type { Metadata } from "next";
 import { auth } from "@/lib/auth";
 import { getProjectContext, buildUserContext } from "@/lib/project-context";
@@ -36,6 +37,11 @@ export default async function BlueprintPage({
   });
   if (!bp) notFound();
 
+  // Track view + load analytics
+  await db.blueprint.update({ where: { id: bp.id }, data: { viewCount: { increment: 1 } } });
+  const projectCount = await db.project.count({ where: { blueprintId: bp.id } });
+  const completedCount = await db.project.count({ where: { blueprintId: bp.id, status: "completed" } });
+
   const session = await auth();
   const isLoggedIn = !!session?.user;
   const isPro = isLoggedIn && ((session.user as any).subscription === "pro" || (session.user as any).role === "admin");
@@ -64,6 +70,8 @@ export default async function BlueprintPage({
 
   const glossaryTerms = await db.glossaryTerm.findMany({ where: { isPublished: true }, orderBy: { sortOrder: "asc" }, take: 12 });
   return (
+      <>
+      <RelatedToolsBlock blueprintSlug={bp.slug} />
     <BlueprintPageClient
       blueprint={JSON.parse(JSON.stringify(bp))} glossaryTerms={JSON.parse(JSON.stringify(glossaryTerms))}
       isLoggedIn={isLoggedIn}
@@ -74,6 +82,9 @@ export default async function BlueprintPage({
       pattern={pattern ? JSON.parse(JSON.stringify(pattern)) : null}
       fromPage={fromPage || null}
       isDemo={isDemo === "true"}
+      projectCount={projectCount}
+      completedCount={completedCount}
     />
+      </>
   );
 }

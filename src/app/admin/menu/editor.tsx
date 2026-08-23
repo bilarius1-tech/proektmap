@@ -5,11 +5,11 @@ import { Plus, Edit, Trash2, GripVertical } from "lucide-react";
 
 interface MenuItem {
   id: string; label: string; href: string; parentId: string | null;
-  sortOrder: number; isActive: boolean; icon: string | null; location: string;
+  sortOrder: number; isActive: boolean; icon: string | null; emoji: string | null; location: string; sourceType: string | null;
   children: MenuItem[];
 }
 
-export default function MenuEditor({ items: initialItems }: { items: MenuItem[] }) {
+export default function MenuEditor({ items: initialItems, blueprints, allBlueprints }: { items: MenuItem[]; blueprints?: any[]; allBlueprints?: any[] }) {
   const [items, setItems] = useState(initialItems);
   const [editing, setEditing] = useState<Partial<MenuItem> | null>(null);
   const [saving, setSaving] = useState(false);
@@ -47,7 +47,7 @@ export default function MenuEditor({ items: initialItems }: { items: MenuItem[] 
   }
 
   function startEdit(item: MenuItem) {
-    setEditing({ ...item });
+    setEditing({ ...item, emoji: item.emoji || "" });
   }
 
   function onDragStart(e: React.DragEvent, id: string) {
@@ -89,6 +89,49 @@ export default function MenuEditor({ items: initialItems }: { items: MenuItem[] 
           </button>
         ))}
       </div>
+
+      {/* Blueprints section */}
+      {(blueprints && blueprints.length > 0) && (
+        <div style={{ marginBottom: "var(--space-xl)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "var(--space-s)", marginBottom: "var(--space-m)" }}>
+            <span style={{ fontSize: "var(--text-s)", fontWeight: 700 }}>🗺️ Blueprint'ы</span>
+            <span style={{ fontSize: 11, color: "var(--color-text-tertiary)", background: "var(--color-accent-light)", padding: "2px 8px", borderRadius: "var(--radius-s)" }}>
+              Авто-список из БД
+            </span>
+            <span style={{ fontSize: 11, color: "var(--color-text-tertiary)", marginLeft: "auto" }}>
+              Изменяйте sortOrder и isPublished в{' '}
+              <a href="/admin/blueprints" style={{ color: "var(--color-accent)", textDecoration: "underline" }}>админке Blueprint'ов</a>
+            </span>
+          </div>
+          <div className="card" style={{ padding: "var(--space-s)" }}>
+            {blueprints.map((bp: any, i: number) => (
+              <div key={bp.id} style={{
+                display: "flex", alignItems: "center", gap: "var(--space-s)",
+                padding: "var(--space-s)", borderBottom: i < blueprints.length - 1 ? "1px solid var(--color-border-light)" : "none",
+              }}>
+                <span style={{ fontSize: 16, flexShrink: 0 }}>📄</span>
+                <span style={{ fontWeight: 600, flex: 1, fontSize: "var(--text-s)" }}>{bp.title}</span>
+                <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", fontFamily: "var(--font-mono)" }}>/blueprints/{bp.slug}</span>
+                <span style={{ fontSize: 10, color: "var(--color-text-tertiary)", background: "var(--color-bg-tertiary)", padding: "2px 6px", borderRadius: "var(--radius-s)" }}>
+                  sort: {bp.sortOrder}
+                </span>
+                {bp.isPublished ? (
+                  <span style={{ fontSize: 10, color: "var(--color-accent)", fontWeight: 600 }}>✓ показ.</span>
+                ) : (
+                  <span style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>скрыт</span>
+                )}
+                <a href={'/admin/blueprints/' + bp.id} style={{
+                  padding: "2px 10px", fontSize: 10, border: "1px solid var(--color-border)",
+                  background: "var(--color-bg-secondary)", textDecoration: "none", color: "var(--color-text-secondary)",
+                  fontWeight: 600,
+                }}>
+                  ✏️
+                </a>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Add button */}
       <div style={{ marginBottom: "var(--space-m)" }}>
@@ -151,6 +194,7 @@ export default function MenuEditor({ items: initialItems }: { items: MenuItem[] 
             <form onSubmit={handleSave} style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)" }}>
               <div><label style={lbl}>Название *</label><input className="input" value={editing.label || ""} onChange={e => setEditing({ ...editing, label: e.target.value })} required /></div>
               <div><label style={lbl}>Ссылка *</label><input className="input" value={editing.href || ""} onChange={e => setEditing({ ...editing, href: e.target.value })} placeholder="/page" required /></div>
+              <div><label style={lbl}>Emoji</label><input className="input" value={editing.emoji || ""} onChange={e => setEditing({ ...editing, emoji: e.target.value })} placeholder="🤖" style={{ width: 80 }} /></div>
               <div><label style={lbl}>Порядок</label><input className="input" type="number" value={editing.sortOrder || 0} onChange={e => setEditing({ ...editing, sortOrder: parseInt(e.target.value) || 0 })} /></div>
               <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: "var(--text-s)" }}>
                 <input type="checkbox" checked={editing.isActive ?? true} onChange={e => setEditing({ ...editing, isActive: e.target.checked })} />

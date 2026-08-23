@@ -1,9 +1,10 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Eye, Calendar, User, Tag, ChevronLeft, ChevronRight, MessageCircle, FolderOpen } from "lucide-react";
+import { Eye, Calendar, User, Tag, ChevronLeft, ChevronRight, MessageCircle, FolderOpen, Rocket, Bookmark } from "lucide-react";
+import { blogCoverUrl } from "@/lib/og/card-url";
 
 export default function BlogPageClient({ posts, categories, total, page, perPage, currentCat }: any) {
   const [mobileCatOpen, setMobileCatOpen] = useState(false);
@@ -12,7 +13,7 @@ export default function BlogPageClient({ posts, categories, total, page, perPage
   const totalPages = Math.ceil(total / perPage);
 
   return (
-    <div className="blog-layout" suppressHydrationWarning style={{ display: "flex", minHeight: "calc(100dvh - 56px)", maxWidth: 1200, margin: "0 auto" }}>
+    <div className="blog-layout" style={{ display: "flex", minHeight: "calc(100dvh - 56px)", maxWidth: 1360, margin: "0 auto" }}>
       {/* LEFT SIDEBAR — categories */}
       <aside className="blog-sidebar" style={{
         width: 220, minWidth: 220, padding: "var(--space-xl) var(--space-m)",
@@ -27,7 +28,7 @@ export default function BlogPageClient({ posts, categories, total, page, perPage
             padding: "8px 12px", borderRadius: "var(--radius-s)", border: "none", background: !currentCat ? "var(--color-accent-light)" : "transparent",
             color: !currentCat ? "var(--color-accent)" : "var(--color-text-secondary)", cursor: "pointer", textAlign: "left",
             fontSize: "var(--text-s)", fontWeight: !currentCat ? 700 : 500,
-          }}>Все посты</button>
+          }}>Все материалы</button>
           {categories.map((c: any) => (
             <button key={c.slug} onClick={() => router.push(`/blog?cat=${c.slug}`)} style={{
               padding: "8px 12px", borderRadius: "var(--radius-s)", border: "none", background: currentCat === c.slug ? "var(--color-accent-light)" : "transparent",
@@ -35,22 +36,36 @@ export default function BlogPageClient({ posts, categories, total, page, perPage
               fontSize: "var(--text-s)", fontWeight: currentCat === c.slug ? 700 : 500,
             }}>{c.name}</button>
           ))}
+          <div style={{ marginTop: "var(--space-m)", paddingTop: "var(--space-m)", borderTop: "1px solid var(--color-border-light)" }}>
+            <a href="/blog/bookmarks" style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 12px", borderRadius: "var(--radius-s)", color: "var(--color-text-secondary)", textDecoration: "none", fontSize: "var(--text-s)", fontWeight: 500 }}>
+              <Bookmark size={14} />
+              Мои закладки
+            </a>
+            <a href="/blog/suggest" style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 12px", borderRadius: "var(--radius-s)", color: "var(--color-accent)", textDecoration: "none", fontSize: "var(--text-s)", fontWeight: 600 }}>
+              ✍️ Предложить статью
+            </a>
+          </div>
         </div>
 
-        {/* Ad banner placeholder */}
+        {/* Suggest article CTA */}
         <div style={{
-          marginTop: "var(--space-xl)", padding: "var(--space-m)", background: "var(--color-bg-secondary)",
-          borderRadius: "var(--radius-m)", border: "1px dashed var(--color-border)", textAlign: "center",
-          fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)",
+          marginTop: "var(--space-xl)", padding: "var(--space-m)", background: "var(--color-accent-light)",
+          borderRadius: "var(--radius-m)", border: "1px solid var(--color-accent)", textAlign: "center",
         }}>
-          📢 Место для баннера
+          <div style={{ fontWeight: 700, fontSize: "var(--text-s)", color: "var(--color-accent)", marginBottom: 4 }}>✍️ Предложить статью</div>
+          <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", marginBottom: "var(--space-s)", lineHeight: 1.5 }}>
+            Есть чем поделиться? Напишите статью и мы опубликуем её после модерации.
+          </div>
+          <a href="/blog/suggest" style={{ display: "inline-block", padding: "8px 16px", borderRadius: "var(--radius-m)", background: "var(--color-accent)", color: "white", textDecoration: "none", fontSize: "var(--text-xs)", fontWeight: 600 }}>
+            Написать →
+          </a>
         </div>
       </aside>
 
       {/* CENTER — posts */}
-      <main style={{ flex: 1, padding: "var(--space-xl) var(--space-l)", maxWidth: 700 }}>
+      <main style={{ flex: 1, padding: "var(--space-xl) var(--space-l)", maxWidth: 940 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 8 }}>
-        <h1 style={{ fontSize: "var(--text-xxxl)", fontWeight: 800, marginBottom: "var(--space-xs)" }}>📝 Блог</h1>
+        <h1 style={{ fontSize: "var(--text-xxxl)", fontWeight: 800, marginBottom: "var(--space-xs)" }}>Блог для продавцов</h1>
         <div className="mobile-cat-menu" style={{ position: "relative", display: "none" }}>
           <button onClick={() => setMobileCatOpen(!mobileCatOpen)} style={{
             display: "flex", alignItems: "center", gap: 4, padding: "8px 14px", borderRadius: "var(--radius-s)",
@@ -69,7 +84,7 @@ export default function BlogPageClient({ posts, categories, total, page, perPage
                 display: "block", width: "100%", padding: "10px 14px", border: "none", background: !currentCat ? "var(--color-accent-light)" : "white",
                 color: !currentCat ? "var(--color-accent)" : "var(--color-text-secondary)",
                 fontSize: "var(--text-xs)", fontWeight: !currentCat ? 700 : 500, cursor: "pointer", textAlign: "left",
-              }}>Все посты</button>
+              }}>Все материалы</button>
               {categories.map((c: any) => (
                 <button key={c.slug} onClick={() => { router.push(`/blog?cat=${c.slug}`); setMobileCatOpen(false); }} style={{
                   display: "block", width: "100%", padding: "10px 14px", border: "none", background: currentCat === c.slug ? "var(--color-accent-light)" : "white",
@@ -82,40 +97,39 @@ export default function BlogPageClient({ posts, categories, total, page, perPage
         </div>
       </div>
         <p style={{ color: "var(--color-text-secondary)", fontSize: "var(--text-s)", marginBottom: "var(--space-xl)" }}>
-          AI-инжиниринг, разработка, дизайн, SEO. Статьи от команды Карты роста.
+          Авито, Ozon, Wildberries, AI и автоматизация продаж — только применимые шаги для продавца.
         </p>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-l)" }}>
-          {posts.map((p: any) => (
+        <div className="blog-grid">
+          {posts.map((p: any) => {
+            const thumb = blogCoverUrl({
+              title: p.title,
+              summary: p.excerpt,
+              category: p.category?.name || "ProektMap",
+              seed: p.slug,
+              coverImage: p.coverImage,
+            });
+            return (
             <Link key={p.id} href={`/blog/${p.slug}`} className="blog-card" style={{
-              display: "flex", gap: "var(--space-l)", padding: "var(--space-l)", background: "white",
-              borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", textDecoration: "none", color: "inherit",
+              display: "flex", flexDirection: "column", background: "white",
+              borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", textDecoration: "none", color: "inherit", overflow: "hidden",
             }}>
-              {/* Cover image placeholder */}
-              <div className="blog-card-image" style={{
-                width: 160, height: 120, borderRadius: "var(--radius-s)", flexShrink: 0,
-                background: p.coverImage ? `url(${p.coverImage}) center/cover` : "linear-gradient(135deg, var(--color-accent-light), var(--color-accent))",
-                display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: 28, fontWeight: 800,
-              }}>
-                {!p.coverImage && (p.category?.name || "📝").slice(0, 2)}
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
-                  <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 99, background: "var(--color-accent-light)", color: "var(--color-accent)", fontWeight: 600 }}>{p.category?.name || "Без категории"}</span>
-                </div>
-                <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-l)", fontWeight: 700, marginBottom: 4, lineHeight: 1.2, letterSpacing: "-0.01em" }}>{p.title}</h2>
-                <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.6, marginBottom: "var(--space-s)" }}>{p.excerpt}</p>
-                <div style={{ display: "flex", alignItems: "center", gap: "var(--space-m)", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>
-                  <span style={{ display: "flex", alignItems: "center", gap: 4 }}><User size={12} />{<Link href={`/blog/author/${p.author?.email}`} style={{color:"inherit",textDecoration:"none"}}>{p.author?.name || "Аноним"}</Link>}</span>
-                  <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Calendar size={12} />{new Date(p.publishedAt).toLocaleDateString("ru")}</span><span style={{ display: "flex", alignItems: "center", gap: 4, color: "var(--color-text-tertiary)", fontSize: 11, marginLeft: 8 }}><Eye size={12} /> {p.viewCount || 0}</span><span style={{ display: "flex", alignItems: "center", gap: 4, color: "var(--color-text-tertiary)", fontSize: 11, marginLeft: 8 }}><Eye size={12} /> {p.viewCount || 0}</span>
-                  <span style={{ display: "flex", alignItems: "center", gap: 4 }}><MessageCircle size={12} />{(p._count?.comments || 0)}</span>
+              <div style={{ width: "100%", aspectRatio: "16 / 9", flexShrink: 0, background: `url("${thumb}") center/cover` }} />
+              <div style={{ padding: "var(--space-m)", display: "flex", flexDirection: "column", gap: 6, flex: 1 }}>
+                <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 99, background: "var(--color-accent-light)", color: "var(--color-accent)", fontWeight: 600, alignSelf: "flex-start" }}>{p.category?.name || "Без категории"}</span>
+                <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-l)", fontWeight: 700, margin: 0, lineHeight: 1.25, letterSpacing: "-0.01em" }}>{p.title}</h2>
+                <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.6, margin: 0 }}>{p.excerpt}</p>
+                <div style={{ display: "flex", alignItems: "center", gap: "var(--space-m)", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", marginTop: "auto", paddingTop: "var(--space-s)" }}>
+                  <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Calendar size={12} />{new Date(p.publishedAt).toLocaleDateString("ru")}</span>
+                  <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Eye size={12} /> {p.viewCount || 0}</span>
+                  <span style={{ display: "flex", alignItems: "center", gap: 4 }}><MessageCircle size={12} />{p._count?.comments || 0}</span>
                 </div>
               </div>
             </Link>
-          ))}
+            );
+          })}
         </div>
-
-        {posts.length === 0 && <div style={{ textAlign: "center", padding: "var(--space-xl)", color: "var(--color-text-tertiary)" }}>Пока нет статей</div>}
+{posts.length === 0 && <div style={{ textAlign: "center", padding: "var(--space-xl)", color: "var(--color-text-tertiary)" }}>Пока нет статей</div>}
 
         {totalPages > 1 && (
           <div style={{ display: "flex", justifyContent: "center", gap: 8, marginTop: "var(--space-xl)" }}>
@@ -159,10 +173,28 @@ export default function BlogPageClient({ posts, categories, total, page, perPage
 }
 
 function RecentComments() {
-  // Static placeholder — real data would come from API
-  return (
+  const [comments, setComments] = useState<any[]>([]);
+  useEffect(() => {
+    fetch("/api/blog/comments/recent").then(r => r.json()).then(d => setComments(d.comments || []));
+  }, []);
+  if (!comments.length) return (
     <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", lineHeight: 1.6 }}>
       Пока нет комментариев. Будьте первым!
+    </div>
+  );
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      {comments.map((c: any) => (
+        <a key={c.id} href={`/blog/${c.post?.slug || "#"}`} style={{ textDecoration: "none", color: "inherit" }}>
+          <div style={{ fontSize: "var(--text-xs)", lineHeight: 1.5, color: "var(--color-text-secondary)", marginBottom: 2 }}>
+            {c.content.slice(0, 80)}{c.content.length > 80 ? "..." : ""}
+          </div>
+          <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", display: "flex", gap: 8 }}>
+            <span style={{ fontWeight: 600 }}>{c.authorName}</span>
+            <span>{new Date(c.createdAt).toLocaleDateString("ru")}</span>
+          </div>
+        </a>
+      ))}
     </div>
   );
 }

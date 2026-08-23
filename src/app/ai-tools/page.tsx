@@ -3,8 +3,8 @@ import AIToolsPage from "./client";
 
 export const dynamic = "force-dynamic";
 export const metadata = {
-  title: "AI-инструменты — сравнение",
-  description: "Сравнение AI-инструментов для разработки: Reasonix, Cursor, Vibecraft, VS Code Copilot, Bolt, Lovable. Плюсы, минусы, цены, для кого подходит.",
+  title: "AI-инструменты для разработки — Cursor, Claude Code, Reasonix: сравнение и инструкции",
+  description: "Полный каталог AI-инструментов: Cursor, Claude Code, Reasonix, Windsurf, Bolt, Lovable. Инструкции по настройке, сравнение цен, плюсы и минусы. Выбери инструмент под свою задачу.",
 };
 
 export default async function Page() {

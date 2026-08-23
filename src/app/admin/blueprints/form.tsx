@@ -3,19 +3,32 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
+import ImagePicker from "@/components/media/image-picker";
 import Link from "next/link";
 
-interface BlueprintForm { id?: string; title: string; slug: string; description: string; icon: string; difficulty: string; isPublished: boolean; sortOrder: number; }
+interface BlueprintForm { id?: string; title: string; slug: string; description: string; icon: string; difficulty: string; isPublished: boolean; sortOrder: number; coverImage: string; goal: string; timeToComplete: string; targetAudience: string; }
 
 export default function BPForm({ initial }: { initial?: any }) {
   const router = useRouter();
   const [form, setForm] = useState<BlueprintForm>({
     title: initial?.title || "", slug: initial?.slug || "", description: initial?.description || "",
     icon: initial?.icon || "Globe", difficulty: initial?.difficulty || "easy",
-    isPublished: initial?.isPublished ?? false, sortOrder: initial?.sortOrder || 0, id: initial?.id,
+    isPublished: initial?.isPublished ?? false, sortOrder: initial?.sortOrder || 0, id: initial?.id, coverImage: initial?.coverImage || "", goal: initial?.goal || "", timeToComplete: initial?.timeToComplete || "", targetAudience: initial?.targetAudience || "",
   });
   const [saving, setSaving] = useState(false);
+  const [linking, setLinking] = useState(false);
+  const [linkMsg, setLinkMsg] = useState("");
   const [msg, setMsg] = useState("");
+
+  async function handleAutoLink() {
+    if (!form.slug) { setLinkMsg("Сначала сохраните Blueprint"); return; }
+    setLinking(true); setLinkMsg("🔍 Ищем связанные инструменты...");
+    const res = await fetch("/api/admin/auto-link", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sourceType: "blueprint", sourceSlug: form.slug }) });
+    const d = await res.json();
+    if (d.ok) setLinkMsg('✅ Создано связей: ' + d.count + (d.count > 0 ? ' (' + d.created.join(', ') + ')' : ''));
+    else setLinkMsg('❌ ' + (d.error || 'Ошибка'));
+    setLinking(false);
+  }
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -39,6 +52,10 @@ export default function BPForm({ initial }: { initial?: any }) {
           <div><label style={lbl}>Slug</label><input className="input" value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })} /></div>
           <div><label style={lbl}>Иконка (Lucide)</label><input className="input" value={form.icon} onChange={e => setForm({ ...form, icon: e.target.value })} /></div>
         </div>
+        <div><label style={lbl}>Обложка (URL или /uploads/...)</label><ImagePicker value={form.coverImage} onChange={url => setForm({ ...form, coverImage: url })} /></div>
+        <div><label style={lbl}>Цель</label><input className="input" value={form.goal} onChange={e => setForm({ ...form, goal: e.target.value })} placeholder="Что получит пользователь"/></div>
+        <div><label style={lbl}>Время прохождения</label><input className="input" value={form.timeToComplete} onChange={e => setForm({ ...form, timeToComplete: e.target.value })} placeholder="2 недели по 1 часу в день"/></div>
+        <div><label style={lbl}>Для кого</label><input className="input" value={form.targetAudience} onChange={e => setForm({ ...form, targetAudience: e.target.value })} placeholder="Малый бизнес, фрилансеры"/></div>
         <div><label style={lbl}>Описание</label><textarea className="input" rows={2} value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} /></div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "var(--space-s)" }}>
           <div><label style={lbl}>Сложность</label><select className="input" value={form.difficulty} onChange={e => setForm({ ...form, difficulty: e.target.value })}><option value="easy">Лёгкий</option><option value="medium">Средний</option><option value="hard">Сложный</option></select></div>
@@ -51,9 +68,11 @@ export default function BPForm({ initial }: { initial?: any }) {
           </div>
         </div>
         {msg && <div style={{ fontSize: "var(--text-s)", color: msg.includes("✅") ? "var(--color-accent)" : "var(--color-error)" }}>{msg}</div>}
+        {linkMsg && <div style={{ fontSize: "var(--text-xs)", color: linkMsg.includes("✅") ? "var(--color-accent)" : "var(--color-text-secondary)", background: "var(--color-bg-secondary)", padding: "var(--space-s)", borderRadius: "var(--radius-m)" }}>{linkMsg}</div>}
         <div style={{ display: "flex", gap: "var(--space-s)" }}>
           <button type="submit" className="btn btn-primary" disabled={saving}>{saving ? "Сохранение..." : (form.id ? "Обновить" : "Создать")}</button>
           <Link href="/admin/blueprints" className="btn btn-secondary" style={{ textDecoration: "none" }}>Отмена</Link>
+          {form.id && <button type="button" onClick={handleAutoLink} className="btn btn-secondary" disabled={linking} style={{ marginLeft: "auto" }}>{linking ? "Связывание..." : "🔄 Авто-связать"}</button>}
         </div>
       </form>
     </div>

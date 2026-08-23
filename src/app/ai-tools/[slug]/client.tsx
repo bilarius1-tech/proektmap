@@ -1,6 +1,6 @@
 "use client";
 
-import { Star, ExternalLink, ArrowLeft, Check, X, Download, User2, Calendar, RefreshCw, MapPin, MessageCircle } from "lucide-react";
+import { Star, ExternalLink, ArrowLeft, ArrowRight, Check, X, Download, User2, Calendar, RefreshCw, MapPin, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import Breadcrumbs from "@/components/nav/breadcrumbs";
 import SaveButton from "@/components/layout/save-button";
@@ -56,7 +56,7 @@ function isNew(createdAt: string): boolean {
   return created > thirtyDaysAgo;
 }
 
-export default function AIToolDetailClient({ tool, related, isLoggedIn }: any) {
+export default function AIToolDetailClient({ tool, related, alternatives, isLoggedIn }: any) {
   const prosArr = JSON.parse(tool.pros || "[]");
   const consArr = JSON.parse(tool.cons || "[]");
   const steps = JSON.parse(tool.howToStart || "[]");
@@ -274,6 +274,43 @@ export default function AIToolDetailClient({ tool, related, isLoggedIn }: any) {
         <div style={{ marginBottom: "var(--space-l)", padding: "var(--space-m)", background: "#f0fdf4", borderRadius: 0, border: "1px solid #bbf7d0" }}>
           <h2 style={{ fontSize: "var(--text-l)", fontWeight: 700, marginBottom: "var(--space-s)", fontFamily: "var(--font-heading)", color: "#166534" }}>🔄 Чем отличается от других</h2>
           <div style={{ fontSize: "var(--text-s)", color: "#15803d", lineHeight: 1.7, whiteSpace: "pre-wrap" }}>{tool.detailComparison}</div>
+        </div>
+      )}
+
+      {/* Mistakes */}
+      {tool.mistakes && (
+        <div style={{ marginBottom: "var(--space-l)", padding: "var(--space-l)", background: "#fef2f2", borderRadius: 0, border: "1px solid #fecaca", borderLeft: "3px solid #ef4444" }}>
+          <h2 style={{ fontSize: "var(--text-l)", fontWeight: 700, marginBottom: "var(--space-s)", fontFamily: "var(--font-heading)", color: "#991b1b", display: "flex", alignItems: "center", gap: 8 }}>
+            ⚠️ Типичные ошибки
+          </h2>
+          <div style={{ fontSize: "var(--text-s)", color: "#7f1d1d", lineHeight: 1.8, whiteSpace: "pre-wrap" }}>{tool.mistakes}</div>
+        </div>
+      )}
+
+      {/* Alternatives */}
+      {alternatives && alternatives.length > 0 && (
+        <div style={{ marginBottom: "var(--space-l)", padding: "var(--space-l)", background: "var(--color-bg-secondary)", borderRadius: 0, border: "1px solid var(--color-border-light)" }}>
+          <h2 style={{ fontSize: "var(--text-l)", fontWeight: 700, marginBottom: "var(--space-m)", fontFamily: "var(--font-heading)" }}>🔄 Аналоги</h2>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "var(--space-s)" }}>
+            {alternatives.map((alt: any) => (
+              <Link key={alt.slug} href={"/ai-tools/" + alt.slug}
+                style={{
+                  display: "flex", alignItems: "center", justifyContent: "space-between",
+                  padding: "var(--space-m)", borderRadius: 0, background: "var(--color-bg-primary)",
+                  border: "1px solid var(--color-border)", textDecoration: "none", color: "inherit",
+                  transition: "border-color 0.15s",
+                }}>
+                <div>
+                  <div style={{ fontWeight: 600, fontSize: "var(--text-s)" }}>{alt.name}</div>
+                  {alt.pricingAmount && <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", marginTop: 2 }}>{alt.pricingAmount}</div>}
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, color: "var(--color-accent)" }}>{alt.rating}/10</span>
+                  <ArrowRight size={14} style={{ color: "var(--color-text-tertiary)" }} />
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       )}
 

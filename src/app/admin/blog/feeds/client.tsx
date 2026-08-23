@@ -8,7 +8,7 @@ export default function FeedsClient({ feeds }: any) {
   const router = useRouter();
   const [items, setItems] = useState(feeds);
   const [saving, setSaving] = useState(false);
-  const empty = { name: "", url: "", type: "json", category: "AI-инжиниринг", language: "en" };
+  const empty = { name: "", url: "", type: "xml", category: "Автоматизация продаж", language: "ru" };
   const [form, setForm] = useState(empty);
   const [showForm, setShowForm] = useState(false);
 
@@ -36,7 +36,7 @@ export default function FeedsClient({ feeds }: any) {
     setSaving(true);
     const res = await fetch("/api/blog/auto-publish", { method: "POST" });
     const data = await res.json();
-    alert(`Создано черновиков: ${data.results?.filter((r: any) => r.status === "draft").length || 0}`);
+    alert(data.collection?.started ? "Сбор запущен в фоне. Отчёт придёт в Telegram." : `Сбор не стартовал: ${data.collection?.reason || "unknown"}`);
     router.refresh();
     setSaving(false);
   }
@@ -63,12 +63,23 @@ export default function FeedsClient({ feeds }: any) {
       {showForm && (
         <div style={{ marginBottom: "var(--space-l)", padding: "var(--space-l)", background: "var(--color-bg-secondary)", borderRadius: "var(--radius-l)", border: "1px solid var(--color-border)" }}>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-m)", marginBottom: "var(--space-m)" }}>
-            <div><label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Название</label><input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Hacker News" style={{ width: "100%", padding: "8px 12px", fontSize: "var(--text-s)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none" }} /></div>
+            <div><label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Название</label><input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="Google News — Ozon для продавцов" style={{ width: "100%", padding: "8px 12px", fontSize: "var(--text-s)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none" }} /></div>
             <div><label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>URL</label><input value={form.url} onChange={e => setForm({ ...form, url: e.target.value })} placeholder="https://..." style={{ width: "100%", padding: "8px 12px", fontSize: "var(--text-s)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none" }} /></div>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "var(--space-m)", marginBottom: "var(--space-m)" }}>
             <div><label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Тип</label><select value={form.type} onChange={e => setForm({ ...form, type: e.target.value })} style={{ width: "100%", padding: "8px 12px", fontSize: "var(--text-s)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none" }}><option value="json">JSON</option><option value="xml">XML / RSS</option></select></div>
-            <div><label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Категория</label><input value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} placeholder="AI-инжиниринг" style={{ width: "100%", padding: "8px 12px", fontSize: "var(--text-s)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none" }} /></div>
+            <div>
+              <label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Редакционная рубрика</label>
+              <select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}
+                style={{ width: "100%", padding: "8px 12px", fontSize: "var(--text-s)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none" }}>
+                <option value="Авито">Авито</option>
+                <option value="Ozon">Ozon</option>
+                <option value="Wildberries">Wildberries</option>
+                <option value="Маркетплейсы">Маркетплейсы</option>
+                <option value="Автоматизация продаж">Автоматизация продаж</option>
+                <option value="AI для бизнеса">AI для бизнеса</option>
+              </select>
+            </div>
             <div><label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Язык</label><select value={form.language} onChange={e => setForm({ ...form, language: e.target.value })} style={{ width: "100%", padding: "8px 12px", fontSize: "var(--text-s)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none" }}><option value="en">EN</option><option value="ru">RU</option><option value="zh">ZH</option></select></div>
           </div>
           <div style={{ display: "flex", gap: 8 }}>
@@ -86,6 +97,7 @@ export default function FeedsClient({ feeds }: any) {
               <div style={{ fontWeight: 700, fontSize: "var(--text-s)" }}>{f.name}</div>
               <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", fontFamily: "var(--font-mono)" }}>{f.url.slice(0, 80)}</div>
             </div>
+            <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 99, background: "var(--color-bg-secondary)", fontWeight: 600 }}>{f.category}</span>
             <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 99, background: "var(--color-bg-secondary)" }}>{f.type.toUpperCase()}</span>
             <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 99, background: "var(--color-bg-secondary)" }}>{f.language.toUpperCase()}</span>
             {f.lastFetched && <span style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>↻ {new Date(f.lastFetched).toLocaleDateString("ru")}</span>}

@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
   if (!slug || !type) return NextResponse.json({});
 
   const db = await getDb();
-  const result: any = { terms: [], prompts: [], patterns: [], mcp: [], tools: [] };
+  const result: any = { terms: [], prompts: [], patterns: [], mcp: [], tools: [], blueprints: [] };
 
   // 1. Get relations from the Relation model (both directions)
   const outgoing = await db.relation.findMany({
@@ -40,10 +40,21 @@ export async function GET(req: NextRequest) {
       const m = await db.mCPServer.findUnique({ where: { slug: targetSlug }, select: { name: true, slug: true, category: true } });
       if (m && !result.mcp.find((x: any) => x.slug === m.slug)) result.mcp.push({ ...m, relType: rel.relType });
     }
+    // NEW: blueprint target
+    if (targetType === "blueprint") {
+      const bp = await db.blueprint.findUnique({ where: { slug: targetSlug }, select: { title: true, slug: true, difficulty: true, icon: true } });
+      if (bp && !result.blueprints.find((x: any) => x.slug === bp.slug)) result.blueprints.push({ ...bp, relType: rel.relType });
+    }
+    // NEW: aitool target
+    if (targetType === "aitool") {
+      const t = await db.aITool.findUnique({ where: { slug: targetSlug }, select: { name: true, slug: true, type: true, rating: true, pricingAmount: true } });
+      if (t && !result.tools.find((x: any) => x.slug === t.slug)) result.tools.push({ ...t, relType: rel.relType });
+    }
   }
 
-  // 3. Fallback: if no relations, do keyword matching (as before)
+  // 3. Fallback: keyword matching for MCP and Blueprint
   const hasRelations = Object.values(result).some((arr: any) => arr.length > 0);
+  
   if (!hasRelations && type === "mcp") {
     const server = await db.mCPServer.findUnique({ where: { slug } });
     if (server) {
@@ -61,5 +72,74 @@ export async function GET(req: NextRequest) {
     }
   }
 
+  // NEW: Fallback for blueprint — keyword match against tools
+  if (!hasRelations && type === "blueprint") {
+    const bp = await db.blueprint.findUnique({ where: { slug } });
+    if (bp) {
+      const keywords = extractTechKeywords(bp);
+      if (keywords.length > 0) {
+        result.tools = await db.aITool.findMany({
+          where: { isActive: true, OR: keywords.map(k => ({
+            OR: [
+              { name: { contains: k, mode: "insensitive" as const } },
+              { description: { contains: k, mode: "insensitive" as const } },
+              { bestFor: { contains: k, mode: "insensitive" as const } },
+            ]
+          })) },
+          select: { name: true, slug: true, type: true, rating: true, pricingAmount: true },
+          take: 6,
+        });
+      }
+    }
+  }
+
   return NextResponse.json(result);
+}
+
+// Extract technology keywords from Blueprint entities, checklist, and description
+function extractTechKeywords(bp: any): string[] {
+  const keywords: string[] = [];
+  const text = [
+    bp.description || "",
+    bp.goal || "",
+    bp.entities || "[]",
+    bp.checklist || "[]",
+  ].join(" ").toLowerCase();
+
+  const techMap: Record<string, string[]> = {
+    "next.js": ["next.js", "nextjs", "next js", "next 14", "next 15"],
+    "react": ["react", "reactjs"],
+    "typescript": ["typescript", "type script"],
+    "tailwind": ["tailwind", "tailwindcss"],
+    "prisma": ["prisma"],
+    "postgresql": ["postgresql", "postgres", "pgvector"],
+    "node.js": ["node.js", "nodejs", "node"],
+    "openai": ["openai", "gpt-4", "gpt-4o", "chatgpt"],
+    "claude": ["claude", "anthropic"],
+    "openrouter": ["openrouter"],
+    "deepseek": ["deepseek"],
+    "rag": ["rag", "retrieval", "embedding", "embeddings", "vector db"],
+    "telegram": ["telegram", "bot", "tg bot"],
+    "python": ["python", "aiogram"],
+    "yookassa": ["yookassa", "юkassa", "юкасса", "платеж", "оплата", "payments"],
+    "stripe": ["stripe"],
+    "docker": ["docker"],
+    "vercel": ["vercel", "deploy"],
+    "redis": ["redis"],
+    "nextauth": ["nextauth", "next auth", "авторизация", "auth"],
+    "crm": ["crm", "клиенты", "сделки", "воронка", "канбан"],
+    "e-commerce": ["магазин", "ecommerce", "каталог", "корзина", "cart"],
+    "marketplace": ["marketplace", "маркетплейс", "продавцы", "комиссия"],
+    "saas": ["saas", "подписки", "личный кабинет"],
+    "gamedev": ["игра", "game", "gamedev"],
+    "vercel ai": ["vercel ai", "ai sdk"],
+  };
+
+  for (const [key, patterns] of Object.entries(techMap)) {
+    if (patterns.some(p => text.includes(p))) {
+      keywords.push(key);
+    }
+  }
+
+  return keywords;
 }

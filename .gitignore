@@ -10,3 +10,7 @@ start.sh
 .env
 start.sh
 .next/
+public/uploads/
+.voice-venv/
+.voice-cache/
+graphify-out/

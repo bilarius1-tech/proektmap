@@ -7,12 +7,14 @@ import VibecraftGuide from "@/components/blueprint/vibecraft-guide";
 import TourOverlay from "@/components/blueprint/tour-overlay";
 import AIToolsComparison from "@/components/blueprint/ai-tools-comparison";
 import BlueprintFlow from "@/components/blueprint/flow-view";
+import DecisionGraph from "@/components/blueprint/decision-graph";
+import { trackGoal, Goals } from "@/lib/metrika";
 import { useRouter } from "next/navigation";
 import SkillChips from "./skill-chips";
 import { useState, useEffect } from "react";
 import {
-  Eye, CheckCircle, Copy, ChevronDown, ChevronUp, Menu, X,
-  Lock, LogIn, FolderOpen, Plus, Briefcase,
+  Eye, CheckCircle, Copy, ChevronDown, ChevronUp, Menu, X, Target, Database, Clock, Package,
+  Lock, LogIn, FolderOpen, Plus, Briefcase, ArrowRight, Play,
 } from "lucide-react";
 
 interface Decision {
@@ -92,7 +94,7 @@ export default function BlueprintPageClient({
   blueprint, isLoggedIn, isPro, projectContext, userProjects, userContext, glossaryTerms, pattern, isDemo,
 }: {
   blueprint: Blueprint; isLoggedIn: boolean; isPro: boolean;
-  projectContext: ProjectContext | null; userProjects: MiniProject[]; userContext: string; glossaryTerms: any[]; isDemo: boolean; pattern: any; fromPage: string | null;
+  projectContext: ProjectContext | null; userProjects: MiniProject[]; userContext: string; glossaryTerms: any[]; isDemo: boolean; pattern: any; fromPage: string | null; projectCount?: number; completedCount?: number;
 }) {
   const router = useRouter();
   const stages = blueprint.stages.map(bs => bs.stage);
@@ -103,7 +105,6 @@ export default function BlueprintPageClient({
   const [promptCopied, setPromptCopied] = useState<string | null>(null);
   const [totalXp, setTotalXp] = useState(0);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
   const FREE_STAGES = 3; // First 3 stages are free
   const isStageLocked = (index: number) => !isPro && index >= FREE_STAGES;
   const [showProjectModal, setShowProjectModal] = useState(false);
@@ -113,10 +114,10 @@ export default function BlueprintPageClient({
   const [showDecisionMap, setShowDecisionMap] = useState(false);
   const [viewMode, setViewMode] = useState<"list"|"flow">("flow");
   const [sidebarPulse, setSidebarPulse] = useState(0);
+  const [showOverview, setShowOverview] = useState(true);
   const [notifications, setNotifications] = useState<Array<{id:number; msg:string; type:string}>>([]);
 
   useEffect(() => {
-    setIsMobile(window.innerWidth < 768);
     if (!isLoggedIn) return;
     fetch("/api/progress").then(r => r.json()).then(d => {
       setCompleted(new Set(d.completed));
@@ -179,7 +180,8 @@ export default function BlueprintPageClient({
 
   const currentStage = stages.find(s => s.slug === activeStage) || stages[0];
   const totalDone = completed.size;
-  const progress = Math.round((totalDone / blueprint.totalDecisions) * 100);
+  const totalDecisions = blueprint.totalDecisions || 1;
+  const progress = Math.min(100, Math.round((totalDone / totalDecisions) * 100));
   const canTrack = isLoggedIn;
 
   const steps = [
@@ -200,14 +202,62 @@ export default function BlueprintPageClient({
           onComplete={() => {}}
         />
       )}
-      <div style={{ display: "flex", minHeight: "calc(100dvh - 56px)" }} suppressHydrationWarning>
-      {/* DESKTOP sidebar */}
-      {!isMobile && (
-        <aside style={{
-          width: 260, minWidth: 260, background: "var(--color-bg-primary)",
-          borderRight: "1px solid var(--color-border-light)",
-          position: "sticky", top: 56, height: "calc(100dvh - 56px)", overflowY: "auto",
-        }}>
+      {showOverview && (
+        <div style={{ maxWidth: 960, margin: "0 auto", padding: "var(--space-xl) var(--space-m)" }}>
+          <div style={{
+            background: "var(--color-bg-primary)", border: "1px solid var(--color-border)",
+            borderRadius: "var(--radius-l)", padding: "var(--space-xl)",
+          }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "var(--space-m)", marginBottom: "var(--space-l)" }}>
+              <div>
+                <div style={{ fontSize: "var(--text-xs)", fontWeight: 700, color: "var(--color-accent)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 }}>Blueprint</div>
+                <h1 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-xxl)", fontWeight: 800, margin: 0, letterSpacing: "-0.02em" }}>{blueprint.title}</h1>
+              </div>
+              <button onClick={() => { setShowOverview(false); trackGoal(Goals.BLUEPRINT_START, { blueprint: blueprint.slug }); }} style={{
+                padding: "12px 28px", borderRadius: "var(--radius-m)",
+                background: "var(--color-accent)", color: "white", border: "none",
+                fontSize: "var(--text-s)", fontWeight: 700, cursor: "pointer",
+                display: "flex", alignItems: "center", gap: 6,
+              }}>Начать путь <ArrowRight size={16} /></button>
+            </div>
+            {(blueprint as any).goal && (
+              <div style={{ marginBottom: "var(--space-l)", padding: "var(--space-m)", background: "var(--color-accent-light)", borderRadius: "var(--radius-s)", display: "flex", gap: 10 }}>
+                <Target size={20} style={{ color: "var(--color-accent)", flexShrink: 0, marginTop: 2 }} />
+                <div>
+                  <div style={{ fontSize: "var(--text-xs)", fontWeight: 700, color: "var(--color-accent)", marginBottom: 2 }}>Цель</div>
+                  <div style={{ fontSize: "var(--text-s)", color: "var(--color-text-primary)", lineHeight: 1.6 }}>{(blueprint as any).goal}</div>
+                </div>
+              </div>
+            )}
+            <div style={{ display: "flex", gap: "var(--space-xl)", flexWrap: "wrap", marginBottom: "var(--space-l)", fontSize: "var(--text-xs)", color: "var(--color-text-secondary)" }}>
+              {(blueprint as any).timeToComplete && <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Clock size={14} style={{ color: "var(--color-accent)" }} /> {(blueprint as any).timeToComplete}</span>}
+              <span style={{ display: "flex", alignItems: "center", gap: 4 }}><CheckCircle size={14} style={{ color: "var(--color-accent)" }} /> {blueprint.totalXp} XP</span>
+              <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Database size={14} style={{ color: "var(--color-accent)" }} /> {blueprint.totalDecisions} этапов</span>
+              {(blueprint as any).viewCount > 0 && <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Eye size={14} style={{ color: "var(--color-accent)" }} /> {(blueprint as any).viewCount} просмотров</span>}
+              {(blueprint as any).startCount > 0 && <span style={{ display: "flex", alignItems: "center", gap: 4 }}><Play size={14} style={{ color: "var(--color-accent)" }} /> {(blueprint as any).startCount} запусков</span>}
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "var(--space-m)" }}>
+              {(() => {
+                try { const e = JSON.parse((blueprint as any).entities || "[]"); if (e.length) return <div style={{ padding: "var(--space-m)", background: "var(--color-bg-secondary)", borderRadius: "var(--radius-s)" }}><div style={{ fontSize: "var(--text-xs)", fontWeight: 700, marginBottom: "var(--space-s)" }}>🗄 Сущности БД</div>{e.slice(0,8).map((x:any,i:number) => <div key={i} style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.6 }}>• {typeof x==="string"?x:x.name||x.table||JSON.stringify(x)}</div>)}</div>; } catch {} return null;
+              })()}
+              {(() => {
+                try { const c = JSON.parse((blueprint as any).checklist || "[]"); if (c.length) return <div style={{ padding: "var(--space-m)", background: "var(--color-bg-secondary)", borderRadius: "var(--radius-s)" }}><div style={{ fontSize: "var(--text-xs)", fontWeight: 700, marginBottom: "var(--space-s)" }}>✅ Чек-лист</div>{c.slice(0,8).map((x:string,i:number) => <div key={i} style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.6 }}>• {x}</div>)}</div>; } catch {} return null;
+              })()}
+              {(() => {
+                try { const a = JSON.parse((blueprint as any).artifacts || "[]"); if (a.length) return <div style={{ padding: "var(--space-m)", background: "var(--color-bg-secondary)", borderRadius: "var(--radius-s)" }}><div style={{ fontSize: "var(--text-xs)", fontWeight: 700, marginBottom: "var(--space-s)" }}>📦 Артефакты</div>{a.slice(0,8).map((x:any,i:number) => <div key={i} style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.6 }}>• {typeof x==="string"?x:x.name||JSON.stringify(x)}</div>)}</div>; } catch {} return null;
+              })()}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div style={{ display: showOverview ? "none" : "flex", minHeight: "calc(100dvh - 56px)" }}>
+      {/* DESKTOP sidebar — hidden on mobile via CSS */}
+      <aside className="hidden md:block" style={{
+        width: 260, minWidth: 260, background: "var(--color-bg-primary)",
+        borderRight: "1px solid var(--color-border-light)",
+        position: "sticky", top: 56, height: "calc(100dvh - 56px)", overflowY: "auto",
+      }}>
           <SidebarContent
             stages={stages} activeStage={activeStage} setActiveStage={setActiveStage}
             completed={completed} progress={progress} totalDone={totalDone} totalDecs={blueprint.totalDecisions}
@@ -220,13 +270,12 @@ export default function BlueprintPageClient({
             setShowDecisionMap={setShowDecisionMap}
           />
         </aside>
-      )}
 
-      {/* MOBILE */}
-      {isMobile && (
+      {/* MOBILE — visible on mobile via CSS */}
+      <div className="md:hidden">
         <>
-          <button onClick={() => setSidebarOpen(true)} style={{
-            position: "fixed", left: 16, bottom: 24, zIndex: 50,
+          <button onClick={() => setSidebarOpen(true)} className="blueprint-mobile-fab" style={{
+            position: "fixed", left: 16, bottom: "calc(var(--bottom-chrome, 56px) + 16px)", zIndex: 50,
             width: 48, height: 48, borderRadius: "50%",
             background: "var(--color-accent)", color: "white",
             border: "none", boxShadow: "0 4px 16px rgba(15,184,128,0.4)",
@@ -263,7 +312,7 @@ export default function BlueprintPageClient({
             </>
           )}
         </>
-      )}
+      </div>
 
       {/* Main content */}
       {viewMode === "flow" && (
@@ -277,7 +326,7 @@ export default function BlueprintPageClient({
         </div>
       )}
 
-      {viewMode === "list" && <main suppressHydrationWarning style={{ flex: 1, padding: isMobile ? "var(--space-m)" : "var(--space-xl)", maxWidth: 1100 }}>
+      {viewMode === "list" && <main style={{ flex: 1, padding: "var(--space-m)", maxWidth: 1100 }}>
         {/* Registration banner */}
         {!isLoggedIn && (
           <div style={{
@@ -332,28 +381,47 @@ export default function BlueprintPageClient({
           </div>
         )}
 
-        {/* Project header */}
-        {projectContext && (
-          <div style={{
-            display: "flex", alignItems: "center", gap: "var(--space-s)", marginBottom: "var(--space-m)",
-            padding: "var(--space-s) var(--space-m)", background: "var(--color-bg-secondary)", borderRadius: "var(--radius-m)",
-            border: "1px solid var(--color-border-light)", fontSize: "var(--text-xs)",
-          }}>
-            <FolderOpen size={14} style={{ color: "var(--color-accent)", flexShrink: 0 }} />
-            <span style={{ fontWeight: 600 }}>{projectContext.name}</span>
-            {projectContext.niche && <span style={{ color: "var(--color-text-tertiary)" }}>· {projectContext.niche}</span>}
-            {projectContext.stack && <span style={{ color: "var(--color-text-tertiary)" }}>· {projectContext.stack}</span>}
+        {/* Sticky header: project + progress + stage */}
+        <div style={{
+          position: "sticky", top: 56, zIndex: 20,
+          background: "var(--color-bg-primary)", borderBottom: "1px solid var(--color-border-light)",
+          padding: "var(--space-s) var(--space-l)", marginBottom: "var(--space-m)",
+        }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 8, flexWrap: "wrap" }}>
+                <h1 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-m)", fontWeight: 800, margin: 0, letterSpacing: "-0.01em" }}>
+                  {blueprint.title}
+                </h1>
+                {projectContext && (
+                  <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", display: "flex", alignItems: "center", gap: 4 }}>
+                    <FolderOpen size={12} style={{ color: "var(--color-accent)" }} />
+                    {projectContext.name || "Проект"}
+                  </span>
+                )}
+              </div>
+              <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", marginTop: 2 }}>
+                Этап {stages.findIndex((s: any) => s.slug === activeStage) + 1 || 0}/{stages.length} · {stages.find((s: any) => s.slug === activeStage)?.title || ""}
+              </div>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+              <div style={{ textAlign: "right" }}>
+                <div style={{ fontSize: "var(--text-xs)", fontWeight: 700, color: progress === 100 ? "var(--color-accent)" : "var(--color-text-primary)" }}>
+                  {totalDone}/{totalDecisions}
+                </div>
+                <div style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>{progress}%</div>
+              </div>
+              <div style={{ width: 80, height: 6, borderRadius: 3, background: "var(--color-border-light)", overflow: "hidden" }}>
+                <div style={{ width: progress + "%", height: "100%", background: progress === 100 ? "var(--color-accent)" : "var(--color-accent)", borderRadius: 3, transition: "width 0.4s ease" }} />
+              </div>
+            </div>
           </div>
-        )}
-
-        <div style={{ height: 2, background: "var(--color-border)", borderRadius: 0, overflow: "hidden", marginBottom: "var(--space-m)" }}>
-          <div style={{ width: progress + "%", height: "100%", background: "var(--color-accent)", borderRadius: 2, transition: "width 0.4s ease" }} />
         </div>
 
         <h1 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-xl)", fontWeight: 700, marginBottom: "var(--space-xs)", letterSpacing: "-0.01em" }}>{currentStage?.title} {isStageLocked(stages.indexOf(currentStage)) && <span style={{ fontSize: 12, color: "var(--color-text-tertiary)", fontWeight: 400, marginLeft: 8 }}>🔒 Pro</span>}</h1>
         {activeStage === "ai-philosophy" && <AIRules />}
         {currentStage?.description && (
-          <p style={{ color: "var(--color-text-secondary)", marginBottom: isMobile ? "var(--space-m)" : "var(--space-l)", fontSize: "var(--text-s)" }}>
+          <p style={{ color: "var(--color-text-secondary)", marginBottom: "var(--space-m)", fontSize: "var(--text-s)" }}>
             {projectContext ? currentStage.description : currentStage.description}
           </p>
         )}
@@ -371,7 +439,7 @@ export default function BlueprintPageClient({
                 background: "white", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)",
               }}>
                 <div onClick={() => { if (canTrack) toggle(dec.id); }} style={{
-                  display: "flex", alignItems: "center", gap: "var(--space-s)", padding: isMobile ? "var(--space-m)" : "var(--space-m) var(--space-l)", cursor: canTrack ? "pointer" : "default",
+                  display: "flex", alignItems: "center", gap: "var(--space-s)", padding: "var(--space-m)", cursor: canTrack ? "pointer" : "default",
                 }}>
                   <div style={{
                     width: 24, height: 24, borderRadius: "50%", flexShrink: 0,
@@ -392,7 +460,7 @@ export default function BlueprintPageClient({
                 </div>
 
                 {expanded && !done && (
-                  <div style={{ borderTop: "1px solid var(--color-border-light)", padding: isMobile ? "var(--space-m)" : "var(--space-l)" }}>
+                  <div style={{ borderTop: "1px solid var(--color-border-light)", padding: "var(--space-m)" }}>
                     <div style={{ display: "flex", gap: 0, marginBottom: "var(--space-m)", borderBottom: "2px solid var(--color-border-light)", overflowX: "auto" }}>
                       {steps.map(s => (
                         <button key={s.key} onClick={() => {
@@ -448,33 +516,44 @@ export default function BlueprintPageClient({
 
       {/* Decision Map Modal */}
       {showDecisionMap && (
-        <div onClick={() => setShowDecisionMap(false)} style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", justifyContent: "center", alignItems: "center", background: "rgba(0,0,0,0.4)" }}>
-          <div onClick={e => e.stopPropagation()} style={{ background: "white", borderRadius: "var(--radius-m)", maxWidth: 700, width: "90%", maxHeight: "80vh", overflow: "auto", padding: "var(--space-l)", boxShadow: "0 8px 40px rgba(0,0,0,0.15)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-m)" }}>
-              <div style={{ fontWeight: 800, fontSize: "var(--text-l)", color: "var(--color-accent)" }}>📋 Карта решений</div>
-              <button onClick={() => setShowDecisionMap(false)} style={{ padding: "4px 12px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "white", cursor: "pointer", fontSize: "var(--text-xs)" }}>✕</button>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-m)" }}>
-              {stages.map((st:any) => {
-                const stageDecs = (st.decisions || []).filter((d:any) => decisionChoices[d.id]);
-                if (stageDecs.length === 0) return null;
-                return (
-                  <div key={st.id}>
-                    <div style={{ fontWeight: 800, fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8, paddingLeft: 4 }}>{st.title}</div>
-                    {stageDecs.map((d:any) => (
-                      <div key={d.id} style={{ display: "flex", gap: 12, padding: "6px 4px", borderLeft: "3px solid var(--color-accent)", marginLeft: 8, marginBottom: 4, alignItems: "flex-start", flexWrap: "wrap" }}>
-                        <div style={{ fontSize: "var(--text-xs)", fontWeight: 600, color: "var(--color-text)" }}>{d.title}</div>
-                        <div style={{ fontSize: "var(--text-xs)", color: "var(--color-accent)", fontWeight: 700 }}>→ {decisionChoices[d.id].choice}</div>
-                        {d.impact && <div style={{ width: "100%", display: "flex", gap: 4, flexWrap: "wrap", marginLeft: 16, marginTop: 2 }}>{d.impact.split(",").map((tag:string) => <span key={tag} style={{ padding: "1px 6px", borderRadius: "var(--radius-s)", background: "var(--color-warning-light)", color: "var(--color-warning)", fontSize: 9, fontWeight: 600 }}>{tag.trim()}</span>)}</div>}
-                      </div>
-                    ))}
-                  </div>
-                );
-              })}
-            </div>
-            <button onClick={() => { const brief = stages.flatMap((s:any) => (s.decisions||[]).filter((d:any)=>decisionChoices[d.id])).map((d:any) => `⚡ ${d.title}: ${decisionChoices[d.id].choice}${decisionChoices[d.id].reason ? " — " + decisionChoices[d.id].reason : ""}`).join("\
-"); navigator.clipboard.writeText(brief); alert("✅ Бриф скопирован!"); }} style={{ marginTop: "var(--space-m)", width: "100%", padding: "10px", borderRadius: "var(--radius-s)", background: "var(--color-accent)", color: "white", border: "none", fontWeight: 700, fontSize: "var(--text-xs)", cursor: "pointer" }}>📋 Скопировать бриф</button>
-          </div>
+        <div style={{ position: "fixed", inset: 0, zIndex: 200, background: "var(--color-bg-secondary)" }}>
+          <DecisionGraph
+            stages={stages.map((st: any) => ({
+              title: st.title,
+              slug: st.slug,
+              decisions: (st.decisions || []).map((d: any) => ({
+                id: d.id,
+                title: d.title,
+                slug: d.slug,
+                stageTitle: st.title,
+                stageSlug: st.slug,
+                status: decisionChoices[d.id] ? "completed" : "pending",
+                userChoice: decisionChoices[d.id]?.choice || "",
+                xpReward: d.xpReward || 0,
+              })),
+            }))}
+            relations={[]}
+            onDecisionClick={(decisionId: string) => {
+              setShowDecisionMap(false);
+              // Find which stage contains this decision
+              for (const st of stages) {
+                const found = (st.decisions || []).find((d: any) => d.id === decisionId);
+                if (found) { setActiveStage(st.slug); break; }
+              }
+            }}
+          />
+          <button
+            onClick={() => setShowDecisionMap(false)}
+            style={{
+              position: "fixed", top: 16, right: 16, zIndex: 210,
+              padding: "8px 16px", borderRadius: "var(--radius-m)",
+              background: "var(--color-bg-primary)", border: "1px solid var(--color-border)",
+              cursor: "pointer", fontSize: "var(--text-s)", fontWeight: 600,
+              boxShadow: "var(--shadow-m)",
+            }}
+          >
+            ✕ Закрыть
+          </button>
         </div>
       )}
 
@@ -531,18 +610,11 @@ function SidebarContent({ stages, activeStage, setActiveStage, completed, progre
             <span>📋 Карта решений</span>
             <span style={{fontSize:9, color:"var(--color-accent)", opacity:0.7}}>{Object.keys(decisionChoices).length}</span>
           </button>
-          <button onClick={() => { 
-            const brief = stages.flatMap((s:any) => (s.decisions||[]).filter((d:any)=>decisionChoices[d.id])).map((d:any) => 
-              `⚡ ${d.title}: ${decisionChoices[d.id].choice}${decisionChoices[d.id].reason ? " — " + decisionChoices[d.id].reason : ""}`
-            ).join("\
-"); 
-            navigator.clipboard.writeText(brief);
-            const toastMsg = "✅ Бриф скопирован! " + Object.keys(decisionChoices).length + " решений";
-            addNotification("📋 Бриф скопирован! " + Object.keys(decisionChoices).length + " решений", "info");
-          }}
-            style={{ width: "100%", padding: "8px 12px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "white", fontWeight: 600, fontSize: "var(--text-xs)", cursor: "pointer", color: "var(--color-accent)" }}>
-            📋 Собрать бриф
-          </button>
+          <a href={projectContext ? `/projects/${projectContext.id}/brief` : "#"}
+            style={{ width: "100%", padding: "8px 12px", borderRadius: "var(--radius-s)", border: "1px solid var(--color-accent)", background: "var(--color-accent-light)", fontWeight: 600, fontSize: "var(--text-xs)", cursor: "pointer", color: "var(--color-accent)", textDecoration: "none", display: "block", textAlign: "center" }}
+            onClick={e => { if (!projectContext) { e.preventDefault(); onNewProject(); } }}>
+            📋 Открыть бриф
+          </a>
         </div>
       </>}
 

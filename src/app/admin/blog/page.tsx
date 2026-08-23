@@ -20,7 +20,7 @@ export default async function BlogAdminPage({ searchParams }: { searchParams: Pr
     }),
     db.blogPost.count({ where }),
     db.blogCategory.findMany({ orderBy: { sortOrder: "asc" } }),
-    db.blogComment.count({ where: { status: "pending" } }),
+    db.blogComment.findMany({ where: { status: "pending" }, orderBy: { createdAt: "desc" }, include: { post: { select: { title: true, slug: true } } }, take: 50 }),
     db.user.findMany({ where: { posts: { some: {} } }, select: { id: true, name: true, email: true } }),
   ]);
 
@@ -29,7 +29,7 @@ export default async function BlogAdminPage({ searchParams }: { searchParams: Pr
       posts={JSON.parse(JSON.stringify(posts))}
       categories={JSON.parse(JSON.stringify(categories))}
       authors={JSON.parse(JSON.stringify(authors))}
-      pendingComments={pendingComments}
+      pendingComments={JSON.parse(JSON.stringify(pendingComments))}
       total={total}
       page={page}
       perPage={perPage}

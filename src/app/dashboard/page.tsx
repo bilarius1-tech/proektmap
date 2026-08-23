@@ -17,6 +17,12 @@ export default async function DashboardPage() {
   if (!user) return null;
 
   // User's posts
+  const projects = await db.project.findMany({
+    where: { userId: user.id },
+    orderBy: { createdAt: "desc" }, take: 10,
+    include: { blueprint: { select: { title: true, slug: true } } },
+  });
+
   const posts = await db.blogPost.findMany({
     where: { authorId: user.id },
     orderBy: { createdAt: "desc" }, take: 5,
@@ -47,6 +53,7 @@ export default async function DashboardPage() {
       user={JSON.parse(JSON.stringify(user))}
       posts={JSON.parse(JSON.stringify(posts))}
       blueprints={JSON.parse(JSON.stringify(blueprints))}
+      projects={JSON.parse(JSON.stringify(projects))}
       completedIds={JSON.parse(JSON.stringify([...completedIds]))}
       stats={{ totalUsers, totalPosts, totalDecisions }}
       isAdmin={user.role === "admin"}

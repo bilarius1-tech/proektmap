@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
-import YandexProvider from "next-auth/providers/yandex";
 import CredentialsProvider from "next-auth/providers/credentials";
+import YandexProvider from "next-auth/providers/yandex";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { compare } from "bcryptjs";
@@ -40,27 +40,28 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   session: { strategy: "jwt" },
-  pages: { signIn: "/auth", error: "/auth" },
+  pages: { signIn: "/auth" },
   callbacks: {
     async signIn({ user, account }) {
       if (account?.provider === "yandex" && user.email) {
-        const db = getAuthPrisma();
-        const email = user.email.toLowerCase();
-        let dbUser = await db.user.findUnique({ where: { email } });
-        if (!dbUser) {
-          // Yandex users: free tier, 0 balance
-          dbUser = await db.user.create({
-            data: { email, name: user.name || "", passwordHash: "", role: "user", subscription: "free", avatar: (user as any).image || "" },
-          });
-        }
-        (user as any).id = dbUser.id;
-        (user as any).role = dbUser.role;
-        (user as any).subscription = dbUser.subscription;
-        (user as any).image = dbUser.avatar || (user as any).image || "";
+        try {
+          const db = getAuthPrisma();
+          const existing = await db.user.findUnique({ where: { email: user.email.toLowerCase() } });
+          if (!existing) {
+            await db.user.create({
+              data: {
+                email: user.email.toLowerCase(),
+                name: user.name || user.email.split("@")[0],
+                role: "user",
+                subscription: "free",
+              },
+            });
+          }
+        } catch (e) { console.error("Yandex signIn error:", e); }
       }
       return true;
     },
-    async jwt({ token, user, trigger }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.email = user.email;
@@ -68,7 +69,6 @@ export const authOptions: NextAuthOptions = {
         token.role = (user as any).role || "user";
         token.subscription = (user as any).subscription || "free";
       }
-      // Refresh from DB on every call to keep role/subscription updated
       if (token.email) {
         try {
           const db = getAuthPrisma();

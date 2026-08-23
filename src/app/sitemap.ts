@@ -1,74 +1,74 @@
 import { MetadataRoute } from "next";
 import { getDb } from "@/lib/db/index";
+import { PUBLIC_SEO_ROUTES } from "./sitemap/site-map-data";
+
+const baseUrl = "https://proektmap.ru";
+
+function pagePriority(href: string) {
+  if (href === "/") return 1;
+  if (href === "/resheniya") return 0.9;
+  if (href.startsWith("/resheniya/")) return href.includes("workspace") ? 0.6 : 0.8;
+  if (["/blog", "/ai-tools", "/mcp", "/telegram", "/avito", "/ai-without-vpn"].includes(href)) return 0.8;
+  if (["/terms", "/privacy", "/offer", "/refund", "/contacts"].includes(href)) return 0.4;
+  if (href === "/auth") return 0.3;
+  return 0.7;
+}
+
+function pageFrequency(href: string): MetadataRoute.Sitemap[number]["changeFrequency"] {
+  if (href === "/blog") return "daily";
+  if (href.startsWith("/demo/") || href.startsWith("/quest/") || href === "/auth") return "monthly";
+  return "weekly";
+}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = "https://proektmap.ru";
-  
-  const staticPages: MetadataRoute.Sitemap = [
-    { url: baseUrl, lastModified: new Date(), changeFrequency: "weekly", priority: 1 },
-    { url: `${baseUrl}/corporate-website`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.9 },
-    { url: `${baseUrl}/saas-project`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.9 },
-    { url: `${baseUrl}/game-dev`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.9 },
-    { url: `${baseUrl}/blog`, lastModified: new Date(), changeFrequency: "daily", priority: 0.9 },
-    { url: `${baseUrl}/ai-tools`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
-    { url: `${baseUrl}/prompts`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
-    { url: `${baseUrl}/models`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
-    { url: `${baseUrl}/specialists`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.8 },
-    { url: `${baseUrl}/terms`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.4 },
-    { url: `${baseUrl}/privacy`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.4 },
-    { url: `${baseUrl}/offer`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.4 },
-    { url: `${baseUrl}/auth`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.3 },
-  ];
+  const staticPages: MetadataRoute.Sitemap = PUBLIC_SEO_ROUTES.map((href) => ({
+    url: href === "/" ? baseUrl : `${baseUrl}${href}`,
+    lastModified: new Date(),
+    changeFrequency: pageFrequency(href),
+    priority: pagePriority(href),
+  }));
 
-  // Dynamic: blog posts
   let blogUrls: MetadataRoute.Sitemap = [];
-  try {
-    const db = await getDb();
-    const posts = await db.blogPost.findMany({ 
-      where: { status: "published" },
-      select: { slug: true, updatedAt: true },
-      orderBy: { updatedAt: "desc" },
-      take: 100,
-    });
-    blogUrls = posts.map(p => ({
-      url: `${baseUrl}/blog/${p.slug}`,
-      lastModified: p.updatedAt,
-      changeFrequency: "monthly" as const,
-      priority: 0.7,
-    }));
-  } catch {}
-
-  // Dynamic: AI tools detail pages
   let aiToolUrls: MetadataRoute.Sitemap = [];
-  try {
-    const db = await getDb();
-    const aiTools = await db.aITool.findMany({
-      where: { isActive: true },
-      select: { slug: true, updatedAt: true },
-    });
-    aiToolUrls = aiTools.map(t => ({
-      url: `${baseUrl}/ai-tools/${t.slug}`,
-      lastModified: t.updatedAt,
-      changeFrequency: "monthly" as const,
-      priority: 0.8,
-    }));
-  } catch {}
-
-  // Dynamic: MCP server detail pages
   let mcpUrls: MetadataRoute.Sitemap = [];
+  let solutionUrls: MetadataRoute.Sitemap = [];
+  let glossaryUrls: MetadataRoute.Sitemap = [];
+  let patternUrls: MetadataRoute.Sitemap = [];
+  let russianAiUrls: MetadataRoute.Sitemap = [];
+  let workshopUrls: MetadataRoute.Sitemap = [];
+
   try {
     const db = await getDb();
-    const mcps = await db.mCPServer.findMany({
-      where: { isActive: true },
-      select: { slug: true, updatedAt: true },
-    });
-    mcpUrls = mcps.map(s => ({
-      url: `${baseUrl}/mcp/${s.slug}`,
-      lastModified: s.updatedAt,
-      changeFrequency: "monthly" as const,
-      priority: 0.8,
-    }));
+    const [posts, tools, mcps, solutions, terms, patterns, russianAi, workshop] = await Promise.all([
+      db.blogPost.findMany({ where: { status: "published" }, select: { slug: true, updatedAt: true }, orderBy: { updatedAt: "desc" }, take: 500 }),
+      db.aITool.findMany({ where: { isActive: true }, select: { slug: true, updatedAt: true } }),
+      db.mCPServer.findMany({ where: { isActive: true }, select: { slug: true, updatedAt: true } }),
+      db.solution.findMany({ where: { isPublished: true }, select: { slug: true, updatedAt: true } }),
+      db.glossaryTerm.findMany({ where: { isPublished: true }, select: { slug: true, updatedAt: true } }),
+      db.buildPattern.findMany({ where: { isPublished: true }, select: { slug: true, updatedAt: true } }),
+      db.russianAIProject.findMany({ where: { isPublished: true }, select: { slug: true, updatedAt: true } }),
+      db.aiProject.findMany({ select: { slug: true, updatedAt: true } }),
+    ]);
+
+    blogUrls = posts.map((item) => ({ url: `${baseUrl}/blog/${item.slug}`, lastModified: item.updatedAt, changeFrequency: "monthly", priority: 0.7 }));
+    aiToolUrls = tools.map((item) => ({ url: `${baseUrl}/ai-tools/${item.slug}`, lastModified: item.updatedAt, changeFrequency: "monthly", priority: 0.8 }));
+    mcpUrls = mcps.map((item) => ({ url: `${baseUrl}/mcp/${item.slug}`, lastModified: item.updatedAt, changeFrequency: "monthly", priority: 0.8 }));
+    solutionUrls = solutions.map((item) => ({ url: `${baseUrl}/solutions/${item.slug}`, lastModified: item.updatedAt, changeFrequency: "monthly", priority: 0.7 }));
+    glossaryUrls = terms.map((item) => ({ url: `${baseUrl}/glossary/${item.slug}`, lastModified: item.updatedAt, changeFrequency: "monthly", priority: 0.6 }));
+    patternUrls = patterns.map((item) => ({ url: `${baseUrl}/patterns/${item.slug}`, lastModified: item.updatedAt, changeFrequency: "monthly", priority: 0.6 }));
+    russianAiUrls = russianAi.map((item) => ({ url: `${baseUrl}/russian-ai/${item.slug}`, lastModified: item.updatedAt, changeFrequency: "monthly", priority: 0.6 }));
+    workshopUrls = workshop.map((item) => ({ url: `${baseUrl}/ai-workshop/${item.slug}`, lastModified: item.updatedAt, changeFrequency: "monthly", priority: 0.6 }));
   } catch {}
 
-  return [...staticPages, ...blogUrls, ...aiToolUrls, ...mcpUrls];
+  return [
+    ...staticPages,
+    ...blogUrls,
+    ...aiToolUrls,
+    ...mcpUrls,
+    ...solutionUrls,
+    ...glossaryUrls,
+    ...patternUrls,
+    ...russianAiUrls,
+    ...workshopUrls,
+  ];
 }

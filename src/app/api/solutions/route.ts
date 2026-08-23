@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   if (!data.title || !data.summary) return NextResponse.json({ error: "title and summary required" }, { status: 400 });
 
   const db: any = await getDb();
-  const slug = data.title.toLowerCase().replace(/[^a-zа-я0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60) + "-" + Date.now().toString(36);
+  const slug = data.title.toLowerCase().replace(/[^a-zа-я0-9]+/g, "-").replace(/^-|-$/g, "").replace(/--+/g, "-").slice(0, 60).replace(/-$/,"") + "-" + Date.now().toString(36);
 
   const solution = await db.solution.create({
     data: {

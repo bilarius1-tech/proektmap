@@ -1,81 +1,120 @@
 "use client";
-
 import { useState } from "react";
 import Link from "next/link";
-import { BookOpen, MessageSquare, Package, Plug, Trash2, Heart } from "lucide-react";
+import { ArrowLeft, Bookmark, Trash2, Eye, Calendar, FileText, Lightbulb, Zap, BookOpen, GitBranch } from "lucide-react";
 
-const TYPE_ICONS: Record<string, any> = {
-  glossary: BookOpen, prompt: MessageSquare, pattern: Package, mcp: Plug,
-};
-const TYPE_LABELS: Record<string, string> = {
-  glossary: "Глоссарий", prompt: "Промпты", pattern: "Паттерны", mcp: "MCP-серверы",
-};
+const TABS = [
+  { key: "all", label: "Все", icon: Bookmark },
+  { key: "blog_post", label: "Блог", icon: FileText },
+  { key: "solution", label: "Решения", icon: Lightbulb },
+  { key: "skill", label: "Навыки", icon: Zap },
+  { key: "glossary_term", label: "Глоссарий", icon: BookOpen },
+  { key: "decision", label: "Решения (этапы)", icon: GitBranch },
+];
 
-export default function CollectionPageClient({ items }: any) {
-  const [list, setList] = useState(items || []);
+export default function CollectionClient({ items, blogMap, solutionMap, skillMap, termMap, decisionMap }: any) {
+  const [list, setList] = useState(items);
+  const [tab, setTab] = useState("all");
+
+  const filtered = tab === "all" ? list : list.filter((i: any) => i.entityType === tab);
 
   async function remove(entityType: string, entitySlug: string) {
-    await fetch("/api/collection", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ entityType, entitySlug }),
-    });
-    setList((prev: any[]) => prev.filter((i: any) => !(i.entityType === entityType && i.entitySlug === entitySlug)));
+    await fetch("/api/collection", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ entityType, entitySlug }) });
+    setList(list.filter((i: any) => !(i.entityType === entityType && i.entitySlug === entitySlug)));
   }
 
-  // Group by type
-  const grouped: Record<string, any[]> = {};
-  for (const item of list) {
-    if (!grouped[item.entityType]) grouped[item.entityType] = [];
-    grouped[item.entityType].push(item);
+  function getTitle(item: any): string {
+    const slug = item.entitySlug;
+    switch (item.entityType) {
+      case "blog_post": return blogMap[slug]?.title || slug;
+      case "solution": return solutionMap[slug]?.title || slug;
+      case "skill": return skillMap[slug]?.title || slug;
+      case "glossary_term": return termMap[slug]?.term || slug;
+      case "decision": return decisionMap[slug]?.title || slug;
+      default: return slug;
+    }
+  }
+
+  function getLink(item: any): string {
+    const slug = item.entitySlug;
+    switch (item.entityType) {
+      case "blog_post": return `/blog/${blogMap[slug]?.slug || slug}`;
+      case "solution": return `/solutions/${slug}`;
+      case "skill": return `/skills/${slug}`;
+      case "glossary_term": return `/glossary/${slug}`;
+      case "decision": return `/decisions#${slug}`;
+      default: return "#";
+    }
+  }
+
+  function getMeta(item: any): string {
+    const slug = item.entitySlug;
+    switch (item.entityType) {
+      case "blog_post": return `${blogMap[slug]?.viewCount || 0} просмотров`;
+      case "solution": return solutionMap[slug]?.summary?.slice(0, 60) || "";
+      case "skill": return "Навык";
+      case "glossary_term": return termMap[slug]?.simpleExplanation?.slice(0, 60) || "";
+      case "decision": return "Этап";
+      default: return "";
+    }
   }
 
   return (
-    <div style={{ maxWidth: 900, margin: "0 auto", padding: "var(--space-xl) var(--space-m)" }}>
-      <div style={{ marginBottom: "var(--space-xl)" }}>
-        <h1 style={{ fontSize: "var(--text-xxl)", fontWeight: 800, marginBottom: 8 }}>❤️ Моя карта знаний</h1>
-        <p style={{ fontSize: "var(--text-s)", color: "var(--color-text-secondary)" }}>
-          {list.length === 0 ? "Вы пока ничего не сохранили. Нажимайте ❤️ на страницах терминов, промптов, паттернов и MCP." : `Сохранено: ${list.length} материалов`}
-        </p>
+    <div style={{ maxWidth: 760, margin: "0 auto", padding: "var(--space-xl) var(--space-m)" }}>
+      <Link href="/dashboard" style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", textDecoration: "none", marginBottom: "var(--space-l)" }}>
+        <ArrowLeft size={14} /> В личный кабинет
+      </Link>
+      <h1 style={{ fontFamily: "var(--font-heading)", fontWeight: 800, fontSize: "var(--text-xxl)", marginBottom: "var(--space-l)", display: "flex", alignItems: "center", gap: 10 }}>
+        <Bookmark size={28} /> Мои закладки
+      </h1>
+
+      {/* Tabs */}
+      <div style={{ display: "flex", gap: 4, marginBottom: "var(--space-l)", flexWrap: "wrap", borderBottom: "1px solid var(--color-border)", paddingBottom: "var(--space-s)" }}>
+        {TABS.map(t => {
+          const count = t.key === "all" ? list.length : list.filter((i: any) => i.entityType === t.key).length;
+          return (
+            <button key={t.key} onClick={() => setTab(t.key)} style={{
+              padding: "6px 14px", borderRadius: "var(--radius-full)", border: "none", cursor: "pointer",
+              background: tab === t.key ? "var(--color-accent)" : "transparent",
+              color: tab === t.key ? "white" : "var(--color-text-secondary)",
+              fontSize: "var(--text-xs)", fontWeight: 600,
+              display: "flex", alignItems: "center", gap: 4,
+            }}>
+              <t.icon size={13} />
+              {t.label}
+              {count > 0 && <span style={{ fontSize: 10, opacity: 0.7 }}>{count}</span>}
+            </button>
+          );
+        })}
       </div>
 
-      {list.length === 0 ? (
-        <div style={{ textAlign: "center", padding: 60, color: "var(--color-text-tertiary)" }}>
-          <Heart size={48} style={{ opacity: 0.3, marginBottom: 16 }} />
-          <div style={{ fontSize: "var(--text-m)", fontWeight: 700, marginBottom: 8 }}>Пока пусто</div>
-          <div style={{ fontSize: "var(--text-s)" }}>
-            Начните с <Link href="/glossary" style={{ color: "var(--color-accent)" }}>глоссария</Link> или <Link href="/patterns" style={{ color: "var(--color-accent)" }}>паттернов</Link>
-          </div>
+      {filtered.length === 0 ? (
+        <div style={{ textAlign: "center", padding: "var(--space-xl)", color: "var(--color-text-tertiary)" }}>
+          <div style={{ fontSize: 48, marginBottom: "var(--space-m)" }}>📑</div>
+          <p>{tab === "all" ? "У вас пока нет закладок." : "В этой категории пока нет закладок."}</p>
+          <p style={{ marginTop: "var(--space-s)", fontSize: "var(--text-xs)" }}>
+            Нажимайте ❤️ Сохранить на страницах блога, решений, навыков и глоссария.
+          </p>
         </div>
       ) : (
-        Object.entries(grouped).map(([type, typeItems]) => {
-          const Icon = TYPE_ICONS[type] || BookOpen;
-          return (
-            <div key={type} style={{ marginBottom: "var(--space-l)" }}>
-              <div style={{ fontSize: "var(--text-xs)", fontWeight: 800, color: "var(--color-text-tertiary)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "var(--space-s)", display: "flex", alignItems: "center", gap: 6 }}>
-                <Icon size={14} /> {TYPE_LABELS[type] || type} ({typeItems.length})
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                {typeItems.map((item: any) => (
-                  <div key={item.id} style={{
-                    display: "flex", alignItems: "center", gap: 12,
-                    padding: "10px 14px", background: "var(--color-bg-primary)",
-                    border: "1px solid var(--color-border-light)", borderRadius: 0,
-                  }}>
-                    <Link href={item.href} style={{ flex: 1, textDecoration: "none", color: "inherit" }}>
-                      <div style={{ fontWeight: 700, fontSize: "var(--text-s)", color: "var(--color-accent)" }}>{item.title}</div>
-                      {item.subtitle && <div style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>{item.subtitle}</div>}
-                    </Link>
-                    <button onClick={() => remove(item.entityType, item.entitySlug)}
-                      style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-tertiary)", padding: 4 }}>
-                      <Trash2 size={14} />
-                    </button>
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-s)" }}>
+          {filtered.map((item: any) => (
+            <div key={item.id} style={{ display: "flex", gap: "var(--space-m)", padding: "var(--space-m)", background: "var(--color-bg-primary)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)" }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <Link href={getLink(item)} style={{ textDecoration: "none", color: "inherit" }}>
+                  <div style={{ fontSize: 10, fontWeight: 600, color: "var(--color-accent)", textTransform: "uppercase", marginBottom: 2 }}>
+                    {TABS.find(t => t.key === item.entityType)?.label || item.entityType}
                   </div>
-                ))}
+                  <div style={{ fontWeight: 700, fontSize: "var(--text-s)", marginBottom: 4, lineHeight: 1.3 }}>{getTitle(item)}</div>
+                  <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.4 }}>{getMeta(item)}</div>
+                </Link>
               </div>
+              <button onClick={() => remove(item.entityType, item.entitySlug)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-tertiary)", padding: 4, alignSelf: "flex-start" }} title="Убрать из закладок">
+                <Trash2 size={14} />
+              </button>
             </div>
-          );
-        })
+          ))}
+        </div>
       )}
     </div>
   );

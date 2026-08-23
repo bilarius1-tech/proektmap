@@ -12,7 +12,10 @@ export default function BlogSettingsClient({ settings, stats }: any) {
     openrouterModel: settings.openrouterModel || "openai/gpt-4o-mini",
     deepseekModel: settings.deepseekModel || "deepseek-chat",
     autoPublishEnabled: !!settings.autoPublishEnabled,
-    autoPublishHour: settings.autoPublishHour || 9,
+    autoPublishHour: settings.autoPublishHour ?? 9,
+    autoPublishEveningHour: settings.autoPublishEveningHour || 20,
+    autoPublishItemsPerFeed: settings.autoPublishItemsPerFeed || 2,
+    autoPublishIntervalMin: settings.autoPublishIntervalMin || 45,
   });
   const [saving, setSaving] = useState(false);
 
@@ -32,8 +35,8 @@ export default function BlogSettingsClient({ settings, stats }: any) {
     setSaving(true);
     const res = await fetch("/api/blog/auto-publish", { method: "POST" });
     const data = await res.json();
-    const count = data.results?.filter((r: any) => r.status === "draft").length || 0;
-    alert(`📝 Создано ${count} черновиков`);
+    const started = data.collection?.started || data.collection?.scheduled;
+    alert(started ? "Сбор запущен в фоне. Отчёт придёт в Telegram." : `Сбор не стартовал: ${data.collection?.reason || "unknown"}`);
     router.refresh();
     setSaving(false);
   }
@@ -88,8 +91,8 @@ export default function BlogSettingsClient({ settings, stats }: any) {
               <label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>DeepSeek модель</label>
               <select value={form.deepseekModel} onChange={e => setForm({ ...form, deepseekModel: e.target.value })}
                 style={{ width: "100%", padding: "10px 12px", fontSize: "var(--text-s)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none" }}>
-                <option value="deepseek-chat">DeepSeek Chat (дешёвый)</option>
-                <option value="deepseek-reasoner">DeepSeek Reasoner (логика)</option>
+                <option value="deepseek-v4-flash">DeepSeek V4 Flash (рекомендуем)</option>
+                <option value="deepseek-chat">DeepSeek Chat (запасной)</option>
               </select>
             </div>
           </div>
@@ -99,7 +102,7 @@ export default function BlogSettingsClient({ settings, stats }: any) {
         <div style={{ padding: "var(--space-l)", background: "white", borderRadius: "var(--radius-l)", border: "1px solid var(--color-border)" }}>
           <h2 style={{ fontSize: "var(--text-l)", fontWeight: 700, marginBottom: "var(--space-m)" }}>⏱️ Авто-публикация</h2>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-m)", marginBottom: "var(--space-m)", alignItems: "end" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "var(--space-m)", marginBottom: "var(--space-m)", alignItems: "end" }}>
             <div>
               <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "var(--text-s)", fontWeight: 600 }}>
                 <input type="checkbox" checked={form.autoPublishEnabled} onChange={e => setForm({ ...form, autoPublishEnabled: e.target.checked })}
@@ -111,13 +114,37 @@ export default function BlogSettingsClient({ settings, stats }: any) {
               </div>
             </div>
             <div>
-              <label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Час запуска (0-23 МСК)</label>
+              <label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Утренний сбор (час МСК)</label>
               <input type="number" min={0} max={23} value={form.autoPublishHour} onChange={e => setForm({ ...form, autoPublishHour: parseInt(e.target.value) || 9 })}
                 style={{ width: "100%", padding: "10px 12px", fontSize: "var(--text-s)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none" }} />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: 'var(--text-xs)', fontWeight: 600, marginBottom: 4 }}>Вечерний сбор (час МСК)</label>
+              <input type='number' min={0} max={23} value={form.autoPublishEveningHour} onChange={e => setForm({ ...form, autoPublishEveningHour: parseInt(e.target.value) || 20 })}
+                style={{ width: '100%', padding: '10px 12px', fontSize: 'var(--text-s)', borderRadius: 'var(--radius-s)', border: '1px solid var(--color-border)', outline: 'none' }} />
+            </div>
+            <div>
+              <label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Статей с источника</label>
+              <input type="number" min={1} max={5} value={form.autoPublishItemsPerFeed} onChange={e => setForm({ ...form, autoPublishItemsPerFeed: parseInt(e.target.value) || 2 })}
+                style={{ width: "100%", padding: "10px 12px", fontSize: "var(--text-s)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none" }} />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: 'var(--text-xs)', fontWeight: 600, marginBottom: 4 }}>Интервал публикации (мин)</label>
+              <input type='number' min={15} max={240} value={form.autoPublishIntervalMin} onChange={e => setForm({ ...form, autoPublishIntervalMin: parseInt(e.target.value) || 45 })}
+                style={{ width: '100%', padding: '10px 12px', fontSize: 'var(--text-s)', borderRadius: 'var(--radius-s)', border: '1px solid var(--color-border)', outline: 'none' }} />
             </div>
           </div>
 
           <div style={{ display: "flex", gap: 8 }}>
+          <div style={{ padding: '12px 16px', borderRadius: 'var(--radius-m)', background: 'var(--color-bg-secondary)', border: '1px solid var(--color-border)', marginBottom: 'var(--space-m)', fontSize: 'var(--text-xs)', lineHeight: 1.7, color: 'var(--color-text-secondary)' }}>
+            <strong>Рекомендации по настройке:</strong><br/>
+            • Утренний и вечерний сбор разводят по времени — блог пополняется дважды в день.<br/>
+            • «Статей с источника» — сколько постов берём с каждого активного RSS-источника (1–2 оптимально, чтобы не спамить).<br/>
+            • Модель: deepseek-v4-flash. Reasoner для сбора не используем — он не успевает вернуть JSON.<br/>
+            • Сбор идёт по московскому времени. После каждого окна приходит короткий отчёт: очередь и сколько AI не успел.<br/>
+            • В публичный канал статьи не сыпятся: раз в неделю (пятница 18:00) уходит дайджест.<br/>
+            • «Интервал публикации» — статьи выходят на сайте по одной через N минут.
+          </div>
             <button onClick={triggerAutoPublish} disabled={saving}
               style={{ display: "flex", alignItems: "center", gap: 6, padding: "10px 20px", borderRadius: "var(--radius-m)", background: "var(--color-accent)", color: "white", border: "none", fontSize: "var(--text-s)", fontWeight: 600, cursor: "pointer" }}>
               <Play size={14} /> Запустить сбор сейчас

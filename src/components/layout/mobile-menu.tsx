@@ -3,6 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Menu, X, ChevronDown } from "lucide-react";
+import FavoritesIndicator from "./favorites-indicator";
+import ThemeToggle from "./theme-toggle";
+import KnowledgeButtons from "@/components/knowledge/knowledge-buttons";
 
 interface MenuItem {
   id: string; label: string; href: string; children?: MenuItem[];
@@ -18,19 +21,22 @@ export default function MobileMenu({ items }: { items: MenuItem[] }) {
 
   return (
     <>
-      {/* Hamburger button — visible only on mobile */}
-      <button onClick={() => setOpen(!open)} className="mobile-only" style={{
-        background: "none", border: "none", padding: 8, cursor: "pointer",
+      <button
+        onClick={() => setOpen(!open)}
+        className="mobile-only"
+        aria-label={open ? "Закрыть меню" : "Открыть меню"}
+        aria-expanded={open}
+        style={{
+        width: 48, height: 48, background: "none", border: "none", padding: 8, cursor: "pointer",
         color: "var(--color-text-primary)",
       }}>
         {open ? <X size={22} /> : <Menu size={22} />}
       </button>
 
-      {/* Overlay + Panel */}
       {open && (
         <>
           <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 98 }} onClick={() => setOpen(false)} />
-          <div style={{
+          <div className="mobile-menu-drawer" style={{
             position: "fixed", top: 0, left: 0, bottom: 0, width: 300, zIndex: 99,
             background: "var(--color-bg-primary)", boxShadow: "var(--shadow-l)", padding: "var(--space-xl) var(--space-m)",
             overflowY: "auto",
@@ -39,7 +45,7 @@ export default function MobileMenu({ items }: { items: MenuItem[] }) {
               <div style={{ fontSize: 18, fontWeight: 800 }}>
                 Proekt<span style={{ color: "var(--color-accent)" }}>Map</span>
               </div>
-              <button onClick={() => setOpen(false)} style={{ background: "none", border: "none", padding: 8, cursor: "pointer", color: "var(--color-text-tertiary)" }}>
+              <button aria-label="Закрыть меню" onClick={() => setOpen(false)} style={{ width: 48, height: 48, background: "none", border: "none", padding: 8, cursor: "pointer", color: "var(--color-text-tertiary)" }}>
                 <X size={20} />
               </button>
             </div>
@@ -71,6 +77,7 @@ export default function MobileMenu({ items }: { items: MenuItem[] }) {
                     </>
                   ) : (
                     <Link href={item.href} onClick={() => setOpen(false)}
+                      className={item.href === "/resheniya" ? "mobile-solutions-link" : undefined}
                       style={{ display: "block", padding: "12px", color: "var(--color-text-primary)", textDecoration: "none", fontSize: "var(--text-m)", fontWeight: 600 }}>
                       {item.label}
                     </Link>
@@ -78,12 +85,22 @@ export default function MobileMenu({ items }: { items: MenuItem[] }) {
                 </div>
               ))}
             </nav>
+
+            <div className="mobile-menu-actions">
+              <div className="mobile-menu-actions-title">Быстрые действия</div>
+              <KnowledgeButtons />
+              <div className="mobile-menu-action-row">
+                <FavoritesIndicator initialCount={0} />
+                <span>Избранное</span>
+              </div>
+              <div className="mobile-menu-action-row">
+                <ThemeToggle />
+                <span>Тема оформления</span>
+              </div>
+            </div>
           </div>
         </>
       )}
-
-      {/* Show hamburger on mobile */}
-
     </>
   );
 }

@@ -98,9 +98,9 @@ export default function GearAssistant({
   if (state === "hidden") return null;
 
   return (
-    <div style={{ position: "fixed", bottom: 20, right: 20, zIndex: 400 }}>
+    <div className="assistant-fab-root" style={{ position: "fixed", zIndex: 1000 }}>
       {showChat && (
-        <div style={{ position: "absolute", bottom: 80, right: 0, width: 340, maxHeight: 400, background: "white", borderRadius: "var(--radius-xl)", boxShadow: "0 8px 32px rgba(0,0,0,0.15)", border: "1px solid var(--color-border)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+        <div className="assistant-chat-panel" style={{ position: "absolute", bottom: 80, right: 0, width: 340, maxHeight: 400, background: "white", borderRadius: "var(--radius-xl)", boxShadow: "0 8px 32px rgba(0,0,0,0.15)", border: "1px solid var(--color-border)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", borderBottom: "1px solid var(--color-border-light)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, fontWeight: 700, fontSize: "var(--text-s)" }}>
               <GearIcon size={20} spinning={state === "thinking"} blinking={blinking} pupilOffset={pupilOffset} /> AI-помощник
@@ -121,7 +121,7 @@ export default function GearAssistant({
       )}
 
       {showBubble && message && !showChat && (
-        <div style={{ position: "absolute", bottom: 70, right: 10, maxWidth: 280, padding: "12px 16px", background: "white", borderRadius: "var(--radius-l)", boxShadow: "0 4px 20px rgba(0,0,0,0.1)", border: "1px solid var(--color-border)", fontSize: "var(--text-xs)", lineHeight: 1.5, cursor: "pointer" }} onClick={toggleChat}>
+        <div className="assistant-bubble" style={{ position: "absolute", bottom: 70, right: 10, maxWidth: 280, padding: "12px 16px", background: "white", borderRadius: "var(--radius-l)", boxShadow: "0 4px 20px rgba(0,0,0,0.1)", border: "1px solid var(--color-border)", fontSize: "var(--text-xs)", lineHeight: 1.5, cursor: "pointer" }} onClick={toggleChat}>
           {message}
           <div style={{ position: "absolute", bottom: -6, right: 20, width: 12, height: 12, background: "white", transform: "rotate(45deg)", borderRight: "1px solid var(--color-border)", borderBottom: "1px solid var(--color-border)" }} />
         </div>

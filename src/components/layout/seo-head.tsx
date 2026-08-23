@@ -15,9 +15,9 @@ export async function SeoHead() {
 
       {/* Open Graph */}
       <meta property="og:type" content="website" />
-      <meta property="og:site_name" content="Карта роста" />
-      <meta property="og:title" content="Карта роста — AI-инженерный навигатор" />
-      <meta property="og:description" content="Школа AI-инженеров. Научись создавать проекты с помощью AI. Готовые промпты и персональный AI-консультант." />
+      <meta property="og:site_name" content="ProektMap" />
+      <meta property="og:title" content="ProektMap — конструктор цифровых проектов с ИИ" />
+      <meta property="og:description" content="Создавайте сайты, Telegram-ботов, CRM-системы, SaaS с помощью ИИ. Готовые Blueprint, инструменты, решения и реальные кейсы." />
       <meta property="og:url" content={url} />
       <meta property="og:locale" content="ru_RU" />
       <meta property="og:image" content={`${url}/og-image.png`} />
@@ -26,34 +26,9 @@ export async function SeoHead() {
 
       {/* Twitter Card */}
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content="Карта роста — AI-инженерный навигатор" />
-      <meta name="twitter:description" content="Школа AI-инженеров. Научись создавать проекты с помощью AI." />
+      <meta name="twitter:title" content="ProektMap — конструктор цифровых проектов с ИИ" />
+      <meta name="twitter:description" content="Создавайте сайты, Telegram-ботов, CRM-системы, SaaS с помощью ИИ. Готовые Blueprint и реальные кейсы." />
       <meta name="twitter:image" content={`${url}/og-image.png`} />
-
-      {/* Schema.org JSON-LD */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "EducationalOrganization",
-            name: "Карта роста",
-            description: "Школа AI-инженеров. Инженерный навигатор с готовыми промптами.",
-            url: url,
-            founder: {
-              "@type": "Person",
-              name: "Тимофеев Алексей Геннадьевич",
-            },
-            knowsAbout: ["AI-инжиниринг", "Vibe Coding", "Next.js", "Веб-разработка"],
-            offers: {
-              "@type": "Offer",
-              price: "300",
-              priceCurrency: "RUB",
-              description: "Pro подписка на AI-консультанта",
-            },
-          }),
-        }}
-      />
     </>
   );
 }

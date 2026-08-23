@@ -2,8 +2,8 @@
 import ImagePicker from "@/components/media/image-picker";
 
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Plus, Edit, Trash2, Eye, Send, CheckCircle, XCircle, FileText, ChevronLeft, ChevronRight, User } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Plus, Edit, Trash2, Eye, Send, CheckCircle, XCircle, FileText, ChevronLeft, ChevronRight, User, MessageCircle, AlertCircle, Check } from "lucide-react";
 import dynamic from "next/dynamic";
 
 const RichEditor = dynamic(() => import("@/components/editor/rich-editor"), { ssr: false });
@@ -18,7 +18,6 @@ export default function BlogAdminClient({ posts, categories, authors, pendingCom
   const router = useRouter();
   const [items, setItems] = useState(posts);
   const [editId, setEditId] = useState<string | null>(null);
-  // Auto-open editor if editPostId is provided (via useEffect)
   useEffect(() => {
     if (editPostId && !editId) {
       const post = posts.find((p: any) => p.id === editPostId);
@@ -28,10 +27,44 @@ export default function BlogAdminClient({ posts, categories, authors, pendingCom
   const [search, setSearch] = useState("");
   const [saving, setSaving] = useState(false);
   const [tab, setTab] = useState<"posts" | "comments">("posts");
+  const [pendingList, setPendingList] = useState(pendingComments || []);
+  const [modLoading, setModLoading] = useState<string | null>(null);
+
+  // Toast notification
+  const [toast, setToast] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  function showToast(type: "success" | "error", message: string) {
+    setToast({ type, message });
+    setTimeout(() => setToast(null), 4000);
+  }
+
+  async function moderateComment(id: string, status: string) {
+    setModLoading(id);
+    await fetch(`/api/admin/blog/comments/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) });
+    setPendingList(pendingList.filter((c: any) => c.id !== id));
+    setModLoading(null);
+  }
+  async function deleteComment(id: string) {
+    if (!confirm("Удалить комментарий?")) return;
+    setModLoading(id);
+    await fetch(`/api/admin/blog/comments/${id}`, { method: "DELETE" });
+    setPendingList(pendingList.filter((c: any) => c.id !== id));
+    setModLoading(null);
+  }
 
   const empty = { title: "", slug: "", content: "", excerpt: "", coverImage: "", categoryId: "", tags: "", status: "draft", metaTitle: "", metaDesc: "" };
   const [form, setForm] = useState(empty);
   const totalPages = Math.ceil(total / perPage);
+
+  function makeSlug(title: string): string {
+    const ru: Record<string, string> = {а:'a',б:'b',в:'v',г:'g',д:'d',е:'e',ё:'yo',ж:'zh',з:'z',и:'i',й:'y',к:'k',л:'l',м:'m',н:'n',о:'o',п:'p',р:'r',с:'s',т:'t',у:'u',ф:'f',х:'h',ц:'ts',ч:'ch',ш:'sh',щ:'sch',ъ:'',ы:'y',ь:'',э:'e',ю:'yu',я:'ya'};
+    let slug = title.toLowerCase().trim();
+    slug = slug.split('').map(c => ru[c] || c).join('');
+    try { slug = decodeURIComponent(slug); } catch {}
+    slug = slug.replace(/[\s_,]+/g, '-');
+    slug = slug.replace(/[^a-z0-9\-]/g, '');
+    slug = slug.replace(/-+/g, '-').replace(/^-|-$/g, '');
+    return slug.slice(0, 70);
+  }
 
   function startEdit(p: any) {
     setEditId(p.id);
@@ -40,30 +73,47 @@ export default function BlogAdminClient({ posts, categories, authors, pendingCom
   function startNew() { setEditId("new"); setForm(empty); }
 
   async function save() {
+    if (!form.title.trim()) {
+      showToast("error", "Введите заголовок");
+      return;
+    }
     setSaving(true);
+    setToast(null);
+
     const url = editId === "new" ? "/api/admin/blog" : `/api/admin/blog/${editId}`;
     const method = editId === "new" ? "POST" : "PUT";
-    if (!form.slug) {
-      // ЧПУ генератор: транслит + очистка
-      const ru: Record<string, string> = {а:'a',б:'b',в:'v',г:'g',д:'d',е:'e',ё:'yo',ж:'zh',з:'z',и:'i',й:'y',к:'k',л:'l',м:'m',н:'n',о:'o',п:'p',р:'r',с:'s',т:'t',у:'u',ф:'f',х:'h',ц:'ts',ч:'ch',ш:'sh',щ:'sch',ъ:'',ы:'y',ь:'',э:'e',ю:'yu',я:'ya'};
-      let slug = form.title.toLowerCase().trim();
-      // Транслитерация кириллицы
-      slug = slug.split('').map(c => ru[c] || c).join('');
-      // Декодировать %XX
-      try { slug = decodeURIComponent(slug); } catch {}
-      // Заменить пробелы, подчёркивания, запятые на тире
-      slug = slug.replace(/[\s_,]+/g, '-');
-      // Удалить всё кроме a-z0-9 и тире
-      slug = slug.replace(/[^a-z0-9\-]/g, '');
-      // Убрать повторяющиеся тире
-      slug = slug.replace(/-+/g, '-').replace(/^-|-$/g, '');
-      // Обрезать до 70 символов + timestamp для уникальности
-      slug = slug.slice(0, 70) + '-' + Date.now().toString(36);
-      form.slug = slug || 'post-' + Date.now().toString(36);
+    const slug = form.slug || (makeSlug(form.title) + '-' + Date.now().toString(36));
+
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, slug }),
+      });
+
+      let data: any = {};
+      try {
+        const text = await res.text();
+        if (text) data = JSON.parse(text);
+      } catch {}
+
+      if (res.ok) {
+        showToast("success", editId === "new" ? "✅ Блог успешно создан" : "✅ Блог успешно обновлён");
+        setTimeout(() => {
+          setEditId(null);
+          setForm(empty);
+          setSaving(false);
+          router.refresh();
+        }, 800);
+      } else {
+        const errMsg = data?.error || data?.message || `Сервер вернул ${res.status} ${res.statusText}`;
+        showToast("error", errMsg);
+        setSaving(false);
+      }
+    } catch (e: any) {
+      showToast("error", e.message || "Не удалось сохранить");
+      setSaving(false);
     }
-    const res = await fetch(url, { method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(form) });
-    if (res.ok) { router.refresh(); setEditId(null); }
-    setSaving(false);
   }
 
   async function remove(id: string) {
@@ -89,12 +139,33 @@ export default function BlogAdminClient({ posts, categories, authors, pendingCom
   const filtered = search ? items.filter((i: any) => i.title.toLowerCase().includes(search.toLowerCase())) : items;
 
   return (
-    <div style={{ padding: "var(--space-xl)" }}>
+    <div style={{ padding: "var(--space-xl)", position: "relative" }}>
+      {/* Toast notification */}
+      {toast && (
+        <div style={{
+          position: "fixed", top: 72, right: 24, zIndex: 9999,
+          display: "flex", alignItems: "center", gap: 10,
+          padding: "14px 24px", borderRadius: "var(--radius-m)",
+          background: toast.type === "success" ? "#ecfdf5" : "#fef2f2",
+          border: `1px solid ${toast.type === "success" ? "#6ee7b7" : "#fca5a5"}`,
+          color: toast.type === "success" ? "#065f46" : "#991b1b",
+          boxShadow: "0 4px 24px rgba(0,0,0,0.12)",
+          fontSize: "var(--text-s)", fontWeight: 600,
+          animation: "slideIn 0.3s ease",
+        }}>
+          {toast.type === "success" ? <Check size={18} /> : <AlertCircle size={18} />}
+          {toast.message}
+          <button onClick={() => setToast(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "inherit", padding: 2, marginLeft: 8 }}>
+            <XCircle size={16} />
+          </button>
+        </div>
+      )}
+
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-l)", flexWrap: "wrap", gap: 12 }}>
         <div>
           <h1 style={{ fontSize: "var(--text-xxl)", fontWeight: 800 }}>📝 Блог</h1>
           <p style={{ color: "var(--color-text-tertiary)", fontSize: "var(--text-s)" }}>
-            {total} постов · {categories.length} категорий · {pendingComments} коммент. на модерации
+            {total} постов · {categories.length} категорий · {pendingList.length} коммент. на модерации
           </p>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
@@ -105,7 +176,7 @@ export default function BlogAdminClient({ posts, categories, authors, pendingCom
         </div>
       </div>
 
-      {/* Toolbar: search + author filter */}
+      {/* Toolbar */}
       <div style={{ display: "flex", gap: 8, marginBottom: "var(--space-l)", flexWrap: "wrap", alignItems: "center" }}>
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Поиск по заголовку..."
           style={{ padding: "8px 14px", fontSize: "var(--text-xs)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none", width: 220 }} />
@@ -132,10 +203,14 @@ export default function BlogAdminClient({ posts, categories, authors, pendingCom
           <h2 style={{ fontSize: "var(--text-xl)", fontWeight: 800, marginBottom: "var(--space-l)" }}>{editId === "new" ? "Новый пост" : "Редактирование"}</h2>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--space-m)", marginBottom: "var(--space-m)" }}>
             <div><label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Заголовок *</label>
-              <input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} style={{ width: "100%", padding: "10px 12px", fontSize: "var(--text-s)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none" }} /></div>
+              <input value={form.title} onChange={e => {
+                const newTitle = e.target.value;
+                const shouldUpdateSlug = editId === "new" || !form.slug || form.slug === makeSlug(form.title);
+                setForm({ ...form, title: newTitle, slug: shouldUpdateSlug ? makeSlug(newTitle) : form.slug });
+              }} style={{ width: "100%", padding: "10px 12px", fontSize: "var(--text-s)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none" }} /></div>
             <div><label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Slug</label>
               <div style={{ display: "flex", gap: 4 }}><input value={form.slug} onChange={e => setForm({ ...form, slug: e.target.value })} style={{ flex: 1, padding: "10px 12px", fontSize: "var(--text-xs)", fontFamily: "var(--font-mono)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none" }} />
-                <button onClick={() => setForm({ ...form, slug: form.title.toLowerCase().replace(/[^a-zа-я0-9]+/g, "-").slice(0, 80) })} style={{ padding: "8px 12px", borderRadius: "var(--radius-s)", background: "var(--color-bg-secondary)", border: "1px solid var(--color-border)", cursor: "pointer", fontSize: "var(--text-xs)" }}>🔗</button></div></div>
+                <button onClick={() => setForm({ ...form, slug: makeSlug(form.title) + '-' + Date.now().toString(36) })} style={{ padding: "8px 12px", borderRadius: "var(--radius-s)", background: "var(--color-bg-secondary)", border: "1px solid var(--color-border)", cursor: "pointer", fontSize: "var(--text-xs)" }}>🔗</button></div></div>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "var(--space-m)", marginBottom: "var(--space-m)" }}>
             <div><label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Категория</label>
@@ -159,16 +234,71 @@ export default function BlogAdminClient({ posts, categories, authors, pendingCom
             <textarea value={form.excerpt} onChange={e => setForm({ ...form, excerpt: e.target.value })} rows={2} style={{ width: "100%", padding: "10px 12px", fontSize: "var(--text-s)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none", resize: "vertical" }} /></div>
           <div style={{ marginBottom: "var(--space-m)" }}><label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Содержание</label>
             <RichEditor content={form.content} onChange={html => setForm({ ...form, content: html })} placeholder="Пишите статью..." /></div>
-          <div style={{ display: "flex", gap: 8 }}>
-            <button onClick={save} disabled={saving || !form.title} style={{ display: "flex", alignItems: "center", gap: 6, padding: "12px 24px", borderRadius: "var(--radius-m)", background: form.title ? "var(--color-accent)" : "var(--color-border)", color: "white", border: "none", fontSize: "var(--text-s)", fontWeight: 600, cursor: form.title ? "pointer" : "default" }}>
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <button onClick={save} disabled={saving || !form.title.trim()} style={{ display: "flex", alignItems: "center", gap: 6, padding: "12px 24px", borderRadius: "var(--radius-m)", background: form.title.trim() ? "var(--color-accent)" : "var(--color-border)", color: "white", border: "none", fontSize: "var(--text-s)", fontWeight: 600, cursor: form.title.trim() ? "pointer" : "default" }}>
               <Send size={14} /> {saving ? "Сохранение..." : "Сохранить"}</button>
-            <button onClick={() => setEditId(null)} style={{ padding: "12px 24px", borderRadius: "var(--radius-m)", background: "var(--color-bg-secondary)", border: "1px solid var(--color-border)", fontSize: "var(--text-s)", cursor: "pointer" }}>Отмена</button>
+            <button onClick={() => { setEditId(null); setForm(empty); }} style={{ padding: "12px 24px", borderRadius: "var(--radius-m)", background: "var(--color-bg-secondary)", border: "1px solid var(--color-border)", fontSize: "var(--text-s)", cursor: "pointer" }}>Отмена</button>
+            {saving && <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", marginLeft: 8 }}>Сохраняю...</span>}
           </div>
         </div>
       )}
 
+      {/* Tabs: posts / comments */}
+      <div style={{ display: "flex", gap: 0, marginBottom: "var(--space-l)", borderBottom: "2px solid var(--color-border)" }}>
+        <button onClick={() => setTab("posts")} style={{
+          padding: "10px 24px", border: "none", background: "none", cursor: "pointer",
+          fontSize: "var(--text-s)", fontWeight: tab === "posts" ? 700 : 500,
+          color: tab === "posts" ? "var(--color-accent)" : "var(--color-text-secondary)",
+          borderBottom: tab === "posts" ? "2px solid var(--color-accent)" : "2px solid transparent",
+          marginBottom: -2,
+        }}>📝 Посты</button>
+        <button onClick={() => setTab("comments")} style={{
+          padding: "10px 24px", border: "none", background: "none", cursor: "pointer",
+          fontSize: "var(--text-s)", fontWeight: tab === "comments" ? 700 : 500,
+          color: tab === "comments" ? "var(--color-accent)" : "var(--color-text-secondary)",
+          borderBottom: tab === "comments" ? "2px solid var(--color-accent)" : "2px solid transparent",
+          marginBottom: -2,
+          display: "flex", alignItems: "center", gap: 6,
+        }}>
+          <MessageCircle size={14} /> Комментарии
+          {pendingList.length > 0 && <span style={{ fontSize: 10, padding: "1px 6px", borderRadius: 99, background: "var(--color-error)", color: "white", fontWeight: 700 }}>{pendingList.length}</span>}
+        </button>
+      </div>
+
+      {/* Comments tab */}
+      {tab === "comments" && (
+        <div style={{ background: "var(--color-bg-primary)", borderRadius: "var(--radius-l)", border: "1px solid var(--color-border)" }}>
+          {pendingList.length === 0 ? (
+            <div style={{ padding: "var(--space-xl)", textAlign: "center", color: "var(--color-text-tertiary)", fontSize: "var(--text-s)" }}>
+              ✅ Нет комментариев на модерации
+            </div>
+          ) : (
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "var(--text-xs)" }}>
+              <thead><tr style={{ background: "var(--color-bg-secondary)", borderBottom: "1px solid var(--color-border)" }}>
+                {["Автор", "Комментарий", "К посту", "Дата", ""].map(h => <th key={h} style={{ padding: "10px 14px", textAlign: "left", fontWeight: 600, color: "var(--color-text-secondary)", whiteSpace: "nowrap" }}>{h}</th>)}
+              </tr></thead>
+              <tbody>
+                {pendingList.map((c: any) => (
+                  <tr key={c.id} style={{ borderBottom: "1px solid var(--color-border-light)" }}>
+                    <td style={{ padding: "10px 14px" }}><div style={{ fontWeight: 600 }}>{c.authorName}</div><div style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>{c.authorEmail}</div></td>
+                    <td style={{ padding: "10px 14px", maxWidth: 300 }}><div style={{ lineHeight: 1.5 }}>{c.content}</div></td>
+                    <td style={{ padding: "10px 14px" }}><a href={`/blog/${c.post?.slug}`} target="_blank" style={{ color: "var(--color-accent)", textDecoration: "none", fontSize: 11 }}>{c.post?.title?.slice(0, 40)}</a></td>
+                    <td style={{ padding: "10px 14px", color: "var(--color-text-tertiary)", whiteSpace: "nowrap", fontSize: 10 }}>{new Date(c.createdAt).toLocaleDateString("ru")}</td>
+                    <td style={{ padding: "10px 14px", whiteSpace: "nowrap" }}>
+                      <button onClick={() => moderateComment(c.id, "approved")} disabled={modLoading === c.id} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-accent)", padding: 4 }} title="Одобрить"><CheckCircle size={16} /></button>
+                      <button onClick={() => moderateComment(c.id, "rejected")} disabled={modLoading === c.id} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-tertiary)", padding: 4 }} title="Отклонить"><XCircle size={16} /></button>
+                      <button onClick={() => deleteComment(c.id)} disabled={modLoading === c.id} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-error)", padding: 4 }} title="Удалить"><Trash2 size={14} /></button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      )}
+
       {/* Posts table */}
-      <div style={{ background: "var(--color-bg-primary)", borderRadius: "var(--radius-l)", border: "1px solid var(--color-border)", overflow: "auto" }}>
+      {tab === "posts" && <div style={{ background: "var(--color-bg-primary)", borderRadius: "var(--radius-l)", border: "1px solid var(--color-border)", overflow: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "var(--text-xs)" }}>
           <thead><tr style={{ background: "var(--color-bg-secondary)", borderBottom: "1px solid var(--color-border)" }}>
             {["Заголовок", "Автор", "Категория", "Статус", "Дата", ""].map(h => <th key={h} style={{ padding: "10px 14px", textAlign: "left", fontWeight: 600, color: "var(--color-text-secondary)", whiteSpace: "nowrap" }}>{h}</th>)}
@@ -178,14 +308,11 @@ export default function BlogAdminClient({ posts, categories, authors, pendingCom
               const s = STATUS_MAP[p.status] || STATUS_MAP.draft;
               return (
                 <tr key={p.id} style={{ borderBottom: "1px solid var(--color-border-light)" }}>
-                  <td style={{ padding: "10px 14px" }}>
-                    <div style={{ fontWeight: 600, maxWidth: 300, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.title}</div>
-                    <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", fontFamily: "var(--font-mono)" }}>{p.slug?.slice(0, 40)}</div>
-                  </td>
+                  <td style={{ padding: "10px 14px" }}><div style={{ fontWeight: 600, maxWidth: 300, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.title}</div><div style={{ fontSize: 10, color: "var(--color-text-tertiary)", fontFamily: "var(--font-mono)" }}>{p.slug?.slice(0, 40)}</div></td>
                   <td style={{ padding: "10px 14px", fontSize: 11, color: "var(--color-text-secondary)" }}>{p.author?.name || "—"}</td>
                   <td style={{ padding: "10px 14px", color: "var(--color-text-secondary)" }}>{p.category?.name || "—"}</td>
                   <td style={{ padding: "10px 14px" }}><span style={{ padding: "2px 8px", borderRadius: 99, fontSize: 10, background: s.bg, color: s.color }}>{s.label}</span></td>
-                  <td style={{ padding: "10px 14px", color: "var(--color-text-tertiary)", whiteSpace: "nowrap" }}>{new Date(p.publishedAt || p.createdAt).toLocaleDateString("ru")}</td>
+                  <td style={{ padding: "10px 14px", color: "var(--color-text-tertiary", whiteSpace: "nowrap" }}>{new Date(p.publishedAt || p.createdAt).toLocaleDateString("ru")}</td>
                   <td style={{ padding: "10px 14px", whiteSpace: "nowrap" }}>
                     <button onClick={() => startEdit(p)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-text-secondary)", padding: 4 }}><Edit size={14} /></button>
                     <button onClick={() => remove(p.id)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--color-error)", padding: 4 }}><Trash2 size={14} /></button>
@@ -195,7 +322,7 @@ export default function BlogAdminClient({ posts, categories, authors, pendingCom
             })}
           </tbody>
         </table>
-      </div>
+      </div>}
 
       {/* Pagination */}
       {totalPages > 1 && (

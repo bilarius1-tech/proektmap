@@ -689,6 +689,17 @@
 - FlowView v2: узлы с текстом, прогресс-бары, цвета по статусу
 - Карта метро: клик → инфокарточка (не мгновенный переход)
 
+### Дополнение (вечер)
+
+**Динамическое меню Blueprint'ов**
+- BlueprintsMenu: серверный компонент — авто-список из БД (always fresh)
+- BlueprintsDropdown: клиентский дропдаун с иконками, сложностью, гридом 2 колонки
+- Header: динамическое меню вместо ручных MenuItem — новые Blueprint'ы появляются автоматически
+- MobileMenu: секция Blueprints в мобильной версии
+- POST API: исправлен — coverImage, goal, timeToComplete, targetAudience сохраняются
+- Форма: поле targetAudience (Для кого)
+- Удалены 7 ручных ссылок из menu_items
+
 ### План на завтра
 - 📱 mobile-app Blueprint
 - 💳 Интеграция ЮKassa webhook
@@ -1036,8 +1047,769 @@ dfeb819f Prompts v3
 - Навыки засижены для 8+ типов решений
 - React #310 в AI-кнопках исправлен
 
+### Дополнение (вечер)
+
+**Динамическое меню Blueprint'ов**
+- BlueprintsMenu: серверный компонент — авто-список из БД (always fresh)
+- BlueprintsDropdown: клиентский дропдаун с иконками, сложностью, гридом 2 колонки
+- Header: динамическое меню вместо ручных MenuItem — новые Blueprint'ы появляются автоматически
+- MobileMenu: секция Blueprints в мобильной версии
+- POST API: исправлен — coverImage, goal, timeToComplete, targetAudience сохраняются
+- Форма: поле targetAudience (Для кого)
+- Удалены 7 ручных ссылок из menu_items
+
 ### План на завтра
 - SOLUTIONS-LIBRARY.md — Архитектор → коллективная база решений
+
+
+---
+
+## 02.08.2026
+
+### Что сделано
+
+**4 новых Blueprint'а**
+- **CRM-система** (company-crm): 8 этапов — клиенты, канбан-воронка (drag-and-drop), задачи с дедлайнами, Telegram-уведомления, авторизация, дашборд. Стек: Next.js + Prisma + PostgreSQL.
+- **AI-ассистент** (ai-assistant): 7 этапов — потоковый чат (Vercel AI SDK + OpenRouter), RAG-поиск по PDF (pgvector), контекстная память, суммаризация диалогов, лимиты токенов. Стек: Next.js + OpenAI/Claude + pgvector.
+- **Интернет-магазин** (online-store): 8 этапов — каталог с фильтрами, корзина, ЮKassa-платежи, личный кабинет, SEO (Schema.org Product), Telegram-уведомления. Стек: Next.js + Prisma + ЮKassa.
+- **Маркетплейс** (marketplace): 8 этапов — продавцы + покупатели, онбординг, комиссии платформы, выплаты продавцам, рейтинги, модерация. Стек: Next.js + Prisma + ЮKassa.
+
+**Итого:** 31 этап, 31 решение с AI-промптами, чек-листами и артефактами. Все опубликованы.
+
+**Сидер**
+- seed-new-blueprints.ts: 113 KB, 4 асинхронные функции, идемпотентность (проверка на существование)
+- Покрыты уровни 1-2 из Roadmap Blueprint: CRM, AI-ассистент, Интернет-магазин, Маркетплейс
+
+**Статистика проекта**
+- 9 Blueprint'ов всего: 5 старых + 4 новых
+- Всего в каталоге: SaaS, Игра, Корп.сайт, Компания+каталог, Telegram Бот, CRM, AI-ассистент, Интернет-магазин, Маркетплейс
+- Общий XP пул: ~4000+ XP
+
+### Дополнение (вечер)
+
+**Динамическое меню Blueprint'ов**
+- BlueprintsMenu: серверный компонент — авто-список из БД (always fresh)
+- BlueprintsDropdown: клиентский дропдаун с иконками, сложностью, гридом 2 колонки
+- Header: динамическое меню вместо ручных MenuItem — новые Blueprint'ы появляются автоматически
+- MobileMenu: секция Blueprints в мобильной версии
+- POST API: исправлен — coverImage, goal, timeToComplete, targetAudience сохраняются
+- Форма: поле targetAudience (Для кого)
+- Удалены 7 ручных ссылок из menu_items
+
+### План на завтра
+- Blueprint AI SEO-аудитор (уровень 2)
+- Blueprint AI Engineering (MCP, Agent, RAG, Multi-Agent, Knowledge Graph)
+- SEO-оптимизация новых Blueprint-лендингов
+
+
+
+---
+
+## 02.08.2026 (вечер) — Content Hub v1
+
+### Проблема
+Инструменты, Карта пути и Песочница — три раздела в полной изоляции. 6 сущностей создавались вручную без связей.
+
+### Решение: ProektMap Content Hub
+
+**Фаза 1 — Динамическая Песочница**
+- Секция «Новое на платформе»: Blueprint'ы, Инструменты, Паттерны из БД
+
+**Фаза 2 — Авто-связи Blueprint ↔ Инструменты**
+- Graph API: типы blueprint и aitool + keyword fallback
+- auto-link API: POST /api/admin/auto-link
+- RelatedToolsBlock / RelatedBlueprintsBlock на страницах
+- 16 авто-связей создано
+
+**Фаза 3 — Auto-link API**
+- API создан, сервер нестабилен (цикл рестартов PM2)
+
+### Коммиты
+- c060a297 feat: Content Hub — авто-связи Blueprint↔Tools + живая Песочница
+
+
+---
+
+## 03.08.2026 — SEO и переименование разделов
+
+### Анализ конкурента (ai-manual.ru)
+- Сильная сторона: понятное позиционирование (Новости/Гайды/Промпты/Инструменты)
+- Слабая сторона: только информация, нет навигатора действий
+- Стратегия ProektMap: не контент-библиотека, а «Google Maps для бизнеса»
+
+### Сделано
+**Переименование разделов меню**
+- 🗺️ Карта роста → **Готовые проекты**
+- 🛠️ Инструменты → **Инструменты** (убрали emoji)
+- Принцип: снаружи человеческий язык, внутри технический
+
+**3 SEO-лендинга (контент-воронка)**
+- /kak-sozdat-internet-magazin → Blueprint «Интернет-магазин»
+- /kak-sozdat-crm → Blueprint «CRM-система»
+- /kak-sozdat-telegram-bota → Blueprint «Telegram Бот»
+- Каждая страница: пошаговый план, CTA на Blueprint, инструменты, OG-метаданные
+
+**Безопасность**
+- Middleware: /admin защищён — только role=admin
+- Без токена → редирект на /auth, без роли → 403
+
+**Главная страница**
+- Новый виджет «Новые Blueprint'ы» под блоком постов
+
+### Решения
+- Blueprint не заменять в URL/коде — только в пользовательских ярлыках
+- Админку для SEO-страниц пока не делать — протестировать трафик 2-4 недели
+
+### Коммиты
+- 17b23025 security: middleware admin protection + homepage Blueprint widget
+- 3b66d2df feat: переименование меню + 3 SEO-лендинга
+
+---
+
+## 03.08.2026 (вечер) — 2 Blueprint'а + фикс парсера
+
+### Сделано
+**2 новых Blueprint'а (особый подход, 10 этапов каждый)**
+- AI-конструктор сайтов (ai-website-builder): 950 XP. AI SDK + Sandpack + CodeMirror + OpenRouter
+- Конструктор сайтов (site-builder): 1050 XP. На базе nordic-builder.ru, 15+ блоков, dnd-kit, GigaChat
+
+**Починка парсера блогов**
+- Проблема: cron не мог авторизоваться (curl без кук → 403)
+- Фикс: CRON_SECRET токен в .env + bypass в API
+- Добавлено 3 новых источника: Habr (ru), Tproger (ru), dev.to (en)
+- Reddit отключён (постоянный 403)
+- 6 активных источников, ~12 постов/день с AI-переводом
+
+### Коммиты дня (15 шт)
+39d027f7 fix: cron parser auth
+7c7a23a8 feat: 3 новых RSS-источника
+1fbfcaeb docs: DEVLOG
+3b66d2df feat: переименование меню + SEO-лендинги
+17b23025 security: middleware admin protection
+b746e578 feat: Все → в дропдаунах
+79a549f2 fix: информер, emoji
+23d5d9f2 fix: меню и информер
+98b3e116 feat: Blueprints в menu_items
+b1140ed5 feat: /admin/menu Blueprint'ы
+4525b90d fix: кнопка ✏️ Ред.
+1a1b0d71 feat: авто-связи + матчинг
+d8e572aa fix: page.tsx + билд
+07ada0a5 docs: DEVLOG Content Hub
+3aabebca feat: 2 Blueprint — AI-конструктор + Конструктор
+
+### Статистика проекта
+- 11 Blueprint'ов всего
+- 6 RSS-источников (2 на русском)
+- Меню: единое управление через /admin/menu
+- Админка: middleware защита
+- SEO: 3 лендинга + виджет на главной
+
+---
+
+## 03.08.2026 (вечер) — Пользователи, биллинг, модерация, соцсеть
+
+### Сделано
+**Биллинг и платежи**
+- Модели Subscription (plan, status, expiresAt, autoRenew) и Payment (amount, currency, status, method)
+- Админка /admin/billing: статистика, toggle Pro, ручные платежи
+- ЮKassa webhook: создаёт Payment + Subscription записи
+
+**Пользователи и соцсеть**
+- Яндекс OAuth: вход через Яндекс ID, авто-создание User
+- Авто-аватары: /api/avatar?name=... (SVG из инициалов, 10 цветов)
+- Публичные профили: /profile/[id] (XP, проекты, навыки, подписка)
+- Верификация email: /api/auth/verify + страница /verify
+- Специалисты: /specialists (рейтинг XP + статьи×50), кнопка «Стать специалистом»
+- Дашборд: кнопки «Стать специалистом», «Написать статью», «Создать проект»
+
+**Админ-дашборд**
+- График новых пользователей (7 дней)
+- Карточки: пользователи, Blueprint'ы, посты, выручка, инструменты
+- Быстрые действия и последние посты
+- Модерация комментариев: /admin/blog/comments (одобрить/отклонить/удалить)
+- Контент-статистика
+
+**Российский AI**
+- Каталог из 45 проектов в 8 категориях
+- Поиск, фильтры (API, OSS, Free), детальные страницы
+- Перекрёстные ссылки /russian-ai ↔ /russian-ai-stack
+
+### Коммиты за день: 20+
+- 17b23025 security: middleware admin protection
+- 3b66d2df feat: переименование меню + SEO-лендинги
+- 7c7a23a8 feat: 3 новых RSS-источника
+- 08c16c74 feat: биллинг — Subscription/Payment
+- 260d0025 feat: ЮKassa + верификация + профили
+- dd9dacee feat: авто-аватары + кнопки в дашборде
+- 8fdddf2a feat: админ-дашборд с графиками
+- 625b28ec feat: модерация комментариев
+- 63d5c388 fix: comment API syntax
+
+---
+
+## 03.08.2026 (ночь) — Граф связей + 3D-вселенная
+
+### Сделано
+**Граф связей (/graph)**
+- React Force Graph 2D: физика узлов, drag, zoom
+- Данные из /api/graph/full: Blueprint'ы + Инструменты + РФ AI + Relation
+- Клик по узлу → карточка с ссылкой
+
+**3D-вселенная (/universe)**
+- THREE.js: 2000 звёзд, спиральная галактика
+- Орбитальные кольца Blueprint'ов с пульсацией
+- Hover: узел увеличивается ×1.8, свечение, тултип
+- Zoom: скролл 8–90
+- Клик → карточка с кнопкой «Открыть Blueprint»
+- Плавная орбитальная камера
+
+**Стратегический план**
+- docs/UNIVERSE_PLAN.md: дорожная карта v1→v4
+- v2.0: AI-генерация вселенной из описания бизнеса
+- v3.0: City / Corporation режимы
+- 🏆 Демка: «Опиши бизнес → смотри как рождается вселенная»
+
+### Коммиты
+- 5bf0df46 feat: граф связей 2D + 3D-вселенная
+- d3246769 fix: /universe — hover, zoom, анимации
+- 3031a999 docs: UNIVERSE_PLAN v1→v4
+
+### Коммиты
+- 108dd1a0 docs: DEVLOG 04.08.2026
+- db6b8228 feat: CI/CD pipeline + daily DB backup
+
+### Итого за день: 24 коммита
+
+---
+
+## 04.08.2026 — День: Критические фиксы + Tailwind-миграция
+
+### Сделано
+- [A] AGENTS.md: удалены учётные данные админа (строка 67 → заглушка)
+- [B] Пустые Blueprint'ы: подтверждено — 11 активных, пустые скрыты
+- [C] Тестирование: vitest + @testing-library/react + jsdom
+  - 8 тестов: 3 smoke (vitest/jsdom/React) + 5 API (/, /blueprints, /auth, /blog, /glossary)
+  - npm test / npm run test:watch — работают
+- [D] Tailwind-миграция: @theme в globals.css + 7 компонентов переписаны
+  - layout.tsx (body flex → Tailwind)
+  - streak-banner.tsx (100% Tailwind)
+  - theme-toggle.tsx (100% Tailwind)
+  - favorites-indicator.tsx (100% Tailwind)
+  - cookie-consent.tsx (80% Tailwind)
+  - footer.tsx (100% Tailwind, 21 style= → 0)
+  - global-search.tsx (100% Tailwind, 27 style= → 0)
+- docs/ANALYSIS-2026.md: полный анализ проекта (293 строки)
+- Правило SSH: использовать bash напрямую, не через PowerShell (ломает спецсимволы)
+
+### Стратегия Tailwind
+- Статические токены (spacing, шрифты, радиусы) → @theme
+- Динамические цвета → text-accent/bg-bg-primary через @theme vars
+- Layout → flex/grid утилиты Tailwind
+- boxShadow → пока inline (Tailwind 4 compat)
+
+### Коммиты
+- ee811028 fix: remove admin creds, add vitest tests, add analysis doc
+- 6e0d0857 refactor: migrate layout components to Tailwind (Part 1)
+- 823a8d0b refactor: migrate footer + global-search to Tailwind (Part 2)
+
+### Коммиты
+- 108dd1a0 docs: DEVLOG 04.08.2026
+- db6b8228 feat: CI/CD pipeline + daily DB backup
+
+### Итого за день: 5 коммитов
+
+---
+
+## 04.08.2026 — День (продолжение): Blueprint Depth + Автоматизация + UX
+
+### Сделано
+
+**Blueprint Depth Plan (4 шага):**
+- [x] Шаг 1: Бриф на выходе — API /api/projects/[id]/brief + страница + PDF/MD экспорт
+- [x] Шаг 2: UI 12 полей — редактор Decision с 3 уровнями глубины + индикатор X/12
+- [x] Шаг 3: Чек-лист качества — 20 критериев в админке (авто + ручные)
+- [x] Шаг 4: Граф связей — ReactFlow DecisionGraph с цветными стрелками
+
+**Автоматизация блога:**
+- Починен 504 Gateway Timeout (proxy_read_timeout 300s)
+- Cron: ежедневный автопостинг в 9:00 МСК
+- Wrapper-скрипт с lock-файлом, валидацией, ротацией логов
+- SEO-промпт: H2-структура, мета-описания, 300-500 слов, ключевые слова
+- 147 AI-постов сгенерировано
+
+**UX Blueprint:**
+- Progress fix: capped at 100% (Math.min)
+- Sticky header: проект + прогресс + текущий этап всегда на виду
+- План геймификации (Tech Tree) — прототип создан, откачен для доработки
+
+**Инфраструктура:**
+- CI/CD: GitHub Actions (build + test на push)
+- Автобэкап БД: cron daily 3:00, Docker pg_dump, 7 дней хранения
+- Nginx: proxy_read_timeout 300s
+
+### Коммиты
+- 22d2f02c feat: Project Brief — full decision summary with PDF export
+- c2aa05e5 feat: 12-field Decision editor with completeness tracker
+- cbe3cb5b feat: 20-point Blueprint quality checklist in admin
+- 7a0593c9 feat: Decision Graph — visual dependency map
+- 42d2671c fix: PDF Cyrillic — replace jsPDF with window.print()
+- b46e6a44 fix: Blueprint UX — sticky header + capped progress
+- 9fe06bca revert: remove Tech Tree gamification
+
+### Итого за день: 15 коммитов (с 04.08 утра)
+
+## 05.08.2026 — День: Design System Guide в Песочнице
+
+### Сделано
+- Новая страница: /sandbox/design-system — полный гайд по дизайн-системам
+- 11 разделов: от Atomic Design до AI-промптов
+- Раздел «Уникальность»: 6 приёмов как не делать клонов
+- Меню: пункт «🎨 Дизайн-система» в выпадающем списке Песочницы
+- Связь с Blueprint: решение «Дизайн-система» ссылается на гайд
+- Контент: токены, компоненты, Figma, Storybook, Style Dictionary, shadcn/ui
+
+### Коммиты
+- c7453c7b feat: Design System guide in Sandbox
+- 1aee4f41 feat: Design System guide — add Uniqueness section
+
+### Итого: 2 коммита
+
+## 11.08.2026 — День: Skills Library — запуск экосистемы
+
+### Сделано
+
+#### Skills Library — инфраструктура
+- Страница /skills — витрина публичных Skills (334 строки)
+- Два типа Skills: Reasonix (для AI-агентов) и Prisma (для людей)
+- Блок «Мост между мирами» — связь Prisma ↔ Reasonix
+- Ссылка в футере «Skills» в колонке «Проект»
+
+#### Система доверия 🟢🟡🔴
+- Трёхуровневая система проверки Skills
+- 🟢 Проверен ProektMap (ручная проверка, нет доступа к secrets, протестирован)
+- 🟡 Community (новый Skill, код открыт, ждёт проверки)
+- 🔴 Не рекомендуется (подозрительный код, обфускация)
+- Процесс: автоматическая → ручная → community → периодическая
+- TrustBadge на каждой карточке Skill
+- Блок «Система доверия» на /skills с критериями
+
+#### Skills — контент
+- visual-content (252 строки, ✅ verified) — методология визуального контента
+- yookassa-checkout (361 строка, ✅ verified) — образцовый Skill: архитектура → API → webhook → Prisma → тесты → деплой
+- 4 planned Skills: blueprint-builder, decision-coach, seo-analyzer, knowledge-clipper
+
+#### Документация
+- docs/SKILLS-LIBRARY-PLAN.md (150 строк) — 3 фазы: Ядро → Публикация → Экосистема
+- PHILOSOPHY.md: Skills — пятый столп экосистемы
+- AGENTS.md: Visual Content + Trust System + yookassa-checkout
+
+#### Инфраструктура
+- .reasonix/skills/visual-content/SKILL.md — локально и на сервере
+- .reasonix/skills/yookassa-checkout/SKILL.md — локально и на сервере
+
+### Ключевые решения
+- ProektMap = навигатор по проверенным Skills, а не океан как skills.sh
+- Фокус: российский стек, русский язык, безопасность
+- Бесплатные Skills → трафик → ProektMap → Pro-подписка
+- 10 образцовых Skills вместо 1000 некачественных
+- Система доверия как конкурентное преимущество (91.8% Skills в skills.sh — с дефектами)
+
+### Коммиты
+- 7f742730 feat: Skills Library — экосистема проверенных AI-навыков (9 файлов, +1520/-126)
+
+### Итого за день: 1 крупный коммит, 2 новых Skills, страница /skills, система доверия, документация
+
+---
+
+## 11.08.2026 (вечер) — Глубокий анализ + план спринта
+
+### Сделано
+
+#### Анализ проекта
+- Глубокий аудит визуальной части: сильные стороны (Graph, Sandbox, Quiz) vs слабые (AI-шаблон, emoji, двойной бренд)
+- Анализ перспектив для российского пользователя: ЮKassa, Telegram, AI без VPN, окно «куратор Skills на русском»
+- Разбор Skills Library: 2 shipped, gaps vs skills.sh, риски trust theater
+- Canvas-отчёт: `canvases/proektmap-deep-analysis.canvas.tsx` (локально в Cursor)
+
+#### Стратегические решения
+- Отход от AI-дизайна → направление **«Картографический минимализм»**
+- Референсы: `/demo/swiss` + `/sandbox` (типографика, radius 0, Swiss-grid)
+- Фирменный знак: `Карта роста.` с точкой
+- Спринт 12–25 августа: главная + decision-coach + Skills на главной
+
+#### Документация
+- `docs/SPRINT-2026-08-12.md` — план спринта на 2 недели (14 дней, критерии готовности)
+
+### Ключевые решения
+- Не гнаться за количеством Skills — 8–10 образцовых RU Skills
+- Главная: с 10+ секций до 6, убрать blobs/pills/emoji
+- Следующий шаг: DESIGN-DIRECTION.md + рефактор hero главной
+
+### Коммиты
+- (этот коммит) docs: глубокий анализ, план спринта «Картографический минимализм»
+
+### Итого за вечер: анализ, стратегия, план спринта. Код не менялся — старт завтра.
+
+---
+
+## 14.08.2026 — Telegram-бот ProektMap + Visual OG Engine + авто-сбор + визуал блога
+
+### Сделано
+
+#### Telegram-бот @proektmap_bot (полный цикл)
+- ТЗ: `docs/TZ-TELEGRAM-BOT.md` — 3 фазы, архитектура, критерии готовности, решения
+- **Фаза 1 (MVP):** постинг блога по RSS (опрос каждые 3 мин), еженедельная выжимка (DeepSeek, понедельник 10:00 MSK)
+- **Фаза 2 (интерактив):** `/ask` (AI-консультант + лимит 20/день), `/decide` (decision-coach, диалог 5 шагов), навигатор `/blueprint` `/tool` `/term` `/search`, `/quiz` (вопрос дня, inline-кнопки)
+- **Фаза 3:** постинг новых разделов (Blueprint / инструмент / паттерн по публичным API)
+- **Дайджест:** одна сводка вместо «скопа» отдельных постов при массовой публикации
+- 2 канала: `@proektmap` + `@avito_dizain`
+- Фикс: baseline RSS записывается только при первом запуске (раньше рестарт «проглатывал» новые посты)
+- Деплой: отдельный PM2-процесс `proektmap-bot` (grammy + TypeScript + node-cron), меню команд в Telegram
+
+#### Авто-сбор блога
+- +7 источников «Авито + AI»: Google News Avito, Habr Авито, Habr e-commerce, Habr дизайн, Habr ML, Google News нейросети, DTF → всего 14 источников
+- Расписание публикации: 06:00 + 20:00 (cron)
+- Настройка «статей на источник» (`autoPublishItemsPerFeed`) в админке блога
+
+#### Visual OG Engine (SVG)
+- `src/lib/og/`: генерация уникальных обложек из title/category/tags
+- 4 композиционных алгоритма (сетка / диагональ / граф / минимализм), 12 Lucide-иконок, цветовые токены по 14 категориям
+- Расширяемая архитектура `ImageProvider` (svg-og + rss-thumbnail + resolveCover) — Kandinsky/Flux подключаются без переделки блога
+- Растеризация SVG→PNG через sharp, шрифт Inter (variable, кириллица)
+- Режим `mode=thumb` (миниатюра без текста)
+
+#### Блог (визуал)
+- Список: 2-колоночная сетка карточек с крупными миниатюрами (thumb, 16:9)
+- Запись: hero-обложка (полноширинная) над заголовком
+
+### Ключевые решения
+- Бот = dogfooding якорного продукта «Telegram Bot MAX» — живое доказательство того, чему учит ProektMap
+- Дайджест вместо отдельных постов — защита каналов от «скопа»
+- Разделение одной OG-картинки на два назначения: full (соцпревью, с текстом) + thumb (карточки, без текста)
+- ImageProvider как точка расширения для будущих AI-генераторов обложек
+
+### Коммиты (9)
+- 438b649d feat: Telegram-бот ProektMap — Фаза 1 (постинг + выжимка)
+- 240894e4 feat: Telegram-бот — Фаза 2 (AI-консультант, decision-coach, навигатор, квиз)
+- 243bbc99 fix: RSS-постинг — baseline только при первом запуске
+- 7b32748a feat: Telegram-бот — Фаза 3 (постинг разделов) + RSS-опрос 3 мин
+- 0470660a feat: настройка autoPublishItemsPerFeed в авто-сборе
+- 66cf39ef feat: Telegram-бот — дайджест новых статей
+- 9291d588 feat: Visual OG Engine (SVG) + ImageProvider + RSS thumbnail
+- b40762d0 feat: OG-движок — шрифт Inter (variable, кириллица)
+- 789781c6 feat: блог — крупные картинки (thumb, 2-колонка, hero)
+
+### Итого за день: 9 коммитов — Telegram-бот (полный цикл, Фазы 1–3), 14 источников авто-сбора, SVG OG-движок с расширяемым ImageProvider, визуал блога.
+
+---
+
+## 14.08.2026 (вечер) — Обложки блога + AI-LAND MVP → заморозка
+
+### Сделано
+
+#### Блог — обложки с читаемой сутью
+- Режим `/api/og?mode=card`: категория + заголовок + краткая суть (excerpt)
+- Одна обложка для ленты блога, Open Graph и Telegram
+- Бот постит фото с enclosure из RSS (не случайное link-preview)
+- Hero внутри статьи не трогали
+- Коммит: `e3d6515d`
+
+#### AI-LAND (игровой квест для детей) — MVP L1
+- Phaser 4.2.1 в Next.js: `/quest/ai-land`
+- Сцена AI Forest: игрок, робот Роби, мост, Arcade Physics
+- Диалог + конструктор prompt из 5 карточек (RU)
+- XP 120, бейдж «Штурман ИИ», localStorage, финальный экран
+- ТЗ: `docs/TZ-AI-LAND.md`, локали: `locales/ru/ai-land/`
+
+### Ключевые решения
+- **AI-LAND ЗАМОРОЖЕН:** движок и вертикальный срез есть, но ребёнок 12 лет ещё не получает полную логику «что такое ИИ → инструменты → как работать»
+- Полная образовательная карта (6 уровней) отложена; идею будем **применять в Blueprint'ах** (AI literacy / Decision-Driven)
+- Спринт «Картографический минимализм» по-прежнему на паузе
+
+### Коммиты
+- e3d6515d feat: обложки блога — режим card с читаемой сутью для ленты и Telegram
+- (этот) feat: AI-LAND MVP на Phaser 4 + заморозка; DEVLOG day close
+
+### Итого за вечер: обложки на проде, AI-LAND MVP заморожен с сохранением кода и ТЗ. День закрыт.
+
+---
+
+## 14.08.2026 (поздний вечер) — Педагогический каркас AI Explorer (без кода)
+
+### Сделано
+- Документ `docs/AI-EXPLORER-CURRICULUM.md`:
+  - цикл навыка (проблема → проба → объяснение → применение → награда)
+  - лестница уроков 1–7 → 🏆 AI Explorer
+  - полный сценарий Урока 1 «Разбуди робота» (8–9 лет, 8–10 мин, робот БИТ)
+  - принцип: история = движок, Phaser = витрина
+  - связь с Blueprint «AI Explorer»
+- Обновлена ссылка в `docs/TZ-AI-LAND.md`
+- Код не трогали — реализация Урока 1 не раньше 15.08.2026
+
+---
+
+## 14.08.2026 (ночь) — SEO-конвейер блога + обложки + глоссарий + ориентир графа знаний
+
+### Сделано
+
+#### Auto-publish → SEO-конвейер (не рерайт)
+- Новость = источник фактов; статья = ответ на поисковый интент
+- Типы: News / Explainer / Practical
+- Ключи из `SiteSettings.seoKeywords`, JSON-ответ DeepSeek
+- Whitelist внутренних ссылок (tools, glossary, blueprints, solutions, skills, patterns, blog)
+- FAQ, Title/Description/H1, deterministic SEO Score
+- Если score &lt; 80 → один retry; если снова &lt; 80 → **не публикуем** (`seo_rejected`)
+- Файлы: `src/lib/blog/seo-pipeline.ts`, `src/app/api/blog/auto-publish/route.ts`
+
+#### Обложки
+- Ручная обложка админа = одна для списка, статьи, OG и RSS (`blogCoverUrl`)
+- Векторная card — только fallback
+
+#### Глоссарий × блог
+- Первое вхождение термина → ссылка + пояснение при наведении
+- Не трогаем code/заголовки/уже существующие ссылки
+- `src/lib/blog/link-glossary.ts` + ContentHtml tooltip
+
+#### Ориентир развития
+- `docs/KNOWLEDGE-GRAPH-BLOG.md` — блог как архитектор базы знаний
+- Knowledge Value, типы NEWS/ENTITY/GUIDE/BLUEPRINT, приоритеты 40/30/20/10
+- Правило: публиковать только новую сущность / новый интент / усиление кластера
+
+### Ключевые решения
+- Текущий SEO Score — шаг 1; Knowledge Value и авто-обновление сущностей — следующий этап
+- Блог должен наращивать граф ProektMap, а не конкурировать с источниками новостей
+
+### Итого за ночь: SEO-конвейер на проде, обложки синхронизированы, глоссарий в статьях, ориентир записан. День закрыт. До завтра.
+
+## 15.08.2026 — Авто-публикация: очередь + drip + смягчение SEO
+
+### Сделано
+- Авто-публикация переведена на асинхронный запуск: эндпоинт отвечает сразу, сбор идёт в фоне с атомарной блокировкой (autoPublishRunning)
+- Расписание 2 сборов (утро/вечер) управляется из админки; cron переведён на */15
+- Модель → deepseek-v4-flash (deepseek-reasoner отдаёт пустой content — рассуждения съедают все токены)
+- Логическая очередь публикации: сбор кладёт статьи в status=queued, drip публикует по одной через интервал (autoPublishIntervalMin, 45 мин)
+- Telegram-отчёт после сбора («собрано N в очередь»)
+- SEO-конвейер смягчён: порог 80→70, внутренние ссылки ≥1, объём 450–1800 слов
+- Фикс обложек: расширение из content-type, отсев мелких thumbnail (<10KB)
+
+### Ключевые решения
+- Двухфазная схема «сбор → drip» вместо публикации скопом — блог/Telegram не заваливает пачкой, естественнее для SEO
+- Один эндпоинт /api/blog/auto-publish делает и drip, и сбор (cron */15)
+
+### Итого
+- Очередь работает end-to-end (queued → published по одной), пересобрано, HTTP 200
+
+## 16.08.2026 — Блог seller-first + Telegram-дайджест + Vaibik voice
+
+### Сделано
+
+#### Блог и автосбор → продавец / авитолог first
+- Редакционный фильтр `judgeRelevance`: материал проходит только при конкретной пользе продавцу (карточки, заявки, цены, остатки, CRM, платежи, аналитика)
+- Рубрики: Авито, Ozon, Wildberries, Маркетплейсы, Автоматизация продаж, AI для бизнеса
+- Мировые кейсы (Amazon/Shopify) — только с адаптацией для России
+- Корпоративные новости без действия для продавца отбрасываются
+- SEO-промпт и ключи перестроены под коммерцию
+- Источники: +Ozon / Wildberries / автоматизация продаж / мировой e-commerce; DTF, arXiv, HN, GitHub, дизайн — на паузе
+- Фикс категорий Tproger (Development → Разработка) без Prisma Unique
+- Блог UI: «Блог для продавцов», рубрики seller-first первыми; RSS/meta обновлены
+
+#### Telegram: без спама и без «Ошибок источников»
+- Служебный отчёт автосбора: только список статей в очереди (без Prisma/timeout/счётчика ошибок)
+- Канал больше не получает каждую статью блога
+- Пятничный дайджест новостей 18:00 МСК (`bot/src/news-digest.ts`, команда `/newsdigest`)
+- Понедельничные итоги проекта сохранены отдельно
+
+#### Vaibik voice (локальный Piper TTS)
+- Скрипты генерации голоса, манифест, менеджер аудио, компонент `vaibik-voice`
+- Реплики квеста + mp3 в `public/audio/vaibik/`
+- npm: `voice:setup` / `voice:generate` / `voice:check`
+
+### Ключевые решения
+- Автосбор = разведка тем для продавца, не поток AI-новостей
+- Публичный Telegram = пятничный дайджест; техотчёт только админу
+- Авито + Ozon + Wildberries — флагман контента ProektMap
+
+### Итого
+- Seller-first фильтр и рубрики на проде, Telegram без спама, день закрыт
+
+## 17.08.2026 — Mobile foundation (день 1)
+
+План: `docs/MOBILE-DAY-PLAN-2026-08-17.md`. Светлая тема — основная.
+
+Сделано:
+- Этап 0: baseline 375px — `/`, `/blog`, `/pricing` без горизонтального overflow; список дефектов в плане
+- Foundation: breakpoints 480/768/960; `.mobile-only` скрыт на desktop; `overflow-x: clip`; body ≥16px; img/pre/table max-width
+- Shell: progress bar + FAB + cookie через `--bottom-chrome`; padding-right 72 у бара; Architect input стак на mobile
+- P0: главная `minmax(min(100%, 280px))`; Blueprint mobile FAB над chrome
+- Билд + `pm2 restart proektmap`
+
+Вне скоупа: Graph/Universe/Admin, полный отказ от dark.
+
+## 17.08.2026 — Готовые решения: Telegram + карта сайта
+
+Сделано:
+- Второй маршрут `/resheniya/telegram-bot`: 8 этапов, workspace, localStorage отдельно от SaaS
+- `/sitemap` переведён в древовидную карту разделов со статусами «Скоро»/«Архив» и каталогами из БД
+- В меню: «Готовые решения» и «Карта сайта»; `/graph` и `/universe` оставлены как эксперименты
+- По аудиту: убраны битые `/skills/{slug}` из XML; HTML и XML берут публичные URL из одного реестра; финиш Telegram выровнен под внешний сигнал
+
+Билд + `pm2 restart proektmap`
+
+## 17.08.2026 — Новая архитектура «Готового решения»
+
+- `/resheniya/saas-product/workspace` переведён с анкеты и ручных доказательств на 12 готовых инженерных шагов
+- ProektMap заранее выбирает Cursor, роли AI-моделей, Next.js, PostgreSQL, Prisma, Auth.js, ЮKassa и VPS
+- Каждый шаг содержит рекомендацию, причину, точные действия, команды, готовый промпт и наблюдаемые критерии успеха
+- Термины подключены к glossary tooltip; модели, программы, Skills, паттерны и промпты связаны с внутренними разделами
+- PROJECT.md создаётся готовым промптом; пользователь не пишет архитектуру и путь к файлу
+- Обновлены `/resheniya`, обзор SaaS, главная, rule, author/auditor Skills и документация продукта
+
+## 17.08.2026 — Зафиксирован правильный вектор `/resheniya`
+
+- Философия обновлена до v4.0: «Мы уже спроектировали маршрут. Вам осталось пройти его»
+- SaaS guided workspace закреплён как эталон для всех следующих решений
+- Зафиксированы неизменяемые инварианты: один рекомендуемый путь, готовые команды и промпты, наблюдаемый результат, никаких анкет и proof-полей
+- Добавлен project Skill `resheniya-validator` со статусом `community`
+- Добавлен автоматический quality gate `npm run validate:resheniya`
+- Обязательный конвейер: author → validator → независимый auditor → clean build → публикация
+
+## 17.08.2026 — Telegram обкатан на guided-маршруте
+
+- `/resheniya/telegram-bot/workspace` переведён со старых анкет и proof-полей на единый guided UX
+- Зафиксирован стек: Cursor, Node.js, TypeScript, grammY, long polling, GitHub, VPS и PM2
+- Добавлены 10 исполнимых шагов от рабочего места и BotFather до production
+- Главный проверяемый результат: публичный бот отвечает на `/start` и `/help` после перезапуска PM2
+- Обзор Telegram и каталог `/resheniya` переведены на новые guided-данные
+- Прогресс изолирован ключом `proektmap:resheniya:telegram-guided:v1`
+- `npm run validate:resheniya` теперь проверяет SaaS и Telegram
+- Первый независимый аудит дал FAIL и выявил реальные пробелы чистого запуска: GitHub CLI, deploy key, подготовка VPS, конфликт polling и PM2 startup
+- После исправлений повторный аудит: PASS WITH NOTES; критических дефектов нет
+- Production-финиш теперь проверяет реальный reboot VPS и автоматическое восстановление бота
+
+## 17.08.2026 — Аудит автосбора блога
+
+- 09:00 не собирал, потому что в настройках стояло 06:00 МСК. Cron живой, ключ и модель `deepseek-v4-flash` рабочие
+- Утренний прогон 06:00 МСК дошёл до AI, но 7 статей оборвались по timeout 60 сек; очередь пустая → Telegram молчал
+- Отчёт «Ошибок источников: 7 / Simulated Cell» — это вчерашний прогон 16.08, не сегодняшний
+- Исправлено: час сбора 09:00 и 20:00; timeout AI 90 сек; max_tokens 2200; SEO-порог 60; не больше 4 статей за запуск; стоп после 2 таймаутов подряд
+- Короткий отчёт в Telegram приходит всегда, без Prisma и сырых ошибок лент
+- Ручной запуск из админки больше не ждёт «своего часа»
+
+## 17.08.2026 — Вечерний сбор починен и закрыт день
+
+Почему в 20:03 было тихо:
+- Сбор в 20:00 запустился, но `deepseek-v4-flash` по умолчанию думает и тратит весь `max_tokens` на reasoning. Статья получается пустой → в очередь 0.
+- При пустой очереди Telegram-отчёт раньше не отправлялся.
+
+Что оставили, чтобы было дешевле и надёжнее:
+- Thinking выключен: `thinking: { type: "disabled" }`. Проба: 1297 токенов и валидный JSON вместо 2563 токенов и пустого ответа.
+- Не больше 2 статей за запуск, не больше 4 AI-попыток.
+- Сначала ленты продавцов: Авито → Ozon → Wildberries.
+- SEO-порог 60, но ключ ищется с учётом русских окончаний, иначе модель проваливалась на падежах.
+- Отчёт в Telegram приходит всегда. Cron с `?force=1` может перезапустить сбор вне часа.
+
+Живая проверка после деплоя:
+- `queued: 2`, `timeouts: 0`, `jsonErrors: 0`, `seoRejected: 0`
+- В очереди: подработка на Авито и комиссии Ozon/Wildberries
+
+## 17.08.2026 — Решение на завтра: Graphify
+
+Алексей решил: **18.08 внедряем Graphify в проект.**
+Репозиторий: https://github.com/Graphify-Labs/graphify
+План: `docs/TOMORROW.md`
+
+Смысл: карта кода для Cursor-агента. Не публичная страница. Не замена `/graph` и `/universe`.
+Сначала проверка автосбора 09:00 МСК, затем установка Graphify.
+
+
+## 18.08.2026 — Graphify внедрён + старт «Лаборатории Авито»
+
+- **Graphify** установлен на сервер (graphifyy 0.9.46): граф кода 2040 узлов / 3041 связь; правило Cursor `.cursor/rules/graphify.mdc`; git hooks (автопересборка в фоне); `graphify-out/` в .gitignore. Коммит `e5d5910f`.
+- **ТЗ «Лаборатория Авито»** — `docs/TZ-AVITO-LAB.md`: фаза 1 (каталог без БД) → фаза 2 (рейтинг авитологов, холодный старт учтён). Коммит `3c75f8a0`.
+- **Страница `/avito` (фаза 1)**: 23 инструмента, 10 категорий, поиск + фильтры + карточки + бейджи (⚠ риск блокировки / официальный Avito API). Сайты сервисов проверены curl. Коммит `4ba76b0a`.
+- ⚠️ **Билд и деплой НЕ выполнены** — первый шаг завтра (правило: не деплой без проверки билда).
+
+## 21.08.2026 — /avito в проде + меню
+
+- Утренний автосбор 09:00 МСК: `collection.started`, Telegram ok; drip опубликовал «ИИ-поиск нестабилен…»; свежие прогоны `queued: 2`, без timeout/jsonErrors
+- Graphify уже на месте с 18.08 (0.9.46, правило Cursor) — сегодня не трогали
+- **Задеплоена «Лаборатория Авито»** `/avito`: билд + `pm2 restart`, HTTP 200
+- В шапку и мобильное меню добавлен пункт «Авито»; в карту сайта и `sitemap.xml` — `/avito`
+- Mobile 375px: без горизонтального скролла; фильтр «Парсинг» работает, бейдж «⚠ риск блокировки» виден
+- Ещё не сделано из плана 19.08: `docs/AVITO-MASTER-LIST.md`, точные URL расширений Chrome Web Store
+
+## 21.08.2026 — BananLab премиум + продуктовое решение
+
+- BananLab (https://bananlab.ru/) добавлен в `/avito` как **featured**: отдельный блок сверху, бейдж «Премиум в каталоге», CTA на сайт
+- Честно отмечен риск блокировки (автозагрузка / мультиаккаунт)
+- Решение по развитию зафиксировано в `docs/TOMORROW.md`:
+  - отдельные `/avito/[slug]` — пока нет (мало отдачи без обзоров)
+  - «+ Добавить» — сначала форма → Telegram, админку не делать рано
+  - master-list и точные Chrome-ссылки — следующий контентный шаг
+
+## 21.08.2026 — Master-list + Chrome Store + набор «Авитолог без прикрас»
+
+- Создан `docs/AVITO-MASTER-LIST.md`
+- AvToolsPro и LikeStats: прямые URL Chrome Web Store вместо поиска
+- Одна карточка «Набор Авитолог без прикрас»: бот ответов, расширение, бидер, переименование на Яндекс Диске + ссылка на ИИ-продавца
+- В карточке список внутренних ссылок (`links[]`)
+
+## 21.08.2026 — Сверка с OtzyvMarketing и Timeweb
+
+- Источники: otzyvmarketing.ru (ТОП-12) и timeweb.com (5 инструментов)
+- В каталог добавлены: AviTool, Av-Poster, Автопостинг Авито, BotMan, Пачка, Jivo, EnvyBox, коллтрекинг Авито, Calltouch, Roistat, Avito Filter/Blacklist/Comment Adder, Multiaccount
+- Не добавлены без живого URL: SellAvi, ViPost, AvitoBot; VitoSAP отложен как слабый по отзывам
+- Сверка зафиксирована в `docs/AVITO-MASTER-LIST.md`
+
+
+## 21.08.2026 — Меню только через админку
+
+- Убран хардкод «Готовые решения / Авито / Карта сайта» из `header.tsx` — шапка читает только `MenuItem` из БД
+- Пункты upsert в БД: `header-resheniya`, `header-avito`, `header-sitemap`; legacy Blueprint в шапке деактивированы
+- Скрипт: `scripts/sync-header-menu.ts`
+- API `/api/admin/menu` и `/reorder` — только admin-сессия
+- Правило агентов: `.cursor/rules/menu.mdc` + раздел в `AGENTS.md`
+- Подсказка в `/admin/menu`: не править меню в коде
+
+
+## 21.08.2026 — Лаборатория Авито: экосистема под задачу
+
+- Позиционирование: не рейтинг аналитики, а подбор под задачу авитолога
+- 10 разделов (как в ТЗ Алексея) + фильтр цены + сценарии «Мне нужно…»
+- В каталог: LikeStats (+ extension), Авитоматика, AviBOX HUB, Авифлоу, Parser24, AutoAnswersBot, Ave Blacklist
+- Avito Blacklist = Ave Blacklist (тот же Chrome id)
+- Docs: AVITO-MASTER-LIST, TZ, TOMORROW под курс на базу 100+
+
+
+## 21.08.2026 — Master-list: волна обзоров 2026
+
+- UX `/avito` не меняли — копим очередь в `docs/AVITO-MASTER-LIST.md`
+- Добавлены пласты: парсеры (ParsingMaster… Web-Data-Extractor, Diggernaut, A-Parser, Zennoposter), массовый постинг (Markoos, AviForce, Massposting…), AI (Intly, avChat, AvBot, Umnico, OkoCRM, ADVIZ, AIX…)
+- План 11-го раздела: «🧰 Универсальные для авитолога» (цепочки задач, не только SaaS Авито)
+- Правило: не удалять нишевые; официальная Автозагрузка — точка сравнения
+
+
+## 21.08.2026 — Вайбик: Миссия №1 на ProektMap
+
+- Перенесён VibeCraft-проект в `/vaibik` (меню, квест, about, contacts)
+- Ассеты в `public/vaibik/assets/`; zip бэкап в `/root/backups/vaibik/`
+- Связка: песочница, карта сайта, меню, CTA в статье «ИИ для детей»
+- Docs: `docs/VAIBIK-MISSION.md`
+
+
+## 21.08.2026 — Вайбик: кнопка «На главную» + MP3-голос
+
+- Кнопка возврата на proektmap.ru в меню и слева сверху в игре
+- Озвучка: сначала MP3 из `public/audio/vaibik/`, иначе Web Speech
+- Философия: дети + ИИ = будущее; миссия ложится в продукт
+
+
+## 21.08.2026 — Вечер: отладка консоли + закрытие дня
+
+- `Unexpected token '<'`: в `headerCode` лежал HTML `<meta google-site-verification>` внутри `<script>` — очистили БД, в `analytics.tsx` HTML больше не кладём в script
+- Шум 401 у гостя: `/api/collection` и `/api/user/streak` вызывались из шапки без сессии — теперь только после входа (`favorites-indicator`, `streak-banner`)
+- Голос Вайбика (MP3 vs TTS / autoplay) — отложили на следующий заход
+- День закрыт: DEVLOG + commit + push
 
 
 ## 22.08.2026 — scroll-film демо (сайт-фильм)

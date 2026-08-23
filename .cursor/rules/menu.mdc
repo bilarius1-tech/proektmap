@@ -1,0 +1,43 @@
+---
+description: Меню сайта только через админку /admin/menu — без хардкода в коде
+globs: src/components/layout/header.tsx,src/components/layout/footer.tsx,src/components/layout/mobile-menu.tsx,src/components/layout/desktop-menu-item.tsx,src/app/api/admin/menu/**,src/app/admin/menu/**
+alwaysApply: true
+---
+
+# Меню ProektMap
+
+## Жёсткое правило
+
+Пункты шапки и футера **не хардкодить** в React-компонентах.
+
+Единственный источник правды: таблица `MenuItem` в БД.
+Редактор для человека: https://proektmap.ru/admin/menu
+
+## Как агенту добавить / изменить пункт
+
+1. **Предпочтительно:** попросить Алексея добавить в `/admin/menu`, либо
+2. Через Prisma/`getDb()` upsert в `menuItem` (как `scripts/sync-header-menu.ts`), либо
+3. Через API (только под сессией admin):
+   - `POST /api/admin/menu` — создать `{ label, href, location: "header"|"footer", sortOrder, parentId? }`
+   - `PUT /api/admin/menu` — обновить
+   - `DELETE /api/admin/menu?id=...` — удалить
+   - `POST /api/admin/menu/reorder` — порядок
+
+После изменения меню в БД **не нужен** rebuild кода — шапка читает БД на каждый запрос.
+Rebuild нужен только если меняли код header/footer/API.
+
+## Запрещено
+
+- Добавлять `<Link href="...">` в `header.tsx` / `mobile-menu.tsx` «поверх» списка из БД
+- Дублировать «Готовые решения», «Авито», «Карта сайта» в коде
+- Включать legacy Blueprint (`/blueprints`, «Готовые проекты») в активное меню
+
+## Стабильные ID ключевых пунктов
+
+| id | label | href |
+|---|---|---|
+| `header-resheniya` | Готовые решения | `/resheniya` |
+| `header-avito` | Авито | `/avito` |
+| `header-sitemap` | Карта сайта | `/sitemap` |
+
+Скрипт синка: `npx tsx --env-file=.env scripts/sync-header-menu.ts`
