@@ -77,6 +77,7 @@ export const SITE_TREE: SiteTreeGroup[] = [
         title: "Песочница",
         href: "/sandbox",
         children: [
+          { title: "Креативная библиотека", href: "/sandbox/creative-library" },
           { title: "Дизайн-система", href: "/sandbox/design-system" },
           { title: "Telegram-хаб", href: "/telegram" },
         ],
