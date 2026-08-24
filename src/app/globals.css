@@ -110,6 +110,25 @@
   border-color: var(--color-border);
 }
 
+/* /resheniya и solutions-карточки: были на жёстком #fff */
+[data-theme="dark"] .solutions-feature-card,
+[data-theme="dark"] .solutions-process-card,
+[data-theme="dark"] .solutions-future-card,
+[data-theme="dark"] .solutions-ecosystem,
+[data-theme="dark"] .solution-route-card,
+[data-theme="dark"] .solution-pack-grid > div,
+[data-theme="dark"] .solution-workspace-header,
+[data-theme="dark"] .solution-mission-heading,
+[data-theme="dark"] .guided-sidebar {
+  background: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-primary);
+  box-shadow: var(--shadow-m);
+}
+[data-theme="dark"] .solution-workspace {
+  background: var(--color-bg-secondary) !important;
+}
+
 .header-menu-link {
   display: inline-flex;
   align-items: center;
@@ -1748,8 +1767,8 @@ body:has(.site-tree-page) .bottom-progress-bar {
   overflow-y: auto;
   height: calc(100vh - 172px);
   padding: 22px 16px;
-  border-right: 1px solid #dce5e2;
-  background: #fff;
+  border-right: 1px solid var(--color-border);
+  background: var(--color-surface);
 }
 .guided-sidebar-heading {
   display: flex;
@@ -2575,9 +2594,9 @@ body:has(.site-tree-page) .bottom-progress-bar {
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(270px, 0.8fr);
   overflow: hidden;
-  border: 1px solid #dce5e2;
+  border: 1px solid var(--color-border);
   border-radius: 22px;
-  background: #fff;
+  background: var(--color-surface);
   color: inherit;
   box-shadow: 0 14px 40px rgba(42, 67, 58, 0.06);
   transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
@@ -2672,9 +2691,9 @@ body:has(.site-tree-page) .bottom-progress-bar {
   position: relative;
   min-width: 0;
   padding: 24px;
-  border: 1px solid #e1e7e5;
+  border: 1px solid var(--color-border);
   border-radius: 16px;
-  background: #fff;
+  background: var(--color-surface);
 }
 .solutions-process-card > svg {
   color: var(--color-accent);
@@ -2707,9 +2726,9 @@ body:has(.site-tree-page) .bottom-progress-bar {
   gap: 52px;
   align-items: center;
   padding: 42px;
-  border: 1px solid #dce5e2;
+  border: 1px solid var(--color-border);
   border-radius: 24px;
-  background: #fff;
+  background: var(--color-surface);
 }
 .solutions-ecosystem-intro > p {
   margin: 16px 0;
@@ -2925,9 +2944,9 @@ body:has(.site-tree-page) .bottom-progress-bar {
   grid-template-columns: 42px 1fr;
   min-width: 0;
   padding: 22px 22px 22px 16px;
-  border: 1px solid #e0e6e4;
+  border: 1px solid var(--color-border);
   border-radius: 16px;
-  background: #fff;
+  background: var(--color-surface);
 }
 .solution-route-marker {
   position: relative;
@@ -3035,9 +3054,9 @@ body:has(.site-tree-page) .bottom-progress-bar {
   align-items: center;
   min-height: 54px;
   padding: 9px 12px;
-  border: 1px solid #e0e6e4;
+  border: 1px solid var(--color-border);
   border-radius: 11px;
-  background: #fff;
+  background: var(--color-surface);
 }
 .solution-pack-grid span {
   color: #a1ada9;
@@ -3133,7 +3152,7 @@ body:has(.site-tree-page) .bottom-progress-bar {
 .solution-workspace {
   min-height: 100vh;
   padding-bottom: 72px;
-  background: #f3f6f5;
+  background: var(--color-bg-secondary);
 }
 .solution-workspace-header {
   display: flex;
@@ -3142,8 +3161,8 @@ body:has(.site-tree-page) .bottom-progress-bar {
   gap: 30px;
   min-height: 92px;
   padding: 16px max(24px, calc((100vw - 1380px) / 2));
-  border-bottom: 1px solid #dfe6e3;
-  background: #fff;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
 }
 .solution-workspace-back {
   display: inline-flex;
@@ -3344,9 +3363,9 @@ body:has(.site-tree-page) .bottom-progress-bar {
 }
 .solution-mission-heading {
   padding: 26px;
-  border: 1px solid #dfe6e3;
+  border: 1px solid var(--color-border);
   border-radius: 16px 16px 0 0;
-  background: #fff;
+  background: var(--color-surface);
 }
 .solution-mission-kicker {
   display: flex;
