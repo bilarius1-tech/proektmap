@@ -1887,3 +1887,11 @@ DEVLOG + commit + push. main = master.
 - globals.css: перекрытия `#fff` / `white` / `.bg-white`, FAB, progress/cookie
 - gear-assistant: surface-токены вместо white
 - avito: поиск и чипы на theme-токенах
+
+### Добивка /resheniya + FOUC
+- Карточки solutions / workspace / guided-sidebar → `--color-surface` / `--color-border`
+- Скрипт темы в `layout.tsx` до paint (без вспышки светлой темы)
+- Коммиты: `a8b1be39`, `ed3cddbf`
+
+### День закрыт
+DEVLOG + commit + push. `main` = `master`. Центр продукта: `/resheniya`.
