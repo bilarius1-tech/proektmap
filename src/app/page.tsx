@@ -37,7 +37,7 @@ export default async function Home() {
           <Link href="/resheniya" className="home-hero-action home-solutions-primary" style={{ display: "flex", alignItems: "center", gap: 8, padding: "17px 34px", borderRadius: "var(--radius-m)", background: "var(--color-accent)", color: "white", textDecoration: "none", fontSize: "var(--text-m)", fontWeight: 800 }}>
             Открыть готовые решения AI <ArrowRight size={18} />
           </Link>
-          <Link href="/resheniya/saas-product" className="home-hero-action" style={{ display: "flex", alignItems: "center", gap: 6, padding: "14px 28px", borderRadius: "var(--radius-m)", background: "white", color: "var(--color-accent)", border: "1px solid var(--color-accent)", textDecoration: "none", fontSize: "var(--text-s)", fontWeight: 700 }}>
+          <Link href="/resheniya/saas-product" className="home-hero-action" style={{ display: "flex", alignItems: "center", gap: 6, padding: "14px 28px", borderRadius: "var(--radius-m)", background: "var(--color-surface)", color: "var(--color-accent)", border: "1px solid var(--color-accent)", textDecoration: "none", fontSize: "var(--text-s)", fontWeight: 700 }}>
             Посмотреть маршрут SaaS
           </Link>
         </div>

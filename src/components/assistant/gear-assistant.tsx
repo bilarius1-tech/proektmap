@@ -100,30 +100,30 @@ export default function GearAssistant({
   return (
     <div className="assistant-fab-root" style={{ position: "fixed", zIndex: 1000 }}>
       {showChat && (
-        <div className="assistant-chat-panel" style={{ position: "absolute", bottom: 80, right: 0, width: 340, maxHeight: 400, background: "white", borderRadius: "var(--radius-xl)", boxShadow: "0 8px 32px rgba(0,0,0,0.15)", border: "1px solid var(--color-border)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
+        <div className="assistant-chat-panel" style={{ position: "absolute", bottom: 80, right: 0, width: 340, maxHeight: 400, background: "var(--color-surface)", color: "var(--color-text-primary)", borderRadius: "var(--radius-xl)", boxShadow: "0 8px 32px rgba(0,0,0,0.35)", border: "1px solid var(--color-border)", display: "flex", flexDirection: "column", overflow: "hidden" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 16px", borderBottom: "1px solid var(--color-border-light)" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, fontWeight: 700, fontSize: "var(--text-s)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, fontWeight: 700, fontSize: "var(--text-s)", color: "var(--color-text-primary)" }}>
               <GearIcon size={20} spinning={state === "thinking"} blinking={blinking} pupilOffset={pupilOffset} /> AI-помощник
             </div>
             <button onClick={toggleChat} style={{ background: "none", border: "none", cursor: "pointer", padding: 4, color: "var(--color-text-tertiary)" }}><X size={16} /></button>
           </div>
           <div style={{ flex: 1, overflow: "auto", padding: "12px 16px", maxHeight: 250, display: "flex", flexDirection: "column", gap: 8, fontSize: "var(--text-xs)" }}>
             {history.map((m, i) => (
-              <div key={i} style={{ alignSelf: m.type === "user" ? "flex-end" : "flex-start", maxWidth: "80%", padding: "8px 14px", borderRadius: "var(--radius-m)", background: m.type === "user" ? "var(--color-accent)" : "var(--color-bg-secondary)", color: m.type === "user" ? "white" : "var(--color-text-primary)", lineHeight: 1.5 }}>{m.text}</div>
+              <div key={i} style={{ alignSelf: m.type === "user" ? "flex-end" : "flex-start", maxWidth: "80%", padding: "8px 14px", borderRadius: "var(--radius-m)", background: m.type === "user" ? "var(--color-accent)" : "var(--color-bg-tertiary)", color: m.type === "user" ? "white" : "var(--color-text-primary)", lineHeight: 1.5 }}>{m.text}</div>
             ))}
-            {state === "thinking" && <div style={{ padding: "8px 14px", borderRadius: "var(--radius-m)", background: "var(--color-bg-secondary)", alignSelf: "flex-start", display: "flex", gap: 4 }}><span className="dot-blink">●</span><span className="dot-blink" style={{ animationDelay: "0.2s" }}>●</span><span className="dot-blink" style={{ animationDelay: "0.4s" }}>●</span></div>}
+            {state === "thinking" && <div style={{ padding: "8px 14px", borderRadius: "var(--radius-m)", background: "var(--color-bg-tertiary)", color: "var(--color-text-secondary)", alignSelf: "flex-start", display: "flex", gap: 4 }}><span className="dot-blink">●</span><span className="dot-blink" style={{ animationDelay: "0.2s" }}>●</span><span className="dot-blink" style={{ animationDelay: "0.4s" }}>●</span></div>}
           </div>
           <div style={{ padding: "10px 16px", borderTop: "1px solid var(--color-border-light)", display: "flex", gap: 8 }}>
-            <input value={userInput} onChange={e => setUserInput(e.target.value)} onKeyDown={e => e.key === "Enter" && ask(userInput)} placeholder="Спроси о чём угодно..." style={{ flex: 1, padding: "8px 12px", fontSize: "var(--text-xs)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none" }} />
+            <input value={userInput} onChange={e => setUserInput(e.target.value)} onKeyDown={e => e.key === "Enter" && ask(userInput)} placeholder="Спроси о чём угодно..." style={{ flex: 1, padding: "8px 12px", fontSize: "var(--text-xs)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", background: "var(--color-bg-tertiary)", color: "var(--color-text-primary)", outline: "none" }} />
             <button onClick={() => ask(userInput)} disabled={!userInput.trim() || state === "thinking"} style={{ padding: "8px 14px", borderRadius: "var(--radius-s)", background: userInput.trim() ? "var(--color-accent)" : "var(--color-border)", color: "white", border: "none", cursor: userInput.trim() ? "pointer" : "default", fontSize: "var(--text-xs)", fontWeight: 600 }}><MessageCircle size={14} /></button>
           </div>
         </div>
       )}
 
       {showBubble && message && !showChat && (
-        <div className="assistant-bubble" style={{ position: "absolute", bottom: 70, right: 10, maxWidth: 280, padding: "12px 16px", background: "white", borderRadius: "var(--radius-l)", boxShadow: "0 4px 20px rgba(0,0,0,0.1)", border: "1px solid var(--color-border)", fontSize: "var(--text-xs)", lineHeight: 1.5, cursor: "pointer" }} onClick={toggleChat}>
+        <div className="assistant-bubble" style={{ position: "absolute", bottom: 70, right: 10, maxWidth: 280, padding: "12px 16px", background: "var(--color-surface)", color: "var(--color-text-primary)", borderRadius: "var(--radius-l)", boxShadow: "0 4px 20px rgba(0,0,0,0.25)", border: "1px solid var(--color-border)", fontSize: "var(--text-xs)", lineHeight: 1.5, cursor: "pointer" }} onClick={toggleChat}>
           {message}
-          <div style={{ position: "absolute", bottom: -6, right: 20, width: 12, height: 12, background: "white", transform: "rotate(45deg)", borderRight: "1px solid var(--color-border)", borderBottom: "1px solid var(--color-border)" }} />
+          <div style={{ position: "absolute", bottom: -6, right: 20, width: 12, height: 12, background: "var(--color-surface)", transform: "rotate(45deg)", borderRight: "1px solid var(--color-border)", borderBottom: "1px solid var(--color-border)" }} />
         </div>
       )}
 

@@ -62,19 +62,52 @@
   to { opacity: 1; transform: translateX(0); }
 }
 
-/* Dark mode card fixes */
+/* Dark mode card / surface fixes
+   Inline style="background: white|#fff" не ловят CSS-переменные — перекрываем.
+   Главный баг: --color-surface оставался #fff при светлом тексте. */
 [data-theme="dark"] .card-bg,
+[data-theme="dark"] .bg-white,
 [data-theme="dark"] [style*="background:white"],
+[data-theme="dark"] [style*="background: white"],
+[data-theme="dark"] [style*="background:#fff"],
+[data-theme="dark"] [style*="background: #fff"],
+[data-theme="dark"] [style*="background:#ffffff"],
+[data-theme="dark"] [style*="background: #ffffff"],
+[data-theme="dark"] [style*="background:#FFF"],
+[data-theme="dark"] [style*="background: #FFF"],
+[data-theme="dark"] [style*="background:#FFFFFF"],
+[data-theme="dark"] [style*="background: #FFFFFF"],
 [data-theme="dark"] input,
 [data-theme="dark"] select,
 [data-theme="dark"] textarea {
-  background: var(--color-bg-primary) !important;
+  background: var(--color-surface) !important;
   color: var(--color-text-primary);
   border-color: var(--color-border);
 }
 [data-theme="dark"] input::placeholder,
 [data-theme="dark"] textarea::placeholder {
   color: var(--color-text-tertiary);
+}
+
+/* Assistant FAB: панель и баблл не должны быть белыми в тёмной теме */
+[data-theme="dark"] .assistant-chat-panel,
+[data-theme="dark"] .assistant-bubble,
+[data-theme="dark"] .assistant-bubble > div {
+  background: var(--color-surface) !important;
+  color: var(--color-text-primary);
+  border-color: var(--color-border);
+}
+[data-theme="dark"] .assistant-chat-panel input {
+  background: var(--color-bg-tertiary) !important;
+  color: var(--color-text-primary);
+}
+
+/* Нижний прогресс / cookie — читаемый хром */
+[data-theme="dark"] .bottom-progress-bar,
+[data-theme="dark"] .cookie-banner {
+  background: var(--color-bg-primary) !important;
+  color: var(--color-text-primary);
+  border-color: var(--color-border);
 }
 
 .header-menu-link {

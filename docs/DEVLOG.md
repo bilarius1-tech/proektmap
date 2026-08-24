@@ -1876,3 +1876,14 @@ DEVLOG + commit + push. Центр продукта по-прежнему `/resh
 
 ### День закрыт (повторно)
 DEVLOG + commit + push. main = master.
+
+## 24.08.2026 — Тёмная тема: surface + FAB
+
+### Баг
+В dark mode `--color-surface` оставался `#FFFFFF`, а текст становился светлым → белые чипы/карточки с невидимым текстом (особенно `/avito`). Assistant FAB: панель и баббл с `background: white`.
+
+### Фикс
+- `--color-surface` / `--color-elevated` в dark (tokens.css + design-tokens.tsx)
+- globals.css: перекрытия `#fff` / `white` / `.bg-white`, FAB, progress/cookie
+- gear-assistant: surface-токены вместо white
+- avito: поиск и чипы на theme-токенах

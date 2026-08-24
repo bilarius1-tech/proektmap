@@ -64,6 +64,8 @@ export default async function DesignTokens() {
       --color-bg-primary: #1a1a1a;
       --color-bg-secondary: #242424;
       --color-bg-tertiary: #2e2e2e;
+      --color-surface: #242424;
+      --color-elevated: #2e2e2e;
       --color-text-primary: #f5f5f3;
       --color-text-secondary: #b0b0a4;
       --color-text-tertiary: #6e6e64;

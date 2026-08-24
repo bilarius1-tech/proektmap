@@ -101,7 +101,7 @@ export default function GlobalSearch() {
 
       {/* Dropdown */}
       {open && (
-        <div className="absolute top-full right-0 mt-1.5 w-[440px] max-w-[90vw] bg-white rounded-l border border-border z-[300] overflow-hidden"
+        <div className="absolute top-full right-0 mt-1.5 w-[440px] max-w-[90vw] bg-bg-primary rounded-l border border-border z-[300] overflow-hidden"
           style={{ boxShadow: "0 12px 40px rgba(0,0,0,0.15)" }}>
           {/* Search input */}
           <div className="flex items-center gap-2 px-[14px] py-[10px] border-b border-border-light">
