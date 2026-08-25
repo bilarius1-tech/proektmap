@@ -1,7 +1,8 @@
 import { getDb } from "@/lib/db/index";
 import Link from "next/link";
 import { CREATIVE_TOOLS } from "@/lib/creative-library/data";
-import { Bot, Globe, Shield, Zap, Cpu, Wrench, Lightbulb, BookOpen, Compass, Sparkles, ArrowRight, Eye, FileText, Layers, Grid3X3, Clock, Palette, Library } from "lucide-react";
+import { Bot, Globe, Shield, Zap, Cpu, Wrench, Lightbulb, BookOpen, Compass, Sparkles, ArrowRight, Eye, FileText, Layers, Grid3X3, Clock, Palette, Library, LayoutTemplate } from "lucide-react";
+import { VIBE_KITS } from "@/lib/vibe-blocks/data";
 
 export const dynamic = "force-dynamic";
 export const metadata = {
@@ -46,6 +47,7 @@ export default async function SandboxPage() {
     { slug: "ai-tools", title: "AI-инструменты", desc: `Каталог из ${toolCount} инструментов с русскими обзорами, рейтингами и гайдами.`, icon: Wrench, size: "small" as const, stat: String(toolCount), statLabel: "инструментов", href: "/ai-tools" },
     { slug: "solutions", title: "Готовые решения", desc: "Клонируй и запускай: бот-магазин, AI-консультант, приём заказов. Код на GitHub.", icon: Layers, size: "small" as const, stat: String(solutionCount), statLabel: "решений", href: "/solutions" },
     { slug: "creative-library", title: "Креативная библиотека", desc: "Tier 1–3: от Vanta и AutoAnimate до GSAP, Three.js, MediaPipe. Карточка + промпт для агента + FPS Killers.", icon: Library, size: "large" as const, stat: String(CREATIVE_TOOLS.length), statLabel: "инструментов", href: "/sandbox/creative-library" },
+    { slug: "vibe-blocks", title: "Вайб-блоки", desc: "UI-киты как OriginKit и 21st.dev: готовые блоки, Copy prompt, MCP. Сценарии для лендинга, анимаций и AI-чата.", icon: LayoutTemplate, size: "large" as const, stat: String(VIBE_KITS.length), statLabel: "китов", href: "/sandbox/vibe-blocks" },
     { slug: "design-system", title: "Дизайн-система", desc: "Полный гайд: токены, компоненты, Atomic Design, Figma, Storybook. Почему AI-инженеру нужна дизайн-система и как её построить.", icon: Palette, size: "medium" as const, href: "/sandbox/design-system" },
     { slug: "blog", title: "Блог", desc: `Статьи об AI-разработке, новости индустрии, гайды и туториалы. ${postCount} статей, RSS, поиск.`, icon: FileText, size: "small" as const, stat: String(postCount), statLabel: "статей", href: "/blog" },
   ];

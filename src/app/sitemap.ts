@@ -2,6 +2,7 @@ import { MetadataRoute } from "next";
 import { getDb } from "@/lib/db/index";
 import { PUBLIC_SEO_ROUTES } from "./sitemap/site-map-data";
 import { CREATIVE_TOOLS } from "@/lib/creative-library/data";
+import { VIBE_KITS } from "@/lib/vibe-blocks/data";
 
 const baseUrl = "https://proektmap.ru";
 
@@ -65,6 +66,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...staticPages,
     ...CREATIVE_TOOLS.map((tool) => ({
       url: `${baseUrl}/sandbox/creative-library/${tool.slug}`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.65,
+    })),
+    ...VIBE_KITS.map((kit) => ({
+      url: `${baseUrl}/sandbox/vibe-blocks/${kit.slug}`,
       lastModified: new Date(),
       changeFrequency: "monthly" as const,
       priority: 0.65,

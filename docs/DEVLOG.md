@@ -1895,3 +1895,18 @@ DEVLOG + commit + push. main = master.
 
 ### День закрыт
 DEVLOG + commit + push. `main` = `master`. Центр продукта: `/resheniya`.
+
+## 25.08.2026 — Вайб-блоки в песочнице
+
+### Сделано
+- Новый раздел `/sandbox/vibe-blocks`: каталог UI-китов для вайбкодера (идеи + промпты агенту)
+- 14 китов: OriginKit, 21st.dev, Magic UI, Aceternity, Cult UI, Motion Primitives, Shadcn Blocks, Tailark, shadcn/ui, Kibo UI, Untitled UI, Fragments UI, VLLNT UI, prompt-kit
+- 4 сценария с брифом: лендинг за вечер, вау-анимации, AI-чат UI, максимум для агента (MCP/prompt)
+- Карточки: когда брать / не брать, Copy Prompt, заметка для РФ, связь с креативной библиотекой
+- Карточка в хабе `/sandbox`, sitemap + карта сайта
+
+### Итог
+Live: https://proektmap.ru/sandbox/vibe-blocks · HTTP 200. Центр продукта: `/resheniya`.
+
+### День закрыт
+DEVLOG + commit + push. `main` = `master`.
