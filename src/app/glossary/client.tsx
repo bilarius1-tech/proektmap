@@ -1,86 +1,618 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState, useMemo } from "react";
 import Link from "next/link";
-import { Search } from "lucide-react";
+import {
+  Search,
+  Sparkles,
+  Zap,
+  Palette,
+  Cpu,
+  Smile,
+  BookOpen,
+  ArrowRight,
+  ExternalLink,
+  HelpCircle,
+  Quote,
+  ShieldCheck,
+} from "lucide-react";
 
-const LEVELS: Record<string, { label: string; color: string; bg: string }> = {
-  survival: { label: "Выживание", color: "#e53e3e", bg: "#fff5f5" },
-  vibe: { label: "Вайбкодинг", color: "#0fb880", bg: "#f0fff4" },
-  modern: { label: "AI", color: "#6c63ff", bg: "#f5f0ff" },
-  senior: { label: "Старший", color: "#ed8936", bg: "#fffaf0" },
-  jargon: { label: "Жаргон", color: "#d53f8c", bg: "#fff0f7" },
-  coding: { label: "Программирование", color: "#2b6cb0", bg: "#ebf8ff" },
-  stack: { label: "Стек", color: "#2d3748", bg: "#f7fafc" },
-  db: { label: "БД", color: "#744210", bg: "#fffff0" },
-  git: { label: "Git", color: "#c05621", bg: "#fffaf0" },
-  deploy: { label: "Деплой", color: "#2f855a", bg: "#f0fff4" },
-  saas: { label: "SaaS", color: "#6b46c1", bg: "#faf5ff" },
-  seo: { label: "SEO", color: "#c53030", bg: "#fff5f5" },
-  translate: { label: "Переводчик", color: "#d69e2e", bg: "#fffff0" },
+interface GlossaryTermItem {
+  id: string;
+  term: string;
+  slug: string;
+  definition: string;
+  simpleExplanation: string;
+  example: string;
+  vibeUsage: string;
+  devSay: string;
+  level: string;
+  category: string;
+  relatedTerms: string;
+  sortOrder: number;
+}
+
+const CATEGORIES = [
+  { id: "all", label: "Все термины", icon: BookOpen, count: 0 },
+  { id: "vibe-process", label: "⚡ Вайбкодинг & Процесс", icon: Zap, matchLevels: ["vibe", "vibe-process"] },
+  { id: "vibe-design", label: "🎨 Дизайн & UI-слоп", icon: Palette, matchLevels: ["design", "vibe-design"] },
+  { id: "vibe-arch", label: "🤖 Архитектура & Агенты", icon: Cpu, matchLevels: ["modern", "vibe-arch", "senior"] },
+  { id: "vibe-slang", label: "🧠 Жаргон & Мемы", icon: Smile, matchLevels: ["jargon", "vibe-slang", "translate"] },
+  { id: "dev-classic", label: "🛠 Инженерный стек", icon: ShieldCheck, matchLevels: ["stack", "git", "db", "deploy", "coding", "survival", "saas", "seo"] },
+];
+
+const LEVEL_BADGES: Record<string, { label: string; color: string; bg: string }> = {
+  vibe: { label: "Вайбкодинг", color: "#0fb880", bg: "rgba(15, 184, 128, 0.1)" },
+  "vibe-process": { label: "Процесс", color: "#0fb880", bg: "rgba(15, 184, 128, 0.1)" },
+  "vibe-design": { label: "UI / Дизайн", color: "#ec4899", bg: "rgba(236, 72, 153, 0.1)" },
+  design: { label: "Дизайн", color: "#ec4899", bg: "rgba(236, 72, 153, 0.1)" },
+  "vibe-arch": { label: "Архитектура", color: "#3b82f6", bg: "rgba(59, 130, 246, 0.1)" },
+  modern: { label: "AI / Агенты", color: "#8b5cf6", bg: "rgba(139, 92, 246, 0.1)" },
+  "vibe-slang": { label: "Жаргон", color: "#f59e0b", bg: "rgba(245, 158, 11, 0.12)" },
+  jargon: { label: "Жаргон", color: "#f59e0b", bg: "rgba(245, 158, 11, 0.12)" },
+  senior: { label: "Senior", color: "#6366f1", bg: "rgba(99, 102, 241, 0.1)" },
+  git: { label: "Git", color: "#ea580c", bg: "rgba(234, 88, 12, 0.1)" },
+  db: { label: "Базы данных", color: "#059669", bg: "rgba(5, 150, 105, 0.1)" },
+  deploy: { label: "Деплой", color: "#0284c7", bg: "rgba(2, 132, 199, 0.1)" },
+  survival: { label: "База", color: "#dc2626", bg: "rgba(220, 38, 38, 0.1)" },
 };
 
-export default function GlossaryClient({ terms }: { terms: any[] }) {
+export default function GlossaryClient({ terms }: { terms: GlossaryTermItem[] }) {
   const [search, setSearch] = useState("");
-  const [level, setLevel] = useState("all");
+  const [activeTab, setActiveTab] = useState("all");
 
-  const levelNames = ["all", ...Array.from(new Set(terms.map((t: any) => t.level)))];
-  const filtered = terms.filter((t: any) => {
-    if (level !== "all" && t.level !== level) return false;
-    if (search && !t.term.toLowerCase().includes(search.toLowerCase()) && !t.definition.toLowerCase().includes(search.toLowerCase())) return false;
-    return true;
-  });
+  const filtered = useMemo(() => {
+    return terms.filter((t) => {
+      // Category filter
+      if (activeTab !== "all") {
+        const cat = CATEGORIES.find((c) => c.id === activeTab);
+        if (cat?.matchLevels) {
+          const matchesCategory =
+            cat.matchLevels.includes(t.category) || cat.matchLevels.includes(t.level);
+          if (!matchesCategory) return false;
+        }
+      }
+
+      // Search query
+      if (search.trim()) {
+        const q = search.toLowerCase();
+        const inTerm = t.term.toLowerCase().includes(q);
+        const inDef = t.definition.toLowerCase().includes(q);
+        const inSimple = (t.simpleExplanation || "").toLowerCase().includes(q);
+        const inUsage = (t.vibeUsage || "").toLowerCase().includes(q);
+        if (!inTerm && !inDef && !inSimple && !inUsage) return false;
+      }
+
+      return true;
+    });
+  }, [terms, activeTab, search]);
 
   return (
-    <div style={{ maxWidth: 900, margin: "0 auto", padding: "var(--space-xl) var(--space-m)" }}>
-      <div style={{ marginBottom: "var(--space-xl)" }}>
-        <h1 style={{ fontSize: "var(--text-xxxl)", fontWeight: 800, marginBottom: "var(--space-xs)" }}>📖 Глоссарий вайбкодера</h1>
-        <p style={{ color: "var(--color-text-secondary)", fontSize: "var(--text-s)", lineHeight: 1.7 }}>
-          94 терминов, которые встречаются каждый день. От «Prompt» до «прокачать контекст».
-        </p>
-      </div>
-
-      <div style={{ display: "flex", gap: 8, marginBottom: "var(--space-l)", flexWrap: "wrap", alignItems: "center" }}>
-        <div style={{ position: "relative", flex: 1, minWidth: 200 }}>
-          <Search size={16} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "var(--color-text-tertiary)" }} />
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Поиск по терминам..."
-            style={{ width: "100%", padding: "10px 10px 10px 38px", fontSize: "var(--text-s)", borderRadius: "var(--radius-m)", border: "1px solid var(--color-border)", outline: "none" }} />
+    <div className="glossary-shell">
+      {/* ═══ 1. EDITORIAL HEADER ═══ */}
+      <header className="glossary-header">
+        <div className="glossary-eyebrow">
+          <span className="eyebrow-pill">PROEKTMAP 2026</span>
+          <span className="eyebrow-sep">/</span>
+          <span className="eyebrow-sub">VIBE CODING & AI DICTIONARY</span>
         </div>
-        <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
-          {levelNames.map(l => {
-            const info = LEVELS[l];
-            const active = level === l;
+
+        <h1 className="glossary-title">Глоссарий вайбкодинга и ИИ-разработки</h1>
+
+        <p className="glossary-subtitle">
+          Переводчик с «птичьего языка» вайбкодеров на человеческий инженерный.
+          От «ИИ-слопа» и «Войны Z-индексов» до «RAG», «MCP» и «Роя агентов».
+        </p>
+
+        {/* Search Input */}
+        <div className="glossary-search-wrap">
+          <Search size={18} className="search-icon" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Поиск по термину, фразе или сленгу (например: слоп, дрейф, z-index, петля, rag)..."
+            className="glossary-search-input"
+          />
+          {search && (
+            <button
+              type="button"
+              onClick={() => setSearch("")}
+              className="search-clear-btn"
+            >
+              Сбросить
+            </button>
+          )}
+        </div>
+
+        {/* Category Tabs */}
+        <div className="category-tabs-row">
+          {CATEGORIES.map((cat) => {
+            const isActive = activeTab === cat.id;
             return (
-              <button key={l} onClick={() => setLevel(l)} style={{
-                padding: "6px 14px", borderRadius: "var(--radius-full)", border: active ? "2px solid " + (info?.color || "#999") : "1px solid var(--color-border)",
-                background: active ? (info?.bg || "#fff") : "white", color: active ? (info?.color || "#333") : "var(--color-text-secondary)",
-                fontSize: "var(--text-xs)", cursor: "pointer", fontWeight: active ? 700 : 500,
-              }}>{l === "all" ? "Все" : info?.label || l}</button>
+              <button
+                key={cat.id}
+                onClick={() => setActiveTab(cat.id)}
+                className={`category-tab ${isActive ? "active" : ""}`}
+              >
+                <span>{cat.label}</span>
+              </button>
             );
           })}
         </div>
+      </header>
+
+      {/* ═══ 2. QUICK STATS BAR ═══ */}
+      <div className="glossary-stats-bar">
+        <span>Показано: <strong>{filtered.length}</strong> из {terms.length} понятий</span>
+        {search && <span className="search-query-badge">По запросу: «{search}»</span>}
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: "var(--space-s)" }}>
-        {filtered.map((t: any) => {
-          const info = LEVELS[t.level] || { label: t.level, color: "#999", bg: "#f5f5f5" };
+      {/* ═══ 3. TERMS EDITORIAL GRID ═══ */}
+      <section className="glossary-grid">
+        {filtered.map((item) => {
+          const badge =
+            LEVEL_BADGES[item.category] ||
+            LEVEL_BADGES[item.level] || {
+              label: item.level || "Термин",
+              color: "#555",
+              bg: "#f0f0f0",
+            };
+
           return (
-            <Link key={t.id} href={`/glossary/${t.slug}`} style={{
-              display: "flex", flexDirection: "column", padding: "var(--space-m)", background: "white",
-              borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", textDecoration: "none", color: "inherit",
-            }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                <span style={{ fontWeight: 700, fontSize: "var(--text-s)", fontFamily: "var(--font-heading)", color: "var(--color-accent)" }}>{t.term}</span>
-                <span style={{ fontSize: 9, padding: "1px 7px", borderRadius: 99, background: info.bg, color: info.color, fontWeight: 600 }}>{info.label}</span>
+            <article key={item.id} className="glossary-card">
+              <div className="card-top">
+                <span
+                  className="card-category-badge"
+                  style={{ color: badge.color, background: badge.bg }}
+                >
+                  {badge.label}
+                </span>
+
+                <Link href={`/glossary/${item.slug}`} className="card-open-link">
+                  <span>Паспорт термина</span>
+                  <ArrowRight size={12} />
+                </Link>
               </div>
-              <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.5 }}>
-                {t.simpleExplanation || t.definition.slice(0, 100)}
+
+              <Link href={`/glossary/${item.slug}`} className="term-link-title">
+                <h3 className="card-term-title">{item.term}</h3>
+              </Link>
+
+              {item.simpleExplanation && (
+                <div className="card-simple-box">
+                  <span className="simple-icon">💡</span>
+                  <p className="simple-text">{item.simpleExplanation}</p>
+                </div>
+              )}
+
+              <p className="card-definition">{item.definition}</p>
+
+              {item.vibeUsage && (
+                <div className="card-quote-box">
+                  <div className="quote-header">
+                    <Quote size={12} className="quote-icon" />
+                    <span>Как это звучит в чатах:</span>
+                  </div>
+                  <div className="quote-text">{item.vibeUsage}</div>
+                </div>
+              )}
+
+              <div className="card-footer">
+                <Link href={`/glossary/${item.slug}`} className="card-detail-btn">
+                  <span>Читать пример и решение</span>
+                  <ArrowRight size={13} />
+                </Link>
               </div>
-            </Link>
+            </article>
           );
         })}
-      </div>
-      <div style={{ marginTop: "var(--space-m)", textAlign: "center", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>{filtered.length} из {terms.length} терминов</div>
+      </section>
+
+      {filtered.length === 0 && (
+        <div className="empty-state">
+          <HelpCircle size={36} className="empty-icon" />
+          <h3>Термины не найдены</h3>
+          <p>Попробуйте изменить запрос или переключить категорию.</p>
+          <button
+            onClick={() => {
+              setSearch("");
+              setActiveTab("all");
+            }}
+            className="btn-reset-filters"
+          >
+            Сбросить все фильтры
+          </button>
+        </div>
+      )}
+
+      {/* ═══ 4. FOOTER CROSS-LINK TO SKILLS ═══ */}
+      <footer className="glossary-crosslink-footer">
+        <div className="crosslink-card">
+          <div className="crosslink-left">
+            <Sparkles size={24} className="text-emerald" />
+            <div>
+              <h3 className="crosslink-title">Связка с Картой способностей ProektMap</h3>
+              <p className="crosslink-text">
+                Каждый термин глоссария интерактивно подсвечивается в паспортах навыков создателя на <code>/skills</code>.
+                Осваивайте понятия прямо во время запуска проектов.
+              </p>
+            </div>
+          </div>
+          <Link href="/skills" className="btn-to-skills">
+            <span>Открыть Карту способностей</span>
+            <ArrowRight size={15} />
+          </Link>
+        </div>
+      </footer>
+
+      {/* ═══ INLINED STYLES ═══ */}
+      <style jsx>{`
+        .glossary-shell {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 40px 20px 80px;
+          font-family: var(--font-body, "Inter", sans-serif);
+          color: var(--color-text-primary, #111);
+        }
+
+        /* ─── Header ─── */
+        .glossary-header {
+          margin-bottom: 32px;
+        }
+        .glossary-eyebrow {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          font-family: var(--font-mono, monospace);
+          font-size: 12px;
+          font-weight: 600;
+          color: var(--color-text-tertiary, #888);
+          margin-bottom: 12px;
+        }
+        .eyebrow-pill {
+          color: #0fb880;
+          background: rgba(15, 184, 128, 0.1);
+          padding: 2px 8px;
+          border-radius: 4px;
+        }
+        .glossary-title {
+          font-family: var(--font-heading, "Onest", "Inter", sans-serif);
+          font-size: clamp(28px, 4.5vw, 42px);
+          font-weight: 800;
+          letter-spacing: -0.02em;
+          line-height: 1.15;
+          margin-bottom: 12px;
+        }
+        .glossary-subtitle {
+          font-size: 16px;
+          line-height: 1.6;
+          color: var(--color-text-secondary, #555);
+          max-width: 760px;
+          margin-bottom: 24px;
+        }
+
+        /* ─── Search ─── */
+        .glossary-search-wrap {
+          position: relative;
+          max-width: 760px;
+          margin-bottom: 20px;
+        }
+        .search-icon {
+          position: absolute;
+          left: 14px;
+          top: 50%;
+          transform: translateY(-50%);
+          color: var(--color-text-tertiary, #888);
+        }
+        .glossary-search-input {
+          width: 100%;
+          padding: 14px 100px 14px 44px;
+          border-radius: 10px;
+          border: 1px solid var(--color-border-light, #eaeaea);
+          background: var(--color-surface, #fff);
+          font-size: 15px;
+          font-family: inherit;
+          color: inherit;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+          outline: none;
+          transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .glossary-search-input:focus {
+          border-color: #0fb880;
+          box-shadow: 0 0 0 3px rgba(15, 184, 128, 0.15);
+        }
+        .search-clear-btn {
+          position: absolute;
+          right: 12px;
+          top: 50%;
+          transform: translateY(-50%);
+          background: #f0f0f0;
+          border: none;
+          padding: 6px 12px;
+          border-radius: 6px;
+          font-size: 12px;
+          font-weight: 600;
+          color: #555;
+          cursor: pointer;
+        }
+
+        /* ─── Category Tabs ─── */
+        .category-tabs-row {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+        }
+        .category-tab {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 8px 14px;
+          border-radius: 20px;
+          border: 1px solid var(--color-border-light, #eaeaea);
+          background: var(--color-surface, #fff);
+          font-size: 13px;
+          font-weight: 600;
+          color: var(--color-text-secondary, #555);
+          cursor: pointer;
+          transition: all 0.15s ease;
+        }
+        .category-tab:hover {
+          background: #f8fafc;
+          border-color: #ccc;
+          color: #111;
+        }
+        .category-tab.active {
+          background: #111827;
+          border-color: #111827;
+          color: #ffffff;
+        }
+
+        /* ─── Stats Bar ─── */
+        .glossary-stats-bar {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          font-size: 13px;
+          color: var(--color-text-tertiary, #777);
+          margin-bottom: 20px;
+          padding-bottom: 12px;
+          border-bottom: 1px solid var(--color-border-light, #eaeaea);
+        }
+        .search-query-badge {
+          background: rgba(15, 184, 128, 0.1);
+          color: #0fb880;
+          padding: 2px 8px;
+          border-radius: 4px;
+          font-weight: 600;
+        }
+
+        /* ─── Grid ─── */
+        .glossary-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+          gap: 18px;
+          margin-bottom: 48px;
+        }
+        .glossary-card {
+          background: var(--color-surface, #fff);
+          border: 1px solid var(--color-border-light, #eaeaea);
+          border-radius: 14px;
+          padding: 20px;
+          display: flex;
+          flex-direction: column;
+          transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .glossary-card:hover {
+          border-color: #bbb;
+          box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+          transform: translateY(-2px);
+        }
+
+        .card-top {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 10px;
+        }
+        .card-category-badge {
+          font-family: var(--font-mono, monospace);
+          font-size: 11px;
+          font-weight: 700;
+          padding: 3px 8px;
+          border-radius: 4px;
+        }
+        .card-open-link {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          font-size: 11px;
+          font-weight: 700;
+          color: var(--color-text-tertiary, #888);
+          text-decoration: none;
+        }
+        .card-open-link:hover {
+          color: #0fb880;
+        }
+
+        .term-link-title {
+          text-decoration: none;
+          color: inherit;
+        }
+        .card-term-title {
+          font-family: var(--font-heading, sans-serif);
+          font-size: 18px;
+          font-weight: 800;
+          line-height: 1.25;
+          margin: 0 0 10px 0;
+          color: var(--color-text-primary, #111);
+          transition: color 0.15s ease;
+        }
+        .term-link-title:hover .card-term-title {
+          color: #0fb880;
+        }
+
+        .card-simple-box {
+          display: flex;
+          align-items: flex-start;
+          gap: 8px;
+          background: rgba(15, 184, 128, 0.06);
+          border-radius: 8px;
+          padding: 8px 10px;
+          margin-bottom: 12px;
+        }
+        .simple-icon {
+          font-size: 13px;
+          line-height: 1.4;
+        }
+        .simple-text {
+          font-size: 13px;
+          font-weight: 600;
+          color: #111;
+          margin: 0;
+          line-height: 1.4;
+        }
+
+        .card-definition {
+          font-size: 13px;
+          line-height: 1.55;
+          color: var(--color-text-secondary, #555);
+          margin-bottom: 14px;
+        }
+
+        .card-quote-box {
+          background: #fffbeb;
+          border: 1px solid #fef3c7;
+          border-radius: 8px;
+          padding: 10px 12px;
+          margin-bottom: 16px;
+        }
+        .quote-header {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          font-family: var(--font-mono, monospace);
+          font-size: 10px;
+          font-weight: 700;
+          color: #b45309;
+          text-transform: uppercase;
+          margin-bottom: 4px;
+        }
+        .quote-icon {
+          color: #f59e0b;
+        }
+        .quote-text {
+          font-size: 12px;
+          line-height: 1.45;
+          color: #78350f;
+          font-style: italic;
+        }
+
+        .card-footer {
+          margin-top: auto;
+          padding-top: 12px;
+          border-top: 1px solid var(--color-border-light, #f0f0f0);
+        }
+        .card-detail-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          font-size: 12px;
+          font-weight: 700;
+          color: #2563eb;
+          text-decoration: none;
+        }
+        .card-detail-btn:hover {
+          color: #1d4ed8;
+          text-decoration: underline;
+        }
+
+        /* ─── Empty State ─── */
+        .empty-state {
+          text-align: center;
+          padding: 60px 20px;
+          background: var(--color-surface, #fff);
+          border: 1px solid var(--color-border-light, #eaeaea);
+          border-radius: 16px;
+          margin-bottom: 48px;
+        }
+        .empty-icon {
+          color: #888;
+          margin-bottom: 12px;
+        }
+        .btn-reset-filters {
+          background: #111;
+          color: #fff;
+          border: none;
+          padding: 10px 18px;
+          border-radius: 8px;
+          font-size: 13px;
+          font-weight: 700;
+          cursor: pointer;
+          margin-top: 12px;
+        }
+
+        /* ─── Crosslink Footer ─── */
+        .glossary-crosslink-footer {
+          margin-top: 24px;
+        }
+        .crosslink-card {
+          background: #111827;
+          color: #fff;
+          border-radius: 16px;
+          padding: 28px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 20px;
+          flex-wrap: wrap;
+        }
+        .crosslink-left {
+          display: flex;
+          align-items: flex-start;
+          gap: 16px;
+          max-width: 700px;
+        }
+        .crosslink-title {
+          font-family: var(--font-heading, sans-serif);
+          font-size: 18px;
+          font-weight: 800;
+          color: #fff;
+          margin: 0 0 6px 0;
+        }
+        .crosslink-text {
+          font-size: 13px;
+          line-height: 1.5;
+          color: rgba(255, 255, 255, 0.75);
+          margin: 0;
+        }
+        .crosslink-text code {
+          font-family: var(--font-mono, monospace);
+          color: #38bdf8;
+          background: rgba(255, 255, 255, 0.1);
+          padding: 2px 5px;
+          border-radius: 4px;
+        }
+        .btn-to-skills {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 12px 20px;
+          border-radius: 8px;
+          background: #0fb880;
+          color: #ffffff !important;
+          font-size: 14px;
+          font-weight: 700;
+          text-decoration: none !important;
+          white-space: nowrap;
+          transition: background 0.15s ease;
+        }
+        .btn-to-skills:hover {
+          background: #0ca36e;
+        }
+
+        .text-emerald { color: #0fb880; }
+      `}</style>
     </div>
   );
 }
