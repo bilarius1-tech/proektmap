@@ -1939,10 +1939,16 @@ DEVLOG + commit + push. `main` = `master`.
 - Обновлен каталог специалистов (`/specialists`) и витрина свежих работ на главной странице.
 - Документация: `docs/VIBECODER-PORTFOLIO.md`.
 
+### 6. Секция «Пульс сообщества вайбкодеров» (OriginKit Hero 22)
+- Интегрирован блок `CommunityPulseHero` на базе OriginKit Hero 22 с живой физикой частиц нейронной сети и интерактивными узлами.
+- Выведены динамические метрики экосистемы из базы данных: специалисты (18), кейсы (15), решения (2), инструменты (36), термины (165), статьи (345), навыки (15).
+- Добавлена векторная marquee-лента AI-агентов и технологий (Cursor, Claude 3.7, GPT-4o, DeepSeek, v0, Bolt.new, Windsurf, Supabase, n8n, Next.js, Prisma).
+- Выполнено точное математическое центрирование диаграммы мозга и узлов под контейнер главной страницы.
+
 ### Итог
 - Все тесты и проверки `npm run validate:all` пройдены успешно (0 ошибок).
 - Build собран, PM2 перезапущен.
-- Live: `/skills`, `/glossary`, `/ai-workshop`, `/specialists`, `/dashboard`, `/resheniya` (HTTP 200).
+- Live: `/`, `/skills`, `/glossary`, `/ai-workshop`, `/specialists`, `/dashboard`, `/resheniya` (HTTP 200).
 
 ### День закрыт
 DEVLOG + commit + push. `main` = `master`.

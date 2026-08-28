@@ -1,5 +1,6 @@
 import { getDb } from "@/lib/db/index";
 import AnimatedHero from "@/components/hero/animated-hero";
+import { CommunityPulseHero, CommunityStats } from "@/components/originkit/community-pulse";
 import Link from "next/link";
 import { ArrowRight, Map, Bot, Rocket, Route, Sparkles, Boxes, Compass, Plus, Flame, Eye, Layers } from "lucide-react";
 import { Metadata } from "next";
@@ -14,24 +15,53 @@ export const metadata: Metadata = {
 
 export default async function Home() {
   const db = await getDb();
-  const latestPosts = await db.blogPost.findMany({ where: { status: "published" }, orderBy: { publishedAt: "desc" }, take: 3, select: { title: true, slug: true, excerpt: true, coverImage: true, publishedAt: true, viewCount: true } });
-  const latestUsers = await db.user.findMany({
-    orderBy: { createdAt: "desc" },
-    take: 8,
-    select: { id: true, name: true, email: true, avatar: true, createdAt: true, status: true, headline: true, role: true, publicProfile: true },
-  });
-  const latestProjects = await db.aiProject.findMany({
-    where: { isPublished: true, moderationStatus: "approved" },
-    orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
-    take: 6,
-    include: {
-      user: {
-        select: { id: true, name: true, email: true, avatar: true, status: true, headline: true },
+
+  const [
+    totalUsers,
+    totalProjects,
+    totalTools,
+    totalTerms,
+    totalPosts,
+    latestPosts,
+    latestUsers,
+    latestProjects,
+    popularPosts,
+    latestTerms,
+  ] = await Promise.all([
+    db.user.count(),
+    db.aiProject.count({ where: { isPublished: true, moderationStatus: "approved" } }),
+    db.aITool.count(),
+    db.glossaryTerm.count({ where: { isPublished: true } }),
+    db.blogPost.count({ where: { status: "published" } }),
+    db.blogPost.findMany({ where: { status: "published" }, orderBy: { publishedAt: "desc" }, take: 3, select: { title: true, slug: true, excerpt: true, coverImage: true, publishedAt: true, viewCount: true } }),
+    db.user.findMany({
+      orderBy: { createdAt: "desc" },
+      take: 8,
+      select: { id: true, name: true, email: true, avatar: true, createdAt: true, status: true, headline: true, role: true, publicProfile: true },
+    }),
+    db.aiProject.findMany({
+      where: { isPublished: true, moderationStatus: "approved" },
+      orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
+      take: 6,
+      include: {
+        user: {
+          select: { id: true, name: true, email: true, avatar: true, status: true, headline: true },
+        },
       },
-    },
-  });
-  const popularPosts = await db.blogPost.findMany({ where: { status: "published" }, orderBy: { viewCount: "desc" }, take: 3, select: { title: true, slug: true, publishedAt: true, viewCount: true } });
-  const latestTerms = await db.glossaryTerm.findMany({ where: { isPublished: true }, orderBy: { createdAt: "desc" }, take: 6, select: { term: true, slug: true, simpleExplanation: true, level: true } });
+    }),
+    db.blogPost.findMany({ where: { status: "published" }, orderBy: { viewCount: "desc" }, take: 3, select: { title: true, slug: true, publishedAt: true, viewCount: true } }),
+    db.glossaryTerm.findMany({ where: { isPublished: true }, orderBy: { createdAt: "desc" }, take: 6, select: { term: true, slug: true, simpleExplanation: true, level: true } }),
+  ]);
+
+  const communityStats: CommunityStats = {
+    totalUsers,
+    totalProjects,
+    totalSolutions: 2,
+    totalTools,
+    totalTerms,
+    totalPosts,
+    totalSkills: 15,
+  };
 
   return (
     <div className="home-page" style={{ fontFamily: "Inter, sans-serif", background: "var(--color-bg-primary)", color: "var(--color-text-primary)", minHeight: "100vh" }}>
@@ -67,6 +97,11 @@ export default async function Home() {
       </div>
       </AnimatedHero>
       <div style={{ height: 1, background: "var(--color-border)" }} />
+
+      {/* OriginKit Community Pulse & Neural Ecosystem Hero */}
+      <div style={{ padding: "var(--space-xxl) 0 0" }}>
+        <CommunityPulseHero stats={communityStats} />
+      </div>
 
       {/* Как это работает */}
       <div style={{ maxWidth: 960, margin: "0 auto", padding: "var(--space-xl) var(--space-m)" }}>
