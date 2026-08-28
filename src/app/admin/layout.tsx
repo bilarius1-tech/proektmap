@@ -1,25 +1,26 @@
 import Link from "next/link";
-import { Home, FileText, Layers, GitBranch, Settings, Users, Menu, Puzzle, Link as LinkIcon, Cpu, BookOpen, Palette, Map, Crown, Factory } from "lucide-react";
+import { Home, FileText, Layers, GitBranch, Settings, Users, Menu, Puzzle, Link as LinkIcon, Cpu, BookOpen, Palette, Map, Crown, Factory, Wrench } from "lucide-react";
 
 const nav = [
   { href: "/admin", label: "Обзор", icon: Home },
-    { href: "/admin/users", label: "Пользователи", icon: Users },
+  { href: "/admin/users", label: "Пользователи", icon: Users },
   { href: "/admin/blueprints", label: "Blueprints", icon: FileText },
   { href: "/admin/stages", label: "Этапы", icon: Layers },
   { href: "/admin/decisions", label: "Решения", icon: GitBranch },
-    { href: "/admin/glossary", label: "Глоссарий", icon: BookOpen },
-    { href: "/admin/skills", label: "Skills", icon: Puzzle },
-    { href: "/admin/ai-projects", label: "AI Цех", icon: Factory },
-    { href: "/admin/blog", label: "Блог", icon: BookOpen },
-    { href: "/admin/quest", label: "Квест", icon: Map },
-    { href: "/admin/ai-radar", label: "AI Radar", icon: Cpu },
+  { href: "/admin/glossary", label: "Глоссарий", icon: BookOpen },
+  { href: "/admin/skills", label: "Skills", icon: Puzzle },
+  { href: "/admin/ai-tools", label: "Инструменты", icon: Wrench },
+  { href: "/admin/ai-projects", label: "AI Цех", icon: Factory },
+  { href: "/admin/blog", label: "Блог", icon: BookOpen },
+  { href: "/admin/quest", label: "Квест", icon: Map },
+  { href: "/admin/ai-radar", label: "AI Radar", icon: Cpu },
   { href: "/admin/design", label: "Дизайн", icon: Palette },
-    { href: "/admin/billing", label: "Биллинг", icon: Crown },
-    { href: "/admin/patterns", label: "Паттерны", icon: Puzzle },
-    { href: "/admin/mcp", label: "MCP-серверы", icon: Cpu },
-    { href: "/admin/settings", label: "Настройки", icon: Settings },
-    { href: "/admin/menu", label: "Меню", icon: Menu },
-    { href: "/admin/referrals", label: "Рефералы", icon: LinkIcon },
+  { href: "/admin/billing", label: "Биллинг", icon: Crown },
+  { href: "/admin/patterns", label: "Паттерны", icon: Puzzle },
+  { href: "/admin/mcp", label: "MCP-серверы", icon: Cpu },
+  { href: "/admin/settings", label: "Настройки", icon: Settings },
+  { href: "/admin/menu", label: "Меню", icon: Menu },
+  { href: "/admin/referrals", label: "Рефералы", icon: LinkIcon },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

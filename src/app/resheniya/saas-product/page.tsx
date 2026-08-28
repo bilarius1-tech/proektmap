@@ -14,6 +14,7 @@ import {
   Target,
 } from "lucide-react";
 import { guidedSaasSolution } from "../guided-data";
+import SolutionSkillsStack from "@/components/skills/solution-skills-stack";
 
 export const metadata: Metadata = {
   title: "Запустить SaaS-продукт — готовое AI-решение",
@@ -100,6 +101,8 @@ export default function SaasSolutionPage() {
             ))}
           </div>
         </section>
+
+        <SolutionSkillsStack />
 
         <section className="solution-pack-section" aria-labelledby="pack-title">
           <div className="solution-pack-copy">
