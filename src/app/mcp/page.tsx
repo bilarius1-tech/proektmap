@@ -1,6 +1,16 @@
 import { getDb } from "@/lib/db/index";
 import MCPPageClient from "./client";
+import { Metadata } from "next";
+
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Каталог MCP-серверов — готовые интеграции для AI | ProektMap",
+  description: "Каталог Model Context Protocol (MCP) серверов: подключение баз данных, файлов, API и внешних сервисов к вашим AI-ассистентам и агентам.",
+  alternates: {
+    canonical: "https://proektmap.ru/mcp",
+  },
+};
 
 export default async function Page() {
   try {

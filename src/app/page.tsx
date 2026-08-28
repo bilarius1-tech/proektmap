@@ -1,12 +1,35 @@
 import { getDb } from "@/lib/db/index";
 import AnimatedHero from "@/components/hero/animated-hero";
 import Link from "next/link";
-import { ArrowRight, Map, Bot, Rocket, Route, Sparkles, Boxes, Compass } from "lucide-react";
+import { ArrowRight, Map, Bot, Rocket, Route, Sparkles, Boxes, Compass, Plus, Flame, Eye, Layers } from "lucide-react";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "ProektMap — Карта роста и готовые AI-решения для создания продуктов",
+  description: "Готовые инженерные маршруты, стек, промпты, Skills и практические шаги для создания веб-сервисов, Telegram-ботов и AI-ассистентов.",
+  alternates: {
+    canonical: "https://proektmap.ru",
+  },
+};
 
 export default async function Home() {
   const db = await getDb();
   const latestPosts = await db.blogPost.findMany({ where: { status: "published" }, orderBy: { publishedAt: "desc" }, take: 3, select: { title: true, slug: true, excerpt: true, coverImage: true, publishedAt: true, viewCount: true } });
-  const latestUsers = await db.user.findMany({ orderBy: { createdAt: "desc" }, take: 4, select: { id: true, name: true, email: true, avatar: true, createdAt: true, status: true, role: true } });
+  const latestUsers = await db.user.findMany({
+    orderBy: { createdAt: "desc" },
+    take: 8,
+    select: { id: true, name: true, email: true, avatar: true, createdAt: true, status: true, headline: true, role: true, publicProfile: true },
+  });
+  const latestProjects = await db.aiProject.findMany({
+    where: { isPublished: true, moderationStatus: "approved" },
+    orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
+    take: 6,
+    include: {
+      user: {
+        select: { id: true, name: true, email: true, avatar: true, status: true, headline: true },
+      },
+    },
+  });
   const popularPosts = await db.blogPost.findMany({ where: { status: "published" }, orderBy: { viewCount: "desc" }, take: 3, select: { title: true, slug: true, publishedAt: true, viewCount: true } });
   const latestTerms = await db.glossaryTerm.findMany({ where: { isPublished: true }, orderBy: { createdAt: "desc" }, take: 6, select: { term: true, slug: true, simpleExplanation: true, level: true } });
 
@@ -124,6 +147,175 @@ export default async function Home() {
         </div>
       </div>
 
+      {/* Behance-Style AI Showcase & Community Portfolio */}
+      {latestProjects.length > 0 && (
+        <div style={{ maxWidth: 960, margin: "0 auto", padding: "0 var(--space-m) var(--space-xxl)" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "var(--space-l)", flexWrap: "wrap", gap: 12 }}>
+            <div>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 700, color: "var(--color-accent)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 }}>
+                <Sparkles size={13} /> Портфолио вайбкодеров
+              </div>
+              <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-xl)", fontWeight: 800, margin: 0, letterSpacing: "-0.01em" }}>
+                Свежие работы сообщества
+              </h2>
+            </div>
+
+            <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+              <Link
+                href="/projects/new"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  padding: "8px 16px",
+                  borderRadius: 6,
+                  background: "var(--color-accent)",
+                  color: "#fff",
+                  textDecoration: "none",
+                  fontSize: "var(--text-xs)",
+                  fontWeight: 700,
+                }}
+              >
+                <Plus size={14} /> Загрузить работу
+              </Link>
+              <Link
+                href="/ai-workshop"
+                style={{
+                  fontSize: "var(--text-xs)",
+                  color: "var(--color-text-secondary)",
+                  textDecoration: "none",
+                  fontWeight: 600,
+                }}
+              >
+                Все кейсы ({latestProjects.length}) →
+              </Link>
+            </div>
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "var(--space-l)" }}>
+            {latestProjects.map((p: any) => {
+              const authorName = p.user?.name || p.authorName || "Вайбкодер";
+              const authorAvatar = p.user?.avatar || p.authorAvatar || "";
+              const authorProfileUrl = p.userId ? `/profile/${p.userId}` : p.authorUrl || "#";
+              const aiList = (p.aiTools || "").split(",").map((s: string) => s.trim()).filter(Boolean);
+
+              return (
+                <div
+                  key={p.id}
+                  style={{
+                    background: "var(--color-bg-primary)",
+                    border: "1px solid var(--color-border)",
+                    borderRadius: "var(--radius-m)",
+                    overflow: "hidden",
+                    display: "flex",
+                    flexDirection: "column",
+                  }}
+                >
+                  {/* Image Cover */}
+                  <Link
+                    href={`/ai-workshop/${p.slug}`}
+                    style={{
+                      display: "block",
+                      width: "100%",
+                      aspectRatio: "16/10",
+                      background: p.screenshot ? `url(${p.screenshot}) center/cover` : "linear-gradient(135deg, #0f172a, #1e293b)",
+                      position: "relative",
+                      textDecoration: "none",
+                    }}
+                  >
+                    {!p.screenshot && (
+                      <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,0.7)", textAlign: "center", padding: 16 }}>
+                        <div style={{ fontSize: 13, fontWeight: 700 }}>{p.title}</div>
+                      </div>
+                    )}
+                    <span
+                      style={{
+                        position: "absolute",
+                        top: 8,
+                        left: 8,
+                        padding: "2px 8px",
+                        borderRadius: 4,
+                        fontSize: 10,
+                        fontWeight: 700,
+                        background: "rgba(0,0,0,0.7)",
+                        color: "#fff",
+                        backdropFilter: "blur(4px)",
+                      }}
+                    >
+                      {p.category}
+                    </span>
+                  </Link>
+
+                  {/* Body */}
+                  <div style={{ padding: "16px", display: "flex", flexDirection: "column", flex: 1 }}>
+                    <Link
+                      href={`/ai-workshop/${p.slug}`}
+                      style={{ textDecoration: "none", color: "inherit", marginBottom: 6 }}
+                    >
+                      <h3 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-s)", fontWeight: 700, margin: 0, lineHeight: 1.3 }}>
+                        {p.title}
+                      </h3>
+                    </Link>
+
+                    <p style={{ fontSize: 11, color: "var(--color-text-secondary)", lineHeight: 1.5, margin: "0 0 12px", flex: 1, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                      {p.description}
+                    </p>
+
+                    {/* AI Tools */}
+                    {aiList.length > 0 && (
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 12 }}>
+                        {aiList.slice(0, 2).map((t: string) => (
+                          <span key={t} style={{ fontSize: 10, fontWeight: 600, padding: "2px 6px", borderRadius: 3, background: "rgba(15, 184, 128, 0.08)", color: "var(--color-accent)" }}>
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Author & Stats Footer */}
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid var(--color-border)", paddingTop: 10, marginTop: "auto" }}>
+                      <Link
+                        href={authorProfileUrl}
+                        style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", color: "inherit", minWidth: 0 }}
+                      >
+                        <div
+                          style={{
+                            width: 26,
+                            height: 26,
+                            borderRadius: "50%",
+                            background: authorAvatar ? `url(${authorAvatar}) center/cover` : "var(--color-bg-secondary)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: 11,
+                            fontWeight: 700,
+                            flexShrink: 0,
+                          }}
+                        >
+                          {!authorAvatar && authorName[0].toUpperCase()}
+                        </div>
+                        <span style={{ fontSize: 11, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                          {authorName}
+                        </span>
+                      </Link>
+
+                      <div style={{ display: "flex", gap: 8, fontSize: 11, color: "var(--color-text-tertiary)", flexShrink: 0 }}>
+                        <span style={{ display: "flex", alignItems: "center", gap: 3 }}>
+                          <Flame size={12} color="#ef4444" /> {p.likesCount || 0}
+                        </span>
+                        <span style={{ display: "flex", alignItems: "center", gap: 3 }}>
+                          <Eye size={12} /> {p.viewCount || 0}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* 3 Content Blocks */}
       <div style={{ maxWidth: 960, margin: "0 auto", padding: "0 var(--space-m) var(--space-xl)" }}>
         {/* Latest Posts */}
@@ -150,19 +342,28 @@ export default async function Home() {
         {latestUsers.length > 0 && (
           <div style={{ marginBottom: "var(--space-xl)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-m)" }}>
-              <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-l)", fontWeight: 700, margin: 0 }}>Новые участники</h2>
+              <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-l)", fontWeight: 700, margin: 0 }}>
+                Новые участники и вайбкодеры
+              </h2>
+              <Link href="/specialists" style={{ fontSize: "var(--text-xs)", color: "var(--color-accent)", textDecoration: "none", fontWeight: 600 }}>
+                Все специалисты ({latestUsers.length}) →
+              </Link>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "var(--space-m)" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "var(--space-m)" }}>
               {latestUsers.map((u: any) => (
-                <a key={u.id} href={`/profile/${u.id}`} style={{ padding: "var(--space-m)", background: "var(--color-bg-primary)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-m)", textDecoration: "none", color: "inherit", display: "flex", alignItems: "center", gap: "var(--space-m)" }}>
-                  <div style={{ width: 40, height: 40, borderRadius: "var(--radius-full)", background: u.avatar ? `url(${u.avatar}) center/cover` : "var(--color-bg-secondary)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 700, flexShrink: 0 }}>
+                <Link key={u.id} href={`/profile/${u.id}`} style={{ padding: "var(--space-m)", background: "var(--color-bg-primary)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-m)", textDecoration: "none", color: "inherit", display: "flex", alignItems: "center", gap: "var(--space-m)" }}>
+                  <div style={{ width: 42, height: 42, borderRadius: "var(--radius-full)", background: u.avatar ? `url(${u.avatar}) center/cover` : "var(--color-bg-secondary)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 700, flexShrink: 0, border: "1px solid var(--color-border)" }}>
                     {!u.avatar && (u.name?.[0] || u.email[0]).toUpperCase()}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 600, fontSize: "var(--text-xs)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{u.name || u.email.split("@")[0]}</div>
-                    <div style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>{u.status === "junior" ? "Новичок" : u.status}</div>
+                    <div style={{ fontWeight: 700, fontSize: "var(--text-xs)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {u.name || u.email.split("@")[0]}
+                    </div>
+                    <div style={{ fontSize: 10, color: "var(--color-accent)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {u.headline || (u.status === "architect" ? "AI-Архитектор" : "Вайбкодер")}
+                    </div>
                   </div>
-                </a>
+                </Link>
               ))}
             </div>
           </div>

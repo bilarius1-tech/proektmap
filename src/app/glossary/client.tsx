@@ -15,6 +15,9 @@ import {
   HelpCircle,
   Quote,
   ShieldCheck,
+  Share2,
+  Check,
+  Send,
 } from "lucide-react";
 
 interface GlossaryTermItem {
@@ -60,6 +63,20 @@ const LEVEL_BADGES: Record<string, { label: string; color: string; bg: string }>
 export default function GlossaryClient({ terms }: { terms: GlossaryTermItem[] }) {
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState("all");
+  const [copiedSlug, setCopiedSlug] = useState<string | null>(null);
+
+  const handleCopyTermLink = async (slug: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const url = `${typeof window !== "undefined" ? window.location.origin : "https://proektmap.ru"}/glossary/${slug}`;
+    try {
+      if (typeof window !== "undefined" && navigator.clipboard) {
+        await navigator.clipboard.writeText(url);
+        setCopiedSlug(slug);
+        setTimeout(() => setCopiedSlug(null), 2000);
+      }
+    } catch {}
+  };
 
   const filtered = useMemo(() => {
     return terms.filter((t) => {
@@ -203,6 +220,26 @@ export default function GlossaryClient({ terms }: { terms: GlossaryTermItem[] })
                   <span>Читать пример и решение</span>
                   <ArrowRight size={13} />
                 </Link>
+
+                <div className="card-quick-share">
+                  <a
+                    href={`https://t.me/share/url?url=${encodeURIComponent(`https://proektmap.ru/glossary/${item.slug}`)}&text=${encodeURIComponent(`${item.term} — ${item.simpleExplanation || item.definition}`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="card-share-icon-btn tg-icon"
+                    title="Поделиться в Telegram"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <Send size={13} />
+                  </a>
+                  <button
+                    onClick={(e) => handleCopyTermLink(item.slug, e)}
+                    className={`card-share-icon-btn copy-icon ${copiedSlug === item.slug ? "copied" : ""}`}
+                    title="Скопировать ссылку на термин"
+                  >
+                    {copiedSlug === item.slug ? <Check size={13} /> : <Share2 size={13} />}
+                  </button>
+                </div>
               </div>
             </article>
           );
@@ -512,6 +549,9 @@ export default function GlossaryClient({ terms }: { terms: GlossaryTermItem[] })
           margin-top: auto;
           padding-top: 12px;
           border-top: 1px solid var(--color-border-light, #f0f0f0);
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
         }
         .card-detail-btn {
           display: inline-flex;
@@ -525,6 +565,42 @@ export default function GlossaryClient({ terms }: { terms: GlossaryTermItem[] })
         .card-detail-btn:hover {
           color: #1d4ed8;
           text-decoration: underline;
+        }
+        .card-quick-share {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+        .card-share-icon-btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 26px;
+          height: 26px;
+          border-radius: 6px;
+          border: 1px solid var(--color-border-light, #e5e7eb);
+          background: var(--color-bg-secondary, #f9fafb);
+          color: var(--color-text-tertiary, #6b7280);
+          cursor: pointer;
+          transition: all 0.15s ease;
+          text-decoration: none;
+        }
+        .card-share-icon-btn:hover {
+          transform: translateY(-1px);
+        }
+        .card-share-icon-btn.tg-icon:hover {
+          background: #229ed9;
+          border-color: #229ed9;
+          color: #fff;
+        }
+        .card-share-icon-btn.copy-icon:hover {
+          background: #f3f4f6;
+          color: #111;
+        }
+        .card-share-icon-btn.copy-icon.copied {
+          background: rgba(15, 184, 128, 0.15);
+          border-color: #0fb880;
+          color: #0fb880;
         }
 
         /* ─── Empty State ─── */

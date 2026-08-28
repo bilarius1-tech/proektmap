@@ -35,9 +35,9 @@ export async function POST(req: NextRequest) {
       label,
       href,
       parentId: parentId || null,
-      sortOrder: sortOrder || 0,
+      sortOrder: typeof sortOrder === "number" ? sortOrder : 0,
       icon: icon || null,
-      emoji: emoji || null,
+      emoji: emoji ? emoji.trim() : null,
       location: location || "header",
     },
   });
@@ -53,7 +53,16 @@ export async function PUT(req: NextRequest) {
   const db = await getDb();
   await db.menuItem.update({
     where: { id },
-    data: { label, href, parentId, sortOrder, icon, location, isActive, emoji },
+    data: {
+      label,
+      href,
+      parentId: parentId || null,
+      sortOrder: typeof sortOrder === "number" ? sortOrder : 0,
+      icon: icon || null,
+      emoji: emoji ? emoji.trim() : null,
+      location: location || "header",
+      isActive: isActive ?? true,
+    },
   });
   return NextResponse.json({ ok: true });
 }

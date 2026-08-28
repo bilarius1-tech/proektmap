@@ -160,6 +160,7 @@ export default function MenuEditor({ items: initialItems, blueprints, allBluepri
                 opacity: dragItem === item.id ? 0.5 : 1,
               }}>
               <GripVertical size={14} color="var(--color-text-tertiary)" style={{ cursor: "grab" }} />
+              {item.emoji && <span style={{ fontSize: 16 }}>{item.emoji}</span>}
               <span style={{ fontWeight: 600, flex: 1, fontSize: "var(--text-s)" }}>{item.label}</span>
               <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", fontFamily: "var(--font-mono)" }}>{item.href}</span>
               {!item.isActive && <span className="badge" style={{ background: "var(--color-bg-tertiary)", color: "var(--color-text-tertiary)" }}>скрыт</span>}
@@ -173,6 +174,7 @@ export default function MenuEditor({ items: initialItems, blueprints, allBluepri
               <div style={{ marginLeft: "var(--space-xl)", marginTop: "var(--space-xs)", display: "flex", flexDirection: "column", gap: 4 }}>
                 {item.children.map(child => (
                   <div key={child.id} style={{ display: "flex", alignItems: "center", gap: "var(--space-s)", padding: "var(--space-s)", background: "var(--color-bg-primary)", borderRadius: "var(--radius-m)", border: "1px solid var(--color-border-light)" }}>
+                    {child.emoji && <span style={{ fontSize: 16 }}>{child.emoji}</span>}
                     <span style={{ fontWeight: 500, flex: 1, fontSize: "var(--text-s)" }}>↳ {child.label}</span>
                     <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", fontFamily: "var(--font-mono)" }}>{child.href}</span>
                     <button onClick={() => startEdit(child)} className="btn btn-ghost" style={{ padding: 4 }}><Edit size={14} /></button>

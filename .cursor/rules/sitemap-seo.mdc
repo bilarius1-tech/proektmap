@@ -1,0 +1,59 @@
+---
+description: Правила SEO, карты сайта и валидации новых маршрутов ProektMap
+globs: src/app/**/page.tsx,src/app/sitemap.ts,src/app/sitemap/**
+alwaysApply: true
+---
+
+# SEO и Карта сайта — правила для агентов
+
+## Главный принцип
+
+Каждый новый публичный раздел, страница или шаблон маршрута в ProektMap **обязан** автоматически попадать в поисковую индексацию и карту сайта.
+
+Никаких «забытых страниц-сирот» (orphan pages) без ссылок и без sitemap.
+
+---
+
+## 4 обязательных шага при создании/изменении любого раздела
+
+### 1. Регистрация в дереве карты сайта (`SITE_TREE`)
+Файл: `src/app/sitemap/site-map-data.ts`
+- Добавь объект `{ title: "...", href: "/your-route", description?: "..." }` в соответствующую группу `SITE_TREE`.
+- Это автоматически добавит страницу в визуальную карту сайта (`/sitemap`) и массив `PUBLIC_SEO_ROUTES`.
+
+### 2. Динамические коллекции в `sitemap.ts`
+Файл: `src/app/sitemap.ts`
+- Если создана динамическая страница (например, `/your-section/[slug]`), добавь выборку записей из БД (Prisma) или статического массива данных и включи их в итоговый массив `sitemap()`.
+- Укажи `changeFrequency` ("daily" / "weekly" / "monthly") и `priority` (0.6 - 0.9).
+
+### 3. SEO-метаданные на странице (`page.tsx`)
+На каждой публичной странице `src/app/**/page.tsx` обязательно должен быть экспорт `metadata`:
+```typescript
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Заголовок страницы — Ключевые слова | ProektMap",
+  description: "Ёмкое описание (140-160 символов) с понятной ценностью для пользователя и поисковика.",
+  alternates: {
+    canonical: "https://proektmap.ru/your-route",
+  },
+};
+```
+Для динамических страниц используй `generateMetadata({ params })`.
+
+### 4. Автоматическая валидация
+Перед сборкой и деплоем обязательно запусти:
+```bash
+npx tsx scripts/validate-sitemap.ts
+```
+или
+```bash
+npm run validate:sitemap
+```
+
+Скрипт проверяет:
+- Все ли файлы `page.tsx` зарегистрированы в `SITE_TREE`.
+- Нет ли битых ссылок в карте сайта.
+- Не попали ли приватные роуты (`/admin`, `/dashboard`) в публичный sitemap.
+- Наличие метаданных `metadata`.
+- Полноту динамических генераторов в `sitemap.ts`.

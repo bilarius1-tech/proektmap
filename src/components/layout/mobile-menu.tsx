@@ -8,7 +8,7 @@ import ThemeToggle from "./theme-toggle";
 import KnowledgeButtons from "@/components/knowledge/knowledge-buttons";
 
 interface MenuItem {
-  id: string; label: string; href: string; children?: MenuItem[];
+  id: string; label: string; href: string; emoji?: string; children?: MenuItem[];
 }
 
 export default function MobileMenu({ items }: { items: MenuItem[] }) {
@@ -68,8 +68,9 @@ export default function MobileMenu({ items }: { items: MenuItem[] }) {
                         <div style={{ paddingLeft: "var(--space-m)" }}>
                           {item.children.map(child => (
                             <Link key={child.id} href={child.href} onClick={() => setOpen(false)}
-                              style={{ display: "block", padding: "10px 12px", color: "var(--color-text-secondary)", textDecoration: "none", fontSize: "var(--text-s)" }}>
-                              {child.label}
+                              style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 12px", color: "var(--color-text-secondary)", textDecoration: "none", fontSize: "var(--text-s)" }}>
+                              {child.emoji && <span style={{ fontSize: 16 }}>{child.emoji}</span>}
+                              <span>{child.label}</span>
                             </Link>
                           ))}
                         </div>

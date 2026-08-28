@@ -5,6 +5,7 @@ import Link from "next/link";
 import Breadcrumbs from "@/components/nav/breadcrumbs";
 import SaveButton from "@/components/layout/save-button";
 import RelatedSidebar from "@/components/layout/related-sidebar";
+import { getAICategory } from "@/lib/constants/ai-categories";
 
 function StarRating({ rating }: { rating: number }) {
   return (
@@ -77,25 +78,33 @@ export default function AIToolDetailClient({ tool, related, alternatives, isLogg
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "var(--space-l)", flexWrap: "wrap", gap: "var(--space-m)" }}>
         <div>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: "var(--space-xs)", alignItems: "center" }}>
-            <span style={{ padding: "3px 10px", borderRadius: 0, background: "var(--color-accent)", color: "white", fontSize: 10, fontWeight: 700 }}>
+            {(() => {
+              const cat = getAICategory(tool.category);
+              return (
+                <span style={{ padding: "3px 10px", borderRadius: 4, background: cat.bg, color: cat.color, border: `1px solid ${cat.border}`, fontSize: 11, fontWeight: 700 }}>
+                  {cat.emoji} {cat.label}
+                </span>
+              );
+            })()}
+            <span style={{ padding: "3px 10px", borderRadius: 4, background: "var(--color-bg-secondary)", color: "var(--color-text-primary)", fontSize: 10, fontWeight: 700 }}>
               {typeLabels[tool.type] || tool.type}
             </span>
             {tool.russianUi ? (
-              <span style={{ padding: "3px 10px", borderRadius: 0, background: "#ecfdf5", color: "#065f46", fontSize: 10, fontWeight: 700 }}>🇷🇺 Российский</span>
+              <span style={{ padding: "3px 10px", borderRadius: 4, background: "#ecfdf5", color: "#065f46", fontSize: 10, fontWeight: 700 }}>🇷🇺 Российский</span>
             ) : (
-              <span style={{ padding: "3px 10px", borderRadius: 0, background: "#eff6ff", color: "#1e40af", fontSize: 10, fontWeight: 700 }}>🌍 Международный</span>
+              <span style={{ padding: "3px 10px", borderRadius: 4, background: "#eff6ff", color: "#1e40af", fontSize: 10, fontWeight: 700 }}>🌍 Международный</span>
             )}
             {tool.requiresVpn && (
-              <span style={{ padding: "3px 10px", borderRadius: 0, background: "#fef2f2", color: "#991b1b", fontSize: 10, fontWeight: 700 }}>🔐 Нужен VPN</span>
+              <span style={{ padding: "3px 10px", borderRadius: 4, background: "#fef2f2", color: "#991b1b", fontSize: 10, fontWeight: 700 }}>🔐 Нужен VPN</span>
             )}
             {tool.requiresForeignCard && (
-              <span style={{ padding: "3px 10px", borderRadius: 0, background: "#fffbeb", color: "#92400e", fontSize: 10, fontWeight: 700 }}>💳 Иностранная карта</span>
+              <span style={{ padding: "3px 10px", borderRadius: 4, background: "#fffbeb", color: "#92400e", fontSize: 10, fontWeight: 700 }}>💳 Иностранная карта</span>
             )}
             {showEditorChoice && (
-              <span style={{ padding: "3px 10px", borderRadius: 0, background: "#fef3c7", color: "#92400e", fontSize: 10, fontWeight: 700 }}>⭐ Выбор редакции</span>
+              <span style={{ padding: "3px 10px", borderRadius: 4, background: "#fef3c7", color: "#92400e", fontSize: 10, fontWeight: 700 }}>⭐ Выбор редакции</span>
             )}
             {showNew && (
-              <span style={{ padding: "3px 10px", borderRadius: 0, background: "#dbeafe", color: "#1e40af", fontSize: 10, fontWeight: 700 }}>🆕 Новинка</span>
+              <span style={{ padding: "3px 10px", borderRadius: 4, background: "#dbeafe", color: "#1e40af", fontSize: 10, fontWeight: 700 }}>🆕 Новинка</span>
             )}
           </div>
           <h1 style={{ fontSize: "var(--text-xxl)", fontWeight: 900, margin: "var(--space-xs) 0", fontFamily: "var(--font-heading)", letterSpacing: "-0.02em" }}><img src={"/uploads/tools/" + tool.slug + ".png"} alt={tool.name} style={{ width: 40, height: 40 }} onError={(e: any) => { e.target.style.display = "none" }} /> {tool.name}</h1>

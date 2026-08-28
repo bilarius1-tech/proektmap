@@ -10,7 +10,22 @@ export async function PATCH(req: NextRequest) {
   const db = await getDb();
   const email = (session.user as any).email?.toLowerCase();
 
-  const { avatar, ...rest } = data;
-  await db.user.update({ where: { email }, data: { ...rest, avatar: avatar || "" } });
+  const { avatar, name, bio, status, headline, telegram, github, website, skills, publicProfile } = data;
+  
+  await db.user.update({
+    where: { email },
+    data: {
+      name: name !== undefined ? name : undefined,
+      bio: bio !== undefined ? bio : undefined,
+      status: status !== undefined ? status : undefined,
+      headline: headline !== undefined ? headline : undefined,
+      telegram: telegram !== undefined ? telegram : undefined,
+      github: github !== undefined ? github : undefined,
+      website: website !== undefined ? website : undefined,
+      skills: skills !== undefined ? skills : undefined,
+      publicProfile: publicProfile !== undefined ? publicProfile : undefined,
+      avatar: avatar !== undefined ? avatar : undefined,
+    },
+  });
   return NextResponse.json({ ok: true });
 }

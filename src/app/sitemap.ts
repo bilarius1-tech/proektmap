@@ -3,6 +3,7 @@ import { getDb } from "@/lib/db/index";
 import { PUBLIC_SEO_ROUTES } from "./sitemap/site-map-data";
 import { CREATIVE_TOOLS } from "@/lib/creative-library/data";
 import { VIBE_KITS } from "@/lib/vibe-blocks/data";
+import { CAPABILITY_SKILLS } from "@/app/skills/skills-data";
 
 const baseUrl = "https://proektmap.ru";
 
@@ -10,7 +11,7 @@ function pagePriority(href: string) {
   if (href === "/") return 1;
   if (href === "/resheniya") return 0.9;
   if (href.startsWith("/resheniya/")) return href.includes("workspace") ? 0.6 : 0.8;
-  if (["/blog", "/ai-tools", "/mcp", "/telegram", "/avito", "/ai-without-vpn"].includes(href)) return 0.8;
+  if (["/blog", "/ai-tools", "/mcp", "/telegram", "/avito", "/ai-without-vpn", "/skills", "/glossary"].includes(href)) return 0.8;
   if (["/terms", "/privacy", "/offer", "/refund", "/contacts"].includes(href)) return 0.4;
   if (href === "/auth") return 0.3;
   return 0.7;
@@ -75,6 +76,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: "monthly" as const,
       priority: 0.65,
+    })),
+    ...CAPABILITY_SKILLS.map((skill) => ({
+      url: `${baseUrl}/skills/${skill.slug}`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
     })),
     ...blogUrls,
     ...aiToolUrls,

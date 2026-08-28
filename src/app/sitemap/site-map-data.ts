@@ -55,7 +55,15 @@ export const SITE_TREE: SiteTreeGroup[] = [
         title: "Практические пути",
         children: [
           { title: "Новичок: первый проект", href: "/quest/beginner" },
-          { title: "Вайбик: Миссия №1", href: "/vaibik" },
+          {
+            title: "Вайбик: Миссия №1",
+            href: "/vaibik",
+            children: [
+              { title: "О Вайбике", href: "/vaibik/about" },
+              { title: "Квест Вайбика", href: "/vaibik/quest" },
+              { title: "Контакты Вайбика", href: "/vaibik/contacts" },
+            ],
+          },
           { title: "AI Land", href: "/quest/ai-land" },
           { title: "Сайт услуг", href: "/quest/services-site" },
           { title: "Vibe Coding", href: "/vibecraft" },
@@ -115,13 +123,21 @@ export const SITE_TREE: SiteTreeGroup[] = [
           { title: "RSS", href: "/blog/rss.xml" },
         ],
       },
-      { title: "AI Цех", href: "/ai-workshop", description: "Проекты, созданные с помощью AI" },
+      {
+        title: "AI Цех",
+        href: "/ai-workshop",
+        description: "Проекты, созданные с помощью AI",
+        children: [
+          { title: "Добавить работу в портфолио", href: "/projects/new" },
+        ],
+      },
       { title: "Специалисты", href: "/specialists" },
       {
         title: "Экспериментальные визуализации",
         children: [
           { title: "Граф связей", href: "/graph" },
           { title: "Вселенная проекта", href: "/universe" },
+          { title: "Сайт-фильм (Scroll Film)", href: "/demo/scroll-film" },
           { title: "Демо Windows 98", href: "/demo/win98" },
           { title: "Демо Swiss", href: "/demo/swiss" },
         ],
@@ -197,6 +213,7 @@ const XML_EXCLUDE = new Set([
   "/dashboard/collection",
   "/dashboard/favorites",
   "/blog/bookmarks",
+  "/projects/new",
   "/verify",
   "/sitemap.xml",
 ]);

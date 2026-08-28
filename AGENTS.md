@@ -68,6 +68,14 @@ rm -rf .next && npx next build && pm2 restart proektmap
 Агенту: править через БД/`scripts/sync-header-menu.ts` или API `/api/admin/menu` (нужна сессия admin).
 Правило: `.cursor/rules/menu.mdc`
 
+### 5.2. Карта сайта и SEO-валидация (обязательно)
+Любой новый публичный раздел (`page.tsx`) должен быть:
+1. Зарегистрирован в `SITE_TREE` (`src/app/sitemap/site-map-data.ts`).
+2. Добавлен в `src/app/sitemap.ts` (для динамических коллекций `[slug]`).
+3. Снабжён метаданными (`export const metadata: Metadata` с `canonical`).
+4. Проверен валидатором: `npm run validate:sitemap` (или `npx tsx scripts/validate-sitemap.ts`).
+Правило: `.cursor/rules/sitemap-seo.mdc`
+
 ### 6. Важные API эндпоинты
 - `/api/ai/ask` — AI-консультант (требуется Pro)
 - `/api/blog/auto-publish` — авто-публикация новостей

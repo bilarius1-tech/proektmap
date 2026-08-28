@@ -25,6 +25,9 @@ model User {
   subscriptionExpiresAt DateTime?
   skills                String           @default("")
   website               String           @default("")
+  telegram              String           @default("")
+  github                String           @default("")
+  headline              String           @default("Вайбкодер & AI-инженер")
   publicProfile         Boolean          @default(false)
   emailVerified         DateTime?
   verifyToken           String?
@@ -34,6 +37,8 @@ model User {
   posts                 BlogPost[]
   subscriptions         Subscription[]
   payments              Payment[]
+  aiProjects            AiProject[]
+  projectLikes          ProjectLike[]
 
   @@map("users")
 }
@@ -333,6 +338,7 @@ model AITool {
   slug                String   @unique @default("")
   provider            String
   type                String   @default("ide") // ide, no-code, agent, assistant
+  category            String   @default("coding-dev") // 14 ai categories (llm-assistants, agents-skills, local-models, etc.)
   description         String   @default("")
   pros                String   @default("") // JSON array of strings
   cons                String   @default("") // JSON array of strings
@@ -879,23 +885,48 @@ model KnowledgeClip {
 }
 
 model AiProject {
-  id          String   @id @default(uuid())
-  title       String
-  slug        String   @unique
-  description String   @default("")
-  url         String   @default("")
-  techStack   String   @default("")
-  aiTools     String   @default("")
-  authorName  String   @default("")
-  authorUrl   String   @default("")
-  screenshot  String   @default("")
-  category    String   @default("Бот")
-  status      String   @default("Запущен")
-  language    String   @default("ru")
-  featured    Boolean  @default(false)
-  viewCount   Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String        @id @default(uuid())
+  userId       String?
+  title        String
+  slug         String        @unique
+  description  String        @default("")
+  url          String        @default("")
+  githubUrl    String        @default("")
+  telegramUrl  String        @default("")
+  techStack    String        @default("")
+  aiTools      String        @default("")
+  authorName   String        @default("")
+  authorUrl    String        @default("")
+  authorAvatar String        @default("")
+  screenshot   String        @default("")
+  screenshots  String        @default("[]")
+  aiRecipe     String        @default("")
+  timeSpent    String        @default("")
+  category     String        @default("Бот")
+  status       String        @default("Запущен")
+  language     String        @default("ru")
+  featured     Boolean       @default(false)
+  viewCount        Int           @default(0)
+  likesCount       Int           @default(0)
+  isPublished      Boolean       @default(true)
+  moderationStatus String        @default("approved") // "pending", "approved", "rejected"
+  createdAt        DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  user         User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  likes        ProjectLike[]
 
   @@map("ai_projects")
 }
+
+model ProjectLike {
+  id        String    @id @default(uuid())
+  userId    String
+  projectId String
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project   AiProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, projectId])
+  @@map("project_likes")
+}
+

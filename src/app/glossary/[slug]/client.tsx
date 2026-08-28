@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -11,6 +11,10 @@ import {
   ExternalLink,
   ShieldCheck,
   Zap,
+  Share2,
+  Check,
+  Send,
+  MessageCircle,
 } from "lucide-react";
 
 const LEVEL_LABELS: Record<string, { label: string; color: string; bg: string }> = {
@@ -30,6 +34,8 @@ const LEVEL_LABELS: Record<string, { label: string; color: string; bg: string }>
 };
 
 export default function TermClient({ term, related }: { term: any; related: any[] }) {
+  const [copied, setCopied] = useState(false);
+
   const badge =
     LEVEL_LABELS[term.category] ||
     LEVEL_LABELS[term.level] || {
@@ -37,6 +43,23 @@ export default function TermClient({ term, related }: { term: any; related: any[
       color: "#555",
       bg: "#f0f0f0",
     };
+
+  const shareUrl = typeof window !== "undefined" ? window.location.href : `https://proektmap.ru/glossary/${term.slug}`;
+  const shareTitle = `${term.term} — Глоссарий вайбкодинга ProektMap`;
+
+  const telegramShareUrl = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(`${term.term} — ${term.simpleExplanation || term.definition}`)}`;
+  const vkShareUrl = `https://vk.com/share.php?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(shareTitle)}`;
+  const whatsappShareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(`${shareTitle}\n${shareUrl}`)}`;
+
+  const handleCopyLink = async () => {
+    try {
+      if (typeof window !== "undefined" && navigator.clipboard) {
+        await navigator.clipboard.writeText(shareUrl);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }
+    } catch {}
+  };
 
   return (
     <div className="term-page-container">
@@ -115,6 +138,60 @@ export default function TermClient({ term, related }: { term: any; related: any[
 
         {/* Sidebar */}
         <aside className="term-sidebar">
+          {/* Share Widget */}
+          <div className="sidebar-box share-box">
+            <div className="share-box-header">
+              <Share2 size={15} className="text-emerald" />
+              <span className="share-box-title">Поделиться термином</span>
+            </div>
+            <p className="share-box-desc">
+              Отправьте карточку в рабочий чат или друзьям:
+            </p>
+            <div className="share-buttons-grid">
+              <a
+                href={telegramShareUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="share-btn share-tg"
+                title="Поделиться в Telegram"
+              >
+                <Send size={13} />
+                <span>Telegram</span>
+              </a>
+
+              <a
+                href={vkShareUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="share-btn share-vk"
+                title="Поделиться во ВКонтакте"
+              >
+                <span className="share-icon-vk">VK</span>
+                <span>ВКонтакте</span>
+              </a>
+
+              <a
+                href={whatsappShareUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="share-btn share-wa"
+                title="Поделиться в WhatsApp"
+              >
+                <MessageCircle size={13} />
+                <span>WhatsApp</span>
+              </a>
+
+              <button
+                onClick={handleCopyLink}
+                className={`share-btn share-copy ${copied ? "copied" : ""}`}
+                title="Скопировать ссылку"
+              >
+                {copied ? <Check size={13} /> : <Share2 size={13} />}
+                <span>{copied ? "Скопировано!" : "Копировать"}</span>
+              </button>
+            </div>
+          </div>
+
           {/* Related Terms */}
           {related && related.length > 0 && (
             <div className="sidebar-box">
@@ -312,6 +389,91 @@ export default function TermClient({ term, related }: { term: any; related: any[
           line-height: 1.55;
           font-style: italic;
           color: #333;
+        }
+
+        /* ─── Share Widget ─── */
+        .share-box {
+          background: #ffffff;
+        }
+        .share-box-header {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          margin-bottom: 6px;
+        }
+        .share-box-title {
+          font-family: var(--font-heading, sans-serif);
+          font-size: 13px;
+          font-weight: 700;
+          color: #111;
+        }
+        .share-box-desc {
+          font-size: 12px;
+          color: var(--color-text-secondary, #666);
+          margin: 0 0 12px 0;
+          line-height: 1.4;
+        }
+        .share-buttons-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 6px;
+        }
+        .share-btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 5px;
+          padding: 7px 8px;
+          border-radius: 6px;
+          font-size: 11px;
+          font-weight: 600;
+          text-decoration: none;
+          border: 1px solid transparent;
+          cursor: pointer;
+          transition: transform 0.1s ease, background 0.15s ease;
+          font-family: inherit;
+        }
+        .share-btn:hover {
+          transform: translateY(-1px);
+        }
+        .share-tg {
+          background: #229ed9;
+          color: #ffffff;
+        }
+        .share-tg:hover {
+          background: #1e8ec3;
+        }
+        .share-vk {
+          background: #0077ff;
+          color: #ffffff;
+        }
+        .share-vk:hover {
+          background: #0066dc;
+        }
+        .share-icon-vk {
+          font-weight: 900;
+          font-size: 10px;
+          letter-spacing: -0.5px;
+        }
+        .share-wa {
+          background: #25d366;
+          color: #ffffff;
+        }
+        .share-wa:hover {
+          background: #20ba5a;
+        }
+        .share-copy {
+          background: var(--color-bg-secondary, #f4f4f5);
+          color: var(--color-text-primary, #111);
+          border-color: var(--color-border-light, #e4e4e7);
+        }
+        .share-copy:hover {
+          background: #eaeaea;
+        }
+        .share-copy.copied {
+          background: rgba(15, 184, 128, 0.15);
+          color: #0fb880;
+          border-color: #0fb880;
         }
 
         .term-sidebar {
