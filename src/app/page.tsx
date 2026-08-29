@@ -2,8 +2,11 @@ import { getDb } from "@/lib/db/index";
 import AnimatedHero from "@/components/hero/animated-hero";
 import { CommunityPulseHero, CommunityStats } from "@/components/originkit/community-pulse";
 import Link from "next/link";
-import { ArrowRight, Map, Bot, Rocket, Route, Sparkles, Boxes, Compass, Plus, Flame, Eye, Layers } from "lucide-react";
+import { ArrowRight, Map, Bot, Rocket, Route, Sparkles, Boxes, Compass, Plus, Flame, Eye, Layers, Crown, Lock } from "lucide-react";
+import { UI_PATTERNS } from "@/app/ui-patterns/data";
 import { Metadata } from "next";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "ProektMap — Карта роста и готовые AI-решения для создания продуктов",
@@ -27,6 +30,7 @@ export default async function Home() {
     latestProjects,
     popularPosts,
     latestTerms,
+    patternMetas,
   ] = await Promise.all([
     db.user.count(),
     db.aiProject.count({ where: { isPublished: true, moderationStatus: "approved" } }),
@@ -51,7 +55,28 @@ export default async function Home() {
     }),
     db.blogPost.findMany({ where: { status: "published" }, orderBy: { viewCount: "desc" }, take: 3, select: { title: true, slug: true, publishedAt: true, viewCount: true } }),
     db.glossaryTerm.findMany({ where: { isPublished: true }, orderBy: { createdAt: "desc" }, take: 6, select: { term: true, slug: true, simpleExplanation: true, level: true } }),
+    db.uiPatternMeta.findMany(),
   ]);
+
+  const patternMetaMap: Record<string, any> = {};
+  (patternMetas || []).forEach((m: any) => {
+    patternMetaMap[m.slug] = m;
+  });
+
+  // Последние добавленные всегда первые
+  const orderedPatterns = [...UI_PATTERNS].reverse();
+
+  const showcasePatterns = orderedPatterns.slice(0, 6).map((p) => {
+    const meta = patternMetaMap[p.slug];
+    return {
+      slug: p.slug,
+      title: meta?.customTitle || p.titleRu,
+      description: meta?.customDesc || p.shortDescription,
+      category: p.category,
+      isPro: meta?.isPro ?? (p.difficulty === "advanced" || p.difficulty === "intermediate"),
+      screenshot: meta?.screenshot || "",
+    };
+  });
 
   const communityStats: CommunityStats = {
     totalUsers,
@@ -166,6 +191,108 @@ export default async function Home() {
           </div>
           <ArrowRight size={20} style={{ color: "var(--color-accent)", flexShrink: 0 }} />
         </Link>
+      </div>
+
+      {/* UI Pattern Library / UI-Atlas Showcase Widget */}
+      <div style={{ maxWidth: 960, margin: "0 auto", padding: "var(--space-l) var(--space-m) var(--space-xxl)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "var(--space-l)", flexWrap: "wrap", gap: 12 }}>
+          <div>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 700, color: "var(--color-accent)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 }}>
+              <Sparkles size={13} /> Золотой фонд UI-инжиниринга
+            </div>
+            <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-xl)", fontWeight: 800, margin: 0, letterSpacing: "-0.01em" }}>
+              Готовые секции и виджеты для сайта
+            </h2>
+            <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", margin: "4px 0 0", maxWidth: 540 }}>
+              Проверенные визуальные приёмы, анатомия CSS, слой WHY, Negative Prompts и чистый код со строгой геометрией 0px radius.
+            </p>
+          </div>
+
+          <Link
+            href="/ui-patterns"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "8px 16px",
+              background: "var(--color-accent)",
+              color: "#fff",
+              textDecoration: "none",
+              fontSize: "var(--text-xs)",
+              fontWeight: 700,
+            }}
+          >
+            <span>Все секции и виджеты ({UI_PATTERNS.length})</span>
+            <ArrowRight size={14} />
+          </Link>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "var(--space-m)" }}>
+          {showcasePatterns.map((p) => (
+            <Link
+              key={p.slug}
+              href={`/ui-patterns/${p.slug}`}
+              style={{
+                textDecoration: "none",
+                color: "inherit",
+                background: "var(--color-bg-primary)",
+                border: "1px solid var(--color-border)",
+                padding: "var(--space-m)",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                position: "relative",
+                transition: "border-color 0.15s ease",
+              }}
+            >
+              <div>
+                {/* Screenshot cover image (как у новостей) */}
+                {p.screenshot ? (
+                  <img
+                    src={p.screenshot}
+                    alt={p.title}
+                    style={{
+                      width: "100%",
+                      height: 140,
+                      objectFit: "cover",
+                      marginBottom: "var(--space-s)",
+                      border: "1px solid var(--color-border)",
+                      display: "block",
+                    }}
+                  />
+                ) : null}
+
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+                  <span style={{ fontSize: 10, fontFamily: "var(--font-mono)", color: "var(--color-text-tertiary)", textTransform: "uppercase" }}>
+                    {p.category}
+                  </span>
+
+                  {p.isPro ? (
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 3, padding: "1px 6px", background: "var(--color-accent)", color: "#fff", fontSize: 9, fontWeight: 800 }}>
+                      <Crown size={10} /> PRO
+                    </span>
+                  ) : (
+                    <span style={{ padding: "1px 6px", background: "rgba(34, 197, 94, 0.1)", color: "var(--color-success)", border: "1px solid var(--color-success)", fontSize: 9, fontWeight: 800 }}>
+                      FREE
+                    </span>
+                  )}
+                </div>
+
+                <h3 style={{ fontSize: "var(--text-s)", fontWeight: 800, margin: "0 0 6px 0", lineHeight: 1.3 }}>
+                  {p.title}
+                </h3>
+                <p style={{ fontSize: 11, color: "var(--color-text-secondary)", lineHeight: 1.5, margin: 0, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                  {p.description}
+                </p>
+              </div>
+
+              <div style={{ marginTop: 14, paddingTop: 10, borderTop: "1px solid var(--color-border-light)", display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 11, color: "var(--color-accent)", fontWeight: 700 }}>
+                <span>Открыть песочницу</span>
+                <ArrowRight size={12} />
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
 
       {/* Search */}

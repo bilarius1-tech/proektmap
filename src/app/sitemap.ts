@@ -4,6 +4,7 @@ import { PUBLIC_SEO_ROUTES } from "./sitemap/site-map-data";
 import { CREATIVE_TOOLS } from "@/lib/creative-library/data";
 import { VIBE_KITS } from "@/lib/vibe-blocks/data";
 import { CAPABILITY_SKILLS } from "@/app/skills/skills-data";
+import { UI_PATTERNS } from "@/app/ui-patterns/data";
 
 const baseUrl = "https://proektmap.ru";
 
@@ -82,6 +83,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: "monthly" as const,
       priority: 0.8,
+    })),
+    ...UI_PATTERNS.map((p) => ({
+      url: `${baseUrl}/ui-patterns/${p.slug}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.75,
     })),
     ...blogUrls,
     ...aiToolUrls,

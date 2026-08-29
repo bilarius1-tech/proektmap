@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { Home, FileText, Layers, GitBranch, Settings, Users, Menu, Puzzle, Link as LinkIcon, Cpu, BookOpen, Palette, Map, Crown, Factory, Wrench } from "lucide-react";
+import { Home, FileText, Layers, GitBranch, Settings, Users, Menu, Puzzle, Link as LinkIcon, Cpu, BookOpen, Palette, Map, Crown, Factory, Wrench, Sparkles } from "lucide-react";
 
 const nav = [
   { href: "/admin", label: "Обзор", icon: Home },
+  { href: "/admin/ui-patterns", label: "Секции и виджеты", icon: Sparkles },
   { href: "/admin/users", label: "Пользователи", icon: Users },
   { href: "/admin/blueprints", label: "Blueprints", icon: FileText },
   { href: "/admin/stages", label: "Этапы", icon: Layers },

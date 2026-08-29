@@ -49,6 +49,14 @@ export const SITE_TREE: SiteTreeGroup[] = [
       { title: "AI-Архитектор", href: "/architect", description: "Сущности, стек, стоимость и план из описания идеи" },
       { title: "Методология решений", href: "/decisions" },
       { title: "Паттерны сборки", href: "/patterns", description: "Проверенные архитектуры продуктов" },
+      {
+        title: "Готовые секции и виджеты",
+        href: "/ui-patterns",
+        description: "Визуальные UI-паттерны, анатомия и готовые промпты для AI",
+        children: [
+          { title: "Дизайн-Рецепты экранов", href: "/ui-patterns/recipes" },
+        ],
+      },
       { title: "Решения сообщества", href: "/solutions", description: "Библиотека архитектур, не путать с готовыми маршрутами" },
       { title: "Карта архитектуры", href: "/architecture" },
       {

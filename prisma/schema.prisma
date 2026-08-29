@@ -930,3 +930,18 @@ model ProjectLike {
   @@map("project_likes")
 }
 
+model UiPatternMeta {
+  id           String   @id @default(uuid())
+  slug         String   @unique
+  customTitle  String   @default("")
+  customDesc   String   @default("")
+  screenshot   String   @default("")
+  isPro        Boolean  @default(false)
+  isFeatured   Boolean  @default(false)
+  sortOrder    Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("ui_pattern_meta")
+}
+

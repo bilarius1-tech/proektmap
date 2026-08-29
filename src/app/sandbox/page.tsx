@@ -1,8 +1,9 @@
 import { getDb } from "@/lib/db/index";
 import Link from "next/link";
 import { CREATIVE_TOOLS } from "@/lib/creative-library/data";
-import { Bot, Globe, Shield, Zap, Cpu, Wrench, Lightbulb, BookOpen, Compass, Sparkles, ArrowRight, Eye, FileText, Layers, Grid3X3, Clock, Palette, Library, LayoutTemplate } from "lucide-react";
+import { Bot, Globe, Shield, Zap, Cpu, Wrench, Lightbulb, BookOpen, Compass, Sparkles, ArrowRight, Eye, FileText, Layers, Grid3X3, Clock, Palette, Library, LayoutTemplate, Box } from "lucide-react";
 import { VIBE_KITS } from "@/lib/vibe-blocks/data";
+import { UI_PATTERNS } from "@/app/ui-patterns/data";
 
 export const dynamic = "force-dynamic";
 export const metadata = {
@@ -38,6 +39,7 @@ export default async function SandboxPage() {
   const russianAiCount = await db.russianAIProject.count({ where: { isPublished: true } });
 
   const cards = [
+    { slug: "ui-patterns", title: "Готовые секции и виджеты", desc: "Визуальные UI-паттерны, Live Sandbox песочница, анатомия CSS, WHY-инжиниринг, промпты для AI и чистый код 0px radius.", icon: Sparkles, size: "large" as const, stat: String(UI_PATTERNS.length), statLabel: "готовых секций", href: "/ui-patterns" },
     { slug: "telegram", title: "Telegram Бот MAX", desc: "Всё для создания ботов: Blueprint, фреймворки, глоссарий, готовые решения. От идеи до работающего бота с платежами и AI.", icon: Bot, size: "large" as const, stat: String(telegramDecisions + telegramTools), statLabel: "решений и инструментов", href: "/telegram" },
     { slug: "vibecraft", title: "Vibe Coding", desc: "Создавай сайты без кода: Cursor, Bolt.new, Lovable, Cline. Гайд для России: оплата, хостинг, домен, почта.", icon: Zap, size: "medium" as const, stat: String(vibeTools), statLabel: "инструментов в обзоре", href: "/vibecraft" },
     { slug: "vaibik", title: "Вайбик: Миссия №1", desc: "Детский квест по вайбкодингу (9–12 лет): промпты, первая игра, робот Вайбик. Связка со статьёй «ИИ для детей».", icon: Sparkles, size: "medium" as const, href: "/vaibik" },
