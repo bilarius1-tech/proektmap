@@ -5,6 +5,7 @@ import { CREATIVE_TOOLS } from "@/lib/creative-library/data";
 import { VIBE_KITS } from "@/lib/vibe-blocks/data";
 import { CAPABILITY_SKILLS } from "@/app/skills/skills-data";
 import { UI_PATTERNS } from "@/app/ui-patterns/data";
+import { MICROSERVICES } from "@/lib/services/data";
 
 const baseUrl = "https://proektmap.ru";
 
@@ -12,7 +13,7 @@ function pagePriority(href: string) {
   if (href === "/") return 1;
   if (href === "/resheniya") return 0.9;
   if (href.startsWith("/resheniya/")) return href.includes("workspace") ? 0.6 : 0.8;
-  if (["/blog", "/ai-tools", "/mcp", "/telegram", "/avito", "/ai-without-vpn", "/skills", "/glossary"].includes(href)) return 0.8;
+  if (["/blog", "/ai-tools", "/mcp", "/telegram", "/avito", "/services", "/ai-without-vpn", "/skills", "/glossary"].includes(href)) return 0.8;
   if (["/terms", "/privacy", "/offer", "/refund", "/contacts"].includes(href)) return 0.4;
   if (href === "/auth") return 0.3;
   return 0.7;
@@ -89,6 +90,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: "weekly" as const,
       priority: 0.75,
+    })),
+    ...MICROSERVICES.map((s) => ({
+      url: `${baseUrl}/services/${s.slug}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.85,
     })),
     ...blogUrls,
     ...aiToolUrls,

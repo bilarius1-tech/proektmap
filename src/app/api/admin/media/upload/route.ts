@@ -12,5 +12,5 @@ export async function POST(req: Request) {
   const filename = Date.now() + "_" + Math.random().toString(36).slice(2, 8) + "." + ext;
   const buffer = Buffer.from(await file.arrayBuffer());
   fs.writeFileSync(path.join(dir, filename), buffer);
-  return NextResponse.json({ url: "/uploads/" + filename, name: file.name });
+  return NextResponse.json({ url: "/api/media/" + filename, name: file.name });
 }

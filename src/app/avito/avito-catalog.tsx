@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Search, ExternalLink, AlertTriangle, ShieldCheck, FlaskConical, Star, Info } from "lucide-react";
+import Link from "next/link";
+import { Search, ExternalLink, AlertTriangle, ShieldCheck, FlaskConical, Star, Info, ShoppingBag, Sparkles, ArrowRight } from "lucide-react";
 import type { AvitoTool, AvitoCategory, AvitoJob, AvitoPricing } from "./data";
 import { avitoJobs, avitoPricingFilters } from "./data";
 
@@ -145,6 +146,52 @@ export default function AvitoCatalog({ tools, categories }: { tools: AvitoTool[]
       </div>
 
       <div style={{ maxWidth: 1080, margin: "0 auto", padding: "var(--space-m) 20px var(--space-xxl)" }}>
+        {/* Banner: Готовое решение Авито-магазин */}
+        <div
+          style={{
+            marginBottom: 24,
+            borderRadius: "var(--radius-l)",
+            padding: "clamp(20px, 3.5vw, 28px)",
+            background: "linear-gradient(135deg, rgba(239, 68, 68, 0.12) 0%, rgba(15, 52, 96, 0.3) 100%)",
+            border: "1px solid rgba(239, 68, 68, 0.3)",
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: 16,
+          }}
+        >
+          <div style={{ maxWidth: 680 }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 10px", borderRadius: "var(--radius-full)", background: "rgba(239, 68, 68, 0.2)", color: "#ef4444", fontSize: "var(--text-xs)", fontWeight: 800, marginBottom: 8 }}>
+              <Sparkles size={14} /> Готовое AI-решение ProektMap
+            </div>
+            <h2 style={{ margin: "0 0 6px", fontSize: "clamp(20px, 3vw, 26px)", fontWeight: 800, letterSpacing: "-0.01em" }}>
+              Запустить AI-магазин на Авито под ключ
+            </h2>
+            <p style={{ margin: 0, fontSize: "var(--text-s)", color: "var(--color-text-secondary)", lineHeight: 1.5 }}>
+              Инженерный пошаговый маршрут: от парсинга спроса и AI-офферов до уникализации фото, XML-автозагрузки и автоответов на базе AI.
+            </p>
+          </div>
+          <Link
+            href="/resheniya/avito-business"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              padding: "12px 20px",
+              borderRadius: "var(--radius-m)",
+              background: "#ef4444",
+              color: "#fff",
+              fontSize: "var(--text-s)",
+              fontWeight: 800,
+              textDecoration: "none",
+              whiteSpace: "nowrap",
+            }}
+          >
+            Открыть маршрут <ArrowRight size={16} />
+          </Link>
+        </div>
+
         {featuredVisible.map((t) => (
           <FeaturedCard key={t.slug} tool={t} categories={categories} />
         ))}
@@ -206,11 +253,18 @@ function FeaturedCard({ tool: t, categories }: { tool: AvitoTool; categories: Av
 
         {t.links && t.links.length > 0 && (
           <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-            {t.links.map((link) => (
-              <a key={link.url} href={link.url} target="_blank" rel="noopener noreferrer" style={{ color: "#ffe566", fontSize: "var(--text-s)", fontWeight: 600 }}>
-                {link.label} ↗
-              </a>
-            ))}
+            {t.links.map((link) => {
+              const isInternal = link.url.startsWith("/");
+              return isInternal ? (
+                <Link key={link.url} href={link.url} style={{ color: "#ffe566", fontSize: "var(--text-s)", fontWeight: 600 }}>
+                  {link.label} →
+                </Link>
+              ) : (
+                <a key={link.url} href={link.url} target="_blank" rel="noopener noreferrer" style={{ color: "#ffe566", fontSize: "var(--text-s)", fontWeight: 600 }}>
+                  {link.label} ↗
+                </a>
+              );
+            })}
           </div>
         )}
 
@@ -225,26 +279,47 @@ function FeaturedCard({ tool: t, categories }: { tool: AvitoTool; categories: Av
 
         <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 12, marginTop: 4 }}>
           <span style={{ fontSize: "var(--text-s)", fontWeight: 700 }}>{t.price}</span>
-          <a
-            href={t.website}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-              padding: "12px 18px",
-              borderRadius: "var(--radius-m)",
-              background: "#ffe566",
-              color: "#1a1a2e",
-              fontSize: "var(--text-s)",
-              fontWeight: 800,
-              textDecoration: "none",
-              minHeight: 48,
-            }}
-          >
-            Открыть BananLab <ExternalLink size={16} />
-          </a>
+          {t.website.startsWith("/") || t.website.includes("proektmap.ru") ? (
+            <Link
+              href={t.website.replace("https://proektmap.ru", "") || "/"}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                padding: "12px 18px",
+                borderRadius: "var(--radius-m)",
+                background: "#ffe566",
+                color: "#1a1a2e",
+                fontSize: "var(--text-s)",
+                fontWeight: 800,
+                textDecoration: "none",
+                minHeight: 48,
+              }}
+            >
+              Открыть инструмент <ArrowRight size={16} />
+            </Link>
+          ) : (
+            <a
+              href={t.website}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                padding: "12px 18px",
+                borderRadius: "var(--radius-m)",
+                background: "#ffe566",
+                color: "#1a1a2e",
+                fontSize: "var(--text-s)",
+                fontWeight: 800,
+                textDecoration: "none",
+                minHeight: 48,
+              }}
+            >
+              Открыть {t.name} <ExternalLink size={16} />
+            </a>
+          )}
         </div>
       </div>
     </div>

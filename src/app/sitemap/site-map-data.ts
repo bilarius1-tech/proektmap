@@ -27,6 +27,8 @@ export const SITE_TREE: SiteTreeGroup[] = [
         href: "/resheniya",
         description: "Маршруты от цели до проверенного продукта",
         children: [
+          { title: "Запустить AI-магазин на Авито", href: "/resheniya/avito-business" },
+          { title: "Рабочая зона AI-магазина на Авито", href: "/resheniya/avito-business/workspace" },
           { title: "Запустить SaaS-продукт", href: "/resheniya/saas-product" },
           { title: "Рабочая зона SaaS", href: "/resheniya/saas-product/workspace" },
           { title: "Запустить Telegram-бота", href: "/resheniya/telegram-bot" },
@@ -103,6 +105,16 @@ export const SITE_TREE: SiteTreeGroup[] = [
         title: "Лаборатория Авито",
         href: "/avito",
         description: "Каталог сервисов, расширений и инструментов для продавцов на Авито",
+      },
+      {
+        title: "Микросервисы",
+        href: "/services",
+        description: "Онлайн-утилиты для работы с медиа, Авито, кодом и промптами",
+        children: [
+          { title: "Уникализатор фото для Авито", href: "/services/avito-photo-uniquizer" },
+          { title: "Калькулятор токенов и стоимости LLM", href: "/services/prompt-token-counter" },
+          { title: "SVG в React / Tailwind оптимизатор", href: "/services/svg-to-react-optimizer" },
+        ],
       },
     ],
   },

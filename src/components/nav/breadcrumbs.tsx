@@ -25,6 +25,7 @@ const ROUTE_LABELS: Record<string, string> = {
   auth: 'Вход',
   blueprints: 'Blueprints',
   resheniya: 'Готовые решения',
+  services: 'Микросервисы',
   'saas-product': 'SaaS-продукт',
       'telegram-bot': 'Telegram-бот',
   workspace: 'Рабочая зона',

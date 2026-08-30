@@ -11,10 +11,12 @@ import {
   Rocket,
   Route,
   Sparkles,
+  ShoppingBag,
 } from "lucide-react";
 import { ecosystemResources } from "./data";
 import { guidedSaasSolution } from "./guided-data";
 import { guidedTelegramSolution } from "./telegram-guided-data";
+import { guidedAvitoSolution } from "./avito-guided-data";
 
 export const metadata: Metadata = {
   title: "Готовые решения AI — от идеи до работающего продукта",
@@ -53,8 +55,11 @@ export default function ResheniyaPage() {
               <Link href="/resheniya/saas-product" className="solutions-button solutions-button-primary">
                 Маршрут SaaS <ArrowRight size={18} />
               </Link>
+              <Link href="/resheniya/avito-business" className="solutions-button solutions-button-secondary">
+                Магазин на Авито
+              </Link>
               <Link href="/resheniya/telegram-bot" className="solutions-button solutions-button-secondary">
-                Маршрут Telegram-бота
+                Telegram-бот
               </Link>
             </div>
           </div>
@@ -82,10 +87,33 @@ export default function ResheniyaPage() {
               <span className="solutions-kicker">Можно начать сейчас</span>
               <h2 id="available-title">Доступные готовые решения</h2>
             </div>
-            <span className="solutions-status-badge">2 маршрута</span>
+            <span className="solutions-status-badge">3 маршрута</span>
           </div>
 
           <div className="solutions-feature-list">
+            <Link href="/resheniya/avito-business" className="solutions-feature-card">
+              <div className="solutions-feature-main">
+                <div className="solutions-feature-icon" style={{ background: "rgba(239, 68, 68, 0.12)", color: "#ef4444" }}><ShoppingBag size={30} /></div>
+                <div>
+                  <span className="solutions-kicker">Для селлеров, авитологов и AI-предпринимателей</span>
+                  <h3>Запустить AI-магазин на Авито</h3>
+                  <p>Готовый путь от анализа спроса и AI-офферов до уникализации фото, XML-автозагрузки и автоответов.</p>
+                </div>
+              </div>
+
+              <div className="solutions-feature-result">
+                <span>Результат маршрута</span>
+                <strong>{guidedAvitoSolution.result}</strong>
+              </div>
+
+              <div className="solutions-feature-meta">
+                <span><Route size={16} /> {guidedAvitoSolution.steps.length} готовых шагов</span>
+                <span><Clock3 size={16} /> {guidedAvitoSolution.duration}</span>
+                <span><Boxes size={16} /> стек и сервисы выбраны</span>
+                <span className="solutions-feature-link">Открыть решение <ArrowRight size={16} /></span>
+              </div>
+            </Link>
+
             <Link href="/resheniya/saas-product" className="solutions-feature-card">
               <div className="solutions-feature-main">
                 <div className="solutions-feature-icon"><Rocket size={30} /></div>

@@ -87,6 +87,30 @@ export const avitoPricingFilters: { slug: AvitoPricing | "all"; label: string }[
 ];
 
 export const avitoTools: AvitoTool[] = [
+  // ── Нативный инструмент ProektMap ──────────────────────────
+  {
+    slug: "avito-photo-lab",
+    name: "Avito Photo Lab (ProektMap)",
+    types: ["Онлайн-утилита", "Инструмент"],
+    categories: ["design", "autoposting"],
+    description:
+      "Инженерный конвейер уникализации товарных фото для Авито: контроль визуального сходства (pHash/dHash), сборщик непересекающихся наборов под 20+ объявлений, сканер дубликатов и Product Lock AI.",
+    price: "Бесплатно",
+    pricing: "free",
+    website: "https://proektmap.ru/services/avito-photo-uniquizer",
+    status: "active",
+    lastChecked: "2026-08-30",
+    api: "none",
+    risk: false,
+    featured: true,
+    highlight: "Нативный инструмент ProektMap: пакетная уникализация, контроль схожести и сборка наборов",
+    links: [
+      { label: "Открыть Avito Photo Lab", url: "/services/avito-photo-uniquizer" },
+      { label: "Готовое решение: Запустить AI-магазин на Авито", url: "/resheniya/avito-business" },
+      { label: "Каталог микросервисов", url: "/services" },
+    ],
+  },
+
   // ── Премиум-партнёр ───────────────────────────────────────
   {
     slug: "bananlab",

@@ -26,6 +26,7 @@ const KNOWN_DYNAMIC_GENERATORS: Record<string, string> = {
   "/sandbox/creative-library/[slug]": "CREATIVE_TOOLS (data)",
   "/sandbox/vibe-blocks/[slug]": "VIBE_KITS (data)",
   "/ui-patterns/[slug]": "UI_PATTERNS (data)",
+  "/services/[slug]": "MICROSERVICES (data)",
   "/blueprints/[slug]": "Legacy / DB",
   "/[blueprint]": "Legacy / DB",
   "/blog/author/[email]": "Dynamic author",

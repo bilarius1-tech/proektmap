@@ -2,8 +2,9 @@ import { getDb } from "@/lib/db/index";
 import AnimatedHero from "@/components/hero/animated-hero";
 import { CommunityPulseHero, CommunityStats } from "@/components/originkit/community-pulse";
 import Link from "next/link";
-import { ArrowRight, Map, Bot, Rocket, Route, Sparkles, Boxes, Compass, Plus, Flame, Eye, Layers, Crown, Lock } from "lucide-react";
+import { ArrowRight, Map, Bot, Rocket, Route, Sparkles, Boxes, Compass, Plus, Flame, Eye, Layers, Crown, Lock, Wrench, Zap, Image as ImageIcon, Calculator, Code2 } from "lucide-react";
 import { UI_PATTERNS } from "@/app/ui-patterns/data";
+import { MICROSERVICES, normalizeMediaUrl } from "@/lib/services/data";
 import { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -31,6 +32,7 @@ export default async function Home() {
     popularPosts,
     latestTerms,
     patternMetas,
+    microserviceMetas,
   ] = await Promise.all([
     db.user.count(),
     db.aiProject.count({ where: { isPublished: true, moderationStatus: "approved" } }),
@@ -56,11 +58,33 @@ export default async function Home() {
     db.blogPost.findMany({ where: { status: "published" }, orderBy: { viewCount: "desc" }, take: 3, select: { title: true, slug: true, publishedAt: true, viewCount: true } }),
     db.glossaryTerm.findMany({ where: { isPublished: true }, orderBy: { createdAt: "desc" }, take: 6, select: { term: true, slug: true, simpleExplanation: true, level: true } }),
     db.uiPatternMeta.findMany(),
+    db.microserviceMeta.findMany(),
   ]);
 
   const patternMetaMap: Record<string, any> = {};
   (patternMetas || []).forEach((m: any) => {
     patternMetaMap[m.slug] = m;
+  });
+
+  const serviceMetaMap: Record<string, any> = {};
+  (microserviceMetas || []).forEach((m: any) => {
+    serviceMetaMap[m.slug] = m;
+  });
+
+  const showcaseServices = MICROSERVICES.map((s) => {
+    const meta = serviceMetaMap[s.slug];
+    return {
+      slug: s.slug,
+      title: meta?.customTitle || s.title,
+      description: meta?.customDesc || s.shortDescription,
+      category: s.category,
+      coverImage: normalizeMediaUrl(meta?.coverImage || s.coverImage || ""),
+      viewCount: meta?.viewCount || 0,
+      badges: s.badges,
+      status: s.status,
+      gradient: s.gradient,
+      icon: s.icon,
+    };
   });
 
   // Последние добавленные всегда первые
@@ -289,6 +313,155 @@ export default async function Home() {
               <div style={{ marginTop: 14, paddingTop: 10, borderTop: "1px solid var(--color-border-light)", display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 11, color: "var(--color-accent)", fontWeight: 700 }}>
                 <span>Открыть песочницу</span>
                 <ArrowRight size={12} />
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      {/* Online Microservices & Utilities Section Widget */}
+      <div style={{ maxWidth: 960, margin: "0 auto", padding: "0 var(--space-m) var(--space-xxl)" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "var(--space-l)", flexWrap: "wrap", gap: 12 }}>
+          <div>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 700, color: "var(--color-accent)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 }}>
+              <Zap size={13} /> Быстрые онлайн-утилиты
+            </div>
+            <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-xl)", fontWeight: 800, margin: 0, letterSpacing: "-0.01em" }}>
+              Микросервисы под задачи
+            </h2>
+            <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", margin: "4px 0 0", maxWidth: 540 }}>
+              Изолированные инструменты для селлеров, AI-инженеров и вайбкодеров. 100% клиентская обработка прямо в браузере без задержек.
+            </p>
+          </div>
+
+          <Link
+            href="/services"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "8px 16px",
+              background: "var(--color-accent)",
+              color: "#fff",
+              textDecoration: "none",
+              fontSize: "var(--text-xs)",
+              fontWeight: 700,
+            }}
+          >
+            <span>Все микросервисы ({showcaseServices.length})</span>
+            <ArrowRight size={14} />
+          </Link>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "var(--space-m)" }}>
+          {showcaseServices.map((s) => (
+            <Link
+              key={s.slug}
+              href={`/services/${s.slug}`}
+              style={{
+                textDecoration: "none",
+                color: "inherit",
+                background: "var(--color-bg-primary)",
+                border: "1px solid var(--color-border)",
+                padding: "var(--space-m)",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                position: "relative",
+                transition: "border-color 0.15s ease, transform 0.15s ease",
+              }}
+            >
+              <div>
+                {/* Cover Image or Gradient fallback */}
+                {s.coverImage ? (
+                  <img
+                    src={s.coverImage}
+                    alt={s.title}
+                    style={{
+                      width: "100%",
+                      height: 140,
+                      objectFit: "cover",
+                      marginBottom: "var(--space-s)",
+                      border: "1px solid var(--color-border)",
+                      display: "block",
+                    }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: "100%",
+                      height: 110,
+                      background: s.gradient || "var(--color-bg-secondary)",
+                      marginBottom: "var(--space-s)",
+                      border: "1px solid var(--color-border)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <div
+                      style={{
+                        padding: "8px 12px",
+                        background: "var(--color-surface)",
+                        borderRadius: "var(--radius-s)",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 6,
+                        boxShadow: "var(--shadow-s)",
+                      }}
+                    >
+                      <Wrench size={16} style={{ color: "var(--color-accent)" }} />
+                      <span style={{ fontSize: 11, fontWeight: 700 }}>ProektMap Service</span>
+                    </div>
+                  </div>
+                )}
+
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+                  <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+                    {s.badges.slice(0, 2).map((b: string) => (
+                      <span
+                        key={b}
+                        style={{
+                          padding: "1px 6px",
+                          borderRadius: "var(--radius-s)",
+                          background: "var(--color-bg-secondary)",
+                          color: "var(--color-text-secondary)",
+                          fontSize: 9,
+                          fontWeight: 700,
+                        }}
+                      >
+                        {b}
+                      </span>
+                    ))}
+                  </div>
+
+                  {s.status === "active" ? (
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 3, padding: "1px 6px", background: "rgba(16, 185, 129, 0.1)", color: "var(--color-accent)", border: "1px solid var(--color-accent)", fontSize: 9, fontWeight: 800 }}>
+                      <Zap size={10} /> READY
+                    </span>
+                  ) : (
+                    <span style={{ padding: "1px 6px", background: "rgba(234, 179, 8, 0.1)", color: "var(--color-warning)", border: "1px solid var(--color-warning)", fontSize: 9, fontWeight: 800 }}>
+                      SOON
+                    </span>
+                  )}
+                </div>
+
+                <h3 style={{ fontSize: "var(--text-s)", fontWeight: 800, margin: "0 0 6px 0", lineHeight: 1.3 }}>
+                  {s.title}
+                </h3>
+                <p style={{ fontSize: 11, color: "var(--color-text-secondary)", lineHeight: 1.5, margin: 0, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                  {s.description}
+                </p>
+              </div>
+
+              <div style={{ marginTop: 14, paddingTop: 10, borderTop: "1px solid var(--color-border-light)", display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 11, color: "var(--color-accent)", fontWeight: 700 }}>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "var(--color-text-tertiary)", fontWeight: 500 }}>
+                  <Eye size={12} /> {s.viewCount > 0 ? s.viewCount : 1}
+                </span>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                  <span>Открыть</span>
+                  <ArrowRight size={12} />
+                </span>
               </div>
             </Link>
           ))}

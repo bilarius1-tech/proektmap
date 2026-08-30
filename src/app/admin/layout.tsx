@@ -3,6 +3,7 @@ import { Home, FileText, Layers, GitBranch, Settings, Users, Menu, Puzzle, Link 
 
 const nav = [
   { href: "/admin", label: "Обзор", icon: Home },
+  { href: "/admin/services", label: "Микросервисы", icon: Wrench },
   { href: "/admin/ui-patterns", label: "Секции и виджеты", icon: Sparkles },
   { href: "/admin/users", label: "Пользователи", icon: Users },
   { href: "/admin/blueprints", label: "Blueprints", icon: FileText },
