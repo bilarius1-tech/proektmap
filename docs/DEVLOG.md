@@ -2107,6 +2107,12 @@ DEVLOG + commit + push. `main` = `master`.
 - Связан с центром готовых решений `/resheniya` (включен в облако ресурсов и связанные маршруты).
 - Валидация SEO пройдена (`npm run validate:sitemap`), Next.js успешно собран, PM2 перезапущен.
 
+### День закрыт
+- Документация `docs/VOICE-GUIDE.md` и `.cursor/skills/voice-guide-author/SKILL.md` актуализированы.
+- Все сервисы и аудио-роуты возвращают HTTP 200.
+- `main` = `master` = synced commit.
+
+
 
 
 
