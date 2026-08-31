@@ -16,7 +16,9 @@
     "voice:setup": "bash scripts/vaibik-voice/setup.sh",
     "voice:test": "bash scripts/vaibik-voice/run.sh test",
     "voice:generate": "bash scripts/vaibik-voice/run.sh all",
-    "voice:check": "node scripts/vaibik-voice/check.mjs"
+    "voice:check": "node scripts/vaibik-voice/check.mjs",
+    "voice:guides": "python3 scripts/generate-voice-guides.py --provider=yandex",
+    "voice:guides:edge": "python3 scripts/generate-voice-guides.py --provider=edge"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",

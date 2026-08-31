@@ -11,6 +11,7 @@ import CookieConsent from "@/components/cookie-consent";
 import AnalyticsScripts, { AnalyticsFooter } from "@/components/analytics";
 import { SessionProvider } from "@/components/session-provider";
 import KnowledgeProvider from "@/components/knowledge/knowledge-provider";
+import VoiceGuideWidget from "@/components/voice-guide/voice-guide-widget";
 
 export const metadata: Metadata = {
   title: {
@@ -89,6 +90,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <BlueprintProgressBar />
           <GlobalFooter />
           <AssistantWrapper />
+          <VoiceGuideWidget />
           <CookieConsent />
           <KnowledgeProvider />
         </SessionProvider>
