@@ -1,6 +1,6 @@
 /**
  * ProektMap Voice Guide — Embeddable Standalone Widget
- * Version: 1.0.0
+ * Version: 1.1.0
  * https://proektmap.ru/services/voice-guide-builder
  */
 (function () {
@@ -169,9 +169,20 @@
     return mins + ":" + (secs < 10 ? "0" : "") + secs;
   }
 
+  function getAudioUrl() {
+    if (activeGuide.audioSrc && activeGuide.audioSrc.indexOf("sample.mp3") === -1 && activeGuide.audioSrc.indexOf("/audio/guides/") === -1) {
+      return activeGuide.audioSrc;
+    }
+    var text = activeGuide.text || activeGuide.rawScript || "";
+    var voice = activeGuide.voice || "svetlana-fast";
+    var rate = voice.indexOf("fast") !== -1 ? "%2B6%25" : "%2B0%25";
+    return "https://proektmap.ru/api/voice-guide/synthesize?text=" + encodeURIComponent(text) + "&voice=" + encodeURIComponent(voice) + "&rate=" + rate;
+  }
+
   function initAudio() {
     if (state.audio) return;
-    state.audio = new Audio(activeGuide.audioSrc);
+    var src = getAudioUrl();
+    state.audio = new Audio(src);
     state.audio.addEventListener("timeupdate", function () {
       state.currentTime = state.audio.currentTime;
       render();
@@ -188,10 +199,14 @@
       } catch (e) {}
       render();
     });
+    state.audio.addEventListener("error", function (e) {
+      console.error("[VoiceGuide] Audio load error:", e);
+    });
   }
 
   function playAudio() {
     initAudio();
+    if (!state.audio) return;
     state.audio.play().then(function () {
       state.isPlaying = true;
       state.isPromptOpen = false;

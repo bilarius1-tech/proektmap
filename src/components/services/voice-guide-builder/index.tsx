@@ -172,8 +172,9 @@ export default function VoiceGuideBuilderWorkspace() {
     showWave: true,
   });
 
-  // Audio Preview State
+  // Audio Preview & Generation State
   const [isSynthesizing, setIsSynthesizing] = useState(false);
+  const [isGeneratingAll, setIsGeneratingAll] = useState(false);
   const [isPlayingPreview, setIsPlayingPreview] = useState(false);
   const [previewProgress, setPreviewProgress] = useState(0);
   const [mockPagePath, setMockPagePath] = useState("/");
@@ -235,8 +236,7 @@ export default function VoiceGuideBuilderWorkspace() {
   const handleUpdateActiveRoute = (field: keyof CustomRouteConfig, val: any) => {
     const updated = [...routes];
     updated[activeRouteIndex] = { ...updated[activeRouteIndex], [field]: val };
-    
-    // Пересчет примерной длительности (примерно 12-14 знаков в секунду)
+
     if (field === "text") {
       const len = String(val).trim().length;
       updated[activeRouteIndex].durationSec = Math.max(10, Math.round(len / 13));
@@ -337,6 +337,42 @@ export default function VoiceGuideBuilderWorkspace() {
     }
   };
 
+  // Пакетная генерация и переход к коду
+  const handleGenerateEmbedCode = async () => {
+    setIsGeneratingAll(true);
+    try {
+      // Предварительный прогрев кэша на сервере для всех страниц
+      await Promise.all(
+        routes.map(async (r) => {
+          if (!r.text.trim()) return;
+          const voiceName =
+            r.voice === "svetlana-fast"
+              ? "ru-RU-SvetlanaNeural"
+              : r.voice === "dmitry-fast"
+              ? "ru-RU-DmitryNeural"
+              : r.voice === "dmitry"
+              ? "ru-RU-DmitryNeural"
+              : "ru-RU-SvetlanaNeural";
+          const rate = r.voice.includes("fast") ? "+6%" : "+0%";
+
+          await fetch("/api/voice-guide/synthesize", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              text: r.text,
+              voice: voiceName,
+              rate: rate,
+            }),
+          }).catch(() => {});
+        })
+      );
+
+      setActiveTab("code");
+    } finally {
+      setIsGeneratingAll(false);
+    }
+  };
+
   // Генерация кодов для вставки
   const generateEmbedJSON = () => {
     const config = {
@@ -346,9 +382,9 @@ export default function VoiceGuideBuilderWorkspace() {
       routes: routes.map((r) => ({
         route: r.route,
         title: r.title,
+        voice: r.voice,
         duration: r.durationSec,
         text: r.text,
-        audioSrc: `/audio/guides/${r.id}.mp3`,
         actions: r.actions,
       })),
     };
@@ -360,9 +396,9 @@ export default function VoiceGuideBuilderWorkspace() {
       routes.map((r) => ({
         route: r.route,
         title: r.title,
+        voice: r.voice,
         duration: r.durationSec,
         text: r.text,
-        audioSrc: `https://proektmap.ru/audio/guides/sample.mp3`,
         actions: r.actions,
       }))
     ).replace(/"/g, "&quot;");
@@ -384,10 +420,19 @@ ${getEmbedScriptCode()}`;
   };
 
   const getReactCode = () => {
+    const cleanRoutes = routes.map((r) => ({
+      route: r.route,
+      title: r.title,
+      voice: r.voice,
+      duration: r.durationSec,
+      text: r.text,
+      actions: r.actions,
+    }));
+
     return `import Script from "next/script";
 
 export default function VoiceGuide() {
-  const routes = ${JSON.stringify(routes, null, 2)};
+  const routes = ${JSON.stringify(cleanRoutes, null, 2)};
 
   return (
     <Script
@@ -424,7 +469,7 @@ export default function VoiceGuide() {
           gap: 20,
         }}
       >
-        <div style={{ maxWidth: 640 }}>
+        <div style={{ maxWidth: 600 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
             <span
               style={{
@@ -438,7 +483,7 @@ export default function VoiceGuide() {
                 letterSpacing: "0.5px",
               }}
             >
-              🎙️ Без API-ключей и сложного кода
+              🎙️ Без API-ключей и оплат
             </span>
             <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)" }}>
               Microsoft Svetlana & Dmitry Neural
@@ -452,40 +497,71 @@ export default function VoiceGuide() {
           </p>
         </div>
 
-        {/* Quick Presets */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          <span style={{ fontSize: 11, fontWeight: 700, color: "var(--color-text-tertiary)", textTransform: "uppercase" }}>
-            Быстрые шаблоны:
-          </span>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        {/* Action Button & Quick Presets */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 12, alignItems: "flex-end" }}>
+          <button
+            onClick={handleGenerateEmbedCode}
+            disabled={isGeneratingAll}
+            style={{
+              padding: "12px 22px",
+              borderRadius: "var(--radius-m)",
+              background: "linear-gradient(135deg, #0fb880 0%, #0d9668 100%)",
+              color: "#ffffff",
+              border: "none",
+              fontSize: "var(--text-s)",
+              fontWeight: 700,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              boxShadow: "0 6px 20px rgba(15, 184, 128, 0.35)",
+              transition: "transform 0.15s, box-shadow 0.15s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = "translateY(-2px)";
+              e.currentTarget.style.boxShadow = "0 8px 24px rgba(15, 184, 128, 0.45)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = "0 6px 20px rgba(15, 184, 128, 0.35)";
+            }}
+          >
+            {isGeneratingAll ? (
+              <>
+                <Radio size={16} className="animate-spin" />
+                <span>Генерация аудио и кода...</span>
+              </>
+            ) : (
+              <>
+                <Zap size={16} fill="white" />
+                <span>Сгенерировать код для вставки</span>
+              </>
+            )}
+          </button>
+
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: "var(--color-text-tertiary)", textTransform: "uppercase" }}>
+              Шаблоны:
+            </span>
             {Object.entries(PRESET_TEMPLATES).map(([key, item]) => (
               <button
                 key={key}
                 onClick={() => handleApplyPreset(key)}
                 style={{
-                  padding: "8px 14px",
+                  padding: "6px 10px",
                   borderRadius: "var(--radius-m)",
                   background: "var(--color-surface)",
                   border: "1px solid var(--color-border)",
                   color: "var(--color-text-primary)",
-                  fontSize: "var(--text-xs)",
+                  fontSize: 11,
                   fontWeight: 600,
                   cursor: "pointer",
-                  transition: "all 0.15s ease",
                   display: "flex",
                   alignItems: "center",
-                  gap: 6,
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = "var(--color-accent)";
-                  e.currentTarget.style.transform = "translateY(-1px)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = "var(--color-border)";
-                  e.currentTarget.style.transform = "translateY(0)";
+                  gap: 4,
                 }}
               >
-                <Sparkles size={13} style={{ color: "var(--color-accent)" }} />
+                <Sparkles size={11} style={{ color: "var(--color-accent)" }} />
                 <span>{item.name}</span>
               </button>
             ))}
@@ -865,7 +941,7 @@ export default function VoiceGuide() {
                   </div>
 
                   {/* Actions / CTA Buttons */}
-                  <div>
+                  <div style={{ marginBottom: 24 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
                       <div>
                         <label style={{ fontSize: "var(--text-xs)", fontWeight: 700, display: "block" }}>
@@ -967,6 +1043,38 @@ export default function VoiceGuide() {
                         </div>
                       ))}
                     </div>
+                  </div>
+
+                  {/* BOTTOM ACTION BUTTON */}
+                  <div
+                    style={{
+                      borderTop: "1px solid var(--color-border-light)",
+                      paddingTop: 18,
+                      display: "flex",
+                      justifyContent: "flex-end",
+                    }}
+                  >
+                    <button
+                      onClick={handleGenerateEmbedCode}
+                      disabled={isGeneratingAll}
+                      style={{
+                        padding: "10px 20px",
+                        borderRadius: "var(--radius-m)",
+                        background: "var(--color-accent)",
+                        color: "#ffffff",
+                        border: "none",
+                        fontSize: "var(--text-s)",
+                        fontWeight: 700,
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 8,
+                        boxShadow: "0 4px 14px rgba(15, 184, 128, 0.3)",
+                      }}
+                    >
+                      <Zap size={15} fill="white" />
+                      <span>Сгенерировать код для вставки →</span>
+                    </button>
                   </div>
                 </div>
               )}
@@ -1157,6 +1265,38 @@ export default function VoiceGuide() {
                   }}
                 />
               </div>
+
+              {/* BOTTOM ACTION BUTTON */}
+              <div
+                style={{
+                  borderTop: "1px solid var(--color-border-light)",
+                  paddingTop: 18,
+                  display: "flex",
+                  justifyContent: "flex-end",
+                }}
+              >
+                <button
+                  onClick={handleGenerateEmbedCode}
+                  disabled={isGeneratingAll}
+                  style={{
+                    padding: "10px 20px",
+                    borderRadius: "var(--radius-m)",
+                    background: "var(--color-accent)",
+                    color: "#ffffff",
+                    border: "none",
+                    fontSize: "var(--text-s)",
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    boxShadow: "0 4px 14px rgba(15, 184, 128, 0.3)",
+                  }}
+                >
+                  <Zap size={15} fill="white" />
+                  <span>Сгенерировать код для вставки →</span>
+                </button>
+              </div>
             </div>
           )}
 
@@ -1175,8 +1315,22 @@ export default function VoiceGuide() {
               }}
             >
               <div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                  <span
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      padding: "2px 8px",
+                      borderRadius: 4,
+                      background: "rgba(15, 184, 128, 0.15)",
+                      color: "var(--color-accent)",
+                    }}
+                  >
+                    ✓ ГОТОВО К ВСТАВКЕ
+                  </span>
+                </div>
                 <h3 style={{ fontSize: "var(--text-l)", fontWeight: 700, margin: "0 0 4px" }}>
-                  Готовый код для вставки на ваш сайт
+                  Готовый код для вашего сайта
                 </h3>
                 <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)" }}>
                   Скопируйте скрипт и вставьте его перед закрывающим тегом &lt;/body&gt; или в Head вашего сайта
@@ -1561,7 +1715,7 @@ export default function VoiceGuide() {
                         <span style={{ width: 3, height: isPlayingPreview ? 14 : 4, background: customization.themeColor, borderRadius: 2 }} />
                         <span style={{ width: 3, height: isPlayingPreview ? 8 : 4, background: customization.themeColor, borderRadius: 2 }} />
                         <span style={{ fontSize: 10, color: customization.themeColor, fontWeight: 600, marginLeft: 4 }}>
-                          {isPlayingPreview ? "Светлана говорит..." : "Готово к прослушиванию"}
+                          {isPlayingPreview ? "Диктор говорит..." : "Готово к прослушиванию"}
                         </span>
                       </div>
                     </div>
