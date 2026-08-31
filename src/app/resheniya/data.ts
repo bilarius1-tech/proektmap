@@ -51,6 +51,7 @@ export const ecosystemResources: SolutionResource[] = [
   { href: "/russian-ai", label: "Российский AI", description: "Каталог LLM, image и business-сервисов без VPN", kind: "Локализация" },
   { href: "/russian-ai-stack", label: "Российский AI-стек", description: "Выбрать сервисы без VPN и зарубежных карт", kind: "Инфраструктура" },
   { href: "/ai-without-vpn", label: "AI без VPN", description: "Оплата в ₽, хостинг в РФ и рабочие замены западных сервисов", kind: "Доступ" },
+  { href: "/services/voice-guide-builder", label: "Голосовой гид", description: "Встроить аудио-проводник на сайт или лендинг за 1 минуту", kind: "Онбординг" },
   { href: "/ai-workshop", label: "AI Цех", description: "Посмотреть реальные проекты и реализации", kind: "Примеры" },
 ];
 

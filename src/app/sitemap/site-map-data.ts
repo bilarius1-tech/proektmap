@@ -111,6 +111,7 @@ export const SITE_TREE: SiteTreeGroup[] = [
         href: "/services",
         description: "Онлайн-утилиты для работы с медиа, Авито, кодом и промптами",
         children: [
+          { title: "Конструктор голосового проводника", href: "/services/voice-guide-builder" },
           { title: "Уникализатор фото для Авито", href: "/services/avito-photo-uniquizer" },
           { title: "Калькулятор токенов и стоимости LLM", href: "/services/prompt-token-counter" },
           { title: "SVG в React / Tailwind оптимизатор", href: "/services/svg-to-react-optimizer" },

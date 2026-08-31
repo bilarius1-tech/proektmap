@@ -33,6 +33,7 @@ import {
 import type { MicroserviceItem } from "@/lib/services/data";
 import Breadcrumbs from "@/components/nav/breadcrumbs";
 import AvitoPhotoLabWorkspace from "@/components/services/avito-photo-lab";
+import VoiceGuideBuilderWorkspace from "@/components/services/voice-guide-builder";
 
 interface ServiceDetailClientProps {
   service: MicroserviceItem;
@@ -314,6 +315,8 @@ export default function ServiceDetailClient({
         <div id="tool-workspace" style={{ marginBottom: 36 }}>
           {service.slug === "avito-photo-uniquizer" ? (
             <AvitoPhotoLabWorkspace />
+          ) : service.slug === "voice-guide-builder" ? (
+            <VoiceGuideBuilderWorkspace />
           ) : (
             <div
               style={{
