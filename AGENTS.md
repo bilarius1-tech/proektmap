@@ -76,6 +76,13 @@ rm -rf .next && npx next build && pm2 restart proektmap
 4. Проверен валидатором: `npm run validate:sitemap` (или `npx tsx scripts/validate-sitemap.ts`).
 Правило: `.cursor/rules/sitemap-seo.mdc`
 
+### 5.3. Голосовой проводник (Voice Guide)
+Ключевые публичные разделы платформы снабжаются аудиогидом (`public/audio/guides/<slug>.mp3`).
+- Реестр и фонетическая нормализация: `src/lib/voice-guide/guide-data.ts`.
+- Генерация файлов: `npm run voice:guides` (Yandex SpeechKit) или `npm run voice:guides:edge` (Svetlana Neural).
+- Документация: `docs/VOICE-GUIDE.md`.
+- Skill создания аудиогидов: `.cursor/skills/voice-guide-author/SKILL.md`.
+
 ### 6. Важные API эндпоинты
 - `/api/ai/ask` — AI-консультант (требуется Pro)
 - `/api/blog/auto-publish` — авто-публикация новостей
