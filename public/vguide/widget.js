@@ -1,6 +1,6 @@
 /**
  * ProektMap Voice Guide — Embeddable Standalone Widget
- * Version: 1.1.0
+ * Version: 1.2.0
  * https://proektmap.ru/services/voice-guide-builder
  */
 (function () {
@@ -75,6 +75,7 @@
     duration: activeGuide.duration || 30,
     audio: null,
     showText: false,
+    lastRenderedView: "",
   };
 
   // 4. Стили
@@ -108,7 +109,7 @@
       gap: 8px;
       font-size: 13px;
       font-weight: 600;
-      transition: all 0.2s ease;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
     .pm-vguide-btn:hover {
       transform: translateY(-2px);
@@ -134,6 +135,7 @@
       box-shadow: 0 16px 40px rgba(0,0,0,0.55), 0 0 20px rgba(15,184,128,0.15);
       color: #f8fafc;
       animation: pmVGuideSlide 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      transform-origin: ${isLeft ? "bottom left" : "bottom right"};
     }
     @keyframes pmVGuideSlide {
       from { opacity: 0; transform: translateY(16px) scale(0.96); }
@@ -150,7 +152,6 @@
     .pm-vguide-anim-1 { animation: pmWave 0.7s infinite alternate ease-in-out; }
     .pm-vguide-anim-2 { animation: pmWave 0.9s infinite alternate ease-in-out 0.2s; }
     .pm-vguide-anim-3 { animation: pmWave 0.6s infinite alternate ease-in-out 0.1s; }
-    .pm-vguide-anim-4 { animation: pmWave 0.8s infinite alternate ease-in-out 0.3s; }
     @keyframes pmWave { 0% { height: 3px; } 100% { height: 15px; } }
   `;
 
@@ -164,6 +165,7 @@
   document.body.appendChild(container);
 
   function formatTime(s) {
+    if (!s || isNaN(s)) return "0:00";
     var mins = Math.floor(s / 60);
     var secs = Math.floor(s % 60);
     return mins + ":" + (secs < 10 ? "0" : "") + secs;
@@ -179,18 +181,40 @@
     return "https://proektmap.ru/api/voice-guide/synthesize?text=" + encodeURIComponent(text) + "&voice=" + encodeURIComponent(voice) + "&rate=" + rate;
   }
 
+  function updateProgressOnly() {
+    // Обновляем только ширину полосы и таймер без перерисовки DOM
+    var progressBar = document.getElementById("pm-vguide-progress-bar");
+    if (progressBar && state.duration > 0) {
+      var pct = Math.min(100, Math.max(0, (state.currentTime / state.duration) * 100));
+      progressBar.style.width = pct + "%";
+    }
+
+    var timeLabel = document.getElementById("pm-vguide-time-label");
+    if (timeLabel) {
+      timeLabel.textContent = formatTime(state.currentTime) + " / " + formatTime(state.duration);
+    }
+
+    var floatingTime = document.getElementById("pm-vguide-floating-time");
+    if (floatingTime) {
+      floatingTime.textContent = formatTime(state.currentTime);
+    }
+  }
+
   function initAudio() {
     if (state.audio) return;
     var src = getAudioUrl();
     state.audio = new Audio(src);
+
     state.audio.addEventListener("timeupdate", function () {
       state.currentTime = state.audio.currentTime;
-      render();
+      updateProgressOnly();
     });
+
     state.audio.addEventListener("loadedmetadata", function () {
       state.duration = state.audio.duration || activeGuide.duration || 30;
-      render();
+      updateProgressOnly();
     });
+
     state.audio.addEventListener("ended", function () {
       state.isPlaying = false;
       state.isCompleted = true;
@@ -199,6 +223,7 @@
       } catch (e) {}
       render();
     });
+
     state.audio.addEventListener("error", function (e) {
       console.error("[VoiceGuide] Audio load error:", e);
     });
@@ -239,10 +264,11 @@
   }
 
   function render() {
+    var currentView = state.isOpen ? "player" : state.isPromptOpen ? "prompt" : "collapsed";
     var html = "";
 
     // А) Промпт-приглашение
-    if (state.isPromptOpen && !state.isOpen) {
+    if (currentView === "prompt") {
       html = `
         <div class="pm-vguide-card">
           <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px;">
@@ -272,7 +298,7 @@
       `;
     }
     // Б) Развернутый плеер
-    else if (state.isOpen) {
+    else if (currentView === "player") {
       var progress = state.duration > 0 ? (state.currentTime / state.duration) * 100 : 0;
       var actionsHtml = "";
       if (state.isCompleted && activeGuide.actions && activeGuide.actions.length > 0) {
@@ -323,13 +349,13 @@
                 ${state.isPlaying ? "Озвучивание..." : state.isCompleted ? "Завершено" : "На паузе"}
               </span>
             </div>
-            <div style="font-size: 12px; color: #94a3b8; font-variant-numeric: tabular-nums;">
+            <div id="pm-vguide-time-label" style="font-size: 12px; color: #94a3b8; font-variant-numeric: tabular-nums;">
               ${formatTime(state.currentTime)} / ${formatTime(state.duration)}
             </div>
           </div>
 
           <div style="width: 100%; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; margin-bottom: 12px;">
-            <div style="width: ${progress}%; height: 100%; background: ${themeColor};"></div>
+            <div id="pm-vguide-progress-bar" style="width: ${progress}%; height: 100%; background: ${themeColor}; transition: width 0.1s linear;"></div>
           </div>
 
           <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -356,10 +382,16 @@
     // В) Свернутая плавающая кнопка
     else {
       var btnClass = state.isPlaying ? "pm-vguide-btn pm-vguide-playing-btn" : "pm-vguide-btn";
+      var btnLabel = state.isPlaying
+        ? "Слушать (<span id='pm-vguide-floating-time'>" + formatTime(state.currentTime) + "</span>)"
+        : state.isCompleted
+        ? "Гид прослушан ✓"
+        : "Аудиогид · " + (activeGuide.duration || 30) + "с";
+
       html = `
         <button id="pm-vguide-floating-btn" class="${btnClass}">
           <span>🎧</span>
-          <span>${state.isPlaying ? "Слушать (" + formatTime(state.currentTime) + ")" : state.isCompleted ? "Гид прослушан ✓" : "Аудиогид · " + (activeGuide.duration || 30) + "с"}</span>
+          <span>${btnLabel}</span>
         </button>
       `;
     }
