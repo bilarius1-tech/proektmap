@@ -13,6 +13,8 @@ import {
   Sparkles,
   ShoppingBag,
 } from "lucide-react";
+import ClaudeAcademyCallout from "@/components/academy/claude-academy-callout";
+import NeuroCatalogCallout from "@/components/arsenal/neuro-catalog-callout";
 import { ecosystemResources } from "./data";
 import { guidedSaasSolution } from "./guided-data";
 import { guidedTelegramSolution } from "./telegram-guided-data";
@@ -81,6 +83,17 @@ export default function ResheniyaPage() {
       </section>
 
       <main className="solutions-shell solutions-main">
+        <ClaudeAcademyCallout
+          style={{ marginBottom: 16 }}
+          secondaryHref="#available-title"
+          secondaryLabel="К маршрутам ниже"
+        />
+        <NeuroCatalogCallout
+          style={{ marginBottom: 28 }}
+          secondaryHref="/arsenal/vibe-coder"
+          secondaryLabel="Стек: агент-кодер"
+        />
+
         <section className="solutions-section" aria-labelledby="available-title">
           <div className="solutions-section-heading">
             <div>

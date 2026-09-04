@@ -3,8 +3,9 @@ import { getDb } from "../src/lib/db/index";
 /** Стабильные ID ключевых пунктов — чтобы агенты и сиды не плодили дубли. */
 const ESSENTIAL_HEADER = [
   { id: "header-resheniya", label: "Готовые решения", href: "/resheniya", sortOrder: 0 },
-  { id: "header-avito", label: "Авито", href: "/avito", sortOrder: 1 },
-  { id: "header-sitemap", label: "Карта сайта", href: "/sitemap", sortOrder: 2 },
+  { id: "header-arsenal", label: "Нейро каталог", href: "/arsenal", sortOrder: 1 },
+  { id: "header-avito", label: "Авито", href: "/avito", sortOrder: 2 },
+  { id: "header-sitemap", label: "Карта сайта", href: "/sitemap", sortOrder: 3 },
 ] as const;
 
 async function main() {
@@ -72,6 +73,7 @@ async function main() {
   // Предпочтительный порядок корней шапки по href (остальные — после)
   const preferredHrefs = [
     "/resheniya",
+    "/arsenal",
     "/avito",
     "/sitemap",
     "/blog",

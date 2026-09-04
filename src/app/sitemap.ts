@@ -6,12 +6,15 @@ import { VIBE_KITS } from "@/lib/vibe-blocks/data";
 import { CAPABILITY_SKILLS } from "@/app/skills/skills-data";
 import { UI_PATTERNS } from "@/app/ui-patterns/data";
 import { MICROSERVICES } from "@/lib/services/data";
+import { getPublishedStacks, ARSENAL_TOOLS } from "@/lib/arsenal";
 
 const baseUrl = "https://proektmap.ru";
 
 function pagePriority(href: string) {
   if (href === "/") return 1;
   if (href === "/resheniya") return 0.9;
+  if (href === "/arsenal") return 0.85;
+  if (href.startsWith("/arsenal/")) return href.includes("/tools/") ? 0.55 : 0.75;
   if (href.startsWith("/resheniya/")) return href.includes("workspace") ? 0.6 : 0.8;
   if (["/blog", "/ai-tools", "/mcp", "/telegram", "/avito", "/services", "/ai-without-vpn", "/skills", "/glossary"].includes(href)) return 0.8;
   if (["/terms", "/privacy", "/offer", "/refund", "/contacts"].includes(href)) return 0.4;
@@ -96,6 +99,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: "weekly" as const,
       priority: 0.85,
+    })),
+    ...getPublishedStacks().map((s) => ({
+      url: `${baseUrl}/arsenal/${s.slug}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.75,
+    })),
+    ...ARSENAL_TOOLS.map((t) => ({
+      url: `${baseUrl}/arsenal/tools/${t.slug}`,
+      lastModified: new Date(),
+      changeFrequency: "monthly" as const,
+      priority: 0.55,
     })),
     ...blogUrls,
     ...aiToolUrls,

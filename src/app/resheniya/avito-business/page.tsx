@@ -15,6 +15,7 @@ import {
   Layers,
 } from "lucide-react";
 import { guidedAvitoSolution } from "../avito-guided-data";
+import ArsenalBridgePanel from "@/components/arsenal/arsenal-bridge-panel";
 
 export const metadata: Metadata = {
   title: "Запустить AI-магазин на Авито — готовое инженерное решение",
@@ -103,6 +104,8 @@ export default function AvitoBusinessSolutionPage() {
             ))}
           </div>
         </section>
+
+        <ArsenalBridgePanel solutionSlug="avito-business" />
 
         <section className="solution-pack-section" aria-labelledby="avito-pack-title">
           <div className="solution-pack-copy">

@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { guidedSaasSolution } from "../guided-data";
 import SolutionSkillsStack from "@/components/skills/solution-skills-stack";
+import ArsenalBridgePanel from "@/components/arsenal/arsenal-bridge-panel";
 
 export const metadata: Metadata = {
   title: "Запустить SaaS-продукт — готовое AI-решение",
@@ -103,6 +104,8 @@ export default function SaasSolutionPage() {
         </section>
 
         <SolutionSkillsStack />
+
+        <ArsenalBridgePanel solutionSlug="saas-product" />
 
         <section className="solution-pack-section" aria-labelledby="pack-title">
           <div className="solution-pack-copy">

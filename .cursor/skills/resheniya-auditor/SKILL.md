@@ -59,6 +59,7 @@ Audit Progress:
 - [ ] B. Готовые шаги и DoD
 - [ ] C. Workspace UX
 - [ ] D. Экосистема и границы
+- [ ] D2. Мост Нейро каталог (/arsenal) — soft warn
 - [ ] E. Mobile / a11y базово
 - [ ] F. Индексация и docs
 - [ ] G. Validator / build / deploy readiness
@@ -99,6 +100,16 @@ Audit Progress:
 - [ ] Нет путаницы с `/solutions`
 - [ ] Старые Blueprint не сломаны и не переписаны «заодно»
 - [ ] Нет Phaser/игровой оболочки как ядра продукта
+
+### D2. Нейро каталог (/arsenal) — soft warn
+
+Не блокирует PASS само по себе, но отметь в «Замечания», если:
+
+- у маршрута очевидный toolkit (код / фото / голос / агент), а нет моста в `RESHENIYA_ARSENAL_BRIDGES` или `ArsenalBridgePanel`;
+- на обзоре есть только фраза «смотрите арсенал» без `/arsenal/<stack>` или `/arsenal/tools/<slug>`;
+- мост ссылается на несуществующие slug.
+
+Skill: `.cursor/skills/arsenal-resheniya-bridge/SKILL.md`.
 
 ### E. Mobile (критично для PASS)
 

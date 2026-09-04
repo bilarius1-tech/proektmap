@@ -1,6 +1,7 @@
 import { getDb } from "@/lib/db";
 import Link from "next/link";
-import { GitBranch, Users, FileText, DollarSign, TrendingUp, Clock, MessageCircle, AlertTriangle, ArrowRight } from "lucide-react";
+import { GitBranch, Users, FileText, DollarSign, TrendingUp, Clock, MessageCircle, AlertTriangle, ArrowRight, Brain } from "lucide-react";
+import { getArsenalHubStats } from "@/lib/arsenal";
 
 export const dynamic = "force-dynamic";
 
@@ -43,6 +44,7 @@ export default async function AdminDashboard() {
   // Payments total
   const payments = await db.payment.aggregate({ where: { status: "completed" }, _sum: { amount: true } });
   const revenue = (payments._sum.amount || 0) / 100;
+  const arsenalStats = getArsenalHubStats();
 
   // Recent users
   const recentUsers = await db.user.findMany({ orderBy: { createdAt: "desc" }, take: 5, select: { id: true, name: true, email: true, createdAt: true, avatar: true } });
@@ -66,6 +68,7 @@ export default async function AdminDashboard() {
         <StatCard icon={<FileText size={20} />} label="Посты" value={posts} sub={`+${newPostsToday} сегодня`} href="/admin/blog" color="#8B5CF6" />
         <StatCard icon={<DollarSign size={20} />} label="Выручка" value={`${revenue} ₽`} sub={`${proUsers} Pro`} href="/admin/billing" color="#F59E0B" />
         <StatCard icon={<AlertTriangle size={20} />} label="Инструменты" value={tools} sub="AI Tools" href="/admin/ai-tools" color="#EF4444" />
+        <StatCard icon={<Brain size={20} />} label="Каталог ИИ" value={arsenalStats.tools} sub={`${arsenalStats.stacks} стеков · публичный`} href="/arsenal" color="#22D3EE" />
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", gap: "var(--space-xl)", marginBottom: "var(--space-xl)" }}>

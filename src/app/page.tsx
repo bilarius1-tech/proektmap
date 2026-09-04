@@ -1,10 +1,12 @@
 import { getDb } from "@/lib/db/index";
 import AnimatedHero from "@/components/hero/animated-hero";
+import ClaudeAcademyCallout from "@/components/academy/claude-academy-callout";
 import { CommunityPulseHero, CommunityStats } from "@/components/originkit/community-pulse";
 import Link from "next/link";
 import { ArrowRight, Map, Bot, Rocket, Route, Sparkles, Boxes, Compass, Plus, Flame, Eye, Layers, Crown, Lock, Wrench, Zap, Image as ImageIcon, Calculator, Code2 } from "lucide-react";
 import { UI_PATTERNS } from "@/app/ui-patterns/data";
 import { MICROSERVICES, normalizeMediaUrl } from "@/lib/services/data";
+import { getArsenalHubStats } from "@/lib/arsenal";
 import { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -102,11 +104,14 @@ export default async function Home() {
     };
   });
 
+  const arsenalStats = getArsenalHubStats();
+
   const communityStats: CommunityStats = {
     totalUsers,
     totalProjects,
     totalSolutions: 2,
     totalTools,
+    totalArsenalTools: arsenalStats.tools,
     totalTerms,
     totalPosts,
     totalSkills: 15,
@@ -177,6 +182,11 @@ export default async function Home() {
             <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.6, margin: 0 }}>На финише остаются работающий продукт, принятые решения, файлы и проверяемый внешний сигнал.</p>
           </div>
         </div>
+      </div>
+
+      {/* Claude Academy → полигон результата (не в hero) */}
+      <div style={{ maxWidth: 960, margin: "0 auto", padding: "0 var(--space-m) var(--space-xl)" }}>
+        <ClaudeAcademyCallout />
       </div>
 
       {/* Точки входа */}

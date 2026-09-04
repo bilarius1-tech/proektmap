@@ -27,11 +27,30 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       if (slugExists) return NextResponse.json({ error: "Slug уже занят другим постом" }, { status: 409 });
     }
 
+    const categoryId =
+      data.categoryId === undefined
+        ? undefined
+        : data.categoryId && String(data.categoryId).trim()
+          ? String(data.categoryId)
+          : null;
+
     const post = await db.blogPost.update({
       where: { id },
       data: {
-        ...data,
-        publishedAt: data.status === "published" && !existing.publishedAt ? new Date() : data.publishedAt || existing.publishedAt,
+        title: data.title,
+        slug: data.slug,
+        content: data.content,
+        excerpt: data.excerpt,
+        coverImage: data.coverImage,
+        status: data.status,
+        tags: data.tags,
+        metaTitle: data.metaTitle,
+        metaDesc: data.metaDesc,
+        ...(categoryId !== undefined ? { categoryId } : {}),
+        publishedAt:
+          data.status === "published" && !existing.publishedAt
+            ? new Date()
+            : data.publishedAt || existing.publishedAt,
       },
     });
     if (data.status === "published") pingSearchEngines(post.slug).catch(() => {});

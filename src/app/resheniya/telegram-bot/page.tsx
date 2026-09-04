@@ -14,6 +14,7 @@ import {
   Target,
 } from "lucide-react";
 import { guidedTelegramSolution } from "../telegram-guided-data";
+import ArsenalBridgePanel from "@/components/arsenal/arsenal-bridge-panel";
 
 export const metadata: Metadata = {
   title: "Запустить Telegram-бота — готовое AI-решение",
@@ -102,6 +103,8 @@ export default function TelegramBotSolutionPage() {
             ))}
           </div>
         </section>
+
+        <ArsenalBridgePanel solutionSlug="telegram-bot" />
 
         <section className="solution-pack-section" aria-labelledby="telegram-pack-title">
           <div className="solution-pack-copy">

@@ -15,6 +15,7 @@ import {
   Plus,
   Flame,
   Zap,
+  Brain,
 } from "lucide-react";
 import "./hero-22.css";
 import { NeuralDiagram } from "@/components/originkit/ui/hero-22/neural-diagram";
@@ -25,6 +26,7 @@ export interface CommunityStats {
   totalProjects: number;
   totalSolutions: number;
   totalTools: number;
+  totalArsenalTools: number;
   totalTerms: number;
   totalPosts: number;
   totalSkills: number;
@@ -55,6 +57,14 @@ export function CommunityPulseHero({ stats }: { stats: CommunityStats }) {
       sublabel: "Инженерные маршруты",
       href: "/resheniya",
       accent: "#a855f7",
+    },
+    {
+      icon: <Brain size={18} color="#22d3ee" />,
+      value: stats.totalArsenalTools,
+      label: "Каталог ИИ",
+      sublabel: "Нейро каталог · стеки и инструменты",
+      href: "/arsenal",
+      accent: "#22d3ee",
     },
     {
       icon: <Wrench size={18} color="#f59e0b" />,

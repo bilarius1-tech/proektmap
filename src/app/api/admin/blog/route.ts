@@ -24,14 +24,44 @@ export async function POST(req: NextRequest) {
     const db = await getDb();
     const session = await auth();
 
+    // Resolve author from DB (email first). Session may still carry OAuth subject id until JWT refresh.
+    const email = session?.user?.email?.toLowerCase();
+    let author =
+      (email ? await db.user.findUnique({ where: { email }, select: { id: true } }) : null) ||
+      ((session?.user as any)?.id
+        ? await db.user.findUnique({ where: { id: (session!.user as any).id }, select: { id: true } })
+        : null);
+    if (!author) {
+      return NextResponse.json(
+        { error: "Автор не найден в базе. Выйдите и войдите снова в админку." },
+        { status: 400 }
+      );
+    }
+
     // Check slug uniqueness
     if (data.slug) {
       const slugExists = await db.blogPost.findUnique({ where: { slug: data.slug } });
       if (slugExists) return NextResponse.json({ error: "Slug уже занят. Придумайте другой заголовок." }, { status: 409 });
     }
 
+    const categoryId =
+      data.categoryId && String(data.categoryId).trim() ? String(data.categoryId) : null;
+
     const post = await db.blogPost.create({
-      data: { ...data, authorId: (session!.user as any).id, publishedAt: data.status === "published" ? new Date() : null },
+      data: {
+        title: data.title,
+        slug: data.slug,
+        content: data.content || "",
+        excerpt: data.excerpt || "",
+        coverImage: data.coverImage || "",
+        status: data.status || "draft",
+        tags: data.tags || "",
+        metaTitle: data.metaTitle || "",
+        metaDesc: data.metaDesc || "",
+        categoryId,
+        authorId: author.id,
+        publishedAt: data.status === "published" ? new Date() : null,
+      },
     });
     if (post.status === "published") pingSearchEngines(post.slug).catch(() => {});
     return NextResponse.json(post);

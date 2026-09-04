@@ -44,6 +44,7 @@ export const ecosystemResources: SolutionResource[] = [
   { href: "/architect", label: "AI-Архитектор", description: "Собрать сущности, стек и план из описания продукта", kind: "Проектирование" },
   { href: "/models", label: "AI-модели", description: "Сравнить модели по цене и возможностям", kind: "Выбор" },
   { href: "/ai-tools", label: "AI-инструменты", description: "Подобрать сервисы для выполнения задачи", kind: "Инструменты" },
+  { href: "/arsenal", label: "Нейро каталог", description: "Стеки AI-инструментов под миссию с порядком и Definition of Done", kind: "Арсенал" },
   { href: "/skills", label: "Skills", description: "Подключить готовые навыки AI-агента", kind: "Действие" },
   { href: "/patterns", label: "Паттерны", description: "Использовать проверенную архитектуру", kind: "Архитектура" },
   { href: "/prompts", label: "Промпты", description: "Запустить работу в Cursor или Claude Code", kind: "Разработка" },

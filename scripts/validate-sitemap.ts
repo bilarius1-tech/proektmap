@@ -27,6 +27,8 @@ const KNOWN_DYNAMIC_GENERATORS: Record<string, string> = {
   "/sandbox/vibe-blocks/[slug]": "VIBE_KITS (data)",
   "/ui-patterns/[slug]": "UI_PATTERNS (data)",
   "/services/[slug]": "MICROSERVICES (data)",
+  "/arsenal/[slug]": "ARSENAL_STACKS / getPublishedStacks (data)",
+  "/arsenal/tools/[slug]": "ARSENAL_TOOLS (data)",
   "/blueprints/[slug]": "Legacy / DB",
   "/[blueprint]": "Legacy / DB",
   "/blog/author/[email]": "Dynamic author",

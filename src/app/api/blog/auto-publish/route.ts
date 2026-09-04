@@ -15,6 +15,12 @@ import {
 import { DEFAULT_SEO_KEYWORDS, EditorialRubric, judgeRelevance } from "@/lib/blog/relevance";
 import { buildPublishReport, isAiJsonError, isAiTimeout, isTransientFeedFailure } from "@/lib/blog/publish-report";
 import { ensureBlogCategory } from "@/lib/blog/categories";
+import {
+  countAiPublishedSince,
+  getBlogAutoPublishDailyLimit,
+  mskDayStartUtc,
+} from "@/lib/blog/daily-quota";
+import { MICROSERVICES } from "@/lib/services/data";
 
 type FeedRow = { id: string; name: string; url: string; type: string; category: string };
 type FeedItem = { title: string; link: string; description: string; image?: string };
@@ -87,28 +93,50 @@ function rankInternalLinks(candidates: InternalLinkCandidate[], query: string): 
 }
 
 async function getInternalLinkCatalog(db: any): Promise<InternalLinkCandidate[]> {
-  const [tools, glossary, blueprints, solutions, skills, patterns, posts] = await Promise.all([
+  const [tools, glossary, solutions, skills, patterns, posts] = await Promise.all([
     db.aITool.findMany({ where: { isActive: true }, select: { name: true, slug: true, shortDescription: true }, take: 60 }),
-    db.glossaryTerm.findMany({ where: { isPublished: true }, select: { term: true, slug: true, simpleExplanation: true }, take: 60 }),
-    db.blueprint.findMany({ where: { isPublished: true }, select: { title: true, slug: true, description: true }, take: 40 }),
+    db.glossaryTerm.findMany({ where: { isPublished: true }, select: { term: true, slug: true, simpleExplanation: true }, take: 40 }),
     db.solution.findMany({ where: { isPublished: true }, select: { title: true, slug: true, summary: true }, take: 40 }),
     db.skill.findMany({ where: { isPublished: true }, select: { title: true, slug: true, description: true }, take: 40 }),
     db.buildPattern.findMany({ where: { isPublished: true }, select: { title: true, slug: true, description: true }, take: 40 }),
-    db.blogPost.findMany({ where: { status: "published" }, select: { title: true, slug: true, excerpt: true }, orderBy: { publishedAt: "desc" }, take: 40 }),
+    db.blogPost.findMany({ where: { status: "published" }, select: { title: true, slug: true, excerpt: true }, orderBy: { publishedAt: "desc" }, take: 30 }),
   ]);
 
+  // Продуктовый whitelist первым (без legacy /blueprints)
+  const productHubs: InternalLinkCandidate[] = [
+    { title: "Готовые решения AI", url: "/resheniya", description: "Маршруты: результат → этапы → проверка" },
+    { title: "Микросервисы", url: "/services", description: "Изолированные браузерные инструменты" },
+    { title: "Лаборатория Авито", url: "/avito", description: "Практика и инструменты для Авито" },
+    { title: "Вайбик", url: "/vaibik", description: "Миссия №1 для новичка" },
+    { title: "Skills", url: "/skills", description: "Карта компетенций AI-инженера" },
+    { title: "Промпты", url: "/prompts", description: "Готовые промпты и шаблоны" },
+    { title: "AI-инструменты", url: "/ai-tools", description: "Каталог инструментов под задачу" },
+    { title: "AI без VPN", url: "/ai-without-vpn", description: "Стек и модели для работы из России" },
+    { title: "Российский AI", url: "/russian-ai", description: "Модели и сервисы РФ" },
+    { title: "Песочница", url: "/sandbox", description: "Практика без продакшена" },
+    { title: "UI-Атлас", url: "/ui-patterns", description: "Инженерные UI-паттерны" },
+    { title: "MCP-серверы", url: "/mcp", description: "Интеграции MCP" },
+    { title: "Запустить SaaS", url: "/resheniya/saas-product", description: "Готовый маршрут SaaS" },
+    { title: "Telegram-бот", url: "/resheniya/telegram-bot", description: "Готовый маршрут бота" },
+    { title: "AI-магазин на Авито", url: "/resheniya/avito-business", description: "Готовый маршрут Авито" },
+  ];
+
+  const microserviceLinks = MICROSERVICES.filter((item) => item.status === "active").map((item) => ({
+    title: item.title,
+    url: `/services/${item.slug}`,
+    description: item.shortDescription,
+  }));
+
   const candidates: InternalLinkCandidate[] = [
-    { title: "Каталог AI-инструментов", url: "/ai-tools", description: "Выбор AI-инструментов под задачу" },
-    { title: "Blueprint'ы", url: "/blueprints", description: "Пошаговые маршруты создания проектов" },
-    { title: "Библиотека промптов", url: "/prompts", description: "Готовые промпты и шаблоны запросов" },
+    ...productHubs,
+    ...microserviceLinks,
     ...tools.map((item: any) => ({ title: item.name, url: `/ai-tools/${item.slug}`, description: item.shortDescription })),
     ...glossary.map((item: any) => ({ title: item.term, url: `/glossary/${item.slug}`, description: item.simpleExplanation })),
-    ...blueprints.map((item: any) => ({ title: item.title, url: `/blueprints/${item.slug}`, description: item.description || "" })),
     ...solutions.map((item: any) => ({ title: item.title, url: `/solutions/${item.slug}`, description: item.summary })),
     ...skills.map((item: any) => ({ title: item.title, url: `/skills/${item.slug}`, description: item.description })),
     ...patterns.map((item: any) => ({ title: item.title, url: `/patterns/${item.slug}`, description: item.description })),
     ...posts.map((item: any) => ({ title: item.title, url: `/blog/${item.slug}`, description: item.excerpt })),
-  ].filter((item) => item.title && item.url && !item.url.endsWith("/"));
+  ].filter((item) => item.title && item.url && !item.url.endsWith("/") && !item.url.startsWith("/blueprints"));
 
   return candidates;
 }
@@ -130,7 +158,7 @@ async function generateSeoArticle(input: {
     messages: [
       {
         role: "system",
-        content: "Ты создаёшь самостоятельные SEO-материалы из новостных источников. Отвечай только валидным JSON без Markdown.",
+        content: "Ты создаёшь практичные материалы для AI-инженеров из новостных источников. Отвечай только валидным JSON без Markdown.",
       },
       { role: "user", content: buildSeoPrompt(input) },
     ],
@@ -249,23 +277,46 @@ export async function POST(req: Request) {
   try { settings = await db.siteSettings.findUnique({ where: { id: "main" } }); } catch {}
 
   let dripResult: any = { published: false, reason: "none" };
+  const dailyLimit = getBlogAutoPublishDailyLimit();
+  let publishedToday = 0;
+  try {
+    publishedToday = await countAiPublishedSince(db, mskDayStartUtc());
+  } catch {
+    publishedToday = 0;
+  }
+
   try {
     const intervalMin = settings?.autoPublishIntervalMin ?? 45;
     const lastDrip = settings?.lastDripPublishedAt;
-    if (!lastDrip || Date.now() - new Date(lastDrip).getTime() >= intervalMin * 60 * 1000) {
+    if (publishedToday >= dailyLimit) {
+      dripResult = {
+        published: false,
+        reason: "daily-limit",
+        limit: dailyLimit,
+        publishedToday,
+        env: "BLOG_AUTO_PUBLISH_DAILY_LIMIT",
+      };
+    } else if (!lastDrip || Date.now() - new Date(lastDrip).getTime() >= intervalMin * 60 * 1000) {
       const nextPost = await db.blogPost.findFirst({ where: { status: "queued" }, orderBy: { createdAt: "asc" } });
       if (nextPost) {
         await db.blogPost.update({ where: { id: nextPost.id }, data: { status: "published", publishedAt: new Date() } });
         await db.siteSettings.update({ where: { id: "main" }, data: { lastDripPublishedAt: new Date() } });
-        dripResult = { published: true, slug: nextPost.slug, title: nextPost.title };
+        publishedToday += 1;
+        dripResult = {
+          published: true,
+          slug: nextPost.slug,
+          title: nextPost.title,
+          publishedToday,
+          limit: dailyLimit,
+        };
       } else {
-        dripResult = { published: false, reason: "empty-queue" };
+        dripResult = { published: false, reason: "empty-queue", publishedToday, limit: dailyLimit };
       }
     } else {
-      dripResult = { published: false, reason: "interval-not-elapsed" };
+      dripResult = { published: false, reason: "interval-not-elapsed", publishedToday, limit: dailyLimit };
     }
   } catch {
-    dripResult = { published: false, reason: "error" };
+    dripResult = { published: false, reason: "error", publishedToday, limit: dailyLimit };
   }
 
   if (settings?.autoPublishEnabled !== true) return NextResponse.json({ drip: dripResult, collection: { scheduled: false, reason: "disabled" } });
@@ -289,15 +340,22 @@ export async function POST(req: Request) {
 
   after(async () => {
     try {
-      const sellerFirst = ["Авито", "Ozon", "Wildberries", "Автоматизация продаж", "Маркетплейсы"];
+      const aiFirst = ["AI-инжиниринг", "AI", "Development", "Разработка", "Авито", "Ozon", "Wildberries", "Автоматизация продаж", "Маркетплейсы"];
       const feeds: FeedRow[] = (await db.blogFeed.findMany({ where: { isActive: true } })).sort((a, b) => {
-        const ai = sellerFirst.indexOf(a.category);
-        const bi = sellerFirst.indexOf(b.category);
+        const ai = aiFirst.indexOf(a.category);
+        const bi = aiFirst.indexOf(b.category);
         return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
       });
       const admin = await db.user.findFirst({ where: { role: "admin" } });
       if (!admin) {
         await sendTelegramReport("Авто-сбор не запустился: нет пользователя-админа");
+        return;
+      }
+
+      const queuedAhead = await db.blogPost.count({ where: { status: "queued" } });
+      // Не раздуваем очередь: дневной лимит × 2 уже в запасе на завтра
+      if (queuedAhead >= dailyLimit * 2) {
+        await sendTelegramReport(`Авто-сбор пропущен: в очереди уже ${queuedAhead} (лимит дня ${dailyLimit}).`);
         return;
       }
 
@@ -370,7 +428,7 @@ export async function POST(req: Request) {
               const cover = await resolveCover({
                 title: item.title.slice(0, 80),
                 category: editorialCategory,
-                tags: [editorialCategory, "автоматизация продаж"],
+                tags: [editorialCategory, "AI-инжиниринг"],
                 thumbnailUrl: item.image || undefined,
               });
               coverImage = cover.url;
@@ -433,7 +491,7 @@ export async function POST(req: Request) {
               data: {
                 title, slug, content, excerpt: metaDesc, coverImage,
                 status: "queued", authorId: admin.id, categoryId: cat.id,
-                tags: [editorialCategory, "продавцы", "автоматизация продаж", article.contentType, article.primaryKeyword, ...article.secondaryKeywords.slice(0, 5)].filter(Boolean).join(","),
+                tags: [editorialCategory, "AI-инжиниринг", article.contentType, article.primaryKeyword, ...article.secondaryKeywords.slice(0, 5)].filter(Boolean).join(","),
                 aiGenerated: true, aiModel: model,
                 metaTitle: article.metaTitle, metaDesc,
               },

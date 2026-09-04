@@ -83,14 +83,19 @@ rm -rf .next && npx next build && pm2 restart proektmap
 - Документация: `docs/VOICE-GUIDE.md`.
 - Skill создания аудиогидов: `.cursor/skills/voice-guide-author/SKILL.md`.
 
+### 5.4. Блог: квота и обзоры продуктов
+- Авто-публикация (drip): жёсткий лимит **1–2 поста/день** — env `BLOG_AUTO_PUBLISH_DAILY_LIMIT` (default `2`), код `src/lib/blog/daily-quota.ts`, эндпоинт `/api/blog/auto-publish`.
+- Редакционные правила новостей: AI-инжиниринг first (`src/lib/blog/relevance.ts`, `seo-pipeline.ts`), без seller-stretch, ссылки на `/resheniya` / `/services` / `/avito` и др. (не `/blueprints`).
+- Skill обзоров внутренних продуктов: `.cursor/skills/product-review-author/SKILL.md`.
+
 ### 6. Важные API эндпоинты
 - `/api/ai/ask` — AI-консультант (требуется Pro)
-- `/api/blog/auto-publish` — авто-публикация новостей
+- `/api/blog/auto-publish` — авто-публикация новостей (квота `BLOG_AUTO_PUBLISH_DAILY_LIMIT`)
 - `/api/billing/webhook` — webhook ЮKassa
 - `/api/admin/settings` — настройки сайта
 
 ### 7. Переменные окружения (.env)
-DATABASE_URL, NEXTAUTH_URL, NEXTAUTH_SECRET, YANDEX_CLIENT_ID, YANDEX_CLIENT_SECRET, DEEPSEEK_API_KEY, OPENROUTER_API_KEY, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
+DATABASE_URL, NEXTAUTH_URL, NEXTAUTH_SECRET, YANDEX_CLIENT_ID, YANDEX_CLIENT_SECRET, DEEPSEEK_API_KEY, OPENROUTER_API_KEY, TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, BLOG_AUTO_PUBLISH_DAILY_LIMIT (опционально, default 2), CRON_SECRET
 
 ### 8. Как закрывать день
 ```bash
@@ -145,6 +150,8 @@ Skill: .reasonix/skills/yookassa-checkout/SKILL.md
 |--------|-------|------|
 | Создать/расширить маршрут | `resheniya-author` | `.cursor/skills/resheniya-author/SKILL.md` |
 | Проверить до публикации | `resheniya-auditor` | `.cursor/skills/resheniya-auditor/SKILL.md` |
+| Связка решения с Нейро каталогом | `arsenal-resheniya-bridge` | `.cursor/skills/arsenal-resheniya-bridge/SKILL.md` |
+| Обзор внутреннего продукта для блога | `product-review-author` | `.cursor/skills/product-review-author/SKILL.md` |
 
 Правило (auto на `src/app/resheniya/**`): `.cursor/rules/resheniya.mdc`
 

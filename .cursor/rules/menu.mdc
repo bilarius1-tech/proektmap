@@ -37,6 +37,7 @@ Rebuild нужен только если меняли код header/footer/API.
 | id | label | href |
 |---|---|---|
 | `header-resheniya` | Готовые решения | `/resheniya` |
+| `header-arsenal` | Нейро каталог | `/arsenal` |
 | `header-avito` | Авито | `/avito` |
 | `header-sitemap` | Карта сайта | `/sitemap` |
 

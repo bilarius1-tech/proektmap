@@ -156,9 +156,16 @@ export function scoreSeoArticle(
   add("H2 структура", headings.length >= 2, 10, `${headings.length} заголовка H2`);
   add("Полезность", words >= 220 && words <= 1400, 10, `${words} слов`);
   add("Оригинальность", isOriginal, 5, isOriginal ? "Не повторяет RSS-описание" : "Повторяет исходное описание");
-  add("Внутренние ссылки", internalCount >= 1, 15, `${internalCount} ссылок из каталога ProektMap`);
+  const productPrefixes = ["/resheniya", "/services", "/avito", "/vaibik", "/skills", "/prompts", "/ai-tools", "/russian-ai", "/sandbox", "/ui-patterns", "/mcp", "/models", "/architect"];
+  const productAllowed = allowedInternalUrls.filter((url) => productPrefixes.some((prefix) => url === prefix || url.startsWith(`${prefix}/`)));
+  const productUsed = productAllowed.filter((url) => article.html.includes(`href="${url}"`) || article.html.includes(`href='${url}'`)).length;
+  const hasUsefulInternal = productAllowed.length > 0 ? productUsed >= 1 : internalCount >= 1;
+
+  add("Внутренние ссылки", hasUsefulInternal, 15, productAllowed.length > 0
+    ? `${productUsed} продуктовых ссылок (из ${productAllowed.length} в whitelist)`
+    : `${internalCount} ссылок из каталога ProektMap`);
   add("Дополнительные запросы", secondaryUsed >= 1, 10, `${secondaryUsed} запросов использовано`);
-  add("FAQ", article.faq.length === 0 || article.faq.length >= 2, 2, article.faq.length ? `${article.faq.length} вопроса` : "Не нужен для этого интента");
+  add("FAQ", article.faq.length === 0 || article.faq.length >= 2, 2, article.faq.length ? `${article.faq.length} вопроса` : "FAQ не обязателен");
   add("Источник", hasSource, 3, hasSource ? "Ссылка присутствует" : "Нет ссылки на источник");
 
   return {
@@ -182,28 +189,36 @@ export function buildSeoPrompt(input: {
     ? `\nИсправь SEO (${input.revision.check.score}/100): ${input.revision.check.missing.join("; ")}.`
     : "";
 
-  return `Ты SEO-редактор ProektMap для продавцов, авитологов и селлеров в России.
-Источник — только факты. Не выдумывай цифры. Если новость зарубежная — переведи в сценарий для РФ.
-Каждая статья даёт один практический шаг: карточка, заявки, цена, остатки, CRM, оплата или меньше ручной работы.
+  return `Ты редактор блога ProektMap для AI-инженеров, вайбкодеров и практиков в России.
+Аудитория: люди, которые собирают продукты с AI (агенты, Cursor, модели, MCP, стек без VPN), а не «все продавцы подряд».
+Источник — только факты. Не выдумывай цифры. Зарубежную новость переводи в практику для РФ.
+Запрещено: натягивать угол «для продавцов» на несвязанные темы; вода и хайп без шага.
+
+Структура html (обязательна):
+1) Что изменилось для практика (2–3 предложения).
+2) Что сделать сейчас (конкретные шаги или проверка) — можно короткий список <li>, но не SEO-чеклист ради галочки.
+3) Где это на ProektMap — минимум одна ссылка из списка ниже (/resheniya, /services, /avito, /skills и т.д.).
+FAQ не обязателен — не добавляй ради SEO.
 
 ИСТОЧНИК: ${input.sourceTitle}
 ОПИСАНИЕ: ${input.sourceDescription || "(нет)"}
 URL: ${input.sourceUrl}
 РУБРИКА: ${input.category}
-КЛЮЧИ: ${input.siteKeywords.slice(0, 12).join(", ") || "автоматизация продаж"}
-ССЫЛКИ (1–2 штуки, только из списка):
-${links || "- /ai-tools | AI-инструменты"}
+КЛЮЧИ: ${input.siteKeywords.slice(0, 12).join(", ") || "AI-инжиниринг"}
+ССЫЛКИ (1–2 штуки, только из списка; предпочитай продуктовые URL):
+${links || "- /resheniya | Готовые решения AI\n- /services | Микросервисы"}
 
 ФОРМАТ: News, Explainer или Practical.
 
 ОБЯЗАТЕЛЬНО, иначе статья отбраковывается:
 1. primaryKeyword — короткая фраза 2–4 слова.
-2. Эта фраза дословно входит в title, metaTitle и metaDesc — скопируй её без изменений и без склонения.
+2. Эта фраза дословно входит в title, metaTitle и metaDesc — без склонения.
 3. metaTitle 35–70 символов, metaDesc 100–165 символов.
-4. html: 300–450 слов, 2–3 <h2>, чек-лист из 3–5 <li>.
+4. html: 280–450 слов, 2–3 <h2> по структуре выше.
 5. Каждое слово из secondaryKeywords дословно встречается в тексте html.
-6. В html минимум одна ссылка вида <a href="/ai-tools">…</a> строго из списка выше, URL копируй символ в символ.
+6. В html минимум одна ссылка вида <a href="/resheniya">…</a> строго из списка выше, URL копируй символ в символ.
 7. Последний абзац html — <a href="${input.sourceUrl}">Источник</a>.
+8. faq: [] если нет реальных вопросов практика.
 
 Без Markdown, <h1>, script и стилей.
 ${revision}

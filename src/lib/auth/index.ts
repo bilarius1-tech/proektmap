@@ -63,6 +63,7 @@ export const authOptions: NextAuthOptions = {
     },
     async jwt({ token, user }) {
       if (user) {
+        // Credentials: DB uuid. Yandex OAuth: provider subject id — overwritten below by email lookup.
         token.id = user.id;
         token.email = user.email;
         token.name = user.name;
@@ -72,8 +73,12 @@ export const authOptions: NextAuthOptions = {
       if (token.email) {
         try {
           const db = getAuthPrisma();
-          const dbUser = await db.user.findUnique({ where: { email: token.email as string } });
+          const email = String(token.email).toLowerCase();
+          const dbUser = await db.user.findUnique({ where: { email } });
           if (dbUser) {
+            // Always use our users.id — never leave Yandex/OAuth subject as session user id
+            // (otherwise blog_posts.authorId FK and other User FKs break).
+            token.id = dbUser.id;
             token.role = dbUser.role;
             token.subscription = dbUser.subscription;
           }
@@ -86,6 +91,7 @@ export const authOptions: NextAuthOptions = {
         (session.user as any).id = token.id;
         (session.user as any).role = token.role || "user";
         (session.user as any).subscription = token.subscription || "free";
+        if (token.email) session.user.email = String(token.email).toLowerCase();
       }
       return session;
     },
