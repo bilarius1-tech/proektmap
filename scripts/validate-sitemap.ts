@@ -29,6 +29,7 @@ const KNOWN_DYNAMIC_GENERATORS: Record<string, string> = {
   "/services/[slug]": "MICROSERVICES (data)",
   "/arsenal/[slug]": "ARSENAL_STACKS / getPublishedStacks (data)",
   "/arsenal/tools/[slug]": "ARSENAL_TOOLS (data)",
+  "/agent-engineering/[slug]": "MODULES (src/lib/agent-engineering) + SITE_TREE",
   "/blueprints/[slug]": "Legacy / DB",
   "/[blueprint]": "Legacy / DB",
   "/blog/author/[email]": "Dynamic author",

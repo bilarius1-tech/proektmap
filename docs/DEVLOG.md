@@ -2278,3 +2278,26 @@ MVP-пайплайн этапов 0–10 закрыт. Display name **Нейро
 - Админка: пункт сайдбара **Каталог ИИ** → `/arsenal` + карточка на дашборде `/admin`.
 - Этап MVP Нейро каталога закрыт (этапы 0–10 + мосты + публичные/админ-ссылки).
 
+
+## 2026-09-04 — Трек «Инженерия агентов» (Harness → Loop → Graph)
+
+### Что сделано
+- Новый образовательный трек отдельно от `/resheniya`: хаб `/agent-engineering` + модули harness / loop / graph.
+- Данные в `src/lib/agent-engineering/`; callout на каталоге готовых решений; SITE_TREE + меню `header-agent-engineering`; voice stub в guide-data.
+- Документ: `docs/AGENT-ENGINEERING.md`.
+
+### Следующий шаг (закрыт вечером)
+- Углубить уроки → в плане «Углубление»; voice MP3; pillar в блоге.
+
+## День 2026-09-04 (вечер) — закрытие: voice + блог + планы агент-трека
+
+### Что сделано
+- **Voice guides:** реестр в `guide-data.ts` — хаб `/agent-engineering` + модули harness / loop / graph; фонетика Harness/Loop/Graph/Cursor/ProektMap/resheniya/arsenal/Нейро каталог; nextActions на модули, `/arsenal`, `/resheniya`. MP3 через `npm run voice:guides` (Yandex Алёна).
+- **Планы:** в `docs/AGENT-ENGINEERING.md` секция **«Углубление»** (статус: запланировано) — практика 10–15 мин, шаблоны, downloadable harness checklist, advanced self-rewrite lab, уровни заданий, опц. skill author.
+- **Блог (pillar):** `/blog/inzheneriya-agentov-harness-loop-graph` — автор Алексей (`bilariuss@yandex.ru`, `aiGenerated: false`), категория AI-инжиниринг; ссылки на трек, 3 модуля, `/arsenal`, `/resheniya`. Скрипт `scripts/publish-agent-engineering-post.ts`.
+- Билд + `pm2 restart proektmap`. Smoke 200: трек, модули, 4 MP3, пост, `/resheniya`, `/arsenal`, `/avito`, `/vaibik`.
+- Коммит + push `main` и выравнивание `master` (один commit).
+
+### Артефакты
+- Пост: https://proektmap.ru/blog/inzheneriya-agentov-harness-loop-graph
+- Аудио: `public/audio/guides/agent-engineering{,-harness,-loop,-graph}.mp3`

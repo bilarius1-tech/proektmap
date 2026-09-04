@@ -58,6 +58,14 @@ export const IT_VOICE_DICTIONARY: Record<string, string> = {
   "UI": "ю-а́й",
   "UX": "ю-и́кс",
   "SEO": "се́о",
+  "Harness": "Ха́рнесс",
+  "Loop": "Луп",
+  "Graph": "Граф",
+  "graphify": "гра́фифай",
+  "self-rewrite": "селф-рира́йт",
+  "resheniya": "реше́ния",
+  "arsenal": "арсена́л",
+  "Нейро каталог": "Не́йро катало́г",
 };
 
 /**
@@ -206,6 +214,74 @@ export const VOICE_GUIDES: Record<string, VoiceGuideItem> = {
     nextActions: [
       { label: "Avito Photo Lab", href: "/services/avito-photo-uniquizer", primary: true },
       { label: "Все микросервисы", href: "/services" },
+    ],
+  },
+  "/agent-engineering": {
+    id: "agent-engineering",
+    route: "/agent-engineering",
+    title: "Инженерия агентов",
+    badge: "Harness → Loop → Graph",
+    durationSec: 34,
+    rawScript:
+      "Инженерия агентов — отдельный трек ProektMap. Промпт — только вход. Здесь вы учитесь собирать окружение: Harness как каркас правил и skills, Loop как цикл с проверкой результата, Graph как карту связей. Self-rewrite — только с вашего разрешения. После трека берите миссию в готовых решениях или стек в Нейро каталоге.",
+    voiceScript:
+      "Инженерия аге́нтов — отдельный трек ПроектМэ́п. Промпт — только вход. Здесь вы учитесь собирать окружение: ха́рнесс как каркас правил и ски́ллов, луп как цикл с проверкой результата, граф как карту связей. Селф-рира́йт — только с вашего разрешения. После трека берите миссию в готовых решениях или стек в Не́йро каталоге.",
+    audioSrc: "/audio/guides/agent-engineering.mp3",
+    nextActions: [
+      { label: "Модуль Harness", href: "/agent-engineering/harness", primary: true },
+      { label: "Нейро каталог", href: "/arsenal" },
+      { label: "Готовые решения", href: "/resheniya" },
+    ],
+  },
+  "/agent-engineering/harness": {
+    id: "agent-engineering-harness",
+    route: "/agent-engineering/harness",
+    title: "Harness — каркас агента",
+    badge: "Модуль 1",
+    durationSec: 32,
+    rawScript:
+      "Harness — каркас вокруг модели в Cursor и ProektMap: правила, skills, хуки, права и папка проекта. Промпт говорит «что сейчас», harness отвечает «как у нас принято всегда». Соберите закон проекта и один skill — затем переходите к Loop.",
+    voiceScript:
+      "Ха́рнесс — каркас вокруг модели в Кёрсоре и ПроектМэ́п: правила, ски́ллы, хуки, права и папка проекта. Промпт говорит «что сейчас», ха́рнесс отвечает «как у нас принято всегда». Соберите закон проекта и один скилл — затем переходите к лупу.",
+    audioSrc: "/audio/guides/agent-engineering-harness.mp3",
+    nextActions: [
+      { label: "Дальше: Loop", href: "/agent-engineering/loop", primary: true },
+      { label: "Нейро каталог", href: "/arsenal" },
+      { label: "К хабу трека", href: "/agent-engineering" },
+    ],
+  },
+  "/agent-engineering/loop": {
+    id: "agent-engineering-loop",
+    route: "/agent-engineering/loop",
+    title: "Loop — цикл с проверкой",
+    badge: "Модуль 2",
+    durationSec: 31,
+    rawScript:
+      "Loop — не один ответ, а цикл: сделать, увидеть, исправить, снова — пока Definition of Done. Задайте бюджет циклов, критика и правило стопа. Качество агента — это повтор с наблюдаемостью, а не красивая фраза.",
+    voiceScript:
+      "Луп — не один ответ, а цикл: сделать, увидеть, исправить, снова — пока дефини́шн оф да́н. Задайте бюджет циклов, критика и правило стопа. Качество аге́нта — это повтор с наблюдаемостью, а не красивая фраза.",
+    audioSrc: "/audio/guides/agent-engineering-loop.mp3",
+    nextActions: [
+      { label: "Дальше: Graph", href: "/agent-engineering/graph", primary: true },
+      { label: "Готовые решения", href: "/resheniya" },
+      { label: "К хабу трека", href: "/agent-engineering" },
+    ],
+  },
+  "/agent-engineering/graph": {
+    id: "agent-engineering-graph",
+    route: "/agent-engineering/graph",
+    title: "Graph — карта системы",
+    badge: "Модуль 3",
+    durationSec: 33,
+    rawScript:
+      "Graph — работа по карте связей, а не по портянке контекста. Спросите graphify, идите по рёбрам, меняйте систему и обновляйте граф. Self-rewrite skills — только после вашего явного разрешения. Дальше — стек в Нейро каталоге или миссия в готовых решениях.",
+    voiceScript:
+      "Граф — работа по карте связей, а не по портянке контекста. Спросите гра́фифай, идите по рёбрам, меняйте систему и обновляйте граф. Селф-рира́йт ски́ллов — только после вашего явного разрешения. Дальше — стек в Не́йро каталоге или миссия в готовых решениях.",
+    audioSrc: "/audio/guides/agent-engineering-graph.mp3",
+    nextActions: [
+      { label: "Нейро каталог", href: "/arsenal", primary: true },
+      { label: "Готовые решения", href: "/resheniya" },
+      { label: "К хабу трека", href: "/agent-engineering" },
     ],
   },
 };

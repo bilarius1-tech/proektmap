@@ -13,6 +13,7 @@ const baseUrl = "https://proektmap.ru";
 function pagePriority(href: string) {
   if (href === "/") return 1;
   if (href === "/resheniya") return 0.9;
+  if (href === "/agent-engineering" || href.startsWith("/agent-engineering/")) return 0.85;
   if (href === "/arsenal") return 0.85;
   if (href.startsWith("/arsenal/")) return href.includes("/tools/") ? 0.55 : 0.75;
   if (href.startsWith("/resheniya/")) return href.includes("workspace") ? 0.6 : 0.8;

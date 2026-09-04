@@ -70,9 +70,32 @@ async function main() {
     }
   }
 
+  // Инженерия агентов — отдельный образовательный трек (не essential-core, но стабильный id)
+  await db.menuItem.upsert({
+    where: { id: "header-agent-engineering" },
+    create: {
+      id: "header-agent-engineering",
+      label: "Инженерия агентов",
+      href: "/agent-engineering",
+      sortOrder: 4,
+      location: "header",
+      isActive: true,
+      parentId: null,
+    },
+    update: {
+      label: "Инженерия агентов",
+      href: "/agent-engineering",
+      location: "header",
+      isActive: true,
+      parentId: null,
+    },
+  });
+  console.log("upsert header-agent-engineering /agent-engineering");
+
   // Предпочтительный порядок корней шапки по href (остальные — после)
   const preferredHrefs = [
     "/resheniya",
+    "/agent-engineering",
     "/arsenal",
     "/avito",
     "/sitemap",

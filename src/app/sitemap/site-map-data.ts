@@ -38,6 +38,16 @@ export const SITE_TREE: SiteTreeGroup[] = [
           { title: "Запустить интернет-магазин", status: "planned" },
         ],
       },
+      {
+        title: "Инженерия агентов",
+        href: "/agent-engineering",
+        description: "Harness → Loop → Graph: окружение агента важнее промпта",
+        children: [
+          { title: "Harness — каркас вокруг модели", href: "/agent-engineering/harness" },
+          { title: "Loop — цикл с проверкой", href: "/agent-engineering/loop" },
+          { title: "Graph — карта системы", href: "/agent-engineering/graph" },
+        ],
+      },
       { title: "Поиск", href: "/search", description: "Поиск по знаниям, инструментам и материалам" },
       { title: "Карта сайта", href: "/sitemap", description: "Полное дерево публичных разделов" },
       { title: "Тарифы", href: "/pricing" },

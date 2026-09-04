@@ -14,6 +14,7 @@ import {
   ShoppingBag,
 } from "lucide-react";
 import ClaudeAcademyCallout from "@/components/academy/claude-academy-callout";
+import AgentEngineeringCallout from "@/components/agent-engineering/agent-engineering-callout";
 import NeuroCatalogCallout from "@/components/arsenal/neuro-catalog-callout";
 import { ecosystemResources } from "./data";
 import { guidedSaasSolution } from "./guided-data";
@@ -89,10 +90,11 @@ export default function ResheniyaPage() {
           secondaryLabel="К маршрутам ниже"
         />
         <NeuroCatalogCallout
-          style={{ marginBottom: 28 }}
+          style={{ marginBottom: 16 }}
           secondaryHref="/arsenal/vibe-coder"
           secondaryLabel="Стек: агент-кодер"
         />
+        <AgentEngineeringCallout style={{ marginBottom: 28 }} />
 
         <section className="solutions-section" aria-labelledby="available-title">
           <div className="solutions-section-heading">
