@@ -2404,3 +2404,20 @@ main = master после merge. Коммит + push выполнены.
 
 День закрыт. Контур `/video` на проде.
 main = master после merge. Коммит + push выполнены.
+
+## 06.09.2026 — Онбординг /resheniya: оплата, окружение, мост к агентам
+
+### Что сделано
+- **Плати по миру** в начале всех guided `/resheniya`: шаг оплаты + `/go/platipomiru` (реф только в `.env`, без кода в UI).
+- Шаг **«Где работать»**: Cursor / Reasonix / OpenCode (стек + плюсы/минусы), локально vs SSH по этапам, установка инструментов.
+- **Мост** «Как общаться с агентом» → Harness → Loop → Graph (`agent-talk-bridge`) со ссылками на `/agent-engineering`.
+- Reasonix и OpenCode в Нейро каталоге (`/arsenal/tools/...`).
+- Канон: `docs/RESHENIYA-V1.md`, `docs/AGENT-ENGINEERING.md`.
+
+### Проверка
+- `npm run validate:resheniya` — PASS
+- `next build` + PM2 restart
+- Smoke: `/resheniya/*/workspace`, `/go/platipomiru`, `/agent-engineering`
+
+### Закрытие дня
+День закрыт. main = master после merge. Коммит + push.

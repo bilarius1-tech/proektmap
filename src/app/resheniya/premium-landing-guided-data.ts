@@ -1,4 +1,5 @@
 import type { GuidedReference, GuidedSolution } from "./guided-data";
+import { withResheniyaOnboardingFirst } from "./workspace-setup";
 
 const ref = (
   kind: GuidedReference["kind"],
@@ -28,6 +29,8 @@ export const guidedPremiumLandingSolution: GuidedSolution = {
     "На localhost (и по желанию на VPS/хостинге в РФ) открывается адаптивный одностраничный шаблон: сильная типографика, один визуальный якорь, без Inter/фиолетового градиента/карточной сетки. Есть DESIGN.md и чеклист «не AI-шно».",
   duration: "1–2 дня",
   defaultStack: [
+    "Плати по миру → оплата Cursor из РФ",
+    "Локально в Cursor (SSH — на финише/хостинге)",
     "Cursor (Agent)",
     "Next.js App Router + TypeScript",
     "CSS-переменные / токены (без обязательного Tailwind)",
@@ -36,7 +39,7 @@ export const guidedPremiumLandingSolution: GuidedSolution = {
     "DESIGN.md в корне",
     "Проверка из РФ: без VPN для сборки; деплой Beget / Timeweb / свой VPS",
   ],
-  steps: [
+  steps: withResheniyaOnboardingFirst([
     {
       slug: "direction",
       shortTitle: "Направление",
@@ -49,7 +52,7 @@ export const guidedPremiumLandingSolution: GuidedSolution = {
         link: aiSkillsRef,
       },
       explanation:
-        "Слабая модель без направления всегда выдаёт AI-скуф: Inter, фиолетовый градиент, три одинаковые карточки. Направление + запреты сильнее «сделай красиво».",
+        "Слабая модель без направления всегда выдаёт AI-скуф: Inter, фиолетовый градиент, три одинаковые карточки. Направление + запреты сильнее «сделай красиво». Оплату Cursor уже закрыли на шаге «Оплата из РФ».",
       instructions: [
         {
           title: "Откройте Cursor",
@@ -498,5 +501,5 @@ URL или способ превью: […]
       terms: ["лендинг", "деплой"],
       references: [aiSkillsRef, uiPatternsRef, rfStackRef, vibeCoderRef],
     },
-  ],
+  ], { includeDocker: false })
 };

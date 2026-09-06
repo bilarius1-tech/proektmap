@@ -1,4 +1,5 @@
 import type { GuidedReference, GuidedSolution } from "./guided-data";
+import { withResheniyaOnboardingFirst } from "./workspace-setup";
 
 const ref = (
   kind: GuidedReference["kind"],
@@ -23,6 +24,8 @@ export const guidedTelegramSolution: GuidedSolution = {
   result: "Публичный Telegram-бот работает на VPS: отвечает на /start и /help, переживает перезапуск сервера, а токен не попадает в Git.",
   duration: "1–3 дня",
   defaultStack: [
+    "Плати по миру → оплата Cursor из РФ",
+    "Локально в Cursor (SSH — на Deploy)",
     "Cursor",
     "Node.js + TypeScript",
     "grammY",
@@ -31,49 +34,7 @@ export const guidedTelegramSolution: GuidedSolution = {
     "GitHub",
     "VPS + PM2",
   ],
-  steps: [
-    {
-      slug: "workspace",
-      shortTitle: "Рабочее место",
-      title: "Проверяем рабочее место",
-      duration: "10–20 минут",
-      goal: "Cursor, Node.js, npm, Git и GitHub CLI готовы к созданию бота.",
-      recommendation: {
-        title: "Собираем бота локально в Cursor",
-        why: "Так проще увидеть ошибки, проверить команды и только после рабочего ответа переносить проект на сервер.",
-        link: cursorRef,
-      },
-      explanation: "На этом шаге ничего не проектируем. Проверяем инструменты и один раз авторизуем GitHub CLI, чтобы следующая команда создала приватный репозиторий.",
-      instructions: [
-        {
-          title: "Откройте терминал Cursor",
-          text: "Откройте пустую рабочую папку и запустите встроенный терминал.",
-        },
-        {
-          title: "Проверьте установку",
-          text: "Команда должна вывести версии Node.js, npm, Git и GitHub CLI без ошибок.",
-          command: "node --version && npm --version && git --version && gh --version",
-        },
-        {
-          title: "Установите GitHub CLI, если команда gh не найдена",
-          text: "Для основного маршрута Windows 11 используйте winget, затем перезапустите терминал Cursor.",
-          command: "winget install --id GitHub.cli",
-        },
-        {
-          title: "Авторизуйте GitHub CLI",
-          text: "Выберите GitHub.com → HTTPS → Login with a web browser и завершите вход.",
-          command: "gh auth login && gh auth status",
-        },
-      ],
-      success: [
-        "Node.js, npm, Git и gh выводят номера версий",
-        "gh auth status подтверждает вход в GitHub",
-        "Cursor открыт в отдельной пустой папке",
-      ],
-      artifact: "Готовое локальное окружение",
-      terms: ["Cursor", "Node.js", "npm", "Git", "GitHub CLI", "терминал"],
-      references: [cursorRef, glossaryRef],
-    },
+  steps: withResheniyaOnboardingFirst([
     {
       slug: "models",
       shortTitle: "AI-модели",
@@ -85,7 +46,7 @@ export const guidedTelegramSolution: GuidedSolution = {
         why: "Одна модель быстро собирает проект, другая независимо ищет ошибки в токенах, обработчиках и деплое.",
         link: modelsRef,
       },
-      explanation: "Названия моделей меняются, поэтому ProektMap показывает актуальные рекомендации из живого рейтинга, а роли остаются постоянными.",
+      explanation: "Названия моделей меняются, поэтому ProektMap показывает актуальные рекомендации из живого рейтинга, а роли остаются постоянными. Окружение уже готово на шаге «Где работать».",
       instructions: [
         {
           title: "Подключите coding-модель",
@@ -122,8 +83,13 @@ export const guidedTelegramSolution: GuidedSolution = {
         title: "Храним код в приватном GitHub",
         why: "GitHub даёт историю изменений и позволяет безопасно забрать проект на VPS. Токен бота при этом остаётся только в .env.",
       },
-      explanation: "Создаём готовое место для кода. Команда ниже сразу создаст приватный репозиторий и скачает его.",
+      explanation: "Создаём готовое место для кода. Сначала авторизуем GitHub CLI (если ещё не входили), затем команда ниже создаст приватный репозиторий и скачает его. Всё локально — SSH к VPS пока не нужен.",
       instructions: [
+        {
+          title: "Установите и авторизуйте GitHub CLI",
+          text: "Если gh не найден: winget install --id GitHub.cli, перезапустите терминал Cursor. Затем войдите через браузер.",
+          command: "gh auth login && gh auth status",
+        },
         {
           title: "Создайте репозиторий",
           text: "Используйте готовое имя my-telegram-bot — оно понадобится в команде деплоя.",
@@ -477,5 +443,5 @@ BOT_TOKEN должен читаться через process.env.BOT_TOKEN.
       terms: ["production", "smoke-тест", "PM2", "лог", "rollback"],
       references: [grammyRef, ref("Термин", "PM2", "/glossary/pm2", "Контроль и перезапуск Node.js-процесса"), skillsRef],
     },
-  ],
+  ], { includeDocker: false })
 };

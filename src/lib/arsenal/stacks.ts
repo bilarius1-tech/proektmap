@@ -48,8 +48,8 @@ export const ARSENAL_STACKS: ArsenalStack[] = [
     commonMistake: "Просить «сделай весь SaaS» одним сообщением без Definition of Done.",
     status: "published",
     priority: 3,
-    tools: ["opencode", "superpowers", "ecc", "agent-skills", "understand-anything", "codegraph", "claudexor", "easy-vibe"],
-    orderHint: ["OpenCode — открытый кодинг-агент", "Superpowers — план → код → тест", "ECC — планирование и ревью", "Agent Skills — навыки для агента", "Understand Anything / CodeGraph — разобрать проект", "Claudexor — экосистема Claude/Cursor", "Easy-Vibe — учебный трек vibe coding"],
+    tools: ["opencode", "reasonix", "superpowers", "ecc", "agent-skills", "understand-anything", "codegraph", "claudexor", "easy-vibe"],
+    orderHint: ["OpenCode — открытый кодинг-агент", "Reasonix — DeepSeek / длинные сессии", "Superpowers — план → код → тест", "ECC — планирование и ревью", "Agent Skills — навыки для агента", "Understand Anything / CodeGraph — разобрать проект", "Claudexor — экосистема Claude/Cursor", "Easy-Vibe — учебный трек vibe coding"],
     excelCategories: ["coding", "agents", "learning"],
     relatedRoutes: [
       { href: "/resheniya/premium-landing", label: "Премиум-шаблон без AI-скуфа" },

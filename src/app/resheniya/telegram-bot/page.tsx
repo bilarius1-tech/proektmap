@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { guidedTelegramSolution } from "../telegram-guided-data";
 import ArsenalBridgePanel from "@/components/arsenal/arsenal-bridge-panel";
+import PlatipomiruCallout from "@/components/resheniya/platipomiru-callout";
 
 export const metadata: Metadata = {
   title: "Запустить Telegram-бота — готовое AI-решение",
@@ -33,6 +34,10 @@ export default function TelegramBotSolutionPage() {
           <span>/</span>
           <span>Telegram-бот</span>
         </nav>
+
+        <div style={{ marginBottom: 20 }}>
+          <PlatipomiruCallout compact />
+        </div>
 
         <section className="solution-detail-hero">
           <div className="solution-detail-copy">

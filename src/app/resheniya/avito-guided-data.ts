@@ -1,4 +1,5 @@
 import type { GuidedReference, GuidedSolution } from "./guided-data";
+import { withResheniyaOnboardingFirst } from "./workspace-setup";
 
 const ref = (
   kind: GuidedReference["kind"],
@@ -22,6 +23,8 @@ export const guidedAvitoSolution: GuidedSolution = {
   result: "Работающий бизнес-аккаунт на Авито с опубликованным каталогом из 20+ уникализированных товарных карточек (с защитой 4:3, аппаратным EXIF и чисткой ИИ), загруженный через официальный XML/CSV-фид, и настроенным AI-ассистентом для быстрой квалификации входящих лидов.",
   duration: "2–4 дня",
   defaultStack: [
+    "Плати по миру → оплата Cursor / AI из РФ",
+    "Локально в Cursor (SSH не для кабинета Авито)",
     "Аналитика и парсинг спроса (/avito)",
     "AI-копирайтинг офферов (DeepSeek / Claude)",
     "Avito Photo Lab (pHash, 4:3 Safe Zone, EXIF Spoofer)",
@@ -29,7 +32,7 @@ export const guidedAvitoSolution: GuidedSolution = {
     "AI-бот автоответов на входящие чаты",
     "Антидетект и мобильные прокси",
   ],
-  steps: [
+  steps: withResheniyaOnboardingFirst([
     {
       slug: "environment",
       shortTitle: "Инфраструктура",
@@ -41,7 +44,7 @@ export const guidedAvitoSolution: GuidedSolution = {
         why: "Авито анализирует отпечатки Canvas, WebGL, аудио-контекст и чистоту IP-подсети. Изолированный профиль защищает аккаунт от склеек.",
         link: avitoCatalogRef,
       },
-      explanation: "Для стабильного бизнеса на Авито важно разделить личный браузер и рабочий кабинет. Выбираем проверенный инструмент из каталога и подключаем приватные мобильные прокси.",
+      explanation: "Сначала на шаге «Где работать» вы подготовили Cursor локально. Теперь для кабинета Авито важно разделить личный браузер и рабочий профиль: выбираем инструмент из каталога и подключаем приватные мобильные прокси.",
       instructions: [
         {
           title: "Выберите инструмент в каталоге Авито",
@@ -360,5 +363,5 @@ export const guidedAvitoSolution: GuidedSolution = {
       terms: ["AI-чатбот", "Автоответы", "Квалификация лидов", "Скорость ответа"],
       references: [avitoCatalogRef, promptsRef, skillsRef],
     },
-  ],
+  ], { includeDocker: false })
 };

@@ -5,7 +5,7 @@ import { guidedPremiumLandingSolution } from "../../premium-landing-guided-data"
 export const metadata: Metadata = {
   title: "Премиум-шаблон без AI-скуфа — рабочая зона",
   description:
-    "8 шагов: BRIEF, DESIGN.md, Premium Landing Stack, Next.js, сборка, polish, проверка из РФ, финиш.",
+    "8 шагов после онбординга: BRIEF, DESIGN.md, Skills, Next.js, сборка, polish, проверка из РФ, финиш.",
   robots: { index: false, follow: true },
 };
 
@@ -14,7 +14,7 @@ export default function PremiumLandingWorkspacePage() {
     <GuidedWorkspace
       solution={guidedPremiumLandingSolution}
       overviewHref="/resheniya/premium-landing"
-      storageKey="proektmap:resheniya:premium-landing-guided:v1"
+      storageKey="proektmap:resheniya:premium-landing-guided:v3-setup"
       finalCta="Шаблон готов — завершить маршрут"
     />
   );

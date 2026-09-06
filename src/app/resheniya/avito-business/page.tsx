@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { guidedAvitoSolution } from "../avito-guided-data";
 import ArsenalBridgePanel from "@/components/arsenal/arsenal-bridge-panel";
+import PlatipomiruCallout from "@/components/resheniya/platipomiru-callout";
 
 export const metadata: Metadata = {
   title: "Запустить AI-магазин на Авито — готовое инженерное решение",
@@ -34,6 +35,10 @@ export default function AvitoBusinessSolutionPage() {
           <span>/</span>
           <span>AI-магазин на Авито</span>
         </nav>
+
+        <div style={{ marginBottom: 20 }}>
+          <PlatipomiruCallout compact />
+        </div>
 
         <section className="solution-detail-hero">
           <div className="solution-detail-copy">

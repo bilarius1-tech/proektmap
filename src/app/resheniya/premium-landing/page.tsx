@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { guidedPremiumLandingSolution } from "../premium-landing-guided-data";
 import ArsenalBridgePanel from "@/components/arsenal/arsenal-bridge-panel";
+import PlatipomiruCallout from "@/components/resheniya/platipomiru-callout";
 
 export const metadata: Metadata = {
   title: "Премиум-шаблон сайта без AI-скуфа — готовое AI-решение | ProektMap",
@@ -37,6 +38,10 @@ export default function PremiumLandingSolutionPage() {
           <span>/</span>
           <span>Премиум-шаблон</span>
         </nav>
+
+        <div style={{ marginBottom: 20 }}>
+          <PlatipomiruCallout compact />
+        </div>
 
         <section className="solution-detail-hero">
           <div className="solution-detail-copy">

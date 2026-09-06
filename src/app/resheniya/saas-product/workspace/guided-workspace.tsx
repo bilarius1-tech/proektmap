@@ -13,10 +13,12 @@ import {
   Clock3,
   Code2,
   Copy,
+  CreditCard,
   ExternalLink,
   Lightbulb,
   Lock,
   Map as MapIcon,
+  MessageSquare,
   Monitor,
   RotateCcw,
   Sparkles,
@@ -24,7 +26,11 @@ import {
   Terminal,
 } from "lucide-react";
 import Term from "@/components/glossary/tooltip-term";
+import CodingPlatformsCompare from "@/components/resheniya/coding-platforms-compare";
+import LocalVsSshCompare from "@/components/resheniya/local-vs-ssh-compare";
+import AgentTalkBridge from "@/components/resheniya/agent-talk-bridge";
 import { guidedSaasSolution, type GuidedSolution } from "../../guided-data";
+import { PLATIPOMIRU } from "../../platipomiru";
 
 type ModelItem = {
   id: string;
@@ -111,7 +117,7 @@ type GuidedWorkspaceProps = {
 export default function GuidedWorkspace({
   solution = guidedSaasSolution,
   overviewHref = "/resheniya/saas-product",
-  storageKey = "proektmap:resheniya:saas-guided:v1",
+  storageKey = "proektmap:resheniya:saas-guided:v3-setup",
   finalCta = "SaaS запущен — завершить маршрут",
 }: GuidedWorkspaceProps) {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -210,7 +216,10 @@ export default function GuidedWorkspace({
                   className={`${current ? "is-active" : ""} ${done ? "is-done" : ""}`}
                 >
                   <span>{done ? <Check size={14} /> : locked ? <Lock size={12} /> : String(index + 1).padStart(2, "0")}</span>
-                  <strong>{item.shortTitle}</strong>
+                  <strong style={item.slug === "pay-from-russia" ? { color: "var(--color-accent)" } : undefined}>
+                    {item.shortTitle}
+                    {item.slug === "pay-from-russia" ? " ★" : ""}
+                  </strong>
                   {current && <ChevronRight size={15} />}
                 </button>
               );
@@ -251,6 +260,38 @@ export default function GuidedWorkspace({
             <p><RichText text={step.explanation} terms={step.terms} /></p>
           </section>
 
+          {step.slug === "pay-from-russia" && (
+            <section className="guided-explanation" style={{ borderColor: "var(--color-accent)" }}>
+              <div className="guided-section-title"><CreditCard size={18} /><h2>Ссылки ProektMap</h2></div>
+              <p>
+                Удобный сервис для карты из РФ:{" "}
+                <a href={PLATIPOMIRU.siteUrl} className="guided-inline-link">
+                  Воспользоваться Плати по миру
+                </a>
+              </p>
+              <p style={{ marginBottom: 0 }}>
+                Дальше: Cursor → Sign in with GitHub → Billing → карта Плати по миру → 3D Secure.
+              </p>
+            </section>
+          )}
+
+          {step.slug === "workspace" && (
+            <>
+              <section className="guided-explanation" style={{ borderColor: "var(--color-accent)" }}>
+                <div className="guided-section-title"><Sparkles size={18} /><h2>Платформы для кодинга: стек и плюсы/минусы</h2></div>
+                <CodingPlatformsCompare />
+              </section>
+              <section className="guided-explanation" style={{ borderColor: "var(--color-accent)" }}>
+                <div className="guided-section-title"><Monitor size={18} /><h2>Локально или SSH — по этапам</h2></div>
+                <LocalVsSshCompare />
+              </section>
+              <section className="guided-explanation" style={{ borderColor: "var(--color-accent)" }}>
+                <div className="guided-section-title"><MessageSquare size={18} /><h2>Как общаться с агентом — мост в Harness → Loop → Graph</h2></div>
+                <AgentTalkBridge />
+              </section>
+            </>
+          )}
+
           {step.slug === "models" && (
             <section className="guided-models">
               <div className="guided-section-title"><Target size={18} /><h2>Актуальная рекомендация моделей</h2></div>
@@ -268,15 +309,33 @@ export default function GuidedWorkspace({
                   <div>
                     <h3>{instruction.title}</h3>
                     <p><RichText text={instruction.text} terms={step.terms} /></p>
-                    {instruction.command && (
-                      <div className="guided-code">
-                        <code>{instruction.command}</code>
-                        <button type="button" onClick={() => copyText(instruction.command!, `${step.slug}-command-${index}`)}>
-                          {copiedKey === `${step.slug}-command-${index}` ? <Check size={15} /> : <Copy size={15} />}
-                          {copiedKey === `${step.slug}-command-${index}` ? "Скопировано" : "Копировать"}
-                        </button>
-                      </div>
-                    )}
+                    {instruction.command && (() => {
+                      const cmd = instruction.command.trim();
+                      const isUrl = /^https?:\/\//i.test(cmd) || cmd.startsWith("/");
+                      if (isUrl) {
+                        return (
+                          <div className="guided-code guided-code--link">
+                            <a href={cmd} className="guided-open-link">
+                              <span>
+                                {cmd.includes("platipomiru") || cmd.includes("/go/platipomiru")
+                                  ? "Воспользоваться Плати по миру"
+                                  : cmd.replace(/^https?:\/\//i, "")}
+                              </span>
+                              <ExternalLink size={15} />
+                            </a>
+                          </div>
+                        );
+                      }
+                      return (
+                        <div className="guided-code">
+                          <code>{instruction.command}</code>
+                          <button type="button" onClick={() => copyText(instruction.command!, `${step.slug}-command-${index}`)}>
+                            {copiedKey === `${step.slug}-command-${index}` ? <Check size={15} /> : <Copy size={15} />}
+                            {copiedKey === `${step.slug}-command-${index}` ? "Скопировано" : "Копировать"}
+                          </button>
+                        </div>
+                      );
+                    })()}
                   </div>
                 </article>
               ))}

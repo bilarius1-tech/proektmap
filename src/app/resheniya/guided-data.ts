@@ -1,3 +1,5 @@
+import { withResheniyaOnboardingFirst } from "./workspace-setup";
+
 export type GuidedReference = {
   kind: "Термин" | "Инструмент" | "Модель" | "Skill" | "Паттерн" | "Промпты";
   label: string;
@@ -66,6 +68,8 @@ export const guidedSaasSolution: GuidedSolution = {
   result: "SaaS работает в интернете: пользователь регистрируется, входит в кабинет, выполняет AI-сценарий и проходит тестовую оплату.",
   duration: "4–8 недель",
   defaultStack: [
+    "Плати по миру → оплата Cursor из РФ",
+    "Локально в Cursor + Docker (SSH — на Deploy)",
     "Cursor",
     "Next.js + TypeScript",
     "PostgreSQL + Prisma",
@@ -75,38 +79,7 @@ export const guidedSaasSolution: GuidedSolution = {
     "GitHub",
     "VPS + PM2 + nginx",
   ],
-  steps: [
-    {
-      slug: "workspace",
-      shortTitle: "Рабочее место",
-      title: "Настраиваем рабочее место",
-      duration: "20–40 минут",
-      goal: "На компьютере установлены Cursor, Git, Node.js LTS и Docker Desktop",
-      recommendation: {
-        title: "Работаем локально в Cursor",
-        why: "Локальная разработка быстрее и безопаснее: файлы видны на компьютере, приложение проверяется до сервера, а AI-агент Cursor умеет читать проект, применять Rules и Skills.",
-        link: cursorRef,
-      },
-      explanation: "До первого рабочего сценария не подключаемся к серверу по SSH. Сервер понадобится на шаге Deploy. Сейчас создаём предсказуемое локальное окружение.",
-      instructions: [
-        { title: "Установите Cursor", text: "Скачайте Cursor с официального сайта, запустите установщик и войдите в аккаунт." },
-        { title: "Установите Node.js LTS", text: "Используйте LTS-версию Node.js. После установки перезапустите терминал.", command: "node --version && npm --version" },
-        { title: "Установите Git", text: "Git будет сохранять каждое устойчивое состояние проекта.", command: "git --version" },
-        { title: "Установите Docker Desktop", text: "Docker запустит PostgreSQL одинаково на любом компьютере.", command: "docker --version" },
-      ],
-      success: [
-        "Cursor открывается",
-        "Команды node, npm, git и docker возвращают версии",
-        "Docker Desktop запущен",
-      ],
-      artifact: "Готовое локальное окружение",
-      terms: ["Cursor", "Git", "Node.js", "Docker", "локальная разработка", "SSH"],
-      references: [
-        cursorRef,
-        glossaryRef("Git", "git-glossary", "Система контроля версий"),
-        glossaryRef("Docker", "docker", "Изолированное окружение сервисов"),
-      ],
-    },
+  steps: withResheniyaOnboardingFirst([
     {
       slug: "models",
       shortTitle: "AI-модели",
@@ -118,7 +91,7 @@ export const guidedSaasSolution: GuidedSolution = {
         why: "Одна сильная coding-модель пишет код, рассуждающая проверяет архитектуру и безопасность, а быстрая недорогая выполняет простые правки. Так маршрут устойчивее, чем работа одной моделью.",
         link: modelsRef,
       },
-      explanation: "ProektMap показывает актуальные рекомендации из внутреннего рейтинга. Конкретные названия меняются вместе с рынком, роли остаются постоянными.",
+      explanation: "ProektMap показывает актуальные рекомендации из внутреннего рейтинга. Конкретные названия меняются вместе с рынком, роли остаются постоянными. Окружение уже готово на шаге «Где работать».",
       instructions: [
         { title: "Откройте настройки Models в Cursor", text: "Включите рекомендуемую coding-модель с максимальной оценкой «Код»." },
         { title: "Добавьте модель-проверяющего", text: "Выберите сильную reasoning-модель для архитектуры, security-review и сложных ошибок." },
@@ -158,7 +131,7 @@ export const guidedSaasSolution: GuidedSolution = {
         why: "GitHub даёт резервную копию кода, историю изменений и понятный способ перенести проект на сервер. Приватный режим не публикует исходники.",
         link: glossaryRef("Git", "git-glossary", "История и сохранение проекта"),
       },
-      explanation: "Git сохраняет версии локально, GitHub хранит их удалённо. Мы используем оба: Git после каждого шага, GitHub как резервную копию и источник для deploy.",
+      explanation: "Git сохраняет версии локально, GitHub хранит их удалённо. Мы используем оба: Git после каждого шага, GitHub как резервную копию и источник для deploy. Работаем локально — SSH к хостингу ещё не нужен.",
       instructions: [
         { title: "Установите GitHub CLI", text: "Скачайте GitHub CLI, затем войдите в свой аккаунт.", command: "gh auth login" },
         { title: "Создайте и клонируйте репозиторий", text: "Команда сама создаст приватный репозиторий с готовым именем.", command: "gh repo create proektmap-saas-starter --private --clone" },
@@ -614,5 +587,5 @@ Source control: Git + приватный GitHub
         skillsRef,
       ],
     },
-  ],
+  ], { includeDocker: true })
 };

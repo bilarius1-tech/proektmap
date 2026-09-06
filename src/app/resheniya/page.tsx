@@ -14,6 +14,7 @@ import {
   Sparkles,
   ShoppingBag,
 } from "lucide-react";
+import PlatipomiruCallout from "@/components/resheniya/platipomiru-callout";
 import ClaudeAcademyCallout from "@/components/academy/claude-academy-callout";
 import AgentEngineeringCallout from "@/components/agent-engineering/agent-engineering-callout";
 import NeuroCatalogCallout from "@/components/arsenal/neuro-catalog-callout";
@@ -89,6 +90,9 @@ export default function ResheniyaPage() {
       </section>
 
       <main className="solutions-shell solutions-main">
+        <div style={{ marginBottom: 16 }}>
+          <PlatipomiruCallout />
+        </div>
         <ClaudeAcademyCallout
           style={{ marginBottom: 16 }}
           secondaryHref="#available-title"

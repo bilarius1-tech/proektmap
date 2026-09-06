@@ -16,6 +16,7 @@ import {
 import { guidedSaasSolution } from "../guided-data";
 import SolutionSkillsStack from "@/components/skills/solution-skills-stack";
 import ArsenalBridgePanel from "@/components/arsenal/arsenal-bridge-panel";
+import PlatipomiruCallout from "@/components/resheniya/platipomiru-callout";
 
 export const metadata: Metadata = {
   title: "Запустить SaaS-продукт — готовое AI-решение",
@@ -32,6 +33,10 @@ export default function SaasSolutionPage() {
           <span>/</span>
           <span>SaaS-продукт</span>
         </nav>
+
+        <div style={{ marginBottom: 20 }}>
+          <PlatipomiruCallout compact />
+        </div>
 
         <section className="solution-detail-hero">
           <div className="solution-detail-copy">

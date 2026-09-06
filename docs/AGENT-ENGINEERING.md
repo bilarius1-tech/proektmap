@@ -33,9 +33,12 @@
 
 ## Связи
 
-- → `/arsenal` (vibe-coder, mcp-agents, desktop-agent, prompt-ops)
+- → `/arsenal` (vibe-coder, mcp-agents, desktop-agent, prompt-ops, reasonix, opencode)
 - → `/resheniya` после готовности окружения
 - ← лёгкий callout на каталоге `/resheniya`
+- ← **мост на шаге «Где работать»** во всех guided `/resheniya/*/workspace`:
+  «Как общаться с агентом» (плохо→хорошо × Harness / Loop / Graph) → этот трек
+  Данные: `src/app/resheniya/agent-talk-bridge.ts`, UI: `src/components/resheniya/agent-talk-bridge.tsx`
 
 ## Углубление (запланировано)
 

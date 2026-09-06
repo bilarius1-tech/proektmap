@@ -4,7 +4,7 @@ import { guidedTelegramSolution } from "../../telegram-guided-data";
 
 export const metadata: Metadata = {
   title: "Создать Telegram-бота с командой /start — готовый маршрут",
-  description: "10 готовых шагов: Cursor, grammY, BotFather, рабочие команды /start и /help, проверка и deploy на VPS через PM2.",
+  description: "Готовые шаги: оплата из РФ, где работать локально, Cursor, grammY, BotFather, /start и /help, deploy на VPS.",
   robots: { index: false, follow: true },
 };
 
@@ -13,7 +13,7 @@ export default function TelegramBotWorkspacePage() {
     <GuidedWorkspace
       solution={guidedTelegramSolution}
       overviewHref="/resheniya/telegram-bot"
-      storageKey="proektmap:resheniya:telegram-guided:v1"
+      storageKey="proektmap:resheniya:telegram-guided:v3-setup"
       finalCta="Бот запущен — завершить маршрут"
     />
   );
