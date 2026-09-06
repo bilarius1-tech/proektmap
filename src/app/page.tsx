@@ -21,6 +21,9 @@ export const metadata: Metadata = {
 
 export default async function Home() {
   const db = await getDb();
+  // «Популярное за неделю» = посты, опубликованные за 7 дней, по просмотрам (не all-time архив)
+  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+  const popularSelect = { title: true, slug: true, publishedAt: true, viewCount: true, impactScore: true } as const;
 
   const [
     totalUsers,
@@ -31,7 +34,7 @@ export default async function Home() {
     latestPosts,
     latestUsers,
     latestProjects,
-    popularPosts,
+    popularWeekRaw,
     latestTerms,
     patternMetas,
     microserviceMetas,
@@ -57,11 +60,33 @@ export default async function Home() {
         },
       },
     }),
-    db.blogPost.findMany({ where: { status: "published" }, orderBy: { viewCount: "desc" }, take: 3, select: { title: true, slug: true, publishedAt: true, viewCount: true } }),
+    db.blogPost.findMany({
+      where: { status: "published", publishedAt: { gte: weekAgo } },
+      orderBy: [{ viewCount: "desc" }, { impactScore: "desc" }],
+      take: 3,
+      select: popularSelect,
+    }),
     db.glossaryTerm.findMany({ where: { isPublished: true }, orderBy: { createdAt: "desc" }, take: 6, select: { term: true, slug: true, simpleExplanation: true, level: true } }),
     db.uiPatternMeta.findMany(),
     db.microserviceMeta.findMany(),
   ]);
+
+  // Если за 7 дней мало постов — добираем из 14 дней, чтобы блок не пустел
+  let popularPosts = popularWeekRaw;
+  if (popularPosts.length < 3) {
+    const twoWeeksAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
+    const fill = await db.blogPost.findMany({
+      where: {
+        status: "published",
+        publishedAt: { gte: twoWeeksAgo },
+        slug: { notIn: popularPosts.map((p) => p.slug) },
+      },
+      orderBy: [{ viewCount: "desc" }, { impactScore: "desc" }],
+      take: 3 - popularPosts.length,
+      select: popularSelect,
+    });
+    popularPosts = [...popularPosts, ...fill];
+  }
 
   const patternMetaMap: Record<string, any> = {};
   (patternMetas || []).forEach((m: any) => {

@@ -199,12 +199,36 @@ async function generateSeoArticle(input: {
   }
 }
 
-function mskNow(): { hour: number; minute: number } {
-  const fmt = new Intl.DateTimeFormat("en-US", { timeZone: "Europe/Moscow", hour: "2-digit", minute: "2-digit", hour12: false });
+function mskNow(): { hour: number; minute: number; dayKey: string } {
+  const fmt = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Moscow",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
   const parts = fmt.formatToParts(new Date());
-  const hour = Number(parts.find((x) => x.type === "hour")?.value ?? "0") % 24;
-  const minute = Number(parts.find((x) => x.type === "minute")?.value ?? "0");
-  return { hour, minute };
+  const get = (t: string) => parts.find((x) => x.type === t)?.value ?? "0";
+  const hour = Number(get("hour")) % 24;
+  const minute = Number(get("minute"));
+  const dayKey = `${get("year")}-${get("month")}-${get("day")}`;
+  return { hour, minute, dayKey };
+}
+
+function mskSlotKey(date: Date): string {
+  const fmt = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Moscow",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    hour12: false,
+  });
+  const parts = fmt.formatToParts(date);
+  const get = (t: string) => parts.find((x) => x.type === t)?.value ?? "0";
+  return `${get("year")}-${get("month")}-${get("day")}T${Number(get("hour")) % 24}`;
 }
 
 async function sendTelegramReport(text: string): Promise<void> {
@@ -327,10 +351,31 @@ export async function POST(req: Request) {
       return NextResponse.json({ drip: dripResult, collection: { scheduled: false, reason: "off-hours", hour: now.hour } });
     }
     const lastRun = settings?.autoPublishLastRunAt;
-    if (lastRun && Date.now() - new Date(lastRun).getTime() < 45 * 60 * 1000) {
-      return NextResponse.json({ drip: dripResult, collection: { scheduled: false, reason: "recent-run" } });
+    // Один слот утра/вечера: не гонять повторно в тот же час МСК (иначе 09:00 + 09:45 → шум в Telegram)
+    if (lastRun) {
+      const sameSlot = mskSlotKey(new Date(lastRun)) === `${now.dayKey}T${now.hour}`;
+      if (sameSlot || Date.now() - new Date(lastRun).getTime() < 45 * 60 * 1000) {
+        return NextResponse.json({ drip: dripResult, collection: { scheduled: false, reason: "recent-run" } });
+      }
     }
   }
+
+  // Запас на завтра уже полный — не стартуем сбор и не пишем в Telegram
+  const queueCap = dailyLimit * 2;
+  let queuedAhead = 0;
+  try {
+    queuedAhead = await db.blogPost.count({ where: { status: "queued" } });
+  } catch {
+    queuedAhead = 0;
+  }
+  if (!force && queuedAhead >= queueCap) {
+    console.info("[auto-publish] skip collect: queue-full", { queuedAhead, queueCap, dailyLimit });
+    return NextResponse.json({
+      drip: dripResult,
+      collection: { scheduled: false, reason: "queue-full", queued: queuedAhead, limit: dailyLimit },
+    });
+  }
+
   const stale = new Date(Date.now() - 2 * 60 * 60 * 1000);
   const claimed = await db.siteSettings.updateMany({
     where: { id: "main", OR: [{ autoPublishRunning: false }, { autoPublishLastRunAt: { lt: stale } }] },
@@ -352,10 +397,10 @@ export async function POST(req: Request) {
         return;
       }
 
-      const queuedAhead = await db.blogPost.count({ where: { status: "queued" } });
-      // Не раздуваем очередь: дневной лимит × 2 уже в запасе на завтра
-      if (queuedAhead >= dailyLimit * 2) {
-        await sendTelegramReport(`Авто-сбор пропущен: в очереди уже ${queuedAhead} (лимит дня ${dailyLimit}).`);
+      const queuedNow = await db.blogPost.count({ where: { status: "queued" } });
+      // Не раздуваем очередь: дневной лимит × 2 уже в запасе на завтра (тихо, без Telegram)
+      if (queuedNow >= dailyLimit * 2) {
+        console.info("[auto-publish] skip collect inside job: queue-full", { queuedNow, dailyLimit });
         return;
       }
 
