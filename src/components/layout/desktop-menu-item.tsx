@@ -4,34 +4,24 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 
-interface MenuChild { id: string; label: string; href: string; icon?: string; emoji?: string; }
-interface MenuItem { id: string; label: string; href: string; icon?: string; children?: MenuChild[]; }
+export interface MenuNode {
+  id: string;
+  label: string;
+  href: string;
+  icon?: string | null;
+  emoji?: string | null;
+  children?: MenuNode[];
+}
 
-// Icon mapping for child items
-const CHILD_ICONS: Record<string, string> = {
-  "Telegram Бот": "🤖",
-  "AI без VPN": "🛡️",
-  "Vibe Coding": "⚡",
-  "Российский AI-стек": "🇷🇺",
-  "Все Blueprints": "📋",
-  "Корпоративный сайт": "🏢",
-  "SaaS-продукт": "🚀",
-  "Каталог + заказы": "🛒",
-  "Разработка игры": "🎮",
-  "Промты": "💬",
-  "Паттерны": "📦",
-  "MCP": "🔌",
-  "AI": "🧠",
-};
-
-export default function DesktopMenuItem({ item }: { item: MenuItem }) {
+export default function DesktopMenuItem({ item }: { item: MenuNode }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const timer = useRef<any>(null);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const hasChildren = item.children && item.children.length > 0;
+  const children = item.children || [];
+  const hasChildren = children.length > 0;
+  const hasGrandchildren = children.some((c) => (c.children?.length || 0) > 0);
 
-  // Close on click outside
   useEffect(() => {
     if (!open) return;
     function handleClick(e: MouseEvent) {
@@ -42,11 +32,11 @@ export default function DesktopMenuItem({ item }: { item: MenuItem }) {
   }, [open]);
 
   function onMouseEnter() {
-    clearTimeout(timer.current);
+    if (timer.current) clearTimeout(timer.current);
     if (hasChildren) setOpen(true);
   }
   function onMouseLeave() {
-    timer.current = setTimeout(() => setOpen(false), 200);
+    timer.current = setTimeout(() => setOpen(false), 180);
   }
 
   if (!hasChildren) {
@@ -66,6 +56,10 @@ export default function DesktopMenuItem({ item }: { item: MenuItem }) {
     );
   }
 
+  const colCount = hasGrandchildren
+    ? Math.min(4, Math.max(2, children.filter((c) => (c.children?.length || 0) > 0 || c.href).length))
+    : 2;
+
   return (
     <div
       ref={ref}
@@ -73,66 +67,88 @@ export default function DesktopMenuItem({ item }: { item: MenuItem }) {
       onMouseLeave={onMouseLeave}
       style={{ position: "relative" }}
     >
-      {/* Trigger */}
       <button
+        type="button"
         onClick={() => setOpen(!open)}
+        aria-expanded={open}
         style={{
-          display: "flex", alignItems: "center", gap: 4,
+          display: "flex",
+          alignItems: "center",
+          gap: 4,
           color: open ? "var(--color-accent)" : "var(--color-text-secondary)",
-          fontSize: "var(--text-s)", textDecoration: "none",
-          padding: "6px 12px", borderRadius: "var(--radius-s)", transition: "all 0.1s",
+          fontSize: "var(--text-s)",
+          padding: "6px 10px",
+          borderRadius: "var(--radius-s)",
+          transition: "all 0.1s",
           background: open ? "var(--color-accent-light)" : "transparent",
-          border: "none", cursor: "pointer", fontFamily: "inherit",
+          border: "none",
+          cursor: "pointer",
+          fontFamily: "inherit",
           whiteSpace: "nowrap",
+          fontWeight: 600,
         }}
       >
         {item.label}
-        <ChevronDown size={14} style={{
-          transform: open ? "rotate(180deg)" : "none",
-          transition: "transform 0.2s",
-        }} />
+        <ChevronDown
+          size={14}
+          style={{
+            transform: open ? "rotate(180deg)" : "none",
+            transition: "transform 0.2s",
+          }}
+        />
       </button>
 
-      {/* Dropdown Panel */}
       {open && (
         <div
-          onMouseEnter={() => clearTimeout(timer.current)}
+          onMouseEnter={() => {
+            if (timer.current) clearTimeout(timer.current);
+          }}
           onMouseLeave={onMouseLeave}
           style={{
-            position: "absolute", top: "100%", left: "50%", transform: "translateX(-50%)",
-            marginTop: 8, zIndex: 200,
+            position: "absolute",
+            top: "100%",
+            left: 0,
+            marginTop: 6,
+            zIndex: 200,
             background: "var(--color-bg-primary)",
             border: "1px solid var(--color-border)",
-            borderRadius: "var(--radius-l)",
-            boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
-            padding: "var(--space-l)",
-            minWidth: 420,
+            boxShadow: "0 12px 40px rgba(0,0,0,0.12)",
+            padding: hasGrandchildren ? 16 : 10,
+            minWidth: hasGrandchildren ? Math.min(720, colCount * 180) : 360,
+            maxWidth: "min(860px, calc(100vw - 32px))",
           }}
         >
-          {/* Arrow */}
-          <div style={{
-            position: "absolute", top: -6, left: "50%", transform: "translateX(-50%)",
-            width: 12, height: 12, background: "var(--color-bg-primary)",
-            borderLeft: "1px solid var(--color-border)", borderTop: "1px solid var(--color-border)",
-            rotate: "45deg",
-          }} />
-
-          {/* Title */}
-          <div style={{
-            display: "flex", justifyContent: "space-between", alignItems: "center",
-            fontSize: 11, fontWeight: 700, textTransform: "uppercase",
-            color: "var(--color-text-secondary)", letterSpacing: "0.05em",
-            marginBottom: "var(--space-m)", paddingBottom: "var(--space-s)",
-            borderBottom: "1px solid var(--color-border)",
-          }}>
-            <span>{item.label}</span>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap: 12,
+              marginBottom: 10,
+              paddingBottom: 8,
+              borderBottom: "1px solid var(--color-border-light)",
+            }}
+          >
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: "0.04em",
+                textTransform: "uppercase",
+                color: "var(--color-text-secondary)",
+              }}
+            >
+              {item.label}
+            </span>
             {item.href && item.href !== "#" && (
               <Link
                 href={item.href}
                 onClick={() => setOpen(false)}
                 style={{
-                  fontSize: 11, color: "var(--color-accent)", textDecoration: "none",
-                  fontWeight: 600, textTransform: "none", letterSpacing: 0,
+                  fontSize: 12,
+                  color: "var(--color-accent)",
+                  textDecoration: "none",
+                  fontWeight: 700,
                 }}
               >
                 Все →
@@ -140,48 +156,121 @@ export default function DesktopMenuItem({ item }: { item: MenuItem }) {
             )}
           </div>
 
-          {/* Grid of children */}
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(2, 1fr)",
-            gap: "var(--space-xs)",
-          }}>
-            {item.children!.map(child => (
-              <Link
-                key={child.id}
-                href={child.href}
-                onClick={() => setOpen(false)}
-                style={{
-                  display: "flex", alignItems: "center", gap: 10,
-                  padding: "10px 12px", borderRadius: "var(--radius-m)",
-                  textDecoration: "none", color: "var(--color-text-primary)",
-                  fontSize: "var(--text-s)", fontWeight: 500,
-                  transition: "background 0.15s",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = "var(--color-accent-light)";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = "transparent";
-                }}
-              >
-                <span style={{ fontSize: 20, flexShrink: 0 }}>
-                  {child.emoji || CHILD_ICONS[child.label] || "📄"}
-                </span>
-                <span>{child.label}</span>
-              </Link>
-            ))}
-          </div>
-
-          {/* Bottom hint */}
-          <div style={{
-            marginTop: "var(--space-m)", paddingTop: "var(--space-s)",
-            borderTop: "1px solid var(--color-border)",
-            fontSize: 11, color: "var(--color-text-secondary)",
-            textAlign: "center",
-          }}>
-            Больше инструментов и гайдов в разделе {item.label}
-          </div>
+          {hasGrandchildren ? (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: `repeat(${colCount}, minmax(140px, 1fr))`,
+                gap: "16px 20px",
+              }}
+            >
+              {children.map((group) => {
+                const links = group.children || [];
+                return (
+                  <div key={group.id}>
+                    {group.href && group.href !== "#" ? (
+                      <Link
+                        href={group.href}
+                        onClick={() => setOpen(false)}
+                        style={{
+                          display: "block",
+                          fontWeight: 800,
+                          fontSize: 13,
+                          color: "var(--color-text-primary)",
+                          textDecoration: "none",
+                          marginBottom: 8,
+                        }}
+                      >
+                        {group.emoji ? `${group.emoji} ` : ""}
+                        {group.label}
+                      </Link>
+                    ) : (
+                      <div
+                        style={{
+                          fontWeight: 800,
+                          fontSize: 13,
+                          marginBottom: 8,
+                          color: "var(--color-text-primary)",
+                        }}
+                      >
+                        {group.emoji ? `${group.emoji} ` : ""}
+                        {group.label}
+                      </div>
+                    )}
+                    <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                      {links.length === 0 && group.href && group.href !== "#" ? (
+                        <span style={{ fontSize: 12, color: "var(--color-text-tertiary)" }}>
+                          Открыть раздел
+                        </span>
+                      ) : (
+                        links.map((link) => (
+                          <Link
+                            key={link.id}
+                            href={link.href}
+                            onClick={() => setOpen(false)}
+                            style={{
+                              display: "block",
+                              padding: "5px 0",
+                              fontSize: 13,
+                              color: "var(--color-text-secondary)",
+                              textDecoration: "none",
+                              lineHeight: 1.35,
+                            }}
+                            onMouseEnter={(e) => {
+                              (e.currentTarget as HTMLElement).style.color = "var(--color-accent)";
+                            }}
+                            onMouseLeave={(e) => {
+                              (e.currentTarget as HTMLElement).style.color =
+                                "var(--color-text-secondary)";
+                            }}
+                          >
+                            {link.label}
+                          </Link>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                gap: 2,
+              }}
+            >
+              {children.map((child) => (
+                <Link
+                  key={child.id}
+                  href={child.href}
+                  onClick={() => setOpen(false)}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    padding: "8px 10px",
+                    textDecoration: "none",
+                    color: "var(--color-text-primary)",
+                    fontSize: "var(--text-s)",
+                    fontWeight: 500,
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLElement).style.background = "var(--color-accent-light)";
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLElement).style.background = "transparent";
+                  }}
+                >
+                  {child.emoji ? (
+                    <span style={{ fontSize: 16, flexShrink: 0, lineHeight: 1 }}>{child.emoji}</span>
+                  ) : null}
+                  <span style={{ lineHeight: 1.3 }}>{child.label}</span>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

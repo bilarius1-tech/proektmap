@@ -21,15 +21,22 @@ export default function TextSelectionPopover({ learningMode = false }: TextSelec
     if (!session?.user) return;
 
     function handleSelection() {
+      if (!learningMode) {
+        setVisible(false);
+        return;
+      }
+
       const sel = window.getSelection();
       if (!sel || sel.isCollapsed || !sel.toString().trim()) {
-        // Only hide if not in learning mode
-        if (!learningMode) setVisible(false);
+        setVisible(false);
         return;
       }
 
       const text = sel.toString().trim();
-      if (text.length < 3) { setVisible(false); return; }
+      if (text.length < 3) {
+        setVisible(false);
+        return;
+      }
 
       const range = sel.getRangeAt(0);
       const rect = range.getBoundingClientRect();

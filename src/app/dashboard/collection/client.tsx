@@ -6,56 +6,102 @@ import { ArrowLeft, Bookmark, Trash2, Eye, Calendar, FileText, Lightbulb, Zap, B
 const TABS = [
   { key: "all", label: "Все", icon: Bookmark },
   { key: "blog_post", label: "Блог", icon: FileText },
+  { key: "ai-tool", label: "AI-инструменты", icon: Zap },
+  { key: "mcp", label: "MCP", icon: GitBranch },
   { key: "solution", label: "Решения", icon: Lightbulb },
   { key: "skill", label: "Навыки", icon: Zap },
   { key: "glossary_term", label: "Глоссарий", icon: BookOpen },
   { key: "decision", label: "Решения (этапы)", icon: GitBranch },
 ];
 
-export default function CollectionClient({ items, blogMap, solutionMap, skillMap, termMap, decisionMap }: any) {
+export default function CollectionClient({
+  items,
+  blogMap,
+  solutionMap,
+  skillMap,
+  termMap,
+  decisionMap,
+  aiToolMap = {},
+  mcpMap = {},
+}: any) {
   const [list, setList] = useState(items);
   const [tab, setTab] = useState("all");
 
   const filtered = tab === "all" ? list : list.filter((i: any) => i.entityType === tab);
 
   async function remove(entityType: string, entitySlug: string) {
-    await fetch("/api/collection", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ entityType, entitySlug }) });
+    await fetch("/api/collection", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ entityType, entitySlug }),
+    });
     setList(list.filter((i: any) => !(i.entityType === entityType && i.entitySlug === entitySlug)));
+    window.dispatchEvent(new CustomEvent("collection:changed"));
   }
 
   function getTitle(item: any): string {
     const slug = item.entitySlug;
     switch (item.entityType) {
-      case "blog_post": return blogMap[slug]?.title || slug;
-      case "solution": return solutionMap[slug]?.title || slug;
-      case "skill": return skillMap[slug]?.title || slug;
-      case "glossary_term": return termMap[slug]?.term || slug;
-      case "decision": return decisionMap[slug]?.title || slug;
-      default: return slug;
+      case "blog_post":
+        return blogMap[slug]?.title || slug;
+      case "solution":
+        return solutionMap[slug]?.title || slug;
+      case "skill":
+        return skillMap[slug]?.title || slug;
+      case "glossary_term":
+        return termMap[slug]?.term || slug;
+      case "decision":
+        return decisionMap[slug]?.title || slug;
+      case "ai-tool":
+        return aiToolMap[slug]?.name || slug;
+      case "mcp":
+        return mcpMap[slug]?.name || slug;
+      default:
+        return slug;
     }
   }
 
   function getLink(item: any): string {
     const slug = item.entitySlug;
     switch (item.entityType) {
-      case "blog_post": return `/blog/${blogMap[slug]?.slug || slug}`;
-      case "solution": return `/solutions/${slug}`;
-      case "skill": return `/skills/${slug}`;
-      case "glossary_term": return `/glossary/${slug}`;
-      case "decision": return `/decisions#${slug}`;
-      default: return "#";
+      case "blog_post":
+        return `/blog/${blogMap[slug]?.slug || slug}`;
+      case "solution":
+        return `/solutions/${slug}`;
+      case "skill":
+        return `/skills/${slug}`;
+      case "glossary_term":
+        return `/glossary/${slug}`;
+      case "decision":
+        return `/decisions#${slug}`;
+      case "ai-tool":
+        return `/ai-tools/${slug}`;
+      case "mcp":
+        return `/mcp/${slug}`;
+      default:
+        return "#";
     }
   }
 
   function getMeta(item: any): string {
     const slug = item.entitySlug;
     switch (item.entityType) {
-      case "blog_post": return `${blogMap[slug]?.viewCount || 0} просмотров`;
-      case "solution": return solutionMap[slug]?.summary?.slice(0, 60) || "";
-      case "skill": return "Навык";
-      case "glossary_term": return termMap[slug]?.simpleExplanation?.slice(0, 60) || "";
-      case "decision": return "Этап";
-      default: return "";
+      case "blog_post":
+        return `${blogMap[slug]?.viewCount || 0} просмотров`;
+      case "solution":
+        return solutionMap[slug]?.summary?.slice(0, 60) || "";
+      case "skill":
+        return "Навык";
+      case "glossary_term":
+        return termMap[slug]?.simpleExplanation?.slice(0, 60) || "";
+      case "decision":
+        return "Этап";
+      case "ai-tool":
+        return aiToolMap[slug]?.shortDescription?.slice(0, 60) || "AI-инструмент";
+      case "mcp":
+        return mcpMap[slug]?.description?.slice(0, 60) || "MCP-сервер";
+      default:
+        return "";
     }
   }
 
@@ -93,7 +139,8 @@ export default function CollectionClient({ items, blogMap, solutionMap, skillMap
           <div style={{ fontSize: 48, marginBottom: "var(--space-m)" }}>📑</div>
           <p>{tab === "all" ? "У вас пока нет закладок." : "В этой категории пока нет закладок."}</p>
           <p style={{ marginTop: "var(--space-s)", fontSize: "var(--text-xs)" }}>
-            Нажимайте ❤️ Сохранить на страницах блога, решений, навыков и глоссария.
+            Нажимайте ♥ Сохранить на страницах AI-инструментов, MCP, блога и других сущностей.
+            Режим «Обучение» + выделение текста сохраняет фрагменты в «Базу знаний» (это другой слой).
           </p>
         </div>
       ) : (

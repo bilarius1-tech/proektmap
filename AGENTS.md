@@ -144,6 +144,17 @@ ProektMap не должен быть стеной текста.
 Skill: .reasonix/skills/visual-content/SKILL.md
 Skill: .reasonix/skills/yookassa-checkout/SKILL.md
 
+## Учебные примеры (обязательно)
+
+Новый раздел или расширение старого обучающего слоя — не только теория.
+
+Обязателен контраст:
+- **плохо → хорошо** (как писать / как решать) и/или
+- **before → after** (наблюдаемый результат),
+желательно с **Copy** готового шаблона.
+
+Эталон: `/ai-skills`. Правило агентов: `.cursor/rules/examples-teaching.mdc`.
+
 ### /resheniya — обязательные Skills агентов
 
 | Задача | Skill | Путь |

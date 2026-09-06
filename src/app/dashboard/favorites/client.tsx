@@ -25,10 +25,27 @@ export default function FavoritesClient({ favorites }: { favorites: Favorite[] }
     return (
       <div style={{ maxWidth: 600, margin: "0 auto", padding: "var(--space-xl) var(--space-m)", textAlign: "center" }}>
         <Heart size={40} style={{ color: "var(--color-text-tertiary)", marginBottom: "var(--space-m)" }} />
-        <h1 style={{ fontSize: "var(--text-xl)", fontWeight: 800, marginBottom: 8 }}>Избранное пусто</h1>
-        <p style={{ color: "var(--color-text-secondary)", fontSize: "var(--text-s)" }}>
-          Нажимайте ♡ на карточках решений чтобы сохранять их здесь.
+        <h1 style={{ fontSize: "var(--text-xl)", fontWeight: 800, marginBottom: 8 }}>Избранное решений (legacy)</h1>
+        <p style={{ color: "var(--color-text-secondary)", fontSize: "var(--text-s)", marginBottom: 16, lineHeight: 1.55 }}>
+          Здесь хранились избранные Decision из старых Blueprint. Сейчас активные закладки — в коллекции:
+          AI-инструменты, MCP, блог и другие сущности.
         </p>
+        <a
+          href="/dashboard/collection"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 6,
+            padding: "12px 18px",
+            background: "var(--color-accent)",
+            color: "#fff",
+            textDecoration: "none",
+            fontWeight: 700,
+            fontSize: "var(--text-s)",
+          }}
+        >
+          Открыть мои закладки →
+        </a>
       </div>
     );
   }

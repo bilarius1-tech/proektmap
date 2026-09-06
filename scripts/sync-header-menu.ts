@@ -92,10 +92,32 @@ async function main() {
   });
   console.log("upsert header-agent-engineering /agent-engineering");
 
+  await db.menuItem.upsert({
+    where: { id: "header-ai-skills" },
+    create: {
+      id: "header-ai-skills",
+      label: "AI Skills",
+      href: "/ai-skills",
+      sortOrder: 5,
+      location: "header",
+      isActive: true,
+      parentId: null,
+    },
+    update: {
+      label: "AI Skills",
+      href: "/ai-skills",
+      location: "header",
+      isActive: true,
+      parentId: null,
+    },
+  });
+  console.log("upsert header-ai-skills /ai-skills");
+
   // Предпочтительный порядок корней шапки по href (остальные — после)
   const preferredHrefs = [
     "/resheniya",
     "/agent-engineering",
+    "/ai-skills",
     "/arsenal",
     "/avito",
     "/sitemap",

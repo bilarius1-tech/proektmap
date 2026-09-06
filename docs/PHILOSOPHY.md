@@ -152,7 +152,17 @@ ProektMap не учит программированию с нуля и не э�
 
 Skills — переиспользуемые процедуры для человека и AI-агента.
 
-### Два типа Skills
+### Слои Skills (не смешивать)
+
+| Слой | Где | Роль |
+|------|-----|------|
+| Карта способностей | `/skills` | компетенции человека-создателя |
+| AI Engineering Skills | `/ai-skills` | внешние Skill-пакеты: прокачка агента (канон `docs/AI-SKILLS.md`) |
+| Design Skills | `/design-skills` | визуальные рецепты композиции ProektMap |
+| Prisma Skill | БД, `/admin/skills` | учебный модуль с XP |
+| Внутренние Agent Skills | `.cursor/skills/`, `.reasonix/skills/` | процедуры сборки самого сайта |
+
+### Два внутренних типа (legacy-таблица)
 
 | | Prisma Skill | Agent Skill |
 |---|---|---|

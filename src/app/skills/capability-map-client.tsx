@@ -113,6 +113,43 @@ export default function CapabilityMapClient() {
           Здесь отражаются способности, подтверждённые работающим кодом, схемой БД и деплоем в готовых решениях ProektMap.
         </p>
 
+        <div
+          style={{
+            marginTop: 20,
+            padding: "14px 16px",
+            border: "1px solid rgba(15,118,110,0.35)",
+            background: "rgba(15,118,110,0.06)",
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 12,
+          }}
+        >
+          <div style={{ flex: "1 1 240px" }}>
+            <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 4 }}>Прокачать агента в дизайне</div>
+            <div style={{ fontSize: 13, lineHeight: 1.5, color: "var(--color-text-secondary, #64748b)" }}>
+              Карта способностей — про вас. AI Skills — про усилители агента: где взять, как поставить и как правильно писать.
+            </div>
+          </div>
+          <Link
+            href="/ai-skills"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "10px 14px",
+              background: "#0f766e",
+              color: "#fff",
+              textDecoration: "none",
+              fontWeight: 700,
+              fontSize: 13,
+            }}
+          >
+            AI Engineering Skills <ArrowRight size={14} />
+          </Link>
+        </div>
+
         {/* Macro Summary Stats */}
         <div className="capability-metrics-bar">
           <div className="metric-item">

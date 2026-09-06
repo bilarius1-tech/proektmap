@@ -169,16 +169,32 @@ export default function MenuEditor({ items: initialItems, blueprints, allBluepri
               <button onClick={() => startNew(item.id)} className="btn btn-ghost" style={{ padding: 4 }} title="Добавить подпункт"><Plus size={14} /></button>
             </div>
 
-            {/* Children */}
+            {/* Children L2 + grandchildren L3 */}
             {item.children.length > 0 && (
               <div style={{ marginLeft: "var(--space-xl)", marginTop: "var(--space-xs)", display: "flex", flexDirection: "column", gap: 4 }}>
                 {item.children.map(child => (
-                  <div key={child.id} style={{ display: "flex", alignItems: "center", gap: "var(--space-s)", padding: "var(--space-s)", background: "var(--color-bg-primary)", borderRadius: "var(--radius-m)", border: "1px solid var(--color-border-light)" }}>
-                    {child.emoji && <span style={{ fontSize: 16 }}>{child.emoji}</span>}
-                    <span style={{ fontWeight: 500, flex: 1, fontSize: "var(--text-s)" }}>↳ {child.label}</span>
-                    <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", fontFamily: "var(--font-mono)" }}>{child.href}</span>
-                    <button onClick={() => startEdit(child)} className="btn btn-ghost" style={{ padding: 4 }}><Edit size={14} /></button>
-                    <button onClick={() => handleDelete(child.id)} className="btn btn-ghost" style={{ padding: 4, color: "var(--color-error)" }}><Trash2 size={14} /></button>
+                  <div key={child.id}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "var(--space-s)", padding: "var(--space-s)", background: "var(--color-bg-primary)", borderRadius: "var(--radius-m)", border: "1px solid var(--color-border-light)" }}>
+                      {child.emoji && <span style={{ fontSize: 16 }}>{child.emoji}</span>}
+                      <span style={{ fontWeight: 500, flex: 1, fontSize: "var(--text-s)" }}>↳ {child.label}</span>
+                      <span style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", fontFamily: "var(--font-mono)" }}>{child.href}</span>
+                      <button onClick={() => startEdit(child)} className="btn btn-ghost" style={{ padding: 4 }}><Edit size={14} /></button>
+                      <button onClick={() => handleDelete(child.id)} className="btn btn-ghost" style={{ padding: 4, color: "var(--color-error)" }}><Trash2 size={14} /></button>
+                      <button onClick={() => startNew(child.id)} className="btn btn-ghost" style={{ padding: 4 }} title="Добавить пункт 3-го уровня"><Plus size={14} /></button>
+                    </div>
+                    {(child.children?.length || 0) > 0 && (
+                      <div style={{ marginLeft: "var(--space-l)", marginTop: 4, display: "flex", flexDirection: "column", gap: 4 }}>
+                        {child.children!.map(g => (
+                          <div key={g.id} style={{ display: "flex", alignItems: "center", gap: "var(--space-s)", padding: "8px 12px", background: "var(--color-bg-secondary)", border: "1px dashed var(--color-border-light)" }}>
+                            {g.emoji && <span style={{ fontSize: 14 }}>{g.emoji}</span>}
+                            <span style={{ fontWeight: 500, flex: 1, fontSize: "var(--text-xs)" }}>↳↳ {g.label}</span>
+                            <span style={{ fontSize: 11, color: "var(--color-text-tertiary)", fontFamily: "var(--font-mono)" }}>{g.href}</span>
+                            <button onClick={() => startEdit(g)} className="btn btn-ghost" style={{ padding: 4 }}><Edit size={12} /></button>
+                            <button onClick={() => handleDelete(g.id)} className="btn btn-ghost" style={{ padding: 4, color: "var(--color-error)" }}><Trash2 size={12} /></button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

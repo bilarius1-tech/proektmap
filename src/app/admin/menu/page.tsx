@@ -9,7 +9,12 @@ export default async function AdminMenuPage() {
   const items = await db.menuItem.findMany({
     where: { parentId: null },
     orderBy: { sortOrder: "asc" },
-    include: { children: { orderBy: { sortOrder: "asc" } } },
+    include: {
+      children: {
+        orderBy: { sortOrder: "asc" },
+        include: { children: { orderBy: { sortOrder: "asc" } } },
+      },
+    },
   });
 
   return (
@@ -35,7 +40,8 @@ export default async function AdminMenuPage() {
         }}
       >
         Агенты и разработчики добавляют пункты только здесь (или через API <code>/api/admin/menu</code> под admin-сессией).
-        Хардкод в <code>header.tsx</code> запрещён.
+        Хардкод в <code>header.tsx</code> запрещён. Поддерживается 3 уровня: корень → группа → ссылки (на desktop группы
+        становятся колонками мега-меню).
       </div>
       <MenuEditor items={JSON.parse(JSON.stringify(items))} blueprints={JSON.parse(JSON.stringify(blueprints))} allBlueprints={JSON.parse(JSON.stringify(allBlueprints))} />
     </div>

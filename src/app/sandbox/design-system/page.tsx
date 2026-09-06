@@ -416,6 +416,60 @@ export const AllVariants = {
             <strong>Это главная причина, почему AI-инженеру нужна дизайн-система.</strong> AI-агенты (Cursor, Claude, Reasonix) генерируют код на основе промптов. Если у агента нет контекста о вашей дизайн-системе — он сгенерирует случайные стили.
           </P>
 
+          <div style={{
+            margin: "var(--space-m) 0",
+            padding: "var(--space-m)",
+            border: "1px solid rgba(15,118,110,0.35)",
+            background: "rgba(15,118,110,0.06)",
+          }}>
+            <div style={{ fontWeight: 800, marginBottom: 6, display: "flex", alignItems: "center", gap: 8 }}>
+              <Sparkles size={16} color="#0f766e" /> Усиль агента Skills — не вместо системы, а поверх неё
+            </div>
+            <P>
+              Дизайн-система = язык продукта (токены, DESIGN.md).{" "}
+              <Link href="/ai-skills" style={{ color: "var(--color-accent)", fontWeight: 700 }}>
+                AI Engineering Skills
+              </Link>{" "}
+              = усилители агента (Frontend Design, taste-skill, Guidelines, Impeccable). Сначала правила, потом Skills.
+              На хабе Skills есть готовый <strong>контур AI-дизайна</strong> и шаблон <strong>DESIGN.md</strong> под копирование.
+            </P>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 8 }}>
+              <Link
+                href="/ai-skills#contour"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  padding: "10px 14px",
+                  background: "#0f766e",
+                  color: "#fff",
+                  textDecoration: "none",
+                  fontWeight: 700,
+                  fontSize: "var(--text-xs)",
+                }}
+              >
+                Контур AI-дизайна →
+              </Link>
+              <Link
+                href="/ai-skills#design-md"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  padding: "10px 14px",
+                  border: "1px solid var(--color-border)",
+                  background: "var(--color-bg-primary)",
+                  color: "var(--color-text-primary)",
+                  textDecoration: "none",
+                  fontWeight: 700,
+                  fontSize: "var(--text-xs)",
+                }}
+              >
+                Шаблон DESIGN.md →
+              </Link>
+            </div>
+          </div>
+
           <H3>Промпт для AI с дизайн-системой</H3>
           <CodeBlock>{`Ты — frontend-разработчик. Твоя задача — создать страницу настроек
 профиля. Используй дизайн-систему проекта:

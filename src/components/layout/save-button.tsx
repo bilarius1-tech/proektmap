@@ -36,6 +36,7 @@ export default function SaveButton({ entityType, entitySlug, isLoggedIn }: {
       });
       setSaved(true);
     }
+    window.dispatchEvent(new CustomEvent("collection:changed"));
     setLoading(false);
   }
 

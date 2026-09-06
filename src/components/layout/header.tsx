@@ -18,7 +18,18 @@ export default async function GlobalHeader() {
     menuItems = await db.menuItem.findMany({
       where: { parentId: null, isActive: true, location: "header" },
       orderBy: { sortOrder: "asc" },
-      include: { children: { where: { isActive: true }, orderBy: { sortOrder: "asc" } } },
+      include: {
+        children: {
+          where: { isActive: true },
+          orderBy: { sortOrder: "asc" },
+          include: {
+            children: {
+              where: { isActive: true },
+              orderBy: { sortOrder: "asc" },
+            },
+          },
+        },
+      },
     });
   } catch {}
 
@@ -28,12 +39,17 @@ export default async function GlobalHeader() {
     return label === "готовые проекты" || label.includes("blueprint") || href.startsWith("/blueprints");
   };
 
-  const visibleMenuItems = menuItems
-    .filter((item) => !isLegacyBlueprintItem(item))
-    .map((item) => ({
-      ...item,
-      children: item.children?.filter((child: any) => !isLegacyBlueprintItem(child)),
-    }));
+  const mapVisible = (item: any): any => ({
+    ...item,
+    children: (item.children || [])
+      .filter((child: any) => !isLegacyBlueprintItem(child))
+      .map((child: any) => ({
+        ...child,
+        children: (child.children || []).filter((g: any) => !isLegacyBlueprintItem(g)),
+      })),
+  });
+
+  const visibleMenuItems = menuItems.filter((item) => !isLegacyBlueprintItem(item)).map(mapVisible);
 
   return (
     <header

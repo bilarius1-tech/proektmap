@@ -40,5 +40,7 @@ Rebuild нужен только если меняли код header/footer/API.
 | `header-arsenal` | Нейро каталог | `/arsenal` |
 | `header-avito` | Авито | `/avito` |
 | `header-sitemap` | Карта сайта | `/sitemap` |
+| `header-agent-engineering` | Инженерия агентов | `/agent-engineering` |
+| `header-ai-skills` | AI Skills | `/ai-skills` |
 
 Скрипт синка: `npx tsx --env-file=.env scripts/sync-header-menu.ts`

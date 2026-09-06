@@ -37,6 +37,12 @@ export const RESHENIYA_ARSENAL_BRIDGES: ResheniyaArsenalBridge[] = [
     toolSlugs: ["removerized", "ideogram", "openshorts", "ai-marketing-skills"],
     why: "Фото витрины, тексты и короткий ролик — этичный контент под объявления.",
   },
+  {
+    solutionSlug: "premium-landing",
+    stackSlugs: ["vibe-coder", "prompt-ops", "rf-stack"],
+    toolSlugs: ["agent-skills", "opencode", "superpowers", "gigachat-3-5"],
+    why: "Агент-кодер + Skills и РФ-доступные модели — собрать премиум-шаблон без AI-скуфа из России.",
+  },
 ];
 
 export function getBridgeForSolution(solutionSlug: string): ResheniyaArsenalBridge | undefined {

@@ -160,7 +160,10 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
 :root {
   --bp-phone: 480px;
   --bp-tablet: 768px;
-  --bp-desktop: 960px;
+  /* Полноширинное меню шапки только на широких экранах;
+     ноутбуки ~1140px уже уходят в гамбургер */
+  --bp-desktop: 1200px;
+  --bp-header-nav: 1200px;
   --bottom-chrome: 56px;
 }
 
@@ -207,24 +210,12 @@ input, select, textarea { font-family: inherit; font-size: inherit; }
    HEADER RESPONSIVE — каскадная адаптация
    ═══════════════════════════════════════════ */
 
-/* Laptop compact: 961–1150px — tighter nav before hamburger */
-@media (max-width: 1150px) and (min-width: 961px) {
-  .header-nav {
-    gap: 1px !important;
-  }
-  .header-nav > a,
-  .header-nav > div > button {
-    font-size: 12px !important;
-    padding: 4px 7px !important;
-  }
-}
-
-/* Tablet/phone: ≤960 — hamburger menu */
+/* ≤1199px (ноутбуки ~1140 и уже): гамбургер вместо горизонтального меню */
 .header-knowledge {
   display: contents;
 }
 
-@media (max-width: 960px) {
+@media (max-width: 1199px) {
   .hide-mobile { display: none !important; }
   .mobile-only { display: flex !important; }
   .header-logo {

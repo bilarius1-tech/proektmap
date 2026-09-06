@@ -52,9 +52,11 @@ export const ARSENAL_STACKS: ArsenalStack[] = [
     orderHint: ["OpenCode — открытый кодинг-агент", "Superpowers — план → код → тест", "ECC — планирование и ревью", "Agent Skills — навыки для агента", "Understand Anything / CodeGraph — разобрать проект", "Claudexor — экосистема Claude/Cursor", "Easy-Vibe — учебный трек vibe coding"],
     excelCategories: ["coding", "agents", "learning"],
     relatedRoutes: [
+      { href: "/resheniya/premium-landing", label: "Премиум-шаблон без AI-скуфа" },
       { href: "/resheniya/saas-product", label: "SaaS-продукт" },
       { href: "/vaibik", label: "Вайбик" },
       { href: "/ui-patterns", label: "UI-Атлас" },
+      { href: "/ai-skills", label: "AI Skills" },
     ],
   },
   {

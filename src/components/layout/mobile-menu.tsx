@@ -67,11 +67,51 @@ export default function MobileMenu({ items }: { items: MenuItem[] }) {
                       {expanded.has(item.id) && (
                         <div style={{ paddingLeft: "var(--space-m)" }}>
                           {item.children.map(child => (
-                            <Link key={child.id} href={child.href} onClick={() => setOpen(false)}
-                              style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 12px", color: "var(--color-text-secondary)", textDecoration: "none", fontSize: "var(--text-s)" }}>
-                              {child.emoji && <span style={{ fontSize: 16 }}>{child.emoji}</span>}
-                              <span>{child.label}</span>
-                            </Link>
+                            <div key={child.id}>
+                              {(child.children?.length || 0) > 0 ? (
+                                <>
+                                  <button
+                                    type="button"
+                                    onClick={() => toggleParent(child.id)}
+                                    style={{
+                                      display: "flex", alignItems: "center", justifyContent: "space-between",
+                                      width: "100%", padding: "10px 12px", border: "none", background: "transparent",
+                                      cursor: "pointer", fontSize: "var(--text-s)", fontWeight: 600,
+                                      color: "var(--color-text-primary)",
+                                    }}
+                                  >
+                                    <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                                      {child.emoji && <span>{child.emoji}</span>}
+                                      {child.label}
+                                    </span>
+                                    <ChevronDown size={14} style={{ transform: expanded.has(child.id) ? "rotate(180deg)" : "none", transition: "0.2s" }} />
+                                  </button>
+                                  {expanded.has(child.id) && (
+                                    <div style={{ paddingLeft: "var(--space-m)" }}>
+                                      {child.href && child.href !== "#" && (
+                                        <Link href={child.href} onClick={() => setOpen(false)}
+                                          style={{ display: "block", padding: "8px 12px", color: "var(--color-accent)", textDecoration: "none", fontSize: "var(--text-xs)", fontWeight: 700 }}>
+                                          Открыть раздел →
+                                        </Link>
+                                      )}
+                                      {child.children!.map(g => (
+                                        <Link key={g.id} href={g.href} onClick={() => setOpen(false)}
+                                          style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", color: "var(--color-text-secondary)", textDecoration: "none", fontSize: "var(--text-s)" }}>
+                                          {g.emoji && <span style={{ fontSize: 14 }}>{g.emoji}</span>}
+                                          <span>{g.label}</span>
+                                        </Link>
+                                      ))}
+                                    </div>
+                                  )}
+                                </>
+                              ) : (
+                                <Link href={child.href} onClick={() => setOpen(false)}
+                                  style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 12px", color: "var(--color-text-secondary)", textDecoration: "none", fontSize: "var(--text-s)" }}>
+                                  {child.emoji && <span style={{ fontSize: 16 }}>{child.emoji}</span>}
+                                  <span>{child.label}</span>
+                                </Link>
+                              )}
+                            </div>
                           ))}
                         </div>
                       )}

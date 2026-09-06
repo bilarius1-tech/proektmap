@@ -2301,3 +2301,74 @@ MVP-пайплайн этапов 0–10 закрыт. Display name **Нейро
 ### Артефакты
 - Пост: https://proektmap.ru/blog/inzheneriya-agentov-harness-loop-graph
 - Аудио: `public/audio/guides/agent-engineering{,-harness,-loop,-graph}.mp3`
+
+## 2026-09-06 — AI Engineering Skills (/ai-skills) MVP
+
+### Что сделано
+- Новый слой: `/ai-skills` — Skills для усиления агента (не путать с `/skills` Картой способностей).
+- Канон: `docs/AI-SKILLS.md`. Данные: `src/lib/ai-skills/`.
+- Design-кластер: Frontend Design, taste-skill, Web Design Guidelines, Impeccable.
+- Хаб: обещание + «Как правильно писать» + Skill Graph + 4 карточки + Stack + Recipe (copy route prompt).
+- Деталки `/ai-skills/[slug]`: install, invoke, плохо/хорошо, before→after, related.
+- SEO: SITE_TREE + sitemap.ts + validate:sitemap OK. Меню: `header-ai-skills`.
+- Кросс-ссылка с `/skills` → «Прокачать агента в дизайне».
+- Билд + PM2. Smoke 200: хаб, 4 slug, `/skills`, `/resheniya`, `/vaibik`, `/avito`.
+
+### Цель раздела
+Научить специалиста: агента можно усилить (особенно в дизайне); где взять усилители; как правильно писать заказ агенту.
+
+## 2026-09-06 — AI Skills × дизайн-система (фазы B→A)
+
+### B
+- Контур AI-дизайна на `/ai-skills` (система → Skills → UI-Атлас).
+- Копируемый шаблон `DESIGN.md` (`DESIGN_MD_TEMPLATE`).
+
+### A
+- Мосты `/ai-skills` ↔ `/sandbox/design-system` (секция AI).
+- Во всех invoke / howToWrite / Recipe — правило: не ломать токены DESIGN.md.
+- На деталках Skill — блок «Дизайн-система».
+
+## 2026-09-06 — Правило «учебные примеры»
+
+- Зафиксирован подход из `/ai-skills`: плохо→хорошо, before→after, Copy-шаблон.
+- Правило: `.cursor/rules/examples-teaching.mdc` (alwaysApply).
+- Упоминание в корневом `AGENTS.md` (секция «Учебные примеры»).
+
+## 2026-09-06 — Мега-меню L3 + аудит закладок/обучения
+
+### Меню
+- Desktop mega: колонки при 3-м уровне; плоский L2 без «шума» и хардкод-emoji.
+- Админка: Plus на L2 → L3; дерево ↳↳.
+- Header/mobile грузят grandchildren.
+- Данные: Песочница (Дизайн / AI в РФ / Практика), Инструменты (Каталоги / Знания). Скрипт `scripts/restructure-mega-menu.ts`.
+
+### Закладки / обучение / база знаний
+- Три слоя разделены: коллекция (♥), обучение+выделение → clips, legacy Decision favorites.
+- Фикс blog bookmark → UserCollection по userId (не email).
+- Коллекция показывает ai-tool и mcp; счётчик ♥ слушает `collection:changed`.
+- Обучение: popover только при включённом режиме; синхрон кнопки с provider.
+
+## 2026-09-06 — Шапка: гамбургер с 1200px
+
+- Breakpoint горизонтального меню → гамбургер поднят с 960px до **1199px** (ноутбуки ~1140).
+- Убран «сжатый» режим 961–1150 (мелкий шрифт вместо меню).
+- Токены: `--bp-desktop` / `--bp-header-nav: 1200px`.
+
+## 2026-09-06 — /resheniya/premium-landing (анти AI-скуф)
+
+### Решение
+- Новый маршрут: премиум-шаблон сайта без AI-скуфа (8 шагов).
+- Данные: `premium-landing-guided-data.ts` — BRIEF → DESIGN.md → Skills Stack → Next.js → compose → polish → РФ-чек → ship.
+- Промпты с плохо/хорошо; бейдж «Проверено из РФ»; мост arsenal (vibe-coder, prompt-ops, rf-stack).
+- Каталог /resheniya + SITE_TREE + связь с /ai-skills.
+- Validator: PASS. Аудитор — отдельная сессия.
+
+## 2026-09-06 — Закрытие дня
+
+День закрыт. На проде:
+- `/ai-skills` — MVP Design Skills + мост с DESIGN.md / sandbox
+- `/resheniya/premium-landing` — решение «премиум без AI-скуфа»
+- Мега-меню L3, коллекция ♥, гамбургер с 1200px
+- Правило учебных примеров (плохо→хорошо)
+
+main = master после merge. Коммит + push выполнены.

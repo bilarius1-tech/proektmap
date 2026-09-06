@@ -6,7 +6,8 @@
 
 ## Границы MVP
 
-- Отдельная сущность `DesignSkill` (не путать с обучающим `Skill`)
+- Отдельная сущность `DesignSkill` (не путать с обучающим `Skill` и с `/ai-skills`)
+- **Не путать с AI Engineering Skills** (`docs/AI-SKILLS.md`, путь `/ai-skills`): там — внешние Skill-пакеты для агента (Frontend Design, Impeccable…). Здесь — визуальные рецепты композиции ProektMap (`pm-hero-…`).
 - Публичный путь: `/design-skills`
 - Канонический ID = `slug` (`pm-hero-0001`)
 - **8–12 Hero** с разной композицией (не 40 сразу)

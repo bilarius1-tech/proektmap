@@ -11,8 +11,16 @@ export function useKnowledgePanel() {
   const [learningMode, setLearningMode] = useState(false);
 
   useEffect(() => {
-    function onToggle() { setOpen(prev => !prev); }
-    function onToggleLearning() { setLearningMode(prev => !prev); }
+    function onToggle() {
+      setOpen((prev) => !prev);
+    }
+    function onToggleLearning() {
+      setLearningMode((prev) => {
+        const next = !prev;
+        window.dispatchEvent(new CustomEvent("kp:learning-state", { detail: { on: next } }));
+        return next;
+      });
+    }
     window.addEventListener("kp:toggle", onToggle);
     window.addEventListener("kp:toggle-learning", onToggleLearning);
     return () => {

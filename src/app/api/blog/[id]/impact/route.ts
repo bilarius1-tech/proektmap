@@ -44,6 +44,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const { id } = await params;
   const userEmail = (session.user as any).email;
+  const userId = (session.user as any).id;
   const { type } = await req.json(); // "bookmark" | "project_use"
 
   if (!type || !["bookmark", "project_use", "like", "dislike"].includes(type)) {
@@ -53,21 +54,22 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const db = await getDb();
 
   // Toggle: if exists, remove; otherwise add
+  // BlogInteraction historically keys by email — keep that contract.
   const existing = await db.blogInteraction.findUnique({
     where: { postId_userId_type: { postId: id, userId: userEmail, type } },
   });
 
   if (existing) {
     await db.blogInteraction.delete({ where: { id: existing.id } });
-    if (type === "bookmark") {
-      await db.userCollection.deleteMany({ where: { userId: userEmail, entityType: "blog_post", entitySlug: id } }).catch(() => {});
+    if (type === "bookmark" && userId) {
+      await db.userCollection.deleteMany({ where: { userId, entityType: "blog_post", entitySlug: id } }).catch(() => {});
     }
   } else {
     await db.blogInteraction.create({
       data: { postId: id, userId: userEmail, type },
     });
-    if (type === "bookmark") {
-      await db.userCollection.create({ data: { userId: userEmail, entityType: "blog_post", entitySlug: id } }).catch(() => {});
+    if (type === "bookmark" && userId) {
+      await db.userCollection.create({ data: { userId, entityType: "blog_post", entitySlug: id } }).catch(() => {});
     }
   }
 

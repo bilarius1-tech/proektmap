@@ -8,6 +8,7 @@ import {
   Clock3,
   Compass,
   Layers3,
+  Palette,
   Rocket,
   Route,
   Sparkles,
@@ -20,6 +21,7 @@ import { ecosystemResources } from "./data";
 import { guidedSaasSolution } from "./guided-data";
 import { guidedTelegramSolution } from "./telegram-guided-data";
 import { guidedAvitoSolution } from "./avito-guided-data";
+import { guidedPremiumLandingSolution } from "./premium-landing-guided-data";
 
 export const metadata: Metadata = {
   title: "Готовые решения AI — от идеи до работающего продукта",
@@ -60,6 +62,9 @@ export default function ResheniyaPage() {
               </Link>
               <Link href="/resheniya/avito-business" className="solutions-button solutions-button-secondary">
                 Магазин на Авито
+              </Link>
+              <Link href="/resheniya/premium-landing" className="solutions-button solutions-button-secondary">
+                Без AI-скуфа
               </Link>
               <Link href="/resheniya/telegram-bot" className="solutions-button solutions-button-secondary">
                 Telegram-бот
@@ -102,10 +107,46 @@ export default function ResheniyaPage() {
               <span className="solutions-kicker">Можно начать сейчас</span>
               <h2 id="available-title">Доступные готовые решения</h2>
             </div>
-            <span className="solutions-status-badge">3 маршрута</span>
+            <span className="solutions-status-badge">4 маршрута</span>
           </div>
 
           <div className="solutions-feature-list">
+            <Link href="/resheniya/premium-landing" className="solutions-feature-card">
+              <div className="solutions-feature-main">
+                <div className="solutions-feature-icon" style={{ background: "rgba(15, 118, 110, 0.12)", color: "#0f766e" }}>
+                  <Palette size={30} />
+                </div>
+                <div>
+                  <span className="solutions-kicker">Для вайбкодера · проверено из РФ</span>
+                  <h3>Премиум-шаблон без AI-скуфа</h3>
+                  <p>
+                    Первый нестандартный лендинг на Next.js: DESIGN.md, AI Skills и промпты плохо/хорошо — даже на
+                    простых моделях без «фиолетового AI».
+                  </p>
+                </div>
+              </div>
+
+              <div className="solutions-feature-result">
+                <span>Результат маршрута</span>
+                <strong>{guidedPremiumLandingSolution.result}</strong>
+              </div>
+
+              <div className="solutions-feature-meta">
+                <span>
+                  <Route size={16} /> {guidedPremiumLandingSolution.steps.length} готовых шагов
+                </span>
+                <span>
+                  <Clock3 size={16} /> {guidedPremiumLandingSolution.duration}
+                </span>
+                <span>
+                  <Boxes size={16} /> Skills + токены выбраны
+                </span>
+                <span className="solutions-feature-link">
+                  Открыть решение <ArrowRight size={16} />
+                </span>
+              </div>
+            </Link>
+
             <Link href="/resheniya/avito-business" className="solutions-feature-card">
               <div className="solutions-feature-main">
                 <div className="solutions-feature-icon" style={{ background: "rgba(239, 68, 68, 0.12)", color: "#ef4444" }}><ShoppingBag size={30} /></div>

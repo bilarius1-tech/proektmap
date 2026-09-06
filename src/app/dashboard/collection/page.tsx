@@ -18,33 +18,60 @@ export default async function CollectionPage() {
     take: 100,
   });
 
-  // Fetch titles for all entity types
-  const blogIds = items.filter(i => i.entityType === "blog_post").map(i => i.entitySlug);
-  const solutionSlugs = items.filter(i => i.entityType === "solution").map(i => i.entitySlug);
-  const skillSlugs = items.filter(i => i.entityType === "skill").map(i => i.entitySlug);
-  const termSlugs = items.filter(i => i.entityType === "glossary_term").map(i => i.entitySlug);
-  const decisionSlugs = items.filter(i => i.entityType === "decision").map(i => i.entitySlug);
+  const blogIds = items.filter((i) => i.entityType === "blog_post").map((i) => i.entitySlug);
+  const solutionSlugs = items.filter((i) => i.entityType === "solution").map((i) => i.entitySlug);
+  const skillSlugs = items.filter((i) => i.entityType === "skill").map((i) => i.entitySlug);
+  const termSlugs = items.filter((i) => i.entityType === "glossary_term").map((i) => i.entitySlug);
+  const decisionSlugs = items.filter((i) => i.entityType === "decision").map((i) => i.entitySlug);
+  const aiToolSlugs = items.filter((i) => i.entityType === "ai-tool").map((i) => i.entitySlug);
+  const mcpSlugs = items.filter((i) => i.entityType === "mcp").map((i) => i.entitySlug);
 
-  const [blogPosts, solutions, skills, terms, decisions] = await Promise.all([
-    blogIds.length ? db.blogPost.findMany({ where: { id: { in: blogIds } }, select: { id: true, title: true, slug: true, excerpt: true, viewCount: true, publishedAt: true } }) : [],
-    solutionSlugs.length ? db.solution.findMany({ where: { slug: { in: solutionSlugs } }, select: { slug: true, title: true, summary: true } }) : [],
-    skillSlugs.length ? db.skill.findMany({ where: { slug: { in: skillSlugs } }, select: { slug: true, title: true } }) : [],
-    termSlugs.length ? db.glossaryTerm.findMany({ where: { slug: { in: termSlugs } }, select: { slug: true, term: true, simpleExplanation: true } }) : [],
-    decisionSlugs.length ? db.decision.findMany({ where: { slug: { in: decisionSlugs } }, select: { slug: true, title: true } }) : [],
+  const [blogPosts, solutions, skills, terms, decisions, aiTools, mcps] = await Promise.all([
+    blogIds.length
+      ? db.blogPost.findMany({
+          where: { id: { in: blogIds } },
+          select: { id: true, title: true, slug: true, excerpt: true, viewCount: true, publishedAt: true },
+        })
+      : [],
+    solutionSlugs.length
+      ? db.solution.findMany({ where: { slug: { in: solutionSlugs } }, select: { slug: true, title: true, summary: true } })
+      : [],
+    skillSlugs.length
+      ? db.skill.findMany({ where: { slug: { in: skillSlugs } }, select: { slug: true, title: true } })
+      : [],
+    termSlugs.length
+      ? db.glossaryTerm.findMany({
+          where: { slug: { in: termSlugs } },
+          select: { slug: true, term: true, simpleExplanation: true },
+        })
+      : [],
+    decisionSlugs.length
+      ? db.decision.findMany({ where: { slug: { in: decisionSlugs } }, select: { slug: true, title: true } })
+      : [],
+    aiToolSlugs.length
+      ? db.aITool.findMany({
+          where: { slug: { in: aiToolSlugs } },
+          select: { slug: true, name: true, shortDescription: true },
+        })
+      : [],
+    mcpSlugs.length
+      ? db.mCPServer.findMany({
+          where: { slug: { in: mcpSlugs } },
+          select: { slug: true, name: true, description: true },
+        })
+      : [],
   ]);
 
-  const blogMap = Object.fromEntries(blogPosts.map(p => [p.id, p]));
-  const solutionMap = Object.fromEntries(solutions.map(s => [s.slug, s]));
-  const skillMap = Object.fromEntries(skills.map(s => [s.slug, s]));
-  const termMap = Object.fromEntries(terms.map(t => [t.slug, t]));
-  const decisionMap = Object.fromEntries(decisions.map(d => [d.slug, d]));
-
-  return <CollectionClient
-    items={JSON.parse(JSON.stringify(items))}
-    blogMap={JSON.parse(JSON.stringify(blogMap))}
-    solutionMap={JSON.parse(JSON.stringify(solutionMap))}
-    skillMap={JSON.parse(JSON.stringify(skillMap))}
-    termMap={JSON.parse(JSON.stringify(termMap))}
-    decisionMap={JSON.parse(JSON.stringify(decisionMap))}
-  />;
+  return (
+    <CollectionClient
+      items={JSON.parse(JSON.stringify(items))}
+      blogMap={JSON.parse(JSON.stringify(Object.fromEntries(blogPosts.map((p) => [p.id, p]))))}
+      solutionMap={JSON.parse(JSON.stringify(Object.fromEntries(solutions.map((s) => [s.slug, s]))))}
+      skillMap={JSON.parse(JSON.stringify(Object.fromEntries(skills.map((s) => [s.slug, s]))))}
+      termMap={JSON.parse(JSON.stringify(Object.fromEntries(terms.map((t) => [t.slug, t]))))}
+      decisionMap={JSON.parse(JSON.stringify(Object.fromEntries(decisions.map((d) => [d.slug, d]))))}
+      aiToolMap={JSON.parse(JSON.stringify(Object.fromEntries(aiTools.map((t) => [t.slug, t]))))}
+      mcpMap={JSON.parse(JSON.stringify(Object.fromEntries(mcps.map((m) => [m.slug, m]))))}
+    />
+  );
 }

@@ -31,7 +31,9 @@ const ROUTE_LABELS: Record<string, string> = {
   graph: 'Graph',
   services: 'Микросервисы',
   'saas-product': 'SaaS-продукт',
-      'telegram-bot': 'Telegram-бот',
+  'telegram-bot': 'Telegram-бот',
+  'premium-landing': 'Премиум-шаблон',
+  'avito-business': 'Авито-магазин',
   workspace: 'Рабочая зона',
 };
 
