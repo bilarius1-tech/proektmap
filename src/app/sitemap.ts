@@ -19,14 +19,14 @@ function pagePriority(href: string) {
   if (href === "/arsenal") return 0.85;
   if (href.startsWith("/arsenal/")) return href.includes("/tools/") ? 0.55 : 0.75;
   if (href.startsWith("/resheniya/")) return href.includes("workspace") ? 0.6 : 0.8;
-  if (["/blog", "/ai-tools", "/mcp", "/telegram", "/avito", "/services", "/ai-without-vpn", "/skills", "/glossary"].includes(href)) return 0.8;
+  if (["/blog", "/video", "/ai-tools", "/mcp", "/telegram", "/avito", "/services", "/ai-without-vpn", "/skills", "/glossary"].includes(href)) return 0.8;
   if (["/terms", "/privacy", "/offer", "/refund", "/contacts"].includes(href)) return 0.4;
   if (href === "/auth") return 0.3;
   return 0.7;
 }
 
 function pageFrequency(href: string): MetadataRoute.Sitemap[number]["changeFrequency"] {
-  if (href === "/blog") return "daily";
+  if (href === "/blog" || href === "/video") return "daily";
   if (href.startsWith("/demo/") || href.startsWith("/quest/") || href === "/auth") return "monthly";
   return "weekly";
 }

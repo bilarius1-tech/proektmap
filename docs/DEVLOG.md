@@ -2390,3 +2390,17 @@ main = master после merge. Коммит + push выполнены.
 
 День закрыт повторно после фиксов блога/главной и аудита трафика.
 main = master после merge. Коммит + push выполнены.
+
+## 2026-09-06 — VK Video хаб `/video`
+
+### Сделано
+- Синк каналов Craftum + club240887610 через VK API → `vk_videos`.
+- Хаб `/video`: фильтр, пагинация по 20, плеер в модалке, плохо→хорошо, CTA на premium-landing.
+- Виджет «Последние уроки» на главной; меню `header-video`; SITE_TREE + sitemap.
+- Docs: `docs/VK-VIDEO.md` (сервисный ключ). Cron: `scripts/vk-video-sync-wrapper.sh`.
+- Токен: `VK_SERVICE_TOKEN` в `.env` (не в git).
+
+## 2026-09-06 — Закрытие дня (контур video)
+
+День закрыт. Контур `/video` на проде.
+main = master после merge. Коммит + push выполнены.

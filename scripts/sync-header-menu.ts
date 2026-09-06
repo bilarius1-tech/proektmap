@@ -113,11 +113,33 @@ async function main() {
   });
   console.log("upsert header-ai-skills /ai-skills");
 
+  await db.menuItem.upsert({
+    where: { id: "header-video" },
+    create: {
+      id: "header-video",
+      label: "Видео",
+      href: "/video",
+      sortOrder: 6,
+      location: "header",
+      isActive: true,
+      parentId: null,
+    },
+    update: {
+      label: "Видео",
+      href: "/video",
+      location: "header",
+      isActive: true,
+      parentId: null,
+    },
+  });
+  console.log("upsert header-video /video");
+
   // Предпочтительный порядок корней шапки по href (остальные — после)
   const preferredHrefs = [
     "/resheniya",
     "/agent-engineering",
     "/ai-skills",
+    "/video",
     "/arsenal",
     "/avito",
     "/sitemap",

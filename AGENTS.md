@@ -83,6 +83,11 @@ rm -rf .next && npx next build && pm2 restart proektmap
 - Документация: `docs/VOICE-GUIDE.md`.
 - Skill создания аудиогидов: `.cursor/skills/voice-guide-author/SKILL.md`.
 
+### 5.3.1. VK Video (`/video`)
+- Каналы Craftum / уроки → кэш `vk_videos`, хаб `/video`, виджет на главной.
+- Токен: `VK_SERVICE_TOKEN` в `.env`, инструкция `docs/VK-VIDEO.md`.
+- Синк: `npm run vk:sync` или cron `scripts/vk-video-sync-wrapper.sh`.
+
 ### 5.4. Блог: квота и обзоры продуктов
 - Авто-публикация (drip): жёсткий лимит **1–2 поста/день** — env `BLOG_AUTO_PUBLISH_DAILY_LIMIT` (default `2`), код `src/lib/blog/daily-quota.ts`, эндпоинт `/api/blog/auto-publish`.
 - Редакционные правила новостей: AI-инжиниринг first (`src/lib/blog/relevance.ts`, `seo-pipeline.ts`), без seller-stretch, ссылки на `/resheniya` / `/services` / `/avito` и др. (не `/blueprints`).

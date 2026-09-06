@@ -18,7 +18,8 @@
     "voice:generate": "bash scripts/vaibik-voice/run.sh all",
     "voice:check": "node scripts/vaibik-voice/check.mjs",
     "voice:guides": "python3 scripts/generate-voice-guides.py --provider=yandex",
-    "voice:guides:edge": "python3 scripts/generate-voice-guides.py --provider=edge"
+    "voice:guides:edge": "python3 scripts/generate-voice-guides.py --provider=edge",
+    "vk:sync": "npx tsx --env-file=.env scripts/sync-vk-video.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",

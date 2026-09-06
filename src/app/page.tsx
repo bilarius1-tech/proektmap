@@ -3,10 +3,11 @@ import AnimatedHero from "@/components/hero/animated-hero";
 import ClaudeAcademyCallout from "@/components/academy/claude-academy-callout";
 import { CommunityPulseHero, CommunityStats } from "@/components/originkit/community-pulse";
 import Link from "next/link";
-import { ArrowRight, Map, Bot, Rocket, Route, Sparkles, Boxes, Compass, Plus, Flame, Eye, Layers, Crown, Lock, Wrench, Zap, Image as ImageIcon, Calculator, Code2 } from "lucide-react";
+import { ArrowRight, Map, Bot, Rocket, Route, Sparkles, Boxes, Compass, Plus, Flame, Eye, Layers, Crown, Lock, Wrench, Zap, Image as ImageIcon, Calculator, Code2, Play } from "lucide-react";
 import { UI_PATTERNS } from "@/app/ui-patterns/data";
 import { MICROSERVICES, normalizeMediaUrl } from "@/lib/services/data";
 import { getArsenalHubStats } from "@/lib/arsenal";
+import { formatDuration, VK_VIDEO_CHANNELS } from "@/lib/vk-video";
 import { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -38,6 +39,7 @@ export default async function Home() {
     latestTerms,
     patternMetas,
     microserviceMetas,
+    latestVideos,
   ] = await Promise.all([
     db.user.count(),
     db.aiProject.count({ where: { isPublished: true, moderationStatus: "approved" } }),
@@ -69,6 +71,12 @@ export default async function Home() {
     db.glossaryTerm.findMany({ where: { isPublished: true }, orderBy: { createdAt: "desc" }, take: 6, select: { term: true, slug: true, simpleExplanation: true, level: true } }),
     db.uiPatternMeta.findMany(),
     db.microserviceMeta.findMany(),
+    db.vkVideo.findMany({
+      where: { isPublished: true },
+      orderBy: { publishedAt: "desc" },
+      take: 4,
+      select: { id: true, title: true, thumbUrl: true, duration: true, views: true, publishedAt: true, vkUrl: true, channelSlug: true },
+    }).catch(() => [] as any[]),
   ]);
 
   // Если за 7 дней мало постов — добираем из 14 дней, чтобы блок не пустел
@@ -688,6 +696,74 @@ export default async function Home() {
 
       {/* 3 Content Blocks */}
       <div style={{ maxWidth: 960, margin: "0 auto", padding: "0 var(--space-m) var(--space-xl)" }}>
+        {/* Latest VK videos */}
+        {latestVideos.length > 0 && (
+          <div style={{ marginBottom: "var(--space-xl)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-m)" }}>
+              <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-l)", fontWeight: 700, margin: 0 }}>Последние уроки</h2>
+              <a href="/video" style={{ fontSize: "var(--text-xs)", color: "var(--color-accent)", textDecoration: "none", fontWeight: 600 }}>Все видео →</a>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "var(--space-m)" }}>
+              {latestVideos.map((v: any) => {
+                const ch = VK_VIDEO_CHANNELS.find((c) => c.slug === v.channelSlug);
+                return (
+                  <a
+                    key={v.id}
+                    href="/video"
+                    style={{
+                      textDecoration: "none",
+                      color: "inherit",
+                      border: "1px solid var(--color-border)",
+                      background: "var(--color-bg-primary)",
+                      display: "flex",
+                      flexDirection: "column",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <div style={{ position: "relative", aspectRatio: "16/9", background: "var(--color-bg-secondary)" }}>
+                      {v.thumbUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={v.thumbUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      ) : null}
+                      <span
+                        style={{
+                          position: "absolute",
+                          inset: 0,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          background: "rgba(0,0,0,0.2)",
+                        }}
+                      >
+                        <span style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(0,0,0,0.65)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}>
+                          <Play size={14} fill="#fff" />
+                        </span>
+                      </span>
+                      {v.duration > 0 && (
+                        <span style={{ position: "absolute", right: 6, bottom: 6, background: "rgba(0,0,0,0.75)", color: "#fff", fontSize: 10, fontWeight: 600, padding: "1px 5px" }}>
+                          {formatDuration(v.duration)}
+                        </span>
+                      )}
+                    </div>
+                    <div style={{ padding: "var(--space-m)" }}>
+                      <div style={{ fontSize: 10, fontWeight: 700, color: ch?.accent || "var(--color-text-tertiary)", marginBottom: 4 }}>
+                        {ch?.shortTitle || "VK Video"}
+                      </div>
+                      <div style={{ fontSize: "var(--text-xs)", fontWeight: 700, fontFamily: "var(--font-heading)", lineHeight: 1.35, marginBottom: 4 }}>
+                        {v.title}
+                      </div>
+                      <div style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>
+                        {v.publishedAt ? new Date(v.publishedAt).toLocaleDateString("ru") : ""}
+                        {v.views > 0 ? ` · ${v.views.toLocaleString("ru")}` : ""}
+                      </div>
+                    </div>
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Latest Posts */}
         {latestPosts.length > 0 && (
           <div style={{ marginBottom: "var(--space-xl)" }}>

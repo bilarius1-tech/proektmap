@@ -6,6 +6,7 @@ import { ChevronRight, Home } from 'lucide-react';
 
 // Route label map
 const ROUTE_LABELS: Record<string, string> = {
+  video: 'Видеоуроки',
   patterns: 'Паттерны',
   mcp: 'MCP-серверы',
   glossary: 'Глоссарий',

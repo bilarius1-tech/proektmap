@@ -187,6 +187,11 @@ export const SITE_TREE: SiteTreeGroup[] = [
         ],
       },
       {
+        title: "Видеоуроки",
+        href: "/video",
+        description: "Уроки с VK Video: Craftum Design и практика вайбкодинга",
+      },
+      {
         title: "AI Цех",
         href: "/ai-workshop",
         description: "Проекты, созданные с помощью AI",
