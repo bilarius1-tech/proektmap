@@ -2421,3 +2421,35 @@ main = master после merge. Коммит + push выполнены.
 
 ### Закрытие дня
 День закрыт. main = master после merge. Коммит + push.
+
+---
+
+## 07.09.2026 — Правила разработки с AI-агентами + стартовый шаблон
+
+### Сделано
+- Новый 4-й модуль трека «Инженерия агентов»: страница `/agent-engineering/rules` («Правила разработки»)
+- Кодекс AI-агента (7 правил), 8 фаз разработки (идея → бриф → ресёрч → PRD → дизайн → окружение → план → код → ревью/деплой), правила окружения, чек-лист приёмки
+- Дизайн-блок на странице: web-design-guidelines, taste-skill, impeccable (со ссылками на `/ai-skills/*`) + конспект Emil Kowalski «Adding Product Design»
+- Starter-kit в репозитории `starter-kit/`: AGENTS.md, commands/00–07, skills/ (4 дизайн-скилла), templates/, adapters/ (opencode/cursor/reasonix), scripts/sync-adapters.mjs, docs/rules.md, примеры outputs «Реверанс»
+- Архив `public/starter-kit/ai-project-starter.zip` + скрипт `scripts/build-starter-kit.mjs`
+- Общий шаг «Скачайте стартовый шаблон и прочитайте правила разработки» в `workspace-setup.ts` → виден во всех 4 решениях `/resheniya`
+- SEO: SITE_TREE + sitemap + metadata/canonical; `validate:sitemap` PASS
+- Меню: пункт «Правила разработки» под «Инженерия агентов» (MenuItem `header-agent-engineering-rules`)
+
+### Источники
+- `mini-course-env` (OpenCode): команды brief/research/prd, шаблон PRD, ideas.md, кейс «Реверанс»
+
+### Проверка
+- `next build` — OK; `pm2 restart proektmap` — online
+- Smoke HTTP 200: `/agent-engineering`, `/agent-engineering/rules`, `/resheniya`, `/resheniya/*/workspace`, `/starter-kit/ai-project-starter.zip`
+- Архив: 77 файлов
+
+### Точка отката
+- Коммит `36e80aa4` на `main` = `master`, push в origin (main + master)
+
+### Следующие шаги
+- Заменить конденсаты скиллов Anthropic на оригинальные тексты, когда появятся источники
+- Расширить starter-kit под конкретные стеки решений (SaaS / бот / Авито / лендинг)
+
+### Закрытие дня
+День закрыт. main = master после merge. Коммит + push.
