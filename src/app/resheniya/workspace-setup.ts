@@ -29,6 +29,13 @@ const agentEngRef: GuidedReference = {
   description: "Harness → Loop → Graph: как строить окружение и общение с агентом",
 };
 
+const rulesRef: GuidedReference = {
+  kind: "Паттерн",
+  label: "Правила разработки",
+  href: "/agent-engineering/rules",
+  description: "Кодекс AI-агента, 8 фаз разработки и стартовый шаблон проекта",
+};
+
 const rfRef: GuidedReference = {
   kind: "Инструмент",
   label: "AI без VPN",
@@ -211,6 +218,11 @@ export function makeBeginnerWorkspaceStep(options: WorkspaceSetupOptions = {}): 
       text: "Шаг «Оплата из РФ» должен быть пройден: карта Плати по миру, вход в Cursor через свой GitHub, Pro в Billing. До этого не запускайте Agent и не копируйте команды проекта — агент упрётся в billing.",
     },
     {
+      title: "Скачайте стартовый шаблон и прочитайте правила разработки",
+      text: "Со страницы «Правила разработки» скачайте ai-project-starter.zip. Внутри: AGENTS.md (кодекс агента), 8 команд-фаз от брифа до деплоя и дизайн-скиллы (web-design-guidelines, taste-skill, impeccable). Шаблон одинаков для всех решений — идею и стек подставите в нужной фазе.",
+      command: "https://proektmap.ru/agent-engineering/rules",
+    },
+    {
       title: "Сверьтесь с таблицами: инструмент, локально/SSH, как писать агенту",
       text: "На карточке шага три блока. 1) Cursor / Reasonix / OpenCode. 2) Локально или SSH по этапам. 3) Мост Harness → Loop → Graph — как общаться с агентом (плохо→хорошо) со ссылкой на /agent-engineering.",
     },
@@ -260,6 +272,7 @@ export function makeBeginnerWorkspaceStep(options: WorkspaceSetupOptions = {}): 
   );
 
   const success = [
+    "Скачан стартовый шаблон и понятны 8 фаз разработки",
     "Понятны Cursor / Reasonix / OpenCode и локально vs SSH",
     "Понятны Harness → Loop → Graph как способ писать агенту",
     "Выбран основной инструмент (рекомендуем Cursor) и он установлен",
@@ -302,7 +315,7 @@ export function makeBeginnerWorkspaceStep(options: WorkspaceSetupOptions = {}): 
     success,
     artifact: "Выбранная платформа + карта локально/SSH + мост Harness/Loop/Graph",
     terms: ["Cursor", "Reasonix", "OpenCode", "Harness", "Loop", "Graph", "AGENTS.md", "SSH", "Deploy"],
-    references: [cursorRef, reasonixRef, opencodeRef, agentEngRef, rfRef, hostingRef],
+    references: [cursorRef, reasonixRef, opencodeRef, agentEngRef, rulesRef, rfRef, hostingRef],
   };
 }
 

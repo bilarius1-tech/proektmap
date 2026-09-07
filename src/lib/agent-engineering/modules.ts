@@ -255,10 +255,90 @@ export const MODULES: AgentModule[] = [
       { label: "Агент-кодер / вайбкодинг", href: "/arsenal/vibe-coder" },
       { label: "Skills ProektMap", href: "/skills", note: "Каталог сценариев" },
     ],
-    nextSlug: null,
+    nextSlug: "rules",
     seoTitle: "Graph Engineering — карта связей и агент | ProektMap",
     seoDescription:
       "Graph engineering: граф зависимостей, graphify, update и осторожный self-rewrite skills только с разрешения. Окружение агента вместо портянки контекста.",
+  },
+  {
+    slug: "rules",
+    order: 4,
+    enLabel: "Rules of Development",
+    title: "Правила разработки — кодекс и стартовый шаблон",
+    shortTitle: "Правила разработки",
+    summary:
+      "Кодекс AI-агента, 8 фаз от идеи до деплоя и стартовый шаблон проекта. Скачайте шаблон, положите идею и ведите разработку по правилам — в OpenCode, Cursor или Reasonix.",
+    heroLead:
+      "Старт — это не «сделай классный SaaS». Это шаблон, идея и восемь фаз.",
+    accent: "#7c3aed",
+    whatItIs: [
+      "Правила разработки — это кодекс для агента и маршрут для человека: 7 правил, 8 фаз и стартовый шаблон.",
+      "Шаблон закрывает весь путь: бриф → ресёрч → PRD → дизайн → окружение → план → код → ревью и деплой.",
+      "Работает в OpenCode, Cursor и Reasonix: команды нейтральные, адаптеры лежат в папке adapters/.",
+    ],
+    driveCatchTitle: "Что ведёт разработку и что её останавливает",
+    driveCatch: [
+      {
+        drive: "Идея в inputs/idea.md → команда фазы → артефакт в outputs/ → следующая фаза",
+        catch: "Кодекс AGENTS.md: инкременты, запрет выдумывания, стоп после 3 неудачных попыток",
+        example:
+          "«Сделай классный SaaS» — плохо. «Положи идею, запусти /brief, покажи outputs/brief.md» — правильно.",
+      },
+    ],
+    parts: [
+      { name: "AGENTS.md", role: "Закон проекта: всегда / никогда" },
+      { name: "commands/ (8 фаз)", role: "Порядок работы: не прыгать к коду" },
+      { name: "skills/ (дизайн)", role: "Визуальный язык до кода" },
+      { name: "templates/", role: "Заготовки брифа, PRD, плана" },
+      { name: "outputs/", role: "Артефакты фаз и приёмка" },
+      { name: "adapters/", role: "Команды под OpenCode / Cursor / Reasonix" },
+    ],
+    checklist: [
+      { label: "Скачан стартовый шаблон", hint: "/starter-kit/ai-project-starter.zip" },
+      { label: "Идея лежит в inputs/idea.md", hint: "Своими словами, одна идея" },
+      { label: "Первая команда запущена в своей среде", hint: "/brief или аналог" },
+      { label: "Агент читал AGENTS.md до работы", hint: "Спросите: какие там стоп-правила?" },
+      { label: "Дизайн-скиллы применены до кода", hint: "outputs/ui-kit.md существует" },
+      { label: "Каждый шаг плана закрыт коммитом", hint: "Шаг → проверка → коммит" },
+    ],
+    prompts: [
+      {
+        level: "новичок",
+        title: "Правильный старт",
+        prompt: `Скачай стартовый шаблон с https://proektmap.ru/starter-kit/ai-project-starter.zip
+Положи свою идею в inputs/idea.md.
+Запусти команду brief и веди меня по фазам.`,
+      },
+      {
+        level: "средний вайбкодер",
+        title: "Старт чужого проекта по правилам",
+        prompt: `Возьми идею из ideas.md. Прогони фазы 0–4:
+brief → research → prd → design → setup.
+На фазе design примени skills/web-design-guidelines.md и taste-skill.md.
+Покажи outputs/ после каждой фазы.`,
+      },
+    ],
+    definitionOfDone: [
+      "Стартовый шаблон скачан и открыт в своей среде",
+      "Идея в inputs/idea.md, фаза brief пройдена",
+      "Понимаете порядок 8 фаз и стоп-правила кодекса",
+    ],
+    artifact: "Скачанный стартовый шаблон + outputs/brief.md после первого прогона",
+    afterTrackAnswers: [
+      "Почему «сделай классный SaaS» — не старт?",
+      "Что лежит в inputs/, commands/, outputs/?",
+      "Зачем дизайн-скиллы до кода?",
+      "Как работает шаблон в OpenCode / Cursor / Reasonix?",
+    ],
+    arsenalLinks: [
+      { label: "Стартовый шаблон (zip)", href: "/starter-kit/ai-project-starter.zip", note: "Скачать и открыть" },
+      { label: "Готовые решения AI", href: "/resheniya", note: "4 маршрута: SaaS, бот, Авито, лендинг" },
+      { label: "AI Engineering Skills", href: "/ai-skills", note: "Дизайн-кластер и Recipe" },
+    ],
+    nextSlug: null,
+    seoTitle: "Правила разработки с AI-агентами — кодекс и шаблон | ProektMap",
+    seoDescription:
+      "Кодекс AI-агента, 8 фаз разработки, дизайн-скиллы Anthropic и стартовый шаблон проекта для OpenCode, Cursor и Reasonix.",
   },
 ];
 

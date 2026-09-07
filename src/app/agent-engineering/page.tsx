@@ -8,6 +8,7 @@ import {
   Layers,
   Network,
   RefreshCw,
+  ScrollText,
   Shield,
 } from "lucide-react";
 import { MODULES, TRACK } from "@/lib/agent-engineering";
@@ -35,6 +36,7 @@ const moduleIcons = {
   harness: Shield,
   loop: RefreshCw,
   graph: Network,
+  rules: ScrollText,
 } as const;
 
 export default function AgentEngineeringHubPage() {
@@ -213,7 +215,7 @@ export default function AgentEngineeringHubPage() {
               letterSpacing: "0.04em",
             }}
           >
-            Лестница из трёх ступеней
+            Лестница из четырёх ступеней
           </p>
           <h2
             id="modules-title"

@@ -48,6 +48,7 @@ export const SITE_TREE: SiteTreeGroup[] = [
           { title: "Harness — каркас вокруг модели", href: "/agent-engineering/harness" },
           { title: "Loop — цикл с проверкой", href: "/agent-engineering/loop" },
           { title: "Graph — карта системы", href: "/agent-engineering/graph" },
+          { title: "Правила разработки", href: "/agent-engineering/rules" },
         ],
       },
       {

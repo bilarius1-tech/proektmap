@@ -1,4 +1,4 @@
-export type AgentModuleSlug = "harness" | "loop" | "graph";
+export type AgentModuleSlug = "harness" | "loop" | "graph" | "rules";
 
 export type DriveCatchPair = {
   drive: string;
