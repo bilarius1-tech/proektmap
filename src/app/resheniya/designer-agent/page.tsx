@@ -26,8 +26,8 @@ export const metadata: Metadata = {
 const mediaItems = [
   {
     src: "/uploads/designer-agent/01-agent-figma-system.png",
-    caption: "Агент читает Figma: компоненты, стили, токены — и собирает новые экраны внутри вашей системы.",
-    alt: "Агент подключён к Figma и видит структуру файла",
+    caption: "Агент читает Figma через MCP: компоненты, стили, токены — и следует им, когда собирает экраны в прототипе и коде.",
+    alt: "Агент читает файл Figma и видит структуру системы",
   },
   {
     src: "/uploads/designer-agent/02-figma-audit-list.png",
@@ -41,8 +41,8 @@ const mediaItems = [
   },
   {
     src: "/uploads/designer-agent/04-prototype-figma-layers.png",
-    caption: "Проверенное решение переносится в Figma слоями — внутри системы.",
-    alt: "Перенос прототипа в Figma слоями",
+    caption: "Из прототипа агент готовит структуру и чек-лист; перенос в Figma — плагином или руками, сверку делает агент.",
+    alt: "Подготовка переноса прототипа в Figma по структуре",
   },
   {
     src: "/uploads/designer-agent/05-mcp-scheme.png",
@@ -83,7 +83,7 @@ export default function DesignerAgentSolutionPage() {
             <h1>AI-агенты для дизайнера</h1>
             <p>
               {guidedDesignerAgentSolution.subtitle}. Не генератор картинок и не чат в браузере —
-              агент читает ваши файлы, работает в Figma через MCP и собирает живой прототип.
+              агент читает ваши файлы и Figma через MCP, следует дизайн-системе и собирает живой прототип.
             </p>
             <div className="solution-detail-meta">
               <span><Route size={16} /> {guidedDesignerAgentSolution.steps.length} готовых шагов</span>
@@ -106,8 +106,8 @@ export default function DesignerAgentSolutionPage() {
             <div className="solution-result-checks">
               {[
                 "Живой прототип продукта из текстового брифа",
-                "Агент подключён к Figma через MCP",
-                "Новые экраны собираются внутри вашей дизайн-системы",
+                "Агент читает Figma через MCP и следует вашей дизайн-системе",
+                "Структура и чек-лист переноса прототипа в Figma",
                 "Аудит макетов на расхождения — списком за минуты",
               ].map((item) => <div key={item}><Check size={16} /> {item}</div>)}
             </div>
