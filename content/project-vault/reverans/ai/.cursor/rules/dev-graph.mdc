@@ -1,0 +1,43 @@
+---
+description: Dev Graph — порядок работ и зависимости по ТЗ
+alwaysApply: true
+---
+
+# Dev Graph (правила разработки)
+
+Визуальный граф: canvas `dev-graph.canvas.tsx` в проекте Cursor.
+
+## Узлы и зависимости (не нарушать порядок без причины)
+
+```
+D1 Landing home/about
+  → D2 Landing prices/contacts + adaptive
+    → D3 Auth (Yandex + email)
+      → D4 Parent cabinet (children)
+        → D5 Documents sign
+          → D6 Payment UI
+            → D7 TBank acquire + webhook
+      → D8 Admin groups/children/coaches
+        → D9 Admin payments/docs/export
+          → D10 QA + polish → Launch
+```
+
+Параллельно после D3 можно вести D8 (админ) рядом с D4–D7, но **платежи админки (D9) после D7**.
+
+## Definition of Done по дню
+
+| День | DoD |
+|------|-----|
+| 1–2 | Страницы лендинга = `tz/outputs/landing/*`, mobile OK, harness green |
+| 3 | Login/register + session; роли parent/admin/coach в схеме |
+| 4 | Родитель видит детей (CRUD минимальный) |
+| 5 | Договор pending→signed |
+| 6 | Сумма со скидкой, статус месяца |
+| 7 | Init + webhook → status paid; без секретов на клиенте |
+| 8 | Админ CRUD групп/детей/педагогов |
+| 9 | Таблица платежей + экспорт |
+| 10 | Harness + ручной сценарий родитель→оплата зелёные |
+
+## Loop дисциплина
+
+На тике Loop: harness. На завершении дня: обновить статус в canvas/Dev Graph (день N done) только после DoD.

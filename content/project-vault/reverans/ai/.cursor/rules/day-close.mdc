@@ -1,0 +1,18 @@
+---
+description: Day close — DEVLOG, commit, push discipline
+alwaysApply: true
+---
+
+# Закрытие дня
+
+Когда пользователь просит «закрой день» / «закрытие дня» / «commit + push + devlog»:
+
+1. Обновить `docs/DEVLOG.md` (сделано / harness / осталось / дата / блок **Сейчас**).  
+2. Дописать запись дня в `docs/DAILY_JOURNAL.md`.  
+3. Прочитать `docs/DEVELOPMENT.md` — не нарушать.  
+4. `git status` + `git diff` — не коммитить `.env`, `secrets/`, ключи.  
+5. Коммит с понятным сообщением (why).  
+6. `git push`, если remote есть и пользователь просил push/закрытие дня.  
+7. Краткий отчёт: что в DEVLOG/журнале, hash коммита, URL remote.
+
+Перед работой дня — сначала DEVLOG «Сейчас», не начинать музыку/дизайн ради дизайна вне приоритета.

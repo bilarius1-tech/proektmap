@@ -1,0 +1,109 @@
+{
+  "manifestVersion": "1.0",
+  "id": "reverans",
+  "slug": "reverans",
+  "name": "Реверанс",
+  "tagline": "Платформа студии художественной гимнастики: лендинг, ЛК родителя, админка, договоры, ТБанк",
+  "sourceUrl": "https://reverans.online",
+  "createdAt": "2026-09-08",
+  "dnaVersion": "1.0.0",
+  "derivedFrom": null,
+  "clientBoundary": {
+    "piiExcluded": true,
+    "secretsExcluded": true,
+    "customerDataExcluded": true,
+    "notes": "Schema-only DB; no parent/child rows; admin email and client legal name redacted"
+  },
+  "stack": {
+    "framework": "Next.js App Router",
+    "language": "TypeScript",
+    "ui": "Tailwind CSS",
+    "orm": "Prisma",
+    "db": "PostgreSQL",
+    "auth": "NextAuth (Yandex + email)",
+    "payments": "TBank acquiring",
+    "hosting": "VPS + Nginx + PM2"
+  },
+  "ai": {
+    "harness": true,
+    "loop": true,
+    "graph": true,
+    "agentsMd": true,
+    "cursorRules": true,
+    "skills": [],
+    "prompts": [
+      "day-close",
+      "harness-tick",
+      "client-qa",
+      "client-parent-qa"
+    ],
+    "decisions": [
+      "001-vps-not-vercel",
+      "002-tbank-secret-file",
+      "003-day-close-devlog"
+    ]
+  },
+  "artifacts": {
+    "sourceArchive": "source/source-code.tar.gz",
+    "schema": "database/schema.prisma",
+    "migrations": "database/migrations/",
+    "dbBackup": "database/database-backup.sql",
+    "nginx": "infrastructure/nginx/",
+    "pm2": "infrastructure/pm2/",
+    "deploy": "infrastructure/deploy/",
+    "docs": "docs/",
+    "ai": "ai/"
+  },
+  "reusable": {
+    "patterns": [
+      "vps-pm2-nginx-next",
+      "day-close-devlog",
+      "harness-healthcheck",
+      "dev-graph-dod",
+      "tbank-secret-file",
+      "rsync-exclude-uploads"
+    ],
+    "skills": [],
+    "rules": [
+      "00-start-here",
+      "harness",
+      "day-close",
+      "dev-graph",
+      "development",
+      "reverans-product"
+    ]
+  },
+  "arsenalCandidates": [
+    {
+      "slug": "vps-pm2-nginx-next",
+      "title": "VPS + PM2 + Nginx Next.js deploy",
+      "reason": "Repeatable studio/SaaS deploy without Vercel"
+    },
+    {
+      "slug": "harness-loop-healthcheck",
+      "title": "Shell harness + 15m Loop",
+      "reason": "Agent-visible health contract for production"
+    },
+    {
+      "slug": "day-close-devlog",
+      "title": "Day-close DEVLOG ritual",
+      "reason": "Cross-chat priority continuity for agents"
+    }
+  ],
+  "urls": {
+    "production": "https://reverans.online",
+    "vault": "https://proektmap.ru/project-vault/reverans"
+  },
+  "hosts": {
+    "sshHost": "159.194.228.226",
+    "appPath": "/var/www/reverans/web",
+    "workspacePath": "/root/projects/reverans",
+    "pm2": "reverans"
+  },
+  "links": {
+    "agentEngineering": "/agent-engineering",
+    "aiSkills": "/ai-skills",
+    "arsenal": "/arsenal",
+    "resheniya": "/resheniya"
+  }
+}

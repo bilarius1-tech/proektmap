@@ -114,6 +114,48 @@ async function main() {
   console.log("upsert header-ai-skills /ai-skills");
 
   await db.menuItem.upsert({
+    where: { id: "header-project-vault" },
+    create: {
+      id: "header-project-vault",
+      label: "Project Vault",
+      href: "/project-vault",
+      sortOrder: 5,
+      location: "header",
+      isActive: true,
+      parentId: null,
+    },
+    update: {
+      label: "Project Vault",
+      href: "/project-vault",
+      location: "header",
+      isActive: true,
+      parentId: null,
+    },
+  });
+  console.log("upsert header-project-vault /project-vault");
+
+  await db.menuItem.upsert({
+    where: { id: "header-project-vault-reverans" },
+    create: {
+      id: "header-project-vault-reverans",
+      label: "Реверанс",
+      href: "/project-vault/reverans",
+      sortOrder: 0,
+      location: "header",
+      isActive: true,
+      parentId: "header-project-vault",
+    },
+    update: {
+      label: "Реверанс",
+      href: "/project-vault/reverans",
+      location: "header",
+      isActive: true,
+      parentId: "header-project-vault",
+    },
+  });
+  console.log("upsert header-project-vault-reverans");
+
+  await db.menuItem.upsert({
     where: { id: "header-video" },
     create: {
       id: "header-video",
@@ -139,6 +181,7 @@ async function main() {
     "/resheniya",
     "/agent-engineering",
     "/ai-skills",
+    "/project-vault",
     "/video",
     "/arsenal",
     "/avito",

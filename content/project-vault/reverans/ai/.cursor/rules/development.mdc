@@ -1,0 +1,13 @@
+---
+description: Core development workflow for Reverans
+alwaysApply: true
+---
+
+# Development workflow
+
+- Read `docs/DEVLOG.md` (priority) and `docs/DEVELOPMENT.md` before coding.  
+- Product truth: `tz/outputs/TZ_reverance.md` + PRD/wireframes/UI kit.  
+- Deploy on this host: `npm run build` in `web/` → `pm2 restart reverans --update-env`.  
+- After feature: run `./harness/check-service.sh --quiet`.  
+- Secrets only in `web/.env` / `secrets/` (gitignored).  
+- Day close: update DEVLOG → commit → push when asked.

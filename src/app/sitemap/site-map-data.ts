@@ -64,6 +64,12 @@ export const SITE_TREE: SiteTreeGroup[] = [
           { title: "Impeccable", href: "/ai-skills/impeccable" },
         ],
       },
+      {
+        title: "Project Vault",
+        href: "/project-vault",
+        description: "Инженерные капсулы: DNA + Snapshot без секретов",
+        children: [{ title: "Реверанс", href: "/project-vault/reverans" }],
+      },
       { title: "Поиск", href: "/search", description: "Поиск по знаниям, инструментам и материалам" },
       { title: "Карта сайта", href: "/sitemap", description: "Полное дерево публичных разделов" },
       { title: "Тарифы", href: "/pricing" },

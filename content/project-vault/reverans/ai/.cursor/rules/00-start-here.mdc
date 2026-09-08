@@ -1,0 +1,16 @@
+---
+description: New agent must read START_HERE and DEVLOG first
+alwaysApply: true
+---
+
+# Новый агент — не теряйся
+
+Перед любым кодом в этом репо:
+
+1. Прочитай `START_HERE.md`  
+2. Прочитай `docs/DEVLOG.md` (блок **Сейчас**)  
+3. При смене контекста / новом чате — `docs/AGENT_HANDOFF.md`
+
+Production крутится на VPS (`deploy@159.194.228.226:/var/www/reverans`), не только в workspace.  
+Секреты не коммитить. Дизайн не важнее рабочего `/admin`, пока клиент не дал фидбек.  
+Закрытие дня: DEVLOG → commit → push (если просят).

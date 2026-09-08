@@ -1,0 +1,69 @@
+---
+description: Reverans product rules from TZ — always apply
+alwaysApply: true
+---
+
+# СКХГ «Реверанс» (reverans.online)
+
+Источник истины по продукту:
+- `tz/outputs/TZ_reverance.md`
+- `tz/outputs/prd_reverance.md`
+- `tz/outputs/ui_kit_reverance.md`
+- `tz/outputs/wireframes_reverance.md`
+- `tz/outputs/landing/` + `prototype_reverance.html`
+
+Публично: https://reverans.online/tz/outputs/
+
+## Продукт
+
+Платформа студии художественной гимнастики:
+- **Родитель** — кабинет, дети, договоры, оплата ТБанк
+- **Админ** — группы, дети, платежи, документы, педагоги
+- **Педагог** — свои группы и дети (без лишнего)
+
+## Стек (как в ТЗ, с адаптацией инфры)
+
+| ТЗ | На этом VPS |
+|----|-------------|
+| Next.js 14+ App Router + TS + Tailwind | `/var/www/reverans/web` (уже) |
+| Prisma + PostgreSQL | ставить при старте бэкенда (день 3+) |
+| NextAuth (Яндекс ID + email/password) | по ТЗ |
+| ТБанк эквайринг | секреты только в `.env` |
+| Vercel / Supabase / R2 | **не использовать** — PM2 + Nginx + этот VPS; файлы локально или S3-совместимое позже |
+
+Домен продукта: **reverans.online** (в ТЗ местами `reverance.ru` — игнорировать в пользу reverans.online).
+
+## Дизайн-система (обязательно)
+
+CSS variables из ТЗ:
+- primary `#7DD3D3`, secondary `#F5F0E8`, text `#4A3728`, accent `#C9A96E`
+- success `#8ED1B0`, error `#E88B8B`, border `#E0D8CF`
+- Заголовки: Montserrat; логотип/декор: Cormorant Garamond
+- Радиусы: кнопки 16px, карточки 20px, инпуты 12px, модалки 24px
+
+Ориентир вёрстки: `tz/outputs/landing/` и `ui_kit_reverance.md`. Не подменять Tiffany/бежевый на «дефолтный AI purple».
+
+## График (10 дней) — не перескакивать
+
+1–2 Landing → 3 Auth → 4 Parent children → 5 Documents → 6–7 Payments/TBank → 8–9 Admin → 10 Polish
+
+Перед фичей перечитай соответствующий кусок ТЗ + wireframes.
+
+## Запреты
+
+- Секреты в git/чате/README (`TBANK_*`, `YANDEX_*`, `DATABASE_URL`, `NEXTAUTH_SECRET`)
+- Платежи без webhook + проверка подписи ТБанк
+- Ломать ISPmanager / UFW без подтверждения
+- Production через `npm run dev`
+- Выдумывать экраны вне ТЗ без согласования
+
+## После изменений приложения
+
+```bash
+cd /root/projects/reverans && ./deploy/rsync-web.sh
+# на VPS:
+cd /var/www/reverans/web && NODE_OPTIONS=--max-old-space-size=2048 npm run build && pm2 restart reverans --update-env
+./harness/check-service.sh --quiet
+```
+
+Никогда не `rsync --delete` без `--exclude public/uploads/` и `--exclude storage/` — сотрётся галерея.

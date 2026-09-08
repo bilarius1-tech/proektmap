@@ -1,0 +1,13 @@
+---
+description: Reverans service harness + loop discipline
+alwaysApply: true
+---
+
+# Harness & Loop
+
+- Health source of truth: `harness/check-service.sh`
+- Before claiming the server is healthy, run the harness (or read `harness/reports/latest.txt` if fresher than ~20m).
+- On Loop ticks: run `./harness/check-service.sh --quiet`, report SUMMARY + any FAIL/WARN only. Do not reinstall packages or change SSH/firewall unless FAIL requires a fix and the user asked for remediation.
+- Must stay green: `https://reverans.online/api/health` and `https://reverans.online/tz/outputs/TZ_reverance.md`
+- Never put secrets from harness output into git commits.
+- Product order: follow Dev Graph (D1→D10). After app features ship, extend `HARNESS_PROBE_PATHS` in `harness/config.env`.

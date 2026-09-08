@@ -1,0 +1,271 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  parent
+  admin
+  coach
+}
+
+enum DocumentType {
+  contract
+  consent
+  medical_clearance
+}
+
+enum DocumentStatus {
+  pending
+  signed
+  expired
+}
+
+enum PaymentType {
+  monthly
+  individual
+}
+
+enum PaymentStatus {
+  pending
+  paid
+  failed
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String?  @map("password_hash")
+  name         String
+  phone        String?
+  role         Role     @default(parent)
+  yandexId     String?  @unique @map("yandex_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  children            Child[]
+  paymentBatches      PaymentBatch[]
+  coachedGroups       Group[]              @relation("GroupCoach")
+  coachedGroupsSecond Group[]              @relation("GroupCoach2")
+  individualTrainings IndividualTraining[] @relation("CoachTrainings")
+
+  @@map("users")
+}
+
+model Group {
+  id           String   @id @default(cuid())
+  name         String
+  coachId      String?  @map("coach_id")
+  coach2Id     String?  @map("coach2_id")
+  defaultPrice Decimal  @default(0) @map("default_price") @db.Decimal(10, 2)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  coach    User?  @relation("GroupCoach", fields: [coachId], references: [id], onDelete: SetNull)
+  coach2   User?  @relation("GroupCoach2", fields: [coach2Id], references: [id], onDelete: SetNull)
+  children Child[]
+
+  @@map("groups")
+}
+
+model Child {
+  id             String    @id @default(cuid())
+  /// null = зачислен админом, родитель ещё не привязался
+  userId         String?   @map("user_id")
+  fullName       String    @map("full_name")
+  dateOfBirth    DateTime? @map("date_of_birth") @db.Date
+  groupId        String?   @map("group_id")
+  pricePerMonth  Decimal   @default(0) @map("price_per_month") @db.Decimal(10, 2)
+  discount       Decimal   @default(0) @db.Decimal(10, 2)
+  discountReason String?   @map("discount_reason")
+  /// Бюджетное место: в списках/документах есть, абонемент не оплачивается
+  isBudget       Boolean   @default(false) @map("is_budget")
+  /// Код для родителя: «Привязать ребёнка» в ЛК (очищается после привязки)
+  inviteCode     String?   @unique @map("invite_code")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  parent              User?                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  group               Group?               @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  documents           Document[]
+  payments            Payment[]
+  individualTrainings IndividualTraining[]
+
+  @@map("children")
+}
+
+model Document {
+  id           String         @id @default(cuid())
+  childId      String         @map("child_id")
+  type         DocumentType
+  status       DocumentStatus @default(pending)
+  fileUrl      String?        @map("file_url")
+  fileThumbUrl String?        @map("file_thumb_url")
+  fileName     String?        @map("file_name")
+  signedAt     DateTime?      @map("signed_at")
+  expiresAt    DateTime?      @map("expires_at")
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @updatedAt @map("updated_at")
+
+  child Child @relation(fields: [childId], references: [id], onDelete: Cascade)
+
+  @@map("documents")
+}
+
+model Payment {
+  id             String        @id @default(cuid())
+  childId        String        @map("child_id")
+  batchId        String?       @map("batch_id")
+  type           PaymentType
+  amount         Decimal       @db.Decimal(10, 2)
+  month          String?
+  status         PaymentStatus @default(pending)
+  tbankPaymentId String?       @map("tbank_payment_id")
+  paidAt         DateTime?     @map("paid_at")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  child               Child                @relation(fields: [childId], references: [id], onDelete: Cascade)
+  batch               PaymentBatch?        @relation(fields: [batchId], references: [id], onDelete: SetNull)
+  individualTrainings IndividualTraining[]
+
+  @@map("payments")
+}
+
+/// Одна оплата родителя за несколько детей (абонемент за месяц).
+model PaymentBatch {
+  id             String        @id @default(cuid())
+  parentUserId   String        @map("parent_user_id")
+  month          String?
+  amount         Decimal       @db.Decimal(10, 2)
+  status         PaymentStatus @default(pending)
+  tbankPaymentId String?       @map("tbank_payment_id")
+  paidAt         DateTime?     @map("paid_at")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  parent   User      @relation(fields: [parentUserId], references: [id], onDelete: Cascade)
+  payments Payment[]
+
+  @@index([parentUserId, month])
+  @@map("payment_batches")
+}
+
+model IndividualTraining {
+  id        String   @id @default(cuid())
+  childId   String   @map("child_id")
+  coachId   String   @map("coach_id")
+  /// Одинаковый id у занятий одного пакета (null = разовая)
+  packageId String?  @map("package_id")
+  date      DateTime @db.Date
+  time      String
+  price     Decimal  @db.Decimal(10, 2)
+  paymentId String?  @map("payment_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  child   Child    @relation(fields: [childId], references: [id], onDelete: Cascade)
+  coach   User     @relation("CoachTrainings", fields: [coachId], references: [id], onDelete: Cascade)
+  payment Payment? @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+
+  @@index([packageId])
+  @@map("individual_trainings")
+}
+
+/// Singleton (id = "default") — contacts, analytics, brand labels
+model SiteSettings {
+  id                 String   @id @default("default")
+  brandName          String   @map("brand_name") @default("Reverence")
+  brandNameRu        String   @map("brand_name_ru") @default("Реверанс")
+  tagline            String   @default("Спортивный клуб художественной гимнастики")
+  city               String   @default("Москва")
+  address            String   @default("ул. Судостроительная, 44 стр. 1")
+  phoneDisplay       String   @map("phone_display") @default("+7 (999) 623-13-01")
+  phoneHref          String   @map("phone_href") @default("tel:+79996231301")
+  email              String?
+  telegram           String?  @default("@sc_reverence_rg")
+  telegramHref       String?  @map("telegram_href") @default("https://t.me/sc_reverence_rg")
+  whatsappHref       String?  @map("whatsapp_href") @default("https://wa.me/79996231301")
+  instagramHref      String?  @map("instagram_href") @default("https://www.instagram.com/sc_reverence_rg")
+  vkHref             String?  @map("vk_href")
+  youtubeHref        String?  @map("youtube_href")
+  logoUrl            String?  @map("logo_url") @default("/brand/logo.png")
+  faviconUrl         String?  @map("favicon_url")
+  ogImageUrl         String?  @map("og_image_url")
+  footerAbout        String?  @map("footer_about")
+  copyrightText      String?  @map("copyright_text")
+  yandexMetrikaId    String?  @map("yandex_metrika_id")
+  yandexMetrikaOn    Boolean  @map("yandex_metrika_on") @default(false)
+  yandexWebvisor     Boolean  @map("yandex_webvisor") @default(true)
+  yandexVerification String?  @map("yandex_verification")
+  googleAnalyticsId  String?  @map("google_analytics_id")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  @@map("site_settings")
+}
+
+model PageSeo {
+  id          String   @id @default(cuid())
+  path        String   @unique
+  title       String
+  description String
+  h1          String?
+  ogTitle     String?  @map("og_title")
+  ogDescription String? @map("og_description")
+  ogImageUrl  String?  @map("og_image_url")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("page_seo")
+}
+
+/// Editable page sections: home.hero, home.why, page.about, …
+model SiteSection {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  label     String
+  enabled   Boolean  @default(true)
+  data      Json
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("site_sections")
+}
+
+model MediaAsset {
+  id           String   @id @default(cuid())
+  filename     String
+  url          String
+  thumbUrl     String?  @map("thumb_url")
+  mimeType     String   @map("mime_type")
+  sizeBytes    Int      @map("size_bytes")
+  width        Int?
+  height       Int?
+  alt          String   @default("")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  galleryItems GalleryItem[]
+
+  @@map("media_assets")
+}
+
+model GalleryItem {
+  id        String   @id @default(cuid())
+  mediaId   String   @map("media_id")
+  caption   String   @default("")
+  alt       String   @default("")
+  category  String   @default("Клуб")
+  sortOrder Int      @default(0) @map("sort_order")
+  published Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  media MediaAsset @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@map("gallery_items")
+}
