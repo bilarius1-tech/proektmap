@@ -2453,3 +2453,30 @@ main = master после merge. Коммит + push выполнены.
 
 ### Закрытие дня
 День закрыт. main = master после merge. Коммит + push.
+
+---
+
+## 08.09.2026 — 5-й маршрут /resheniya: «AI-агенты для дизайнера»
+
+### Сделано
+- Новый 5-й готовый маршрут `/resheniya/designer-agent` + рабочая зона `/workspace`
+- Контент — гайд «Как дизайнеру начать работать с AI-агентами» (10 шагов + 2 онбординг-шага): агент vs чат, MCP + Figma, выбор Claude Code / Codex, среда, наполнение (код/Figma/дизайн-система), скиллы, живой прототип из брифа, перенос в Figma, аудит макетов, типичные проблемы
+- Медиа self-hosted (без ссылок на Notion/внешние сайты):
+  - Видео-демо `public/uploads/designer-agent-demo.mp4` (CleanShot, из брифа в живой прототип)
+  - 7 скриншотов `public/uploads/designer-agent/01–07.png` (Figma-система, аудит, прототип→слои, MCP-схема, Claude vs Codex, скиллы)
+- Карточка в хабе `/resheniya`, счётчик «5 маршрутов»
+- SEO: SITE_TREE + sitemap + metadata/canonical; `validate:sitemap` PASS
+
+### Проверка
+- `next build` — OK; `pm2 restart proektmap` — online
+- Smoke HTTP 200: `/resheniya/designer-agent`, `/workspace`, `/uploads/designer-agent-demo.mp4`, скриншоты
+
+### Точка отката
+- Коммит `e84912c8` на `main` = `master`, push origin (main + master)
+
+### Следующие шаги
+- При желании: разбить курс-продакшн-CTA и ссылки на обучающую программу в конце маршрута
+- Проверить видео на мобильных и добавить постер
+
+### Закрытие дня
+День закрыт. main = master после merge. Коммит + push.
