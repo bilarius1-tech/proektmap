@@ -23,6 +23,7 @@ import { guidedSaasSolution } from "./guided-data";
 import { guidedTelegramSolution } from "./telegram-guided-data";
 import { guidedAvitoSolution } from "./avito-guided-data";
 import { guidedPremiumLandingSolution } from "./premium-landing-guided-data";
+import { guidedDesignerAgentSolution } from "./designer-agent-guided-data";
 
 export const metadata: Metadata = {
   title: "Готовые решения AI — от идеи до работающего продукта",
@@ -111,7 +112,7 @@ export default function ResheniyaPage() {
               <span className="solutions-kicker">Можно начать сейчас</span>
               <h2 id="available-title">Доступные готовые решения</h2>
             </div>
-            <span className="solutions-status-badge">4 маршрута</span>
+            <span className="solutions-status-badge">5 маршрутов</span>
           </div>
 
           <div className="solutions-feature-list">
@@ -216,6 +217,28 @@ export default function ResheniyaPage() {
                 <span><Route size={16} /> {guidedTelegramSolution.steps.length} готовых шагов</span>
                 <span><Clock3 size={16} /> {guidedTelegramSolution.duration}</span>
                 <span><Boxes size={16} /> стек и команды выбраны</span>
+                <span className="solutions-feature-link">Открыть решение <ArrowRight size={16} /></span>
+              </div>
+            </Link>
+            <Link href="/resheniya/designer-agent" className="solutions-feature-card">
+              <div className="solutions-feature-main">
+                <div className="solutions-feature-icon" style={{ background: "rgba(79, 70, 229, 0.12)", color: "#4f46e5" }}><Palette size={30} /></div>
+                <div>
+                  <span className="solutions-kicker">Для дизайнеров · агент на компьютере</span>
+                  <h3>AI-агенты для дизайнера</h3>
+                  <p>Путь от брифа до живого прототипа и аудита Figma: MCP, дизайн-система и скиллы — с демо и скриншотами.</p>
+                </div>
+              </div>
+
+              <div className="solutions-feature-result">
+                <span>Результат маршрута</span>
+                <strong>{guidedDesignerAgentSolution.result}</strong>
+              </div>
+
+              <div className="solutions-feature-meta">
+                <span><Route size={16} /> {guidedDesignerAgentSolution.steps.length} готовых шагов</span>
+                <span><Clock3 size={16} /> {guidedDesignerAgentSolution.duration}</span>
+                <span><Boxes size={16} /> промпты и скиллы выбраны</span>
                 <span className="solutions-feature-link">Открыть решение <ArrowRight size={16} /></span>
               </div>
             </Link>

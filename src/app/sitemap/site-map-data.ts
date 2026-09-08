@@ -35,6 +35,8 @@ export const SITE_TREE: SiteTreeGroup[] = [
           { title: "Рабочая зона Telegram-бота", href: "/resheniya/telegram-bot/workspace" },
           { title: "Премиум-шаблон без AI-скуфа", href: "/resheniya/premium-landing" },
           { title: "Рабочая зона премиум-шаблона", href: "/resheniya/premium-landing/workspace" },
+          { title: "AI-агенты для дизайнера", href: "/resheniya/designer-agent" },
+          { title: "Рабочая зона дизайнера", href: "/resheniya/designer-agent/workspace" },
           { title: "Создать корпоративный сайт", status: "planned" },
           { title: "Создать CRM-систему", status: "planned" },
           { title: "Запустить интернет-магазин", status: "planned" },
