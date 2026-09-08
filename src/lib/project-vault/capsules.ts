@@ -70,8 +70,8 @@ export const CAPSULES: VaultCapsule[] = [
       {
         id: "prompts",
         title: "Промпты и решения",
-        summary: "Day-close, harness tick, QA; ADR про VPS и TBank secret file.",
-        paths: ["ai/prompts/", "ai/decisions/", "ai/COPY-FIRST.md"],
+        summary: "Day-close, harness tick, QA; bootstrap из DNA; ADR про VPS и TBank secret file.",
+        paths: ["ai/prompts/", "ai/decisions/", "ai/COPY-FIRST.md", "ai/BOOTSTRAP-FROM-DNA.md"],
       },
     ],
     snapshotHighlights: [

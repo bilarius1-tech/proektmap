@@ -57,6 +57,10 @@
 
 Скопируй блок целиком в новый чат. Замени `{{…}}` или вставь готовый **INSTANCE** (§4). Не переписывай PASS’ы под конкретный бренд.
 
+> **Две разные миссии**  
+> - **Археология** (этот §3): готовый продукт → Package → капсула в Vault.  
+> - **Bootstrap нового проекта из DNA** (§3.1 ниже / `ai/BOOTSTRAP-FROM-DNA.md`): капсула → каркас агента в проекте #2.
+
 ```text
 # MISSION: Project Vault — engineering archaeology → Package → ProektMap import
 
@@ -114,6 +118,45 @@ Stop and report blockers with evidence; do not skip Client Boundary checks.
 - Package exists at {{PACKAGE_OUTPUT_DIR}} with valid manifest.json
 - Capsule live (or ready module+routes) at https://proektmap.ru/project-vault/{{PROEKTMAP_CAPSULE_SLUG}}
 - Audit checklist PASS 7 green for “start project #2 from DNA”
+```
+
+### 3.1 Промпт: создать новый проект из DNA
+
+Не археология. Скопируй в чат, когда нужно **поднять проект #2** по уже существующей капсуле.  
+UI: блок «Скопировать промпт» на `/project-vault/[slug]` (после soft-gate). Файлы капсулы: `ai/BOOTSTRAP-FROM-DNA.md`, `ai/COPY-FIRST.md`. Правило: `.cursor/rules/project-vault-bootstrap.mdc`.
+
+```text
+# MISSION: Создать новый проект из Project Vault DNA
+
+Ты агент, который поднимает НОВЫЙ проект по ДНК капсулы (не археология готового продукта в Vault).
+
+## Канон
+- COPY-FIRST: /var/www/www-root/data/www/proektmap.ru/content/project-vault/{{CAPSULE_SLUG}}/ai/COPY-FIRST.md
+- BOOTSTRAP: …/ai/BOOTSTRAP-FROM-DNA.md
+- Полный TZ (археология другого продукта): docs/PROJECT-VAULT-TZ.md §3 TEMPLATE
+- Live: https://proektmap.ru/project-vault/{{CAPSULE_SLUG}}
+
+## Источник DNA
+- CAPSULE_SLUG: {{CAPSULE_SLUG}}
+- Корень: /var/www/www-root/data/www/proektmap.ru/content/project-vault/{{CAPSULE_SLUG}}
+- Прочитай: AGENTS, START_HERE, .cursor/rules, harness/loop/graph, philosophy, deploy, decisions
+
+## Новый проект
+- NEW_PROJECT_NAME: {{NEW_PROJECT_NAME}}
+- NEW_PROJECT_SLUG: {{NEW_PROJECT_SLUG}}
+- NEW_PROJECT_URL: {{NEW_PROJECT_URL}}
+- NEW_WORKSPACE_PATH: {{NEW_WORKSPACE_PATH}}
+- NEW_PROD_APP_PATH: {{NEW_PROD_APP_PATH}}
+- NEW_PM2_PROCESS: {{NEW_PM2_PROCESS}}
+
+## Сделай
+1. Прочитай DNA капсулы
+2. Воссоздай AGENTS.md + .cursor/rules + harness skeleton + Dev Graph DoD под NEW_*
+3. Следуй COPY-FIRST; не копируй клиентский контент / секреты / PII / customer DB
+4. Упаковка другого готового продукта в Vault — отдельная миссия (TEMPLATE §3)
+
+## DoD
+- Каркас агента в новом workspace готов к day-0; брендинг новый; Client Boundary OK
 ```
 
 ---

@@ -11,4 +11,13 @@ Order for a new VPS studio / membership product of the same class:
 7. Optional: start Prisma from `database/schema.prisma` as inspiration (do not copy customer data)  
 8. Read ADRs in `ai/decisions/` before inventing Vercel or raw TBank dotenv secrets  
 
+**Ready prompt (copy-paste):** see [`BOOTSTRAP-FROM-DNA.md`](./BOOTSTRAP-FROM-DNA.md)  
+or the «Скопировать промпт» block on https://proektmap.ru/project-vault/reverans (after unlock).
+
 Vocabulary: https://proektmap.ru/agent-engineering
+
+## Do not copy
+
+- Client marketing content as if it were the new brand  
+- `.env` values, API keys, SSL private keys  
+- Production customer DB rows / PII  

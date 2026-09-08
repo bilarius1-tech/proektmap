@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, ExternalLink, GitBranch, Network, RefreshCw, Shield } from "lucide-react";
+import { ArrowRight, ExternalLink, GitBranch, Lock, Network, RefreshCw, Shield } from "lucide-react";
 import type { VaultCapsule } from "@/lib/project-vault";
 
 type Props = {
@@ -122,6 +122,7 @@ export default function VaultCapsuleCard({ capsule }: Props) {
           borderRadius: "var(--radius-s, 8px)",
         }}
       >
+        <Lock size={15} aria-hidden />
         Открыть инженерную карту
         <ArrowRight size={16} aria-hidden />
       </Link>

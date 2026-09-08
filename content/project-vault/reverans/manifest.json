@@ -35,7 +35,8 @@
       "day-close",
       "harness-tick",
       "client-qa",
-      "client-parent-qa"
+      "client-parent-qa",
+      "BOOTSTRAP-FROM-DNA"
     ],
     "decisions": [
       "001-vps-not-vercel",

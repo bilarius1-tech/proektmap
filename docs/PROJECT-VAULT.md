@@ -29,12 +29,20 @@
 
 ## Для агентов
 
-Полное ТЗ, copy-paste TEMPLATE и PASS 1–7:
+Полное ТЗ, copy-paste TEMPLATE (археология) и PASS 1–7:
 
 → [`docs/PROJECT-VAULT-TZ.md`](./PROJECT-VAULT-TZ.md)
 
+**Промпт «создать новый проект из DNA»** (bootstrap проекта #2, не археология):
+
+→ §3.1 в [`PROJECT-VAULT-TZ.md`](./PROJECT-VAULT-TZ.md) · капсула `ai/BOOTSTRAP-FROM-DNA.md` · UI «Скопировать промпт» на `/project-vault/[slug]` · правило `.cursor/rules/project-vault-bootstrap.mdc`
+
 Связь со словарём окружения: [`docs/AGENT-ENGINEERING.md`](./AGENT-ENGINEERING.md).
 
-## Phase 2 (не v1)
+## Soft gate
 
-«Создать из этого» — чекбоксы seed-kit из DNA. В первой поставке только teaser.
+Хаб `/project-vault` публичный. Детальная инженерная карта `/project-vault/[slug]` (пути DNA) — soft password + `sessionStorage`. Не документировать пароль как «секрет продукта» в публичных гайдах.
+
+## Phase 2 (расширение)
+
+Чекбоксы seed-kit из DNA в UI. Сейчас: копируемый bootstrap-промпт + COPY-FIRST / BOOTSTRAP-FROM-DNA.

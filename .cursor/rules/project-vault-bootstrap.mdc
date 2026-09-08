@@ -1,0 +1,28 @@
+---
+description: Bootstrap a new project from a Project Vault capsule DNA («создай из капсулы»)
+globs:
+alwaysApply: false
+---
+
+# Project Vault — bootstrap из капсулы
+
+Когда пользователь говорит **«создай из капсулы X»**, **«bootstrap from vault»**, **«новый проект из DNA»** или просит поднять проект #2 по Vault:
+
+## Порядок
+
+1. Открой капсулу: `content/project-vault/{{slug}}/` (live: `/project-vault/{{slug}}`).
+2. Прочитай **`ai/COPY-FIRST.md`** и **`ai/BOOTSTRAP-FROM-DNA.md`** (или UI «Скопировать промпт»).
+3. Прочитай DNA: `ai/AGENTS.md`, `ai/START_HERE.md`, `ai/.cursor/rules/`, harness/loop/graph, philosophy, deploy.
+4. В **новом** workspace воссоздай каркас агента (AGENTS + rules + harness stub + Dev Graph DoD), адаптируя имена, домены, брендинг.
+5. **Не копируй** клиентский контент, секреты, PII, customer DB.
+6. Для упаковки **другого готового** продукта в Vault — отдельная миссия: TEMPLATE §3 в `docs/PROJECT-VAULT-TZ.md` (археология), не путать с bootstrap.
+
+## Канон
+
+- `docs/PROJECT-VAULT-TZ.md` — § «Промпт: создать новый проект из DNA»
+- `docs/PROJECT-VAULT.md`
+- Словарь: `/agent-engineering`
+
+## Soft gate UI
+
+Инженерная карта `/project-vault/[slug]` может быть за паролем (sessionStorage). Хаб `/project-vault` публичный. Пароль — soft gate, не «секрет продукта» в markdown.

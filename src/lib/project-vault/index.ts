@@ -12,3 +12,13 @@ export {
   getPublishedCapsules,
   getCapsuleSlugs,
 } from "./capsules";
+export {
+  PROJECT_VAULT_GATE_STORAGE_KEY,
+  getProjectVaultPassword,
+  isVaultUnlockedInSession,
+  setVaultUnlockedInSession,
+} from "./gate";
+export {
+  buildBootstrapFromDnaPrompt,
+  type BootstrapPromptVars,
+} from "./bootstrap-prompt";
