@@ -2509,3 +2509,33 @@ main = master после merge. Коммит + push выполнены.
 
 ### Закрытие дня
 День закрыт. main = master после merge. Коммит + push.
+
+---
+
+## 09.09.2026 — Копилка дизайна (`/kopilka`) + баннер на главной
+
+### Сделано
+- Новый раздел **Копилка дизайна** — кураторская полка ссылок (анимации, секции, кнопки, фоны, дашборды, CodePen и т.п.)
+- ТЗ: `docs/KOPILKA-DESIGN-TZ.md`
+- Prisma: `DesignBankCategory` + `DesignBankItem`; сид 10 категорий (`scripts/seed-kopilka.ts`)
+- Публичная страница `/kopilka`: чипы категорий, компактные строки (favicon + RU-описание + кнопка «Открыть»)
+- Быстрый add с фронта только для `role=admin`: URL → meta/favicon → DeepSeek 1–2 предложения → сохранение
+- Админка `/admin/kopilka`: CRUD ссылок и категорий, перемещение ↑↓, AI-описание
+- API: `/api/admin/kopilka/{categories,items,enrich,reorder}`
+- SEO: пункт в `SITE_TREE` + sitemap; `validate:sitemap` PASS
+- Баннер на главной: MagicRings (React Bits / Three.js) → ссылка на `/kopilka`, заголовок «Копилка AI элементов и сайтов»
+
+### Проверка
+- `next build` — OK; `pm2 restart proektmap` — online
+- Smoke HTTP 200: `/`, `/kopilka`, `/admin/kopilka`
+
+### Точка отката
+- Ветка `feature/kopilka-design` → merge в `main` = `master`, push origin
+
+### Следующие шаги
+- Добавить пункт «Копилка» в меню через `/admin/menu`
+- Наполнить копилку первыми ссылками
+- При желании: уточнить текст баннера под дизайн-ресурсы
+
+### Закрытие дня
+День закрыт. Коммит + push. main = master после merge.

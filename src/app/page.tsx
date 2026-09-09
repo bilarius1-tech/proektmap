@@ -1,6 +1,7 @@
 import { getDb } from "@/lib/db/index";
 import AnimatedHero from "@/components/hero/animated-hero";
 import ClaudeAcademyCallout from "@/components/academy/claude-academy-callout";
+import KopilkaHomeBanner from "@/components/kopilka/kopilka-home-banner";
 import { CommunityPulseHero, CommunityStats } from "@/components/originkit/community-pulse";
 import Link from "next/link";
 import { ArrowRight, Map, Bot, Rocket, Route, Sparkles, Boxes, Compass, Plus, Flame, Eye, Layers, Crown, Lock, Wrench, Zap, Image as ImageIcon, Calculator, Code2, Play } from "lucide-react";
@@ -184,6 +185,9 @@ export default async function Home() {
       </div>
       </AnimatedHero>
       <div style={{ height: 1, background: "var(--color-border)" }} />
+
+      {/* Копилка дизайна / AI элементов */}
+      <KopilkaHomeBanner />
 
       {/* OriginKit Community Pulse & Neural Ecosystem Hero */}
       <div style={{ padding: "var(--space-xxl) 0 0" }}>

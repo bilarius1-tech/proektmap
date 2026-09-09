@@ -91,6 +91,11 @@ export const SITE_TREE: SiteTreeGroup[] = [
           { title: "Дизайн-Рецепты экранов", href: "/ui-patterns/recipes" },
         ],
       },
+      {
+        title: "Копилка дизайна",
+        href: "/kopilka",
+        description: "Кураторская полка: анимации, секции, кнопки, фоны, CodePen — с русским описанием",
+      },
       { title: "Решения сообщества", href: "/solutions", description: "Библиотека архитектур, не путать с готовыми маршрутами" },
       { title: "Карта архитектуры", href: "/architecture" },
       {

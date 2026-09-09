@@ -962,6 +962,43 @@ model MicroserviceMeta {
   @@map("microservice_meta")
 }
 
+/// Категория «Копилки дизайна» (/kopilka).
+model DesignBankCategory {
+  id          String           @id @default(uuid())
+  slug        String           @unique
+  title       String
+  emoji       String           @default("")
+  description String           @default("")
+  sortOrder   Int              @default(0)
+  isPublished Boolean          @default(true)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  items       DesignBankItem[]
+
+  @@index([sortOrder])
+  @@map("design_bank_categories")
+}
+
+/// Ссылка в «Копилке дизайна»: favicon + RU-описание + кнопка перехода.
+model DesignBankItem {
+  id            String             @id @default(uuid())
+  categoryId    String
+  url           String
+  title         String             @default("")
+  descriptionRu String             @default("")
+  faviconUrl    String             @default("")
+  sourceMeta    String             @default("") // сырой title/og для отладки
+  sortOrder     Int                @default(0)
+  isPublished   Boolean            @default(true)
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  category      DesignBankCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@index([categoryId, sortOrder])
+  @@index([isPublished, sortOrder])
+  @@map("design_bank_items")
+}
+
 /// Кэш видео с VK Video (каналы Craftum / уроки вайбкодинга).
 model VkVideo {
   id          String   @id // "{ownerId}_{videoId}"
