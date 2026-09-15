@@ -2539,3 +2539,31 @@ main = master после merge. Коммит + push выполнены.
 
 ### Закрытие дня
 День закрыт. Коммит + push. main = master после merge.
+
+---
+
+## 15.09.2026 — Починка автопубликации блога
+
+### Зачем
+На `/blog` посты есть (~390 published), но **новые** автопублики остановились: cron звал `_backups/autopublish-wrapper.sh`, файла не было.
+
+### Сделано
+- Восстановлен `scripts/autopublish-wrapper.sh` (drip + collect через `/api/blog/auto-publish` + `CRON_SECRET`)
+- Симлинк: `_backups/autopublish-wrapper.sh` → скрипт в репо (путь cron без правок crontab)
+- Ручной прогон: из очереди вышла «Красноярские учёные и нейросети…»
+- Диагностика: DeepSeek 402 Insufficient Balance — новый RSS-сбор без пополнения баланса не поедет; drip из `queued` работает без DeepSeek
+
+### Проверка
+- Wrapper executable + symlink OK
+- Лог `/var/log/proektmap-auto-publish.log` снова пишет START/OK
+- `/blog` HTTP 200, свежий пост в сетке
+
+### Точка отката
+- Коммит на `main` = `master`, push origin
+
+### Следующие шаги
+- Пополнить баланс DeepSeek (иначе collect пустой)
+- Следить за drip: лимит 2/день, интервал 45 мин, в очереди ещё `queued`
+
+### Закрытие дня
+День закрыт. Коммит + push. main = master.
