@@ -30,6 +30,12 @@ export default function PromptsPageClient({ prompts, total, variables, categorie
           Не просто тексты — инженерные решения. System Prompt, Agent Prompt, MCP, Cursor Rules.
           Со статистикой эффективности, эволюцией и связями с паттернами.
         </p>
+        <p style={{ marginTop: 12, fontSize: "var(--text-s)", color: "var(--color-text-secondary)", maxWidth: 700 }}>
+          Нужен готовый запрос в ChatGPT по профессии — не сюда.{" "}
+          <Link href="/shpargalka" style={{ color: "var(--color-accent)", fontWeight: 700 }}>
+            Открыть шпаргалку промптов
+          </Link>
+        </p>
       </div>
 
       {/* Category filter */}

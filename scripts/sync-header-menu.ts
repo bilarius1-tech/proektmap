@@ -114,6 +114,27 @@ async function main() {
   console.log("upsert header-ai-skills /ai-skills");
 
   await db.menuItem.upsert({
+    where: { id: "header-shpargalka" },
+    create: {
+      id: "header-shpargalka",
+      label: "Шпаргалка",
+      href: "/shpargalka",
+      sortOrder: 6,
+      location: "header",
+      isActive: true,
+      parentId: null,
+    },
+    update: {
+      label: "Шпаргалка",
+      href: "/shpargalka",
+      location: "header",
+      isActive: true,
+      parentId: null,
+    },
+  });
+  console.log("upsert header-shpargalka /shpargalka");
+
+  await db.menuItem.upsert({
     where: { id: "header-project-vault" },
     create: {
       id: "header-project-vault",
@@ -181,6 +202,7 @@ async function main() {
     "/resheniya",
     "/agent-engineering",
     "/ai-skills",
+    "/shpargalka",
     "/project-vault",
     "/video",
     "/arsenal",

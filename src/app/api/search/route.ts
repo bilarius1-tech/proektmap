@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db/index";
+import { searchShpargalka } from "@/lib/shpargalka";
 
 export async function GET(req: NextRequest) {
   const q = req.nextUrl.searchParams.get("q") || "";
@@ -90,6 +91,14 @@ export async function GET(req: NextRequest) {
     ...blog.map(b => ({ ...b, type: "blog", typeLabel: "📝 Блог", href: "/blog/" + b.slug, snippet: highlightText(b.excerpt || "", query) })),
     ...decisions.map(d => ({ ...d, type: "decision", typeLabel: "⚡ Решение", href: "/corporate-website?stage=" + d.slug, snippet: highlightText(d.content || "", query) })),
     ...prompts.map(p => ({ ...p, type: "prompt", typeLabel: "💬 Промпт", href: "/prompts", snippet: highlightText(p.description, query) })),
+    ...searchShpargalka(query).map((p) => ({
+      id: p.id,
+      title: p.title,
+      type: "shpargalka",
+      typeLabel: "Шпаргалка",
+      href: `/shpargalka/${p.pack}`,
+      snippet: highlightText(p.why || p.body, query),
+    })),
     ...aiProjects.map(p => ({ ...p, type: "aiProject", typeLabel: "🏭 AI Цех", href: "/ai-workshop/" + p.slug, snippet: highlightText(p.description, query), subtitle: p.category + (p.language === "en" ? " · EN" : " · RU") })),
   ];
 

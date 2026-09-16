@@ -42,6 +42,7 @@ Rebuild нужен только если меняли код header/footer/API.
 | `header-sitemap` | Карта сайта | `/sitemap` |
 | `header-agent-engineering` | Инженерия агентов | `/agent-engineering` |
 | `header-ai-skills` | AI Skills | `/ai-skills` |
+| `header-shpargalka` | Шпаргалка | `/shpargalka` |
 | `header-video` | Видео | `/video` |
 
 Скрипт синка: `npx tsx --env-file=.env scripts/sync-header-menu.ts`

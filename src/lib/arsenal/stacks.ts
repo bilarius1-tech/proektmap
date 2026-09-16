@@ -206,7 +206,8 @@ export const ARSENAL_STACKS: ArsenalStack[] = [
     orderHint: ["prompts.chat — открытая библиотека", "Библиотека Claude Code — кодинг-сценарии", "Superdesign Library — UI/лендинги", "Awesome Video / GPT Image — медиа", "Model Guidance — нормы запросов", "ImageToPrompt — референс → промпт", "pxpipe — сжать контекст в изображения"],
     excelCategories: ["prompts", "coding", "images"],
     relatedRoutes: [
-      { href: "/prompts", label: "Промпты" },
+      { href: "/shpargalka", label: "Шпаргалка промптов" },
+      { href: "/prompts", label: "Инженерные промпты" },
       { href: "/resheniya/saas-product", label: "SaaS-продукт" },
       { href: "/ui-patterns", label: "UI-Атлас" },
     ],

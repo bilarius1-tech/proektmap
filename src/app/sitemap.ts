@@ -8,6 +8,7 @@ import { UI_PATTERNS } from "@/app/ui-patterns/data";
 import { MICROSERVICES } from "@/lib/services/data";
 import { getPublishedStacks, ARSENAL_TOOLS } from "@/lib/arsenal";
 import { AI_SKILLS } from "@/lib/ai-skills";
+import { getPublishedPacks } from "@/lib/shpargalka";
 
 const baseUrl = "https://proektmap.ru";
 
@@ -16,6 +17,7 @@ function pagePriority(href: string) {
   if (href === "/resheniya") return 0.9;
   if (href === "/agent-engineering" || href.startsWith("/agent-engineering/")) return 0.85;
   if (href === "/ai-skills" || href.startsWith("/ai-skills/")) return 0.85;
+  if (href === "/shpargalka" || href.startsWith("/shpargalka/")) return 0.8;
   if (href === "/arsenal") return 0.85;
   if (href.startsWith("/arsenal/")) return href.includes("/tools/") ? 0.55 : 0.75;
   if (href.startsWith("/resheniya/")) return href.includes("workspace") ? 0.6 : 0.8;
@@ -120,6 +122,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: "weekly" as const,
       priority: 0.8,
+    })),
+    ...getPublishedPacks().map((pack) => ({
+      url: `${baseUrl}/shpargalka/${pack.slug}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.75,
     })),
     ...blogUrls,
     ...aiToolUrls,

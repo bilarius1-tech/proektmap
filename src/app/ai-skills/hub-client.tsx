@@ -272,6 +272,24 @@ export default function AiSkillsHubClient() {
             >
               Дизайн-система
             </Link>
+            <Link
+              href="/shpargalka"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                padding: "14px 22px",
+                background: "var(--color-bg-primary)",
+                border: "1px solid var(--color-border)",
+                color: "var(--color-text-primary)",
+                textDecoration: "none",
+                fontWeight: 700,
+                fontSize: "var(--text-s)",
+                minHeight: 52,
+              }}
+            >
+              Шпаргалка промптов
+            </Link>
           </div>
         </div>
       </section>
