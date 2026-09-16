@@ -24,6 +24,7 @@ import { guidedTelegramSolution } from "./telegram-guided-data";
 import { guidedAvitoSolution } from "./avito-guided-data";
 import { guidedPremiumLandingSolution } from "./premium-landing-guided-data";
 import { guidedDesignerAgentSolution } from "./designer-agent-guided-data";
+import { guidedGrokBotCursorSolution } from "./grok-bot-cursor-guided-data";
 
 export const metadata: Metadata = {
   title: "Готовые решения AI — от идеи до работающего продукта",
@@ -112,10 +113,46 @@ export default function ResheniyaPage() {
               <span className="solutions-kicker">Можно начать сейчас</span>
               <h2 id="available-title">Доступные готовые решения</h2>
             </div>
-            <span className="solutions-status-badge">5 маршрутов</span>
+              <span className="solutions-status-badge">6 маршрутов</span>
           </div>
 
           <div className="solutions-feature-list">
+            <Link href="/resheniya/grok-bot-cursor" className="solutions-feature-card">
+              <div className="solutions-feature-main">
+                <div className="solutions-feature-icon" style={{ background: "rgba(234, 88, 12, 0.12)", color: "#ea580c" }}>
+                  <Bot size={30} />
+                </div>
+                <div>
+                  <span className="solutions-kicker">Для вайбкодера · внешний + внутренний контур</span>
+                  <h3>Собрать контур Grok Bot → Cursor</h3>
+                  <p>
+                    Продюсер с облачным компьютером собирает бриф, Cursor пишет код. Устав, skill, стоп на PR —
+                    без флота ботов и серых схем доступа.
+                  </p>
+                </div>
+              </div>
+
+              <div className="solutions-feature-result">
+                <span>Результат маршрута</span>
+                <strong>{guidedGrokBotCursorSolution.result}</strong>
+              </div>
+
+              <div className="solutions-feature-meta">
+                <span>
+                  <Route size={16} /> {guidedGrokBotCursorSolution.steps.length} готовых шагов
+                </span>
+                <span>
+                  <Clock3 size={16} /> {guidedGrokBotCursorSolution.duration}
+                </span>
+                <span>
+                  <Boxes size={16} /> два контура выбраны
+                </span>
+                <span className="solutions-feature-link">
+                  Открыть решение <ArrowRight size={16} />
+                </span>
+              </div>
+            </Link>
+
             <Link href="/resheniya/premium-landing" className="solutions-feature-card">
               <div className="solutions-feature-main">
                 <div className="solutions-feature-icon" style={{ background: "rgba(15, 118, 110, 0.12)", color: "#0f766e" }}>

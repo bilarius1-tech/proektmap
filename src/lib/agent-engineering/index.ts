@@ -6,3 +6,7 @@ export {
   getModuleSlugs,
   getNextModule,
 } from "./modules";
+export {
+  GROK_BOT_META,
+  GROK_BOT_ACCENT,
+} from "./grok-bot-data";

@@ -37,6 +37,8 @@ export const SITE_TREE: SiteTreeGroup[] = [
           { title: "Рабочая зона премиум-шаблона", href: "/resheniya/premium-landing/workspace" },
           { title: "AI-агенты для дизайнера", href: "/resheniya/designer-agent" },
           { title: "Рабочая зона дизайнера", href: "/resheniya/designer-agent/workspace" },
+          { title: "Собрать контур Grok Bot → Cursor", href: "/resheniya/grok-bot-cursor" },
+          { title: "Рабочая зона Grok Bot → Cursor", href: "/resheniya/grok-bot-cursor/workspace" },
           { title: "Создать корпоративный сайт", status: "planned" },
           { title: "Создать CRM-систему", status: "planned" },
           { title: "Запустить интернет-магазин", status: "planned" },
@@ -51,6 +53,7 @@ export const SITE_TREE: SiteTreeGroup[] = [
           { title: "Loop — цикл с проверкой", href: "/agent-engineering/loop" },
           { title: "Graph — карта системы", href: "/agent-engineering/graph" },
           { title: "Правила разработки", href: "/agent-engineering/rules" },
+          { title: "Grok Bot — мануал для вайбкодера", href: "/agent-engineering/grok-bot", description: "Коллега с облачным компьютером: skills, плагины, routines" },
         ],
       },
       {

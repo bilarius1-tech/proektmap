@@ -2647,3 +2647,40 @@ main = master после merge. Коммит + push выполнены.
 
 ### Закрытие дня
 День закрыт. Коммит + push. main = master.
+
+---
+
+## 16.09.2026 — Grok Bot: мануал, маршрут, статья
+
+### Зачем
+Grok Bot в Cursor легко принять за ещё один чат. Тогда один агент и читает почту, и сразу правит репозиторий. Нужен русский слой: что это, как писать устав, и готовый маршрут «снаружи бриф — внутри код».
+
+### Сделано
+- Мануал `/agent-engineering/grok-bot`: плохо→хорошо, инфографики, копируемые шаблоны, лестница задача → skill → routine
+- 6-й маршрут `/resheniya/grok-bot-cursor`: внешний Grok Bot-продюсер → внутренний Cursor, устав «Продюсер», бриф FAQ, skill, handoff без авто-PR
+- Статья в блог: `/blog/grok-bot-vneshniy-kontur-cursor`
+- Меню шапки: ребёнок `header-agent-engineering-grok-bot` под «Инженерия агентов» (БД, не хардкод)
+- Мост Нейро каталог: vibe-coder + mcp-agents
+- Voice: `agent-engineering-grok-bot.mp3`, `resheniya-grok-bot-cursor.mp3`
+
+### SEO / карта сайта
+- `SITE_TREE`: мануал + обзор + workspace
+- `validate:sitemap` — PASS (старые предупреждения bookmarks / project-vault без изменений)
+- Метаданные и canonical на публичных страницах; workspace `noindex`
+
+### Проверка
+- `validate:resheniya` — PASS, 9 шагов
+- Аудит маршрута — PASS WITH NOTES; устав заполнен под продюсера, не «разведчик/Авито»
+- `next build` — OK; `pm2 restart proektmap` — online
+- HTTP 200: `/agent-engineering/grok-bot`, `/resheniya`, `/resheniya/grok-bot-cursor`, `/resheniya/grok-bot-cursor/workspace`, `/blog/grok-bot-vneshniy-kontur-cursor`, `/vaibik`, `/avito`
+- Шапка: Инженерия агентов → Grok Bot
+
+### Точка отката
+- Коммит на `main` = `master`, push origin
+
+### Следующие шаги
+- В `/admin/menu` можно выключить дубль «ai Инженерия» (ведёт на тот же хаб)
+- Живой прогон Grok Bot → Cursor на своём репозитории
+
+### Закрытие дня
+День закрыт. Коммит + push. main = master.

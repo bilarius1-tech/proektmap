@@ -35,6 +35,9 @@ const ROUTE_LABELS: Record<string, string> = {
   'telegram-bot': 'Telegram-бот',
   'premium-landing': 'Премиум-шаблон',
   'avito-business': 'Авито-магазин',
+  'designer-agent': 'AI-агенты для дизайнера',
+  'grok-bot-cursor': 'Grok Bot → Cursor',
+  'grok-bot': 'Grok Bot',
   workspace: 'Рабочая зона',
 };
 

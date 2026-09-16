@@ -66,6 +66,8 @@ export const IT_VOICE_DICTIONARY: Record<string, string> = {
   "resheniya": "реше́ния",
   "arsenal": "арсена́л",
   "Нейро каталог": "Не́йро катало́г",
+  "Grok Bot": "Грок Бот",
+  "Grok": "Грок",
 };
 
 /**
@@ -229,7 +231,7 @@ export const VOICE_GUIDES: Record<string, VoiceGuideItem> = {
     audioSrc: "/audio/guides/agent-engineering.mp3",
     nextActions: [
       { label: "Модуль Harness", href: "/agent-engineering/harness", primary: true },
-      { label: "Нейро каталог", href: "/arsenal" },
+      { label: "Grok Bot", href: "/agent-engineering/grok-bot" },
       { label: "Готовые решения", href: "/resheniya" },
     ],
   },
@@ -282,6 +284,40 @@ export const VOICE_GUIDES: Record<string, VoiceGuideItem> = {
       { label: "Нейро каталог", href: "/arsenal", primary: true },
       { label: "Готовые решения", href: "/resheniya" },
       { label: "К хабу трека", href: "/agent-engineering" },
+    ],
+  },
+  "/agent-engineering/grok-bot": {
+    id: "agent-engineering-grok-bot",
+    route: "/agent-engineering/grok-bot",
+    title: "Grok Bot — мануал",
+    badge: "Практикум",
+    durationSec: 33,
+    rawScript:
+      "Grok Bot — не чат. Это коллега с облачным компьютером. На странице: чем он не Cursor и не Grok Build, как писать устав бота, лестница задача — skill — routine, и копируемые шаблоны на русском. Сначала один ручной прогон, потом автоматизация.",
+    voiceScript:
+      "Грок Бот — не чат. Это колле́га с о́блачным компьютером. На странице: чем он не Кёрсор и не Грок Билд, как писать уста́в бота, ле́стница зада́ча — скилл — рути́на, и копи́руемые шабло́ны на русском. Снача́ла один ручно́й прого́н, пото́м автоматиза́ция.",
+    audioSrc: "/audio/guides/agent-engineering-grok-bot.mp3",
+    nextActions: [
+      { label: "Копируемые шаблоны", href: "/agent-engineering/grok-bot#shablony", primary: true },
+      { label: "Маршрут Grok Bot → Cursor", href: "/resheniya/grok-bot-cursor" },
+      { label: "Модуль Harness", href: "/agent-engineering/harness" },
+    ],
+  },
+  "/resheniya/grok-bot-cursor": {
+    id: "resheniya-grok-bot-cursor",
+    route: "/resheniya/grok-bot-cursor",
+    title: "Grok Bot → Cursor",
+    badge: "Готовое решение",
+    durationSec: 32,
+    rawScript:
+      "Готовое решение: внешний контур Grok Bot и внутренний Cursor. Продюсер собирает бриф, кодер меняет репозиторий. Устав, один ручной прогон, skill, передача без авто-PR. Откройте рабочую зону и идите по шагам.",
+    voiceScript:
+      "Гото́вое реше́ние: вне́шний ко́нтур Грок Бот и вну́тренний Кёрсор. Продю́сер собира́ет бриф, ко́дер меня́ет репозито́рий. Уста́в, один ручно́й прого́н, скилл, переда́ча без а́вто пи-а́р. Откро́йте рабо́чую зо́ну и иди́те по шага́м.",
+    audioSrc: "/audio/guides/resheniya-grok-bot-cursor.mp3",
+    nextActions: [
+      { label: "Рабочая зона", href: "/resheniya/grok-bot-cursor/workspace", primary: true },
+      { label: "Мануал Grok Bot", href: "/agent-engineering/grok-bot" },
+      { label: "Все решения", href: "/resheniya" },
     ],
   },
 };

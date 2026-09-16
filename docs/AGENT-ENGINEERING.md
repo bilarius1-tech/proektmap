@@ -1,6 +1,6 @@
 # Инженерия агентов — трек ProektMap
 
-> **Статус:** MVP (хаб + 3 модуля) + voice guides  
+> **Статус:** MVP (хаб + 3 модуля + правила + практикум Grok Bot) + voice guides  
 > **URL:** `/agent-engineering`  
 > **Позиционирование:** отдельно от `/resheniya` (продукт) — здесь окружение агента
 
@@ -19,17 +19,19 @@
 | Путь | Назначение |
 |------|------------|
 | `src/lib/agent-engineering/` | Данные модулей (DRY для хаба и страниц) |
+| `src/lib/agent-engineering/grok-bot-data.ts` | Мануал Grok Bot: плохо→хорошо, шаблоны, сценарии |
 | `src/app/agent-engineering/page.tsx` | Хаб трека |
 | `src/app/agent-engineering/[slug]/page.tsx` | harness / loop / graph |
+| `src/app/agent-engineering/grok-bot/page.tsx` | Практикум Grok Bot |
 | `src/components/agent-engineering/agent-engineering-callout.tsx` | Callout на `/resheniya` |
-| `src/lib/voice-guide/guide-data.ts` | Voice: хаб + 3 модуля |
+| `src/lib/voice-guide/guide-data.ts` | Voice: хаб + 3 модуля + Grok Bot |
 | `docs/AGENT-ENGINEERING.md` | Этот канон |
 
 ## SEO и меню
 
 - `SITE_TREE` → группа «Начать» → «Инженерия агентов» + дети
 - Меню: `header-agent-engineering` через `scripts/sync-header-menu.ts`
-- Voice MP3: `/agent-engineering`, `/harness`, `/loop`, `/graph`
+- Voice MP3: `/agent-engineering`, `/harness`, `/loop`, `/graph`, `/grok-bot`, `/resheniya/grok-bot-cursor`
 
 ## Связи
 

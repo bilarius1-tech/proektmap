@@ -43,6 +43,12 @@ export const RESHENIYA_ARSENAL_BRIDGES: ResheniyaArsenalBridge[] = [
     toolSlugs: ["agent-skills", "opencode", "superpowers", "gigachat-3-5"],
     why: "Агент-кодер + Skills и РФ-доступные модели — собрать премиум-шаблон без AI-скуфа из России.",
   },
+  {
+    solutionSlug: "grok-bot-cursor",
+    stackSlugs: ["vibe-coder", "mcp-agents"],
+    toolSlugs: ["opencode", "superpowers", "agent-skills", "hermes-agent"],
+    why: "Внутренний кодер-агент и skills рядом с внешним контуром Grok Bot: бриф отдельно, код отдельно.",
+  },
 ];
 
 export function getBridgeForSolution(solutionSlug: string): ResheniyaArsenalBridge | undefined {

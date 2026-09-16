@@ -57,6 +57,8 @@ export const ARSENAL_STACKS: ArsenalStack[] = [
       { href: "/vaibik", label: "Вайбик" },
       { href: "/ui-patterns", label: "UI-Атлас" },
       { href: "/ai-skills", label: "AI Skills" },
+      { href: "/agent-engineering/grok-bot", label: "Grok Bot — мануал" },
+      { href: "/resheniya/grok-bot-cursor", label: "Контур Grok Bot → Cursor" },
     ],
   },
   {
@@ -77,6 +79,8 @@ export const ARSENAL_STACKS: ArsenalStack[] = [
       { href: "/skills", label: "Skills" },
       { href: "/resheniya/telegram-bot", label: "Telegram-бот" },
       { href: "/mcp", label: "MCP-серверы" },
+      { href: "/agent-engineering/grok-bot", label: "Grok Bot — мануал" },
+      { href: "/resheniya/grok-bot-cursor", label: "Контур Grok Bot → Cursor" },
     ],
   },
   {

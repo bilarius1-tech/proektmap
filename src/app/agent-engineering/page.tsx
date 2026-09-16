@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRight,
+  Bot,
   CheckCircle2,
   Cpu,
   GitBranch,
@@ -140,7 +141,7 @@ export default function AgentEngineeringHubPage() {
               Начать с Harness <ArrowRight size={16} />
             </Link>
             <Link
-              href="/arsenal"
+              href="/agent-engineering/grok-bot"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -155,7 +156,7 @@ export default function AgentEngineeringHubPage() {
                 minHeight: 52,
               }}
             >
-              <Layers size={16} /> Нейро каталог
+              <Bot size={16} /> Grok Bot
             </Link>
           </div>
 
@@ -188,6 +189,23 @@ export default function AgentEngineeringHubPage() {
                 <span style={{ opacity: 0.7 }}>{m.order}.</span> {m.shortTitle}
               </Link>
             ))}
+            <Link
+              href="/agent-engineering/grok-bot"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "8px 12px",
+                border: "1px solid #ea580c55",
+                color: "#ea580c",
+                textDecoration: "none",
+                fontSize: 13,
+                fontWeight: 700,
+                background: "var(--color-bg-primary)",
+              }}
+            >
+              Grok Bot
+            </Link>
           </nav>
         </div>
       </section>
@@ -323,6 +341,84 @@ export default function AgentEngineeringHubPage() {
                 </Link>
               );
             })}
+          </div>
+        </section>
+
+        <section
+          aria-labelledby="grok-bot-title"
+          style={{
+            background: "var(--color-bg-primary)",
+            border: "1px solid var(--color-border)",
+            borderLeft: "4px solid #ea580c",
+            padding: "22px",
+            marginBottom: 40,
+          }}
+        >
+          <div style={{ display: "flex", gap: 16, alignItems: "flex-start", flexWrap: "wrap" }}>
+            <div
+              style={{
+                width: 44,
+                height: 44,
+                display: "grid",
+                placeItems: "center",
+                background: "rgba(234,88,12,0.12)",
+                color: "#ea580c",
+                flexShrink: 0,
+              }}
+            >
+              <Bot size={22} />
+            </div>
+            <div style={{ flex: 1, minWidth: 200 }}>
+              <p
+                style={{
+                  margin: "0 0 4px",
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: "#ea580c",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.04em",
+                }}
+              >
+                Практикум · новый слой
+              </p>
+              <h2
+                id="grok-bot-title"
+                style={{
+                  margin: "0 0 8px",
+                  fontFamily: "var(--font-heading)",
+                  fontSize: 20,
+                  fontWeight: 800,
+                }}
+              >
+                Grok Bot на русском
+              </h2>
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: "var(--text-s)",
+                  lineHeight: 1.6,
+                  color: "var(--color-text-secondary)",
+                }}
+              >
+                Не чат Grok: постоянный коллега с облачным компьютером. Устав бота, skills и плагины,
+                лестница «задача → skill → routine», копируемые шаблоны для вайбкодера.
+              </p>
+              <Link
+                href="/agent-engineering/grok-bot"
+                style={{
+                  marginTop: 12,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: "#ea580c",
+                  textDecoration: "none",
+                }}
+              >
+                Открыть мануал <ArrowRight size={14} />
+              </Link>
+            </div>
           </div>
         </section>
 

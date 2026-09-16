@@ -93,6 +93,27 @@ async function main() {
   console.log("upsert header-agent-engineering /agent-engineering");
 
   await db.menuItem.upsert({
+    where: { id: "header-agent-engineering-grok-bot" },
+    create: {
+      id: "header-agent-engineering-grok-bot",
+      label: "Grok Bot",
+      href: "/agent-engineering/grok-bot",
+      sortOrder: 0,
+      location: "header",
+      isActive: true,
+      parentId: "header-agent-engineering",
+    },
+    update: {
+      label: "Grok Bot",
+      href: "/agent-engineering/grok-bot",
+      location: "header",
+      isActive: true,
+      parentId: "header-agent-engineering",
+    },
+  });
+  console.log("upsert header-agent-engineering-grok-bot /agent-engineering/grok-bot");
+
+  await db.menuItem.upsert({
     where: { id: "header-ai-skills" },
     create: {
       id: "header-ai-skills",

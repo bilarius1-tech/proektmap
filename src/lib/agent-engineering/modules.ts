@@ -95,6 +95,7 @@ export const MODULES: AgentModule[] = [
       { label: "Агент-кодер / вайбкодинг", href: "/arsenal/vibe-coder", note: "Cursor и контур кодинга" },
       { label: "Агенты, скиллы и рабочий контур", href: "/arsenal/mcp-agents", note: "Skills + MCP" },
       { label: "Агент на рабочем столе", href: "/arsenal/desktop-agent" },
+      { label: "Grok Bot — мануал", href: "/agent-engineering/grok-bot", note: "Облачный коллега, skills, routines" },
     ],
     nextSlug: "loop",
     seoTitle: "Harness Engineering — каркас агента в Cursor | ProektMap",
