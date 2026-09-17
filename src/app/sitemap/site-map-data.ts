@@ -21,7 +21,7 @@ export const SITE_TREE: SiteTreeGroup[] = [
     title: "Начать",
     description: "Главные точки входа и поиск по проекту",
     items: [
-      { title: "Главная", href: "/", description: "Центр ProektMap и быстрый вход в готовые решения" },
+      { title: "Главная", href: "/", description: "Четыре станции входа и живые маршруты /resheniya" },
       {
         title: "Готовые решения AI",
         href: "/resheniya",
@@ -329,3 +329,85 @@ const XML_EXCLUDE = new Set([
 export const PUBLIC_SEO_ROUTES = [...new Set(AVAILABLE_SITE_ROUTES)].filter(
   (href) => !XML_EXCLUDE.has(href) && !href.startsWith("/dashboard"),
 );
+
+export type SiteTaskHint = {
+  id: string;
+  label: string;
+  query: string;
+  keywords: string[];
+  href: string;
+};
+
+export const SITE_TASK_HINTS: SiteTaskHint[] = [
+  {
+    id: "avito",
+    label: "Запустить магазин",
+    query: "магазин авито",
+    keywords: ["магазин", "авито", "продаж", "объявлен", "фид"],
+    href: "/resheniya/avito-business",
+  },
+  {
+    id: "saas",
+    label: "Собрать SaaS",
+    query: "saas сервис",
+    keywords: ["saas", "саас", "подписк", "кабинет", "оплат"],
+    href: "/resheniya/saas-product",
+  },
+  {
+    id: "bot",
+    label: "Сделать бота",
+    query: "telegram бот",
+    keywords: ["бот", "telegram", "телеграм"],
+    href: "/resheniya/telegram-bot",
+  },
+  {
+    id: "stack",
+    label: "Подобрать стек",
+    query: "нейро каталог стек",
+    keywords: ["стек", "инструмент", "арсенал", "модел"],
+    href: "/arsenal",
+  },
+  {
+    id: "design",
+    label: "Собрать экран",
+    query: "ui паттерн секция",
+    keywords: ["экран", "ui", "секц", "кнопк", "дизайн"],
+    href: "/ui-patterns",
+  },
+];
+
+export const BEGINNER_HIDDEN_GROUPS = new Set(["legacy"]);
+
+const BEGINNER_HIDDEN_HREFS = new Set([
+  "/graph",
+  "/universe",
+  "/demo/scroll-film",
+  "/demo/win98",
+  "/demo/swiss",
+]);
+
+export function isBeginnerHiddenItem(item: SiteTreeItem): boolean {
+  if (item.status === "planned" || item.status === "legacy") return true;
+  if (item.title === "Экспериментальные визуализации") return true;
+  if (item.href && (BEGINNER_HIDDEN_HREFS.has(item.href) || item.href.startsWith("/demo/"))) return true;
+  return false;
+}
+
+export function filterBeginnerItems(items: SiteTreeItem[]): SiteTreeItem[] {
+  return items.flatMap((item) => {
+    if (isBeginnerHiddenItem(item)) return [];
+    const children = filterBeginnerItems(item.children || []);
+    return [{ ...item, children }];
+  });
+}
+
+export function matchTaskHints(query: string): SiteTaskHint[] {
+  const normalized = query.trim().toLowerCase();
+  if (!normalized) return [];
+  return SITE_TASK_HINTS.filter(
+    (hint) =>
+      hint.keywords.some((keyword) => normalized.includes(keyword) || keyword.includes(normalized)) ||
+      hint.label.toLowerCase().includes(normalized) ||
+      hint.query.includes(normalized),
+  );
+}

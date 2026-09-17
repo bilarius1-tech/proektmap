@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X, ChevronDown, Search } from "lucide-react";
 import FavoritesIndicator from "./favorites-indicator";
 import ThemeToggle from "./theme-toggle";
 import KnowledgeButtons from "@/components/knowledge/knowledge-buttons";
@@ -57,9 +57,12 @@ export default function MobileMenu({ items }: { items: MenuItem[] }) {
                     <>
                       <button onClick={() => toggleParent(item.id)} style={{
                         display: "flex", alignItems: "center", justifyContent: "space-between",
-                        width: "100%", padding: "12px", border: "none", background: "transparent",
+                        width: "100%", padding: "12px", border: "none",
+                        background: item.href === "/resheniya" ? "var(--color-accent)" : "transparent",
                         cursor: "pointer", fontSize: "var(--text-m)", fontWeight: 600,
-                        color: "var(--color-text-primary)",
+                        color: item.href === "/resheniya" ? "#fff" : "var(--color-text-primary)",
+                        borderRadius: "var(--radius-m)",
+                        minHeight: 52,
                       }}>
                         {item.label}
                         <ChevronDown size={16} style={{ transform: expanded.has(item.id) ? "rotate(180deg)" : "none", transition: "0.2s" }} />
@@ -129,6 +132,10 @@ export default function MobileMenu({ items }: { items: MenuItem[] }) {
 
             <div className="mobile-menu-actions">
               <div className="mobile-menu-actions-title">Быстрые действия</div>
+              <Link href="/search" onClick={() => setOpen(false)} className="mobile-menu-action-row" style={{ textDecoration: "none", color: "inherit" }}>
+                <Search size={16} />
+                <span>Поиск</span>
+              </Link>
               <KnowledgeButtons />
               <div className="mobile-menu-action-row">
                 <FavoritesIndicator initialCount={0} />

@@ -71,21 +71,30 @@ export default function DesktopMenuItem({ item }: { item: MenuNode }) {
         type="button"
         onClick={() => setOpen(!open)}
         aria-expanded={open}
+        className={item.href === "/resheniya" ? "header-station-primary" : undefined}
         style={{
           display: "flex",
           alignItems: "center",
           gap: 4,
-          color: open ? "var(--color-accent)" : "var(--color-text-secondary)",
+          color: item.href === "/resheniya"
+            ? "#fff"
+            : open
+              ? "var(--color-accent)"
+              : "var(--color-text-secondary)",
           fontSize: "var(--text-s)",
           padding: "6px 10px",
-          borderRadius: "var(--radius-s)",
+          borderRadius: item.href === "/resheniya" ? "var(--radius-m)" : "var(--radius-s)",
           transition: "all 0.1s",
-          background: open ? "var(--color-accent-light)" : "transparent",
+          background: item.href === "/resheniya"
+            ? "var(--color-accent)"
+            : open
+              ? "var(--color-accent-light)"
+              : "transparent",
           border: "none",
           cursor: "pointer",
           fontFamily: "inherit",
           whiteSpace: "nowrap",
-          fontWeight: 600,
+          fontWeight: item.href === "/resheniya" ? 800 : 600,
         }}
       >
         {item.label}

@@ -13,6 +13,46 @@ alwaysApply: true
 Единственный источник правды: таблица `MenuItem` в БД.
 Редактор для человека: https://proektmap.ru/admin/menu
 
+## Закон роста: спица, не корень
+
+Новый публичный раздел **по умолчанию не получает корень шапки**.
+
+Он обязан ответить: «я спица какой станции?» и попасть:
+
+1. ребёнком одной из 4 станций в `MenuItem`;
+2. в `SITE_TREE` (`src/app/sitemap/site-map-data.ts`).
+
+Корень шапки меняется **только по явному решению Алексея**.
+
+Слои страницы (voice guide, примеры плохо/хорошо, SEO) — не пункты меню.
+
+| Новая сущность | Станция-родитель | Хаб |
+|---|---|---|
+| Маршрут `/resheniya/[slug]` | Решения | `/resheniya` |
+| UI-паттерн, капсула, виджет | Собрать | `/ui-patterns` |
+| Стек, утилита, промпт-пачка | Инструменты | `/arsenal` |
+| Гайд, урок, skill, статья | Научиться | `/agent-engineering` |
+
+Антипримеры:
+
+- новый хаб → новый пункт шапки
+- новый слой → новый пункт шапки
+- блок-витрина на главной как способ «запустить раздел»
+
+## 4 станции шапки + Карта
+
+В шапке максимум **5 корней**. Дети живут в мега-меню.
+
+| id | label | href | Дети (спицы) |
+|---|---|---|---|
+| `header-resheniya` | Решения | `/resheniya` | живые маршруты `/resheniya/*`, Вайбик |
+| `header-station-build` | Собрать | `/ui-patterns` | UI-паттерны, Копилка, Vault, песочница, Архитектор |
+| `header-station-tools` | Инструменты | `/arsenal` | Нейро каталог, микросервисы, Авито, шпаргалка |
+| `header-station-learn` | Научиться | `/agent-engineering` | инженерия агентов, AI Skills, видео, блог, глоссарий |
+| `header-sitemap` | Карта | `/sitemap` | нет, это полная карта |
+
+Стабильные id спиц: `header-arsenal`, `header-avito`, `header-agent-engineering`, `header-ai-skills`, `header-shpargalka`, `header-video`, `header-project-vault`. Их **не удалять** — только переносить под станцию.
+
 ## Как агенту добавить / изменить пункт
 
 1. **Предпочтительно:** попросить Алексея добавить в `/admin/menu`, либо
@@ -26,23 +66,11 @@ alwaysApply: true
 После изменения меню в БД **не нужен** rebuild кода — шапка читает БД на каждый запрос.
 Rebuild нужен только если меняли код header/footer/API.
 
+Синк станций: `npx tsx --env-file=.env scripts/sync-header-menu.ts`
+
 ## Запрещено
 
 - Добавлять `<Link href="...">` в `header.tsx` / `mobile-menu.tsx` «поверх» списка из БД
-- Дублировать «Готовые решения», «Авито», «Карта сайта» в коде
+- Дублировать станции и «Карта» в коде навигации
 - Включать legacy Blueprint (`/blueprints`, «Готовые проекты») в активное меню
-
-## Стабильные ID ключевых пунктов
-
-| id | label | href |
-|---|---|---|
-| `header-resheniya` | Готовые решения | `/resheniya` |
-| `header-arsenal` | Нейро каталог | `/arsenal` |
-| `header-avito` | Авито | `/avito` |
-| `header-sitemap` | Карта сайта | `/sitemap` |
-| `header-agent-engineering` | Инженерия агентов | `/agent-engineering` |
-| `header-ai-skills` | AI Skills | `/ai-skills` |
-| `header-shpargalka` | Шпаргалка | `/shpargalka` |
-| `header-video` | Видео | `/video` |
-
-Скрипт синка: `npx tsx --env-file=.env scripts/sync-header-menu.ts`
+- Делать новый `parentId: null` в шапке без явного решения Алексея

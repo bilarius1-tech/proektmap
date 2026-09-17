@@ -8,16 +8,30 @@ async function getFooterLinks() {
       where: { parentId: null, isActive: true, location: "footer" },
       orderBy: { sortOrder: "asc" },
     });
-  } catch { return []; }
+  } catch {
+    return [];
+  }
+}
+
+async function getHeaderStations() {
+  try {
+    const db = await getDb();
+    return await db.menuItem.findMany({
+      where: { parentId: null, isActive: true, location: "header" },
+      orderBy: { sortOrder: "asc" },
+      select: { id: true, label: true, href: true },
+    });
+  } catch {
+    return [];
+  }
 }
 
 export default async function GlobalFooter() {
-  const footerLinks = await getFooterLinks();
+  const [footerLinks, stationLinks] = await Promise.all([getFooterLinks(), getHeaderStations()]);
 
   return (
     <footer className="bg-bg-primary border-t border-border-light px-m py-xl mt-auto">
       <div className="max-w-[1000px] mx-auto grid grid-cols-[repeat(auto-fit,minmax(180px,1fr))] gap-xl">
-        {/* Brand */}
         <div>
           <div className="font-extrabold text-m mb-s">
             Proekt<span className="text-accent">Map</span>
@@ -27,23 +41,24 @@ export default async function GlobalFooter() {
           </p>
         </div>
 
-        {/* Project links */}
         <div>
-          <div className="font-semibold text-xs mb-s uppercase tracking-[0.06em] text-text-tertiary">Проект</div>
+          <div className="font-semibold text-xs mb-s uppercase tracking-[0.06em] text-text-tertiary">Станции</div>
           <div className="flex flex-col gap-xs">
-            <Link href="/" className="text-s text-text-secondary no-underline">Шаблоны</Link>
-            <Link href="/skills" className="text-s text-text-secondary no-underline">Skills</Link>
+            {stationLinks.map((item) => (
+              <Link key={item.id} href={item.href} className="text-s text-text-secondary no-underline">
+                {item.label}
+              </Link>
+            ))}
             <Link href="/dashboard" className="text-s text-text-secondary no-underline">Личный кабинет</Link>
             <Link href="/auth" className="text-s text-text-secondary no-underline">Войти</Link>
           </div>
         </div>
 
-        {/* Documents */}
         <div>
           <div className="font-semibold text-xs mb-s uppercase tracking-[0.06em] text-text-tertiary">Документы</div>
           <div className="flex flex-col gap-xs">
             {footerLinks.length > 0 ? (
-              footerLinks.map(item => (
+              footerLinks.map((item) => (
                 <Link key={item.id} href={item.href} className="text-s text-text-secondary no-underline">{item.label}</Link>
               ))
             ) : (
@@ -59,7 +74,6 @@ export default async function GlobalFooter() {
         </div>
       </div>
 
-      {/* Copyright */}
       <div className="max-w-[1000px] mx-auto mt-xl pt-m border-t border-border-light text-center text-xs text-text-tertiary">
         © 2026 Карта роста. Школа AI-инженеров. ИП Тимофеев Алексей Геннадьевич, ИНН 532002912418.
         <div className="mt-1">

@@ -1,5 +1,6 @@
 import { getDb } from "@/lib/db";
 import Link from "next/link";
+import { Search } from "lucide-react";
 import MobileMenu from "./mobile-menu";
 import AuthBlock from "./auth-block";
 import FavoritesIndicator from "./favorites-indicator";
@@ -93,6 +94,23 @@ export default async function GlobalHeader() {
       </div>
 
       <div className="header-right" style={{ display: "flex", alignItems: "center", gap: "var(--space-s)" }}>
+        <Link
+          href="/search"
+          className="header-search-link hide-mobile"
+          aria-label="Поиск по проекту"
+          title="Поиск"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 36,
+            height: 36,
+            color: "var(--color-text-secondary)",
+            textDecoration: "none",
+          }}
+        >
+          <Search size={16} />
+        </Link>
         <div className="header-knowledge">
           <KnowledgeButtons />
         </div>

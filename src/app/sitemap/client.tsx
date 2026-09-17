@@ -17,7 +17,13 @@ import {
   Sparkles,
   Wrench,
 } from "lucide-react";
-import { SITE_TREE } from "./site-map-data";
+import {
+  BEGINNER_HIDDEN_GROUPS,
+  SITE_TASK_HINTS,
+  SITE_TREE,
+  filterBeginnerItems,
+  matchTaskHints,
+} from "./site-map-data";
 import type { SiteTreeGroup, SiteTreeItem } from "./site-map-data";
 
 export type DynamicSiteSection = {
@@ -38,18 +44,20 @@ const GROUP_ICONS = {
   legacy: Archive,
 } as const;
 
-function filterItems(items: SiteTreeItem[], query: string): SiteTreeItem[] {
-  if (!query) return items;
+function filterItems(items: SiteTreeItem[], query: string, extraHrefs: Set<string>): SiteTreeItem[] {
+  if (!query && extraHrefs.size === 0) return items;
   return items.flatMap((item) => {
-    const children = filterItems(item.children || [], query);
-    const matches = `${item.title} ${item.description || ""} ${item.href || ""}`.toLowerCase().includes(query);
+    const children = filterItems(item.children || [], query, extraHrefs);
+    const haystack = `${item.title} ${item.description || ""} ${item.href || ""}`.toLowerCase();
+    const matches = (query && haystack.includes(query)) || Boolean(item.href && extraHrefs.has(item.href));
     if (!matches && children.length === 0) return [];
     return [{ ...item, children }];
   });
 }
 
-function TreeBranch({ item, level = 0 }: { item: SiteTreeItem; level?: number }) {
+function TreeBranch({ item, level = 0, highlightHref }: { item: SiteTreeItem; level?: number; highlightHref?: string }) {
   const hasChildren = Boolean(item.children?.length);
+  const isHit = Boolean(highlightHref && item.href === highlightHref);
   const content = (
     <>
       <span className="site-tree-node-dot" aria-hidden />
@@ -65,13 +73,18 @@ function TreeBranch({ item, level = 0 }: { item: SiteTreeItem; level?: number })
 
   return (
     <li className="site-tree-node" data-level={level}>
-      <div className={`site-tree-node-row ${!item.href ? "is-static" : ""}`}>
+      <div className={`site-tree-node-row ${!item.href ? "is-static" : ""}${isHit ? " is-task-hit" : ""}`}>
         {item.href ? <Link href={item.href}>{content}</Link> : <div>{content}</div>}
       </div>
       {hasChildren && (
         <ul className="site-tree-children">
           {item.children!.map((child) => (
-            <TreeBranch key={`${child.title}-${child.href || "planned"}`} item={child} level={level + 1} />
+            <TreeBranch
+              key={`${child.title}-${child.href || "planned"}`}
+              item={child}
+              level={level + 1}
+              highlightHref={highlightHref}
+            />
           ))}
         </ul>
       )}
@@ -81,10 +94,14 @@ function TreeBranch({ item, level = 0 }: { item: SiteTreeItem; level?: number })
 
 export default function SitemapClient({ dynamicSections }: { dynamicSections: DynamicSiteSection[] }) {
   const [query, setQuery] = useState("");
+  const [beginner, setBeginner] = useState(true);
   const [openMap, setOpenMap] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries(SITE_TREE.map((group) => [group.id, group.id !== "legacy"])),
+    Object.fromEntries(SITE_TREE.map((group) => [group.id, group.id !== "legacy" && group.id !== "service"])),
   );
   const normalizedQuery = query.trim().toLowerCase();
+  const matchedHints = useMemo(() => matchTaskHints(normalizedQuery), [normalizedQuery]);
+  const extraHrefs = useMemo(() => new Set(matchedHints.map((hint) => hint.href)), [matchedHints]);
+  const showFullTree = !beginner || Boolean(normalizedQuery);
 
   function setAllOpen(open: boolean) {
     setOpenMap((previous) => {
@@ -99,63 +116,114 @@ export default function SitemapClient({ dynamicSections }: { dynamicSections: Dy
     setOpenMap((previous) => ({ ...previous, [id]: open }));
   }
 
-  const groups = useMemo(
-    () => SITE_TREE.map((group) => ({ ...group, items: filterItems(group.items, normalizedQuery) }))
-      .filter((group) => group.items.length > 0),
-    [normalizedQuery],
-  );
-  const filteredDynamic = useMemo(
-    () => dynamicSections.map((section) => ({
+  const groups = useMemo(() => {
+    return SITE_TREE.filter((group) => showFullTree || !BEGINNER_HIDDEN_GROUPS.has(group.id))
+      .map((group) => {
+        const scopedItems = showFullTree ? group.items : filterBeginnerItems(group.items);
+        return { ...group, items: filterItems(scopedItems, normalizedQuery, extraHrefs) };
+      })
+      .filter((group) => group.items.length > 0);
+  }, [normalizedQuery, extraHrefs, showFullTree]);
+
+  const filteredDynamic = useMemo(() => {
+    if (beginner && !normalizedQuery) return [];
+    return dynamicSections.map((section) => ({
       ...section,
       items: normalizedQuery
         ? section.items.filter((item) => `${item.title} ${item.href}`.toLowerCase().includes(normalizedQuery))
         : section.items,
-    })).filter((section) => !normalizedQuery || section.items.length > 0 || section.title.toLowerCase().includes(normalizedQuery)),
-    [dynamicSections, normalizedQuery],
+    })).filter((section) => !normalizedQuery || section.items.length > 0 || section.title.toLowerCase().includes(normalizedQuery));
+  }, [dynamicSections, normalizedQuery, beginner]);
+
+  const visibleTree = showFullTree ? SITE_TREE : SITE_TREE.filter((group) => !BEGINNER_HIDDEN_GROUPS.has(group.id));
+  const staticCount = visibleTree.reduce(
+    (total, group) => total + countItems(showFullTree ? group.items : filterBeginnerItems(group.items)),
+    0,
   );
-  const staticCount = SITE_TREE.reduce((total, group) => total + countItems(group.items), 0);
-  const dynamicCount = dynamicSections.reduce((total, section) => total + section.items.length, 0);
+  const dynamicCount = beginner && !normalizedQuery
+    ? 0
+    : dynamicSections.reduce((total, section) => total + section.items.length, 0);
+  const highlightHref = matchedHints[0]?.href;
 
   return (
     <div className="site-tree-page">
       <header className="site-tree-hero">
         <div className="site-tree-hero-icon"><FolderTree size={28} /></div>
-        <span>Навигация без лабиринта</span>
+        <span>Полная карта, не первый шаг</span>
         <h1>Карта сайта ProektMap</h1>
         <p>
-          Обычное дерево всех публичных разделов: открывайте ветки, находите страницу
-          по названию или URL и сразу переходите по ссылке.
+          Здесь лежит вся вселенная разделов. Новичку достаточно режима «Новичок» и задачи вроде
+          «запустить магазин». Если нужен продукт сегодня — начните с готового маршрута.
         </p>
         <div className="site-tree-stats">
-          <div><strong>{staticCount}</strong><span>страниц и разделов</span></div>
+          <div><strong>{staticCount}</strong><span>страниц в этом режиме</span></div>
           <div><strong>{dynamicCount}</strong><span>материалов в каталогах</span></div>
-          <div><strong>{SITE_TREE.length}</strong><span>главных веток</span></div>
+          <div><strong>{groups.length}</strong><span>видимых веток</span></div>
         </div>
       </header>
 
       <main className="site-tree-shell">
-        <section className="site-tree-toolbar" aria-label="Поиск и управление деревом">
+        <section className="site-tree-toolbar" aria-label="Поиск и режим карты">
           <label>
             <Search size={18} />
             <input
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Найти раздел, страницу или URL…"
-              aria-label="Найти раздел, страницу или URL"
+              placeholder="Хочу запустить магазин, собрать SaaS, сделать бота…"
+              aria-label="Найти раздел по задаче, названию или URL"
             />
           </label>
           <div>
+            <button
+              type="button"
+              className={beginner ? "is-active" : undefined}
+              onClick={() => setBeginner(true)}
+            >
+              Новичок
+            </button>
+            <button
+              type="button"
+              className={!beginner ? "is-active" : undefined}
+              onClick={() => setBeginner(false)}
+            >
+              Вся карта
+            </button>
             <button type="button" onClick={() => setAllOpen(true)}>Развернуть всё</button>
             <button type="button" onClick={() => setAllOpen(false)}>Свернуть всё</button>
           </div>
         </section>
 
+        <section className="site-tree-tasks" aria-label="Поиск по задаче">
+          {SITE_TASK_HINTS.map((hint) => (
+            <button
+              key={hint.id}
+              type="button"
+              className={query === hint.query ? "is-active" : undefined}
+              onClick={() => setQuery(hint.query)}
+            >
+              {hint.label}
+            </button>
+          ))}
+          <Link href="/resheniya" className="site-tree-start-link">Начать с маршрута →</Link>
+        </section>
+
+        {matchedHints.length > 0 && (
+          <div className="site-tree-task-hits">
+            {matchedHints.map((hint) => (
+              <Link key={hint.id} href={hint.href}>
+                Задача: {hint.label}
+                <code>{hint.href}</code>
+              </Link>
+            ))}
+          </div>
+        )}
+
         {groups.length === 0 && filteredDynamic.length === 0 ? (
           <div className="site-tree-empty">
             <Search size={24} />
             <strong>Ничего не найдено</strong>
-            <span>Попробуйте название раздела или часть URL.</span>
+            <span>Попробуйте задачу: магазин, SaaS, бот — или часть URL.</span>
           </div>
         ) : (
           <div className="site-tree-layout">
@@ -166,6 +234,7 @@ export default function SitemapClient({ dynamicSections }: { dynamicSections: Dy
                   group={group}
                   open={Boolean(normalizedQuery) || (openMap[group.id] ?? group.id !== "legacy")}
                   onOpenChange={(open) => toggleOpen(group.id, open)}
+                  highlightHref={highlightHref}
                 />
               ))}
             </section>
@@ -207,8 +276,8 @@ export default function SitemapClient({ dynamicSections }: { dynamicSections: Dy
         <section className="site-tree-note">
           <Bot size={20} />
           <div>
-            <strong>Карта показывает публичную часть проекта.</strong>
-            <span>API, административные и персональные динамические URL намеренно не публикуются. Новые страницы добавляются в единый реестр, а материалы каталогов подтягиваются автоматически.</span>
+            <strong>Карта инвентаризует, главная маршрутизирует.</strong>
+            <span>Режим «Новичок» прячет архив, лаборатории и planned-страницы. Новые разделы добавляются спицей в существующий хаб, а не отдельной вселенной.</span>
           </div>
         </section>
       </main>
@@ -220,10 +289,12 @@ function TreeGroup({
   group,
   open,
   onOpenChange,
+  highlightHref,
 }: {
   group: SiteTreeGroup;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  highlightHref?: string;
 }) {
   const Icon = GROUP_ICONS[group.id as keyof typeof GROUP_ICONS] || FolderTree;
   return (
@@ -235,7 +306,9 @@ function TreeGroup({
         <ChevronDown size={18} />
       </summary>
       <ul className="site-tree-list">
-        {group.items.map((item) => <TreeBranch key={`${item.title}-${item.href || "group"}`} item={item} />)}
+        {group.items.map((item) => (
+          <TreeBranch key={`${item.title}-${item.href || "group"}`} item={item} highlightHref={highlightHref} />
+        ))}
       </ul>
     </details>
   );

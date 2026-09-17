@@ -1,11 +1,15 @@
 import SitemapClient from "./client";
 import type { DynamicSiteSection } from "./client";
 import { getDb } from "@/lib/db";
+import { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
-export const metadata = {
+export const metadata: Metadata = {
   title: "Карта сайта ProektMap — все разделы и страницы",
-  description: "Полное древовидное меню ProektMap: готовые решения AI, инструменты, знания, каталоги, личный кабинет, документы и архивные маршруты.",
+  description: "Полное дерево публичных разделов ProektMap: режим новичка, поиск по задаче и переход в готовые AI-маршруты.",
+  alternates: {
+    canonical: "https://proektmap.ru/sitemap",
+  },
 };
 
 export default async function Page() {

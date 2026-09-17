@@ -1,17 +1,9 @@
-import { getDb } from "@/lib/db/index";
 import AnimatedHero from "@/components/hero/animated-hero";
-import ClaudeAcademyCallout from "@/components/academy/claude-academy-callout";
-import KopilkaHomeBanner from "@/components/kopilka/kopilka-home-banner";
-import { CommunityPulseHero, CommunityStats } from "@/components/originkit/community-pulse";
+import HomeStartExample from "@/components/home/home-start-example";
 import Link from "next/link";
-import { ArrowRight, Map, Bot, Rocket, Route, Sparkles, Boxes, Compass, Plus, Flame, Eye, Layers, Crown, Lock, Wrench, Zap, Image as ImageIcon, Calculator, Code2, Play } from "lucide-react";
-import { UI_PATTERNS } from "@/app/ui-patterns/data";
-import { MICROSERVICES, normalizeMediaUrl } from "@/lib/services/data";
-import { getArsenalHubStats } from "@/lib/arsenal";
-import { formatDuration, VK_VIDEO_CHANNELS } from "@/lib/vk-video";
+import { ArrowRight, Boxes, Compass, GraduationCap, Route, Wrench } from "lucide-react";
+import { HOME_LIVE_ROUTES, HOME_MORE_LAYERS, HOME_STATIONS } from "@/lib/home/stations-data";
 import { Metadata } from "next";
-
-export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "ProektMap — Карта роста и готовые AI-решения для создания продуктов",
@@ -21,845 +13,105 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function Home() {
-  const db = await getDb();
-  // «Популярное за неделю» = посты, опубликованные за 7 дней, по просмотрам (не all-time архив)
-  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-  const popularSelect = { title: true, slug: true, publishedAt: true, viewCount: true, impactScore: true } as const;
+const STATION_ICONS = {
+  route: Route,
+  architect: Compass,
+  tools: Wrench,
+  learn: GraduationCap,
+} as const;
 
-  const [
-    totalUsers,
-    totalProjects,
-    totalTools,
-    totalTerms,
-    totalPosts,
-    latestPosts,
-    latestUsers,
-    latestProjects,
-    popularWeekRaw,
-    latestTerms,
-    patternMetas,
-    microserviceMetas,
-    latestVideos,
-  ] = await Promise.all([
-    db.user.count(),
-    db.aiProject.count({ where: { isPublished: true, moderationStatus: "approved" } }),
-    db.aITool.count(),
-    db.glossaryTerm.count({ where: { isPublished: true } }),
-    db.blogPost.count({ where: { status: "published" } }),
-    db.blogPost.findMany({ where: { status: "published" }, orderBy: { publishedAt: "desc" }, take: 3, select: { title: true, slug: true, excerpt: true, coverImage: true, publishedAt: true, viewCount: true } }),
-    db.user.findMany({
-      orderBy: { createdAt: "desc" },
-      take: 8,
-      select: { id: true, name: true, email: true, avatar: true, createdAt: true, status: true, headline: true, role: true, publicProfile: true },
-    }),
-    db.aiProject.findMany({
-      where: { isPublished: true, moderationStatus: "approved" },
-      orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
-      take: 6,
-      include: {
-        user: {
-          select: { id: true, name: true, email: true, avatar: true, status: true, headline: true },
-        },
-      },
-    }),
-    db.blogPost.findMany({
-      where: { status: "published", publishedAt: { gte: weekAgo } },
-      orderBy: [{ viewCount: "desc" }, { impactScore: "desc" }],
-      take: 3,
-      select: popularSelect,
-    }),
-    db.glossaryTerm.findMany({ where: { isPublished: true }, orderBy: { createdAt: "desc" }, take: 6, select: { term: true, slug: true, simpleExplanation: true, level: true } }),
-    db.uiPatternMeta.findMany(),
-    db.microserviceMeta.findMany(),
-    db.vkVideo.findMany({
-      where: { isPublished: true },
-      orderBy: { publishedAt: "desc" },
-      take: 4,
-      select: { id: true, title: true, thumbUrl: true, duration: true, views: true, publishedAt: true, vkUrl: true, channelSlug: true },
-    }).catch(() => [] as any[]),
-  ]);
-
-  // Если за 7 дней мало постов — добираем из 14 дней, чтобы блок не пустел
-  let popularPosts = popularWeekRaw;
-  if (popularPosts.length < 3) {
-    const twoWeeksAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
-    const fill = await db.blogPost.findMany({
-      where: {
-        status: "published",
-        publishedAt: { gte: twoWeeksAgo },
-        slug: { notIn: popularPosts.map((p) => p.slug) },
-      },
-      orderBy: [{ viewCount: "desc" }, { impactScore: "desc" }],
-      take: 3 - popularPosts.length,
-      select: popularSelect,
-    });
-    popularPosts = [...popularPosts, ...fill];
-  }
-
-  const patternMetaMap: Record<string, any> = {};
-  (patternMetas || []).forEach((m: any) => {
-    patternMetaMap[m.slug] = m;
-  });
-
-  const serviceMetaMap: Record<string, any> = {};
-  (microserviceMetas || []).forEach((m: any) => {
-    serviceMetaMap[m.slug] = m;
-  });
-
-  const showcaseServices = MICROSERVICES.map((s) => {
-    const meta = serviceMetaMap[s.slug];
-    return {
-      slug: s.slug,
-      title: meta?.customTitle || s.title,
-      description: meta?.customDesc || s.shortDescription,
-      category: s.category,
-      coverImage: normalizeMediaUrl(meta?.coverImage || s.coverImage || ""),
-      viewCount: meta?.viewCount || 0,
-      badges: s.badges,
-      status: s.status,
-      gradient: s.gradient,
-      icon: s.icon,
-    };
-  });
-
-  // Последние добавленные всегда первые
-  const orderedPatterns = [...UI_PATTERNS].reverse();
-
-  const showcasePatterns = orderedPatterns.slice(0, 6).map((p) => {
-    const meta = patternMetaMap[p.slug];
-    return {
-      slug: p.slug,
-      title: meta?.customTitle || p.titleRu,
-      description: meta?.customDesc || p.shortDescription,
-      category: p.category,
-      isPro: meta?.isPro ?? (p.difficulty === "advanced" || p.difficulty === "intermediate"),
-      screenshot: meta?.screenshot || "",
-    };
-  });
-
-  const arsenalStats = getArsenalHubStats();
-
-  const communityStats: CommunityStats = {
-    totalUsers,
-    totalProjects,
-    totalSolutions: 2,
-    totalTools,
-    totalArsenalTools: arsenalStats.tools,
-    totalTerms,
-    totalPosts,
-    totalSkills: 15,
-  };
-
+export default function Home() {
   return (
     <div className="home-page" style={{ fontFamily: "Inter, sans-serif", background: "var(--color-bg-primary)", color: "var(--color-text-primary)", minHeight: "100vh" }}>
-      {/* Hero */}
       <AnimatedHero>
-      <div className="home-hero-content" style={{ background: "transparent", padding: "80px 20px 50px", textAlign: "center" }}>
-        <div className="home-hero-badge" style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 14px", borderRadius: "var(--radius-full)", background: "var(--color-accent-light)", color: "var(--color-accent)", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: "var(--space-m)" }}>
-          <Sparkles size={14} /> Новый центр ProektMap
+        <div className="home-hero-content" style={{ background: "transparent", padding: "80px 20px 50px", textAlign: "center" }}>
+          <div className="home-hero-badge" style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 14px", borderRadius: "var(--radius-full)", background: "var(--color-accent-light)", color: "var(--color-accent)", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: "var(--space-m)" }}>
+            Что сделать сегодня
+          </div>
+          <h1 className="home-hero-title" style={{ fontFamily: "var(--font-heading)", fontSize: "clamp(28px, 5vw, 40px)", fontWeight: 800, lineHeight: 1.05, marginBottom: "var(--space-s)", letterSpacing: "-0.02em" }}>
+            Не изучайте AI бесконечно.<br />Соберите работающий продукт
+          </h1>
+          <p className="home-hero-lead" style={{ fontSize: "var(--text-l)", color: "var(--color-text-secondary)", maxWidth: 520, margin: "0 auto", lineHeight: 1.6 }}>
+            ProektMap уже выбрал стек, программы, модели, команды и промпты. Выберите продукт и выполняйте готовый маршрут до production.
+          </p>
+          <div className="home-solution-flow" aria-label="Модель готового решения">
+            {["Продукт", "Рекомендация", "Команда", "Результат", "Проверка"].map((step, index) => (
+              <div key={step}>
+                <span>{index + 1}</span>
+                <strong>{step}</strong>
+                {index < 4 && <ArrowRight size={13} aria-hidden />}
+              </div>
+            ))}
+          </div>
+          <div className="home-hero-actions" style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: "var(--space-xl)", flexWrap: "wrap" }}>
+            <Link href="/resheniya" className="home-hero-action home-solutions-primary" style={{ display: "flex", alignItems: "center", gap: 8, padding: "17px 34px", borderRadius: "var(--radius-m)", background: "var(--color-accent)", color: "white", textDecoration: "none", fontSize: "var(--text-m)", fontWeight: 800 }}>
+              Открыть готовые решения AI <ArrowRight size={18} />
+            </Link>
+            <Link href="/resheniya/saas-product" className="home-hero-action" style={{ display: "flex", alignItems: "center", gap: 6, padding: "14px 28px", borderRadius: "var(--radius-m)", background: "var(--color-surface)", color: "var(--color-accent)", border: "1px solid var(--color-accent)", textDecoration: "none", fontSize: "var(--text-s)", fontWeight: 700 }}>
+              Посмотреть маршрут SaaS
+            </Link>
+          </div>
         </div>
-        <h1 className="home-hero-title" style={{ fontFamily: "var(--font-heading)", fontSize: "clamp(28px, 5vw, 40px)", fontWeight: 800, lineHeight: 1.05, marginBottom: "var(--space-s)", letterSpacing: "-0.02em" }}>
-          Не изучайте AI бесконечно.<br />Соберите работающий продукт
-        </h1>
-        <p className="home-hero-lead" style={{ fontSize: "var(--text-l)", color: "var(--color-text-secondary)", maxWidth: 520, margin: "0 auto", lineHeight: 1.6 }}>
-          ProektMap уже выбрал стек, программы, модели, команды и промпты. Выберите продукт и выполняйте готовый маршрут до production.
-        </p>
-        <div className="home-solution-flow" aria-label="Модель готового решения">
-          {["Продукт", "Рекомендация", "Команда", "Результат", "Проверка"].map((step, index) => (
-            <div key={step}>
-              <span>{index + 1}</span>
-              <strong>{step}</strong>
-              {index < 4 && <ArrowRight size={13} aria-hidden />}
-            </div>
-          ))}
-        </div>
-        <div className="home-hero-actions" style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: "var(--space-xl)", flexWrap: "wrap" }}>
-          <Link href="/resheniya" className="home-hero-action home-solutions-primary" style={{ display: "flex", alignItems: "center", gap: 8, padding: "17px 34px", borderRadius: "var(--radius-m)", background: "var(--color-accent)", color: "white", textDecoration: "none", fontSize: "var(--text-m)", fontWeight: 800 }}>
-            Открыть готовые решения AI <ArrowRight size={18} />
-          </Link>
-          <Link href="/resheniya/saas-product" className="home-hero-action" style={{ display: "flex", alignItems: "center", gap: 6, padding: "14px 28px", borderRadius: "var(--radius-m)", background: "var(--color-surface)", color: "var(--color-accent)", border: "1px solid var(--color-accent)", textDecoration: "none", fontSize: "var(--text-s)", fontWeight: 700 }}>
-            Посмотреть маршрут SaaS
-          </Link>
-        </div>
-      </div>
       </AnimatedHero>
+
       <div style={{ height: 1, background: "var(--color-border)" }} />
 
-      {/* Копилка дизайна / AI элементов */}
-      <KopilkaHomeBanner />
-
-      {/* OriginKit Community Pulse & Neural Ecosystem Hero */}
-      <div style={{ padding: "var(--space-xxl) 0 0" }}>
-        <CommunityPulseHero stats={communityStats} />
-      </div>
-
-      {/* Как это работает */}
-      <div style={{ maxWidth: 960, margin: "0 auto", padding: "var(--space-xl) var(--space-m)" }}>
-        <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-xl)", fontWeight: 700, textAlign: "center", marginBottom: "var(--space-xl)", letterSpacing: "-0.01em" }}>
-          Как это работает
-        </h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "var(--space-l)" }}>
-          <div style={{ background: "var(--color-bg-primary)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-m)", padding: "var(--space-xl)", textAlign: "center", position: "relative" }}>
-            <div style={{ position: "absolute", top: 12, left: 16, fontSize: "var(--text-xs)", fontWeight: 800, color: "var(--color-accent)", fontFamily: "var(--font-heading)" }}>1</div>
-            <Map size={36} style={{ color: "var(--color-accent)", marginBottom: "var(--space-s)" }} />
-            <h3 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-m)", fontWeight: 700, marginBottom: "var(--space-xs)" }}>Выберите результат</h3>
-            <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.6, margin: 0 }}>Начните не с теории, а с конкретной цели: например, запустить SaaS с работающим сценарием и оплатой.</p>
-          </div>
-          <div style={{ background: "var(--color-bg-primary)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-m)", padding: "var(--space-xl)", textAlign: "center", position: "relative" }}>
-            <div style={{ position: "absolute", top: 12, left: 16, fontSize: "var(--text-xs)", fontWeight: 800, color: "var(--color-accent)", fontFamily: "var(--font-heading)" }}>2</div>
-            <Bot size={36} style={{ color: "var(--color-accent)", marginBottom: "var(--space-s)" }} />
-            <h3 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-m)", fontWeight: 700, marginBottom: "var(--space-xs)" }}>Сделайте и докажите</h3>
-            <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.6, margin: 0 }}>Каждый этап заканчивается артефактом и проверками. Прогресс растёт только после доказанного результата.</p>
-          </div>
-          <div style={{ background: "var(--color-bg-primary)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-m)", padding: "var(--space-xl)", textAlign: "center", position: "relative" }}>
-            <div style={{ position: "absolute", top: 12, left: 16, fontSize: "var(--text-xs)", fontWeight: 800, color: "var(--color-accent)", fontFamily: "var(--font-heading)" }}>3</div>
-            <Rocket size={36} style={{ color: "var(--color-accent)", marginBottom: "var(--space-s)" }} />
-            <h3 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-m)", fontWeight: 700, marginBottom: "var(--space-xs)" }}>Получите продукт</h3>
-            <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.6, margin: 0 }}>На финише остаются работающий продукт, принятые решения, файлы и проверяемый внешний сигнал.</p>
-          </div>
+      <section className="home-hub" aria-labelledby="home-stations-title">
+        <h2 id="home-stations-title">Что вы хотите сделать сегодня?</h2>
+        <p className="home-hub-lead">Четыре входа. Каталоги и лаборатории живут внутри станций, а не на первом экране.</p>
+        <div className="home-station-grid">
+          {HOME_STATIONS.map((station) => {
+            const Icon = STATION_ICONS[station.id as keyof typeof STATION_ICONS];
+            return (
+              <Link
+                key={station.id}
+                href={station.href}
+                className={`home-station-card${station.primary ? " is-primary" : ""}`}
+              >
+                <div className="home-station-kicker">
+                  <Icon size={18} />
+                  <span>{station.kicker}</span>
+                </div>
+                <strong>{station.title}</strong>
+                <p>{station.description}</p>
+                <span className="home-station-cta">
+                  {station.cta} <ArrowRight size={14} />
+                </span>
+              </Link>
+            );
+          })}
         </div>
-      </div>
 
-      {/* Claude Academy → полигон результата (не в hero) */}
-      <div style={{ maxWidth: 960, margin: "0 auto", padding: "0 var(--space-m) var(--space-xl)" }}>
-        <ClaudeAcademyCallout />
-      </div>
-
-      {/* Точки входа */}
-      <div style={{ maxWidth: 960, margin: "0 auto", padding: "0 var(--space-m) var(--space-xl)" }}>
-        <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-xl)", fontWeight: 700, textAlign: "center", marginBottom: "var(--space-l)", letterSpacing: "-0.01em" }}>
-          Начните с подходящей точки
-        </h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))", gap: "var(--space-l)" }}>
-          <Link href="/resheniya" style={{ textDecoration: "none", color: "inherit", background: "var(--color-bg-primary)", border: "1px solid var(--color-border)", borderTop: "4px solid var(--color-accent)", padding: "var(--space-xl)", display: "flex", flexDirection: "column" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: "var(--space-m)" }}>
-              <div style={{ width: 48, height: 48, background: "var(--color-accent)", borderRadius: "var(--radius-s)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}><Route size={22} /></div>
-              <div><div style={{ fontSize: "var(--text-s)", fontWeight: 800, fontFamily: "var(--font-heading)", marginBottom: 2 }}>Пройти готовый маршрут</div><div style={{ fontSize: 11, color: "var(--color-accent)", fontWeight: 700 }}>SaaS или Telegram-бот</div></div>
-            </div>
-            <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.7, flex: 1, marginBottom: "var(--space-m)" }}>В SaaS-маршруте программа, модели, стек, GitHub, авторизация, AI, оплата и deploy уже разложены по готовым шагам.</p>
-            <div style={{ marginTop: "auto", fontSize: "var(--text-xs)", fontWeight: 700, color: "var(--color-accent)", fontFamily: "var(--font-heading)" }}>2 МАРШРУТА → ПРОВЕРЕННЫЙ РЕЗУЛЬТАТ</div>
-          </Link>
-          <Link href="/architect" style={{ textDecoration: "none", color: "inherit", background: "var(--color-bg-primary)", border: "1px solid var(--color-border)", borderTop: "4px solid #8b5cf6", padding: "var(--space-xl)", display: "flex", flexDirection: "column" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: "var(--space-m)" }}>
-              <div style={{ width: 48, height: 48, background: "#8b5cf6", borderRadius: "var(--radius-s)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}><Compass size={22} /></div>
-              <div><div style={{ fontSize: "var(--text-s)", fontWeight: 800, fontFamily: "var(--font-heading)", marginBottom: 2 }}>Спроектировать свою идею</div><div style={{ fontSize: 11, color: "#8b5cf6", fontWeight: 700 }}>AI-Архитектор</div></div>
-            </div>
-            <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", lineHeight: 1.7, flex: 1, marginBottom: "var(--space-m)" }}>Опишите идею и получите сущности, стек, паттерны, MCP, стоимость и план реализации.</p>
-            <div style={{ marginTop: "auto", fontSize: "var(--text-xs)", fontWeight: 700, color: "#8b5cf6", fontFamily: "var(--font-heading)" }}>ИДЕЯ → ТЕХНИЧЕСКАЯ КАРТА</div>
-          </Link>
+        <h3 className="home-routes-title">Три живых маршрута</h3>
+        <div className="home-route-grid">
+          {HOME_LIVE_ROUTES.map((route) => (
+            <Link key={route.href} href={route.href} className="home-route-card">
+              <span>{route.duration}</span>
+              <strong>{route.title}</strong>
+              <p>{route.result}</p>
+              <em>Открыть маршрут <ArrowRight size={14} /></em>
+            </Link>
+          ))}
         </div>
-      </div>
 
-      {/* Ecosystem Banner */}
-      <div style={{ maxWidth: 960, margin: "0 auto", padding: "0 var(--space-m) var(--space-m)" }}>
-        <Link href="/sitemap" style={{ display: "flex", alignItems: "center", gap: "var(--space-m)", padding: "var(--space-l)", background: "var(--color-accent-light)", border: "1px solid var(--color-accent)", borderLeft: "4px solid var(--color-accent)", textDecoration: "none", color: "inherit" }}>
-          <Boxes size={24} style={{ color: "var(--color-accent)", flexShrink: 0 }} />
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: "var(--text-xs)", fontWeight: 700, color: "var(--color-accent)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 }}>Экосистема вокруг результата</div>
-            <div style={{ fontSize: "var(--text-s)", fontWeight: 700, fontFamily: "var(--font-heading)" }}>Полная карта сайта — все разделы деревом</div>
-            <div style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", marginTop: 2 }}>Открывайте ветки, ищите по названию или URL и сразу переходите на нужную страницу</div>
+        <HomeStartExample />
+
+        <Link href="/sitemap" className="home-map-link">
+          <Boxes size={22} />
+          <div>
+            <strong>Полная карта проекта</strong>
+            <span>Все разделы деревом, режим новичка и поиск по задаче. Не вместо старта — если нужен обзор.</span>
           </div>
-          <ArrowRight size={20} style={{ color: "var(--color-accent)", flexShrink: 0 }} />
+          <ArrowRight size={18} />
         </Link>
-      </div>
 
-      {/* UI Pattern Library / UI-Atlas Showcase Widget */}
-      <div style={{ maxWidth: 960, margin: "0 auto", padding: "var(--space-l) var(--space-m) var(--space-xxl)" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "var(--space-l)", flexWrap: "wrap", gap: 12 }}>
-          <div>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 700, color: "var(--color-accent)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 }}>
-              <Sparkles size={13} /> Золотой фонд UI-инжиниринга
-            </div>
-            <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-xl)", fontWeight: 800, margin: 0, letterSpacing: "-0.01em" }}>
-              Готовые секции и виджеты для сайта
-            </h2>
-            <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", margin: "4px 0 0", maxWidth: 540 }}>
-              Проверенные визуальные приёмы, анатомия CSS, слой WHY, Negative Prompts и чистый код со строгой геометрией 0px radius.
-            </p>
-          </div>
-
-          <Link
-            href="/ui-patterns"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 6,
-              padding: "8px 16px",
-              background: "var(--color-accent)",
-              color: "#fff",
-              textDecoration: "none",
-              fontSize: "var(--text-xs)",
-              fontWeight: 700,
-            }}
-          >
-            <span>Все секции и виджеты ({UI_PATTERNS.length})</span>
-            <ArrowRight size={14} />
-          </Link>
-        </div>
-
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "var(--space-m)" }}>
-          {showcasePatterns.map((p) => (
-            <Link
-              key={p.slug}
-              href={`/ui-patterns/${p.slug}`}
-              style={{
-                textDecoration: "none",
-                color: "inherit",
-                background: "var(--color-bg-primary)",
-                border: "1px solid var(--color-border)",
-                padding: "var(--space-m)",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                position: "relative",
-                transition: "border-color 0.15s ease",
-              }}
-            >
-              <div>
-                {/* Screenshot cover image (как у новостей) */}
-                {p.screenshot ? (
-                  <img
-                    src={p.screenshot}
-                    alt={p.title}
-                    style={{
-                      width: "100%",
-                      height: 140,
-                      objectFit: "cover",
-                      marginBottom: "var(--space-s)",
-                      border: "1px solid var(--color-border)",
-                      display: "block",
-                    }}
-                  />
-                ) : null}
-
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-                  <span style={{ fontSize: 10, fontFamily: "var(--font-mono)", color: "var(--color-text-tertiary)", textTransform: "uppercase" }}>
-                    {p.category}
-                  </span>
-
-                  {p.isPro ? (
-                    <span style={{ display: "inline-flex", alignItems: "center", gap: 3, padding: "1px 6px", background: "var(--color-accent)", color: "#fff", fontSize: 9, fontWeight: 800 }}>
-                      <Crown size={10} /> PRO
-                    </span>
-                  ) : (
-                    <span style={{ padding: "1px 6px", background: "rgba(34, 197, 94, 0.1)", color: "var(--color-success)", border: "1px solid var(--color-success)", fontSize: 9, fontWeight: 800 }}>
-                      FREE
-                    </span>
-                  )}
-                </div>
-
-                <h3 style={{ fontSize: "var(--text-s)", fontWeight: 800, margin: "0 0 6px 0", lineHeight: 1.3 }}>
-                  {p.title}
-                </h3>
-                <p style={{ fontSize: 11, color: "var(--color-text-secondary)", lineHeight: 1.5, margin: 0, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-                  {p.description}
-                </p>
-              </div>
-
-              <div style={{ marginTop: 14, paddingTop: 10, borderTop: "1px solid var(--color-border-light)", display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 11, color: "var(--color-accent)", fontWeight: 700 }}>
-                <span>Открыть песочницу</span>
-                <ArrowRight size={12} />
-              </div>
-            </Link>
+        <nav className="home-more-layers" aria-label="Другие слои проекта">
+          {HOME_MORE_LAYERS.map((item) => (
+            <Link key={item.href} href={item.href}>{item.label}</Link>
           ))}
-        </div>
-      </div>
+        </nav>
+      </section>
 
-      {/* Online Microservices & Utilities Section Widget */}
-      <div style={{ maxWidth: 960, margin: "0 auto", padding: "0 var(--space-m) var(--space-xxl)" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "var(--space-l)", flexWrap: "wrap", gap: 12 }}>
-          <div>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 700, color: "var(--color-accent)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 }}>
-              <Zap size={13} /> Быстрые онлайн-утилиты
-            </div>
-            <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-xl)", fontWeight: 800, margin: 0, letterSpacing: "-0.01em" }}>
-              Микросервисы под задачи
-            </h2>
-            <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", margin: "4px 0 0", maxWidth: 540 }}>
-              Изолированные инструменты для селлеров, AI-инженеров и вайбкодеров. 100% клиентская обработка прямо в браузере без задержек.
-            </p>
-          </div>
-
-          <Link
-            href="/services"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 6,
-              padding: "8px 16px",
-              background: "var(--color-accent)",
-              color: "#fff",
-              textDecoration: "none",
-              fontSize: "var(--text-xs)",
-              fontWeight: 700,
-            }}
-          >
-            <span>Все микросервисы ({showcaseServices.length})</span>
-            <ArrowRight size={14} />
-          </Link>
-        </div>
-
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "var(--space-m)" }}>
-          {showcaseServices.map((s) => (
-            <Link
-              key={s.slug}
-              href={`/services/${s.slug}`}
-              style={{
-                textDecoration: "none",
-                color: "inherit",
-                background: "var(--color-bg-primary)",
-                border: "1px solid var(--color-border)",
-                padding: "var(--space-m)",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                position: "relative",
-                transition: "border-color 0.15s ease, transform 0.15s ease",
-              }}
-            >
-              <div>
-                {/* Cover Image or Gradient fallback */}
-                {s.coverImage ? (
-                  <img
-                    src={s.coverImage}
-                    alt={s.title}
-                    style={{
-                      width: "100%",
-                      height: 140,
-                      objectFit: "cover",
-                      marginBottom: "var(--space-s)",
-                      border: "1px solid var(--color-border)",
-                      display: "block",
-                    }}
-                  />
-                ) : (
-                  <div
-                    style={{
-                      width: "100%",
-                      height: 110,
-                      background: s.gradient || "var(--color-bg-secondary)",
-                      marginBottom: "var(--space-s)",
-                      border: "1px solid var(--color-border)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <div
-                      style={{
-                        padding: "8px 12px",
-                        background: "var(--color-surface)",
-                        borderRadius: "var(--radius-s)",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 6,
-                        boxShadow: "var(--shadow-s)",
-                      }}
-                    >
-                      <Wrench size={16} style={{ color: "var(--color-accent)" }} />
-                      <span style={{ fontSize: 11, fontWeight: 700 }}>ProektMap Service</span>
-                    </div>
-                  </div>
-                )}
-
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-                  <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
-                    {s.badges.slice(0, 2).map((b: string) => (
-                      <span
-                        key={b}
-                        style={{
-                          padding: "1px 6px",
-                          borderRadius: "var(--radius-s)",
-                          background: "var(--color-bg-secondary)",
-                          color: "var(--color-text-secondary)",
-                          fontSize: 9,
-                          fontWeight: 700,
-                        }}
-                      >
-                        {b}
-                      </span>
-                    ))}
-                  </div>
-
-                  {s.status === "active" ? (
-                    <span style={{ display: "inline-flex", alignItems: "center", gap: 3, padding: "1px 6px", background: "rgba(16, 185, 129, 0.1)", color: "var(--color-accent)", border: "1px solid var(--color-accent)", fontSize: 9, fontWeight: 800 }}>
-                      <Zap size={10} /> READY
-                    </span>
-                  ) : (
-                    <span style={{ padding: "1px 6px", background: "rgba(234, 179, 8, 0.1)", color: "var(--color-warning)", border: "1px solid var(--color-warning)", fontSize: 9, fontWeight: 800 }}>
-                      SOON
-                    </span>
-                  )}
-                </div>
-
-                <h3 style={{ fontSize: "var(--text-s)", fontWeight: 800, margin: "0 0 6px 0", lineHeight: 1.3 }}>
-                  {s.title}
-                </h3>
-                <p style={{ fontSize: 11, color: "var(--color-text-secondary)", lineHeight: 1.5, margin: 0, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-                  {s.description}
-                </p>
-              </div>
-
-              <div style={{ marginTop: 14, paddingTop: 10, borderTop: "1px solid var(--color-border-light)", display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 11, color: "var(--color-accent)", fontWeight: 700 }}>
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 4, color: "var(--color-text-tertiary)", fontWeight: 500 }}>
-                  <Eye size={12} /> {s.viewCount > 0 ? s.viewCount : 1}
-                </span>
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
-                  <span>Открыть</span>
-                  <ArrowRight size={12} />
-                </span>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </div>
-
-      {/* Search */}
-      <div style={{ maxWidth: 960, margin: "0 auto", padding: "var(--space-xl) var(--space-m)", textAlign: "center" }}>
-        <div style={{ fontSize: "var(--text-m)", fontWeight: 700, color: "var(--color-text-secondary)", marginBottom: "var(--space-m)" }}>
-          Найди термин, паттерн или инструмент
-        </div>
-        <form action="/search" method="GET" className="home-search-form" style={{ display: "flex", gap: 0, maxWidth: 500, margin: "0 auto", boxShadow: "0 2px 16px rgba(0,0,0,0.08)" }}>
-          <input name="q" placeholder="RAG, MCP, Prisma, SEO Аудитор..." style={{ flex: 1, padding: "14px 20px", fontSize: "var(--text-m)", border: "2px solid var(--color-border)", borderRight: "none", background: "var(--color-bg-primary)", outline: "none", color: "var(--color-text-primary)", boxSizing: "border-box" }} />
-          <button type="submit" style={{ padding: "14px 24px", border: "none", background: "var(--color-accent)", color: "white", fontWeight: 700, fontSize: "var(--text-s)", cursor: "pointer" }}> Найти</button>
-        </form>
-        <div style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: "var(--space-m)", flexWrap: "wrap", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)" }}>
-          Часто ищут: <a href="/search?q=MCP" style={{ color: "var(--color-accent)", textDecoration: "none" }}>MCP</a> <a href="/search?q=RAG" style={{ color: "var(--color-accent)", textDecoration: "none" }}>RAG</a> <a href="/search?q=Prisma" style={{ color: "var(--color-accent)", textDecoration: "none" }}>Prisma</a> <a href="/search?q=SEO" style={{ color: "var(--color-accent)", textDecoration: "none" }}>SEO</a>
-        </div>
-      </div>
-
-      {/* Behance-Style AI Showcase & Community Portfolio */}
-      {latestProjects.length > 0 && (
-        <div style={{ maxWidth: 960, margin: "0 auto", padding: "0 var(--space-m) var(--space-xxl)" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: "var(--space-l)", flexWrap: "wrap", gap: 12 }}>
-            <div>
-              <div style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 700, color: "var(--color-accent)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 }}>
-                <Sparkles size={13} /> Портфолио вайбкодеров
-              </div>
-              <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-xl)", fontWeight: 800, margin: 0, letterSpacing: "-0.01em" }}>
-                Свежие работы сообщества
-              </h2>
-            </div>
-
-            <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-              <Link
-                href="/projects/new"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 6,
-                  padding: "8px 16px",
-                  borderRadius: 6,
-                  background: "var(--color-accent)",
-                  color: "#fff",
-                  textDecoration: "none",
-                  fontSize: "var(--text-xs)",
-                  fontWeight: 700,
-                }}
-              >
-                <Plus size={14} /> Загрузить работу
-              </Link>
-              <Link
-                href="/ai-workshop"
-                style={{
-                  fontSize: "var(--text-xs)",
-                  color: "var(--color-text-secondary)",
-                  textDecoration: "none",
-                  fontWeight: 600,
-                }}
-              >
-                Все кейсы ({latestProjects.length}) →
-              </Link>
-            </div>
-          </div>
-
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "var(--space-l)" }}>
-            {latestProjects.map((p: any) => {
-              const authorName = p.user?.name || p.authorName || "Вайбкодер";
-              const authorAvatar = p.user?.avatar || p.authorAvatar || "";
-              const authorProfileUrl = p.userId ? `/profile/${p.userId}` : p.authorUrl || "#";
-              const aiList = (p.aiTools || "").split(",").map((s: string) => s.trim()).filter(Boolean);
-
-              return (
-                <div
-                  key={p.id}
-                  style={{
-                    background: "var(--color-bg-primary)",
-                    border: "1px solid var(--color-border)",
-                    borderRadius: "var(--radius-m)",
-                    overflow: "hidden",
-                    display: "flex",
-                    flexDirection: "column",
-                  }}
-                >
-                  {/* Image Cover */}
-                  <Link
-                    href={`/ai-workshop/${p.slug}`}
-                    style={{
-                      display: "block",
-                      width: "100%",
-                      aspectRatio: "16/10",
-                      background: p.screenshot ? `url(${p.screenshot}) center/cover` : "linear-gradient(135deg, #0f172a, #1e293b)",
-                      position: "relative",
-                      textDecoration: "none",
-                    }}
-                  >
-                    {!p.screenshot && (
-                      <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,0.7)", textAlign: "center", padding: 16 }}>
-                        <div style={{ fontSize: 13, fontWeight: 700 }}>{p.title}</div>
-                      </div>
-                    )}
-                    <span
-                      style={{
-                        position: "absolute",
-                        top: 8,
-                        left: 8,
-                        padding: "2px 8px",
-                        borderRadius: 4,
-                        fontSize: 10,
-                        fontWeight: 700,
-                        background: "rgba(0,0,0,0.7)",
-                        color: "#fff",
-                        backdropFilter: "blur(4px)",
-                      }}
-                    >
-                      {p.category}
-                    </span>
-                  </Link>
-
-                  {/* Body */}
-                  <div style={{ padding: "16px", display: "flex", flexDirection: "column", flex: 1 }}>
-                    <Link
-                      href={`/ai-workshop/${p.slug}`}
-                      style={{ textDecoration: "none", color: "inherit", marginBottom: 6 }}
-                    >
-                      <h3 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-s)", fontWeight: 700, margin: 0, lineHeight: 1.3 }}>
-                        {p.title}
-                      </h3>
-                    </Link>
-
-                    <p style={{ fontSize: 11, color: "var(--color-text-secondary)", lineHeight: 1.5, margin: "0 0 12px", flex: 1, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-                      {p.description}
-                    </p>
-
-                    {/* AI Tools */}
-                    {aiList.length > 0 && (
-                      <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 12 }}>
-                        {aiList.slice(0, 2).map((t: string) => (
-                          <span key={t} style={{ fontSize: 10, fontWeight: 600, padding: "2px 6px", borderRadius: 3, background: "rgba(15, 184, 128, 0.08)", color: "var(--color-accent)" }}>
-                            {t}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Author & Stats Footer */}
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid var(--color-border)", paddingTop: 10, marginTop: "auto" }}>
-                      <Link
-                        href={authorProfileUrl}
-                        style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", color: "inherit", minWidth: 0 }}
-                      >
-                        <div
-                          style={{
-                            width: 26,
-                            height: 26,
-                            borderRadius: "50%",
-                            background: authorAvatar ? `url(${authorAvatar}) center/cover` : "var(--color-bg-secondary)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            fontSize: 11,
-                            fontWeight: 700,
-                            flexShrink: 0,
-                          }}
-                        >
-                          {!authorAvatar && authorName[0].toUpperCase()}
-                        </div>
-                        <span style={{ fontSize: 11, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                          {authorName}
-                        </span>
-                      </Link>
-
-                      <div style={{ display: "flex", gap: 8, fontSize: 11, color: "var(--color-text-tertiary)", flexShrink: 0 }}>
-                        <span style={{ display: "flex", alignItems: "center", gap: 3 }}>
-                          <Flame size={12} color="#ef4444" /> {p.likesCount || 0}
-                        </span>
-                        <span style={{ display: "flex", alignItems: "center", gap: 3 }}>
-                          <Eye size={12} /> {p.viewCount || 0}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* 3 Content Blocks */}
-      <div style={{ maxWidth: 960, margin: "0 auto", padding: "0 var(--space-m) var(--space-xl)" }}>
-        {/* Latest VK videos */}
-        {latestVideos.length > 0 && (
-          <div style={{ marginBottom: "var(--space-xl)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-m)" }}>
-              <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-l)", fontWeight: 700, margin: 0 }}>Последние уроки</h2>
-              <a href="/video" style={{ fontSize: "var(--text-xs)", color: "var(--color-accent)", textDecoration: "none", fontWeight: 600 }}>Все видео →</a>
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "var(--space-m)" }}>
-              {latestVideos.map((v: any) => {
-                const ch = VK_VIDEO_CHANNELS.find((c) => c.slug === v.channelSlug);
-                return (
-                  <a
-                    key={v.id}
-                    href="/video"
-                    style={{
-                      textDecoration: "none",
-                      color: "inherit",
-                      border: "1px solid var(--color-border)",
-                      background: "var(--color-bg-primary)",
-                      display: "flex",
-                      flexDirection: "column",
-                      overflow: "hidden",
-                    }}
-                  >
-                    <div style={{ position: "relative", aspectRatio: "16/9", background: "var(--color-bg-secondary)" }}>
-                      {v.thumbUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={v.thumbUrl} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                      ) : null}
-                      <span
-                        style={{
-                          position: "absolute",
-                          inset: 0,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          background: "rgba(0,0,0,0.2)",
-                        }}
-                      >
-                        <span style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(0,0,0,0.65)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff" }}>
-                          <Play size={14} fill="#fff" />
-                        </span>
-                      </span>
-                      {v.duration > 0 && (
-                        <span style={{ position: "absolute", right: 6, bottom: 6, background: "rgba(0,0,0,0.75)", color: "#fff", fontSize: 10, fontWeight: 600, padding: "1px 5px" }}>
-                          {formatDuration(v.duration)}
-                        </span>
-                      )}
-                    </div>
-                    <div style={{ padding: "var(--space-m)" }}>
-                      <div style={{ fontSize: 10, fontWeight: 700, color: ch?.accent || "var(--color-text-tertiary)", marginBottom: 4 }}>
-                        {ch?.shortTitle || "VK Video"}
-                      </div>
-                      <div style={{ fontSize: "var(--text-xs)", fontWeight: 700, fontFamily: "var(--font-heading)", lineHeight: 1.35, marginBottom: 4 }}>
-                        {v.title}
-                      </div>
-                      <div style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>
-                        {v.publishedAt ? new Date(v.publishedAt).toLocaleDateString("ru") : ""}
-                        {v.views > 0 ? ` · ${v.views.toLocaleString("ru")}` : ""}
-                      </div>
-                    </div>
-                  </a>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* Latest Posts */}
-        {latestPosts.length > 0 && (
-          <div style={{ marginBottom: "var(--space-xl)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-m)" }}>
-              <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-l)", fontWeight: 700, margin: 0 }}>Новые посты</h2>
-              <a href="/blog" style={{ fontSize: "var(--text-xs)", color: "var(--color-accent)", textDecoration: "none", fontWeight: 600 }}>Все посты </a>
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "var(--space-m)" }}>
-              {latestPosts.map((p: any) => (
-                <a key={p.slug} href={`/blog/${p.slug}`} style={{ padding: "var(--space-l)", background: "var(--color-bg-primary)", border: "1px solid var(--color-border)", textDecoration: "none", color: "inherit", display: "flex", flexDirection: "column" }}>
-                  {p.coverImage && <img src={p.coverImage} alt="" style={{ width: "100%", height: 140, objectFit: "cover", marginBottom: "var(--space-s)" }} />}
-                  <div style={{ fontSize: "var(--text-xs)", fontWeight: 700, fontFamily: "var(--font-heading)", marginBottom: 4, lineHeight: 1.4 }}>{p.title}</div>
-                  {p.excerpt && <div style={{ fontSize: 11, color: "var(--color-text-tertiary)", lineHeight: 1.5, marginBottom: "var(--space-s)", flex: 1 }}>{p.excerpt.slice(0, 100)}{p.excerpt.length > 100 ? "..." : ""}</div>}
-                  <div style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>{new Date(p.publishedAt).toLocaleDateString("ru")} &middot; {p.viewCount || 0} просмотров</div>
-                </a>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Latest Users */}
-        {latestUsers.length > 0 && (
-          <div style={{ marginBottom: "var(--space-xl)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-m)" }}>
-              <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-l)", fontWeight: 700, margin: 0 }}>
-                Новые участники и вайбкодеры
-              </h2>
-              <Link href="/specialists" style={{ fontSize: "var(--text-xs)", color: "var(--color-accent)", textDecoration: "none", fontWeight: 600 }}>
-                Все специалисты ({latestUsers.length}) →
-              </Link>
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "var(--space-m)" }}>
-              {latestUsers.map((u: any) => (
-                <Link key={u.id} href={`/profile/${u.id}`} style={{ padding: "var(--space-m)", background: "var(--color-bg-primary)", border: "1px solid var(--color-border)", borderRadius: "var(--radius-m)", textDecoration: "none", color: "inherit", display: "flex", alignItems: "center", gap: "var(--space-m)" }}>
-                  <div style={{ width: 42, height: 42, borderRadius: "var(--radius-full)", background: u.avatar ? `url(${u.avatar}) center/cover` : "var(--color-bg-secondary)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 700, flexShrink: 0, border: "1px solid var(--color-border)" }}>
-                    {!u.avatar && (u.name?.[0] || u.email[0]).toUpperCase()}
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 700, fontSize: "var(--text-xs)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {u.name || u.email.split("@")[0]}
-                    </div>
-                    <div style={{ fontSize: 10, color: "var(--color-accent)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {u.headline || (u.status === "architect" ? "AI-Архитектор" : "Вайбкодер")}
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Popular Posts */}
-        {popularPosts.length > 0 && (
-          <div style={{ marginBottom: "var(--space-xl)" }}>
-            <div style={{ marginBottom: "var(--space-m)" }}>
-              <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-l)", fontWeight: 700, margin: 0 }}>Популярное за неделю</h2>
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: "var(--space-m)" }}>
-              {popularPosts.map((p: any, i: number) => (
-                <a key={p.slug} href={`/blog/${p.slug}`} style={{ padding: "var(--space-l)", background: "var(--color-bg-primary)", border: "1px solid var(--color-border)", textDecoration: "none", color: "inherit", display: "flex", alignItems: "center", gap: "var(--space-m)" }}>
-                  <div style={{ fontSize: "var(--text-xl)", fontWeight: 800, color: "var(--color-accent)", fontFamily: "var(--font-heading)", width: 32, flexShrink: 0 }}>{i + 1}</div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: "var(--text-xs)", fontWeight: 700, fontFamily: "var(--font-heading)", marginBottom: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{p.title}</div>
-                    <div style={{ fontSize: 10, color: "var(--color-text-tertiary)" }}>{new Date(p.publishedAt).toLocaleDateString("ru")} &middot; {p.viewCount || 0} просмотров</div>
-                  </div>
-                </a>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Latest Glossary */}
-        {latestTerms.length > 0 && (
-          <div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "var(--space-m)" }}>
-              <h2 style={{ fontFamily: "var(--font-heading)", fontSize: "var(--text-l)", fontWeight: 700, margin: 0 }}>Новое в Глоссарии</h2>
-              <a href="/glossary" style={{ fontSize: "var(--text-xs)", color: "var(--color-accent)", textDecoration: "none", fontWeight: 600 }}>Все термины </a>
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: "var(--space-s)" }}>
-              {latestTerms.map((t: any) => (
-                <a key={t.slug} href={`/glossary/${t.slug}`} style={{ padding: "var(--space-m)", background: "var(--color-bg-primary)", border: "1px solid var(--color-border)", textDecoration: "none", color: "inherit" }}>
-                  <div style={{ fontSize: "var(--text-xs)", fontWeight: 700, fontFamily: "var(--font-heading)", marginBottom: 2 }}>{t.term}</div>
-                  <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", lineHeight: 1.4 }}>{t.simpleExplanation}</div>
-                  <span style={{ fontSize: 10, color: t.level === "beginner" ? "#0fb880" : t.level === "intermediate" ? "#f59e0b" : "#ef4444" }}>{t.level}</span>
-                </a>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Реквизиты */}
       <div style={{ padding: "var(--space-xl) var(--space-m)", background: "var(--color-bg-primary)", borderTop: "1px solid var(--color-border)", textAlign: "center" }}>
         <div style={{ maxWidth: 960, margin: "0 auto", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", lineHeight: 1.8 }}>
           <div style={{ fontWeight: 700, marginBottom: 4, color: "var(--color-text-secondary)" }}>Реквизиты</div>

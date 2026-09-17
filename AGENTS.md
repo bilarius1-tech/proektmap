@@ -65,6 +65,7 @@ rm -rf .next && npx next build && pm2 restart proektmap
 ### 5.1. Меню сайта (обязательно)
 Пункты шапки и футера **только** через админку https://proektmap.ru/admin/menu (таблица `MenuItem`).
 **Не хардкодить** ссылки в `header.tsx` / `footer.tsx`.
+Шапка = 4 станции (Решения, Собрать, Инструменты, Научиться) + Карта. Новый раздел — спица станции, не новый корень.
 Агенту: править через БД/`scripts/sync-header-menu.ts` или API `/api/admin/menu` (нужна сессия admin).
 Правило: `.cursor/rules/menu.mdc`
 
