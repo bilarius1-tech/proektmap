@@ -10,7 +10,7 @@ export const DESIGNER_PROMPTS = [
 
 Продукт: [название]
 Аудитория: [кто]
-Направление (выбери одно и обоснуй): editorial / product-minimal / bold-marketing
+Направление (выбери одно и обоснуй): editorial / swiss / product-minimal / bold-marketing
 Токены, если есть: [цвета, шрифты]
 Запреты: Inter, Roboto, фиолетовый градиент, сетка из 4 одинаковых карточек как hero.
 
@@ -175,7 +175,25 @@ CTA: [текст кнопки + куда]
 Запрет: фиолетовый «AI-градиент», если это не бренд.
 Выдай имена токенов как в CSS: --color-…`,
     "Палитра «из настроения» не переживает второй экран.",
-    { relatedHref: "/sandbox/design-system", relatedLabel: "Дизайн-система" },
+    { relatedHref: "/services/site-style-builder", relatedLabel: "Конструктор стиля" },
+  ),
+  makePrompt(
+    "designers",
+    "tokens-from-url",
+    "Токены с референса, не копия сайта",
+    "бренд",
+    `Сними стиль с референса, не клонируй бренд.
+
+Референс: [URL]
+Направление: [editorial / swiss / product-minimal / bold-marketing]
+Возьми цветовую пару целиком (не 4 случайных hex) и шрифтовую пару с кириллицей.
+Смени хотя бы пару или display-шрифт.
+Запреты: Inter, Roboto, фиолетовый градиент, «сделай как этот сайт».
+
+Выдай DESIGN.md: bg/text/accent/border, display+body, радиус, запреты.
+Потом короткий заказ агенту: «собери экран по DESIGN.md, hex не выдумывай».`,
+    "Скрин без смены токенов превращается в чужой бренд.",
+    { relatedHref: "/services/site-style-builder", relatedLabel: "Конструктор стиля" },
   ),
   makePrompt(
     "designers",

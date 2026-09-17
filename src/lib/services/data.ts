@@ -204,6 +204,67 @@ export const MICROSERVICES: MicroserviceItem[] = [
       { label: "UI-Паттерны", href: "/ui-patterns" },
       { label: "Сборка продуктов", href: "/patterns" }
     ]
+  },
+  {
+    slug: "site-style-builder",
+    title: "Конструктор стиля сайта для агента",
+    shortDescription: "Стиль и токены с URL → DESIGN.md и промпт с уже прописанными GitHub-скиллами. Рабочий файл агенту, не урок.",
+    fullDescription: "Рабочий инструмент: вставляете ссылку или выбираете стиль, копируете DESIGN.md и промпт. В файл сразу вшит Design-кластер с GitHub — Frontend Design, taste-skill, web-design-guidelines, Impeccable. Агент подключает скиллы и собирает шаблон в нужной стилистике, без AI-скуфа и без клона чужого бренда.",
+    category: "dev",
+    icon: "Palette",
+    gradient: "linear-gradient(135deg, rgba(15, 184, 128, 0.18) 0%, rgba(196, 165, 116, 0.16) 100%)",
+    badges: ["Бесплатно", "Из РФ", "DESIGN.md", "Skills"],
+    status: "active",
+    isFeatured: true,
+    features: [
+      "В промпте сразу: Frontend Design → taste → Vercel guidelines → Impeccable",
+      "Copy установки: четыре npx skills add с GitHub",
+      "8 стилей и пары с кириллицей — если собираете без ссылки",
+      "Съём URL: превью сразу показывает дизайн-систему сайта — палитра, шрифты, радиусы, атомы",
+      "Copy DESIGN.md, tokens.css и короткий заказ агенту",
+      "Запрет клона бренда сидит в файле, копирование не блокируется"
+    ],
+    howToUse: [
+      {
+        step: 1,
+        title: "Снимите стиль или выберите пары",
+        desc: "URL либо ручной стиль. Это заказ агенту, не лекция."
+      },
+      {
+        step: 2,
+        title: "Скопируйте установку скиллов",
+        desc: "Четыре команды GitHub. Вставьте в терминал проекта, где будет работать агент."
+      },
+      {
+        step: 3,
+        title: "Отдайте DESIGN.md и промпт",
+        desc: "Файл в корень, промпт в чат. Скиллы уже прописаны по порядку."
+      }
+    ],
+    faq: [
+      {
+        q: "Это скопирует чужой сайт один в один?",
+        a: "Нет. Съём даёт токены и сетку. В файле запрет на логотип, тексты и бренд. Агенту уходит стилистика шаблона, не HTML референса."
+      },
+      {
+        q: "Какие скиллы подключаются?",
+        a: "Тот же пакет, что в /ai-skills: Anthropic Frontend Design, Leonxlnx taste-skill, Vercel web-design-guidelines, Paul Bakaus Impeccable. Команды копируются одной кнопкой и дублируются в DESIGN.md."
+      },
+      {
+        q: "Зачем DeepSeek, если уже есть Playwright?",
+        a: "Playwright снимает CSS. DeepSeek по ключу сразу собирает токены этого сайта — фон, шрифты, акцент, радиусы. Без ключа остаётся CSS-досье, без Times и «бумаги журнала»."
+      },
+      {
+        q: "Можно ли загрузить скриншот вместо ссылки?",
+        a: "Пока нет. Ссылка точнее: читается настоящий CSS. Скрин — следующий этап."
+      }
+    ],
+    relatedRoutes: [
+      { label: "UI-Атлас", href: "/ui-patterns" },
+      { label: "Шаблон DESIGN.md", href: "/ai-skills#design-md" },
+      { label: "Премиум-шаблон без AI-скуфа", href: "/resheniya/premium-landing" },
+      { label: "Шпаргалка дизайнера", href: "/shpargalka/designers" }
+    ]
   }
 ];
 

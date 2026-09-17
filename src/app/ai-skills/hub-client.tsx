@@ -449,7 +449,11 @@ export default function AiSkillsHubClient() {
           </div>
           <p style={{ margin: "0 0 16px", lineHeight: 1.65, color: "var(--color-text-secondary)" }}>
             Файл, который агент читает до кода. Skills (особенно Impeccable) усиливают процесс — но источник правды
-            здесь. Положите в корень проекта и допишите свои токены.
+            здесь. Положите в корень проекта. Есть референс-URL — снимите старт в{" "}
+            <Link href="/services/site-style-builder" style={{ color: "var(--color-accent)", fontWeight: 700 }}>
+              конструкторе стиля
+            </Link>
+            : школа журнал/swiss, цветовая и шрифтовая пара, не копия бренда.
           </p>
           <PreBlock text={DESIGN_MD_TEMPLATE} />
           <div style={{ marginTop: 12, display: "flex", flexWrap: "wrap", gap: 10 }}>
@@ -469,6 +473,22 @@ export default function AiSkillsHubClient() {
               }}
             >
               Гайд по токенам →
+            </Link>
+            <Link
+              href="/services/site-style-builder"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "8px 12px",
+                border: "1px solid var(--color-accent)",
+                textDecoration: "none",
+                color: "var(--color-text-primary)",
+                fontWeight: 700,
+                fontSize: 13,
+              }}
+            >
+              Снять стиль с сайта →
             </Link>
           </div>
         </section>

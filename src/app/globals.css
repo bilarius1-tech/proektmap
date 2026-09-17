@@ -245,6 +245,26 @@
   max-width: 100%;
   contain: paint;
 }
+.home-hero-content {
+  background: transparent;
+  padding: 28px 20px 8px;
+  text-align: center;
+}
+.home-hero-title {
+  font-family: var(--font-heading);
+  font-size: clamp(26px, 4.4vw, 36px);
+  font-weight: 800;
+  line-height: 1.08;
+  margin: 0 0 8px;
+  letter-spacing: -0.02em;
+}
+.home-hero-lead {
+  max-width: 420px;
+  margin: 0 auto;
+  color: var(--color-text-secondary);
+  font-size: var(--text-m);
+  line-height: 1.45;
+}
 .home-search-form {
   width: 100%;
   min-width: 0;
@@ -261,22 +281,14 @@
 .home-hub {
   width: min(960px, calc(100% - 32px));
   margin: 0 auto;
-  padding: 48px 0 56px;
+  padding: 20px 0 56px;
 }
 .home-hub h2 {
-  margin: 0 0 8px;
+  margin: 0 0 16px;
   font-family: var(--font-heading);
   font-size: var(--text-xl);
   font-weight: 800;
   letter-spacing: -0.01em;
-  text-align: center;
-}
-.home-hub-lead {
-  max-width: 560px;
-  margin: 0 auto 28px;
-  color: var(--color-text-secondary);
-  font-size: var(--text-s);
-  line-height: 1.55;
   text-align: center;
 }
 .home-station-grid {
@@ -437,6 +449,124 @@
   color: var(--color-text-tertiary);
   font-size: 12px;
   line-height: 1.5;
+}
+@keyframes site-style-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.site-style-builder {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  overflow-x: clip;
+}
+.site-style-skill-pack {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.site-style-skill-pack li {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
+}
+.site-style-skill-pack span {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--color-accent);
+}
+.site-style-skill-pack strong {
+  font-size: 13px;
+  line-height: 1.3;
+}
+.site-style-skill-pack em {
+  font-style: normal;
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+@media (max-width: 960px) {
+  .site-style-skill-pack {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 520px) {
+  .site-style-skill-pack {
+    grid-template-columns: 1fr;
+  }
+}
+.site-style-url-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.site-style-builder-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
+  gap: 16px;
+  min-width: 0;
+  align-items: start;
+}
+.site-style-ds-swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: 8px;
+}
+.site-style-ds-swatch {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.site-style-ds-swatch span {
+  display: block;
+  height: 44px;
+  width: 100%;
+}
+.site-style-ds-swatch em,
+.site-style-ds-swatch code {
+  font-style: normal;
+  font-size: 10px;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.site-style-ds-swatch code {
+  font-family: ui-monospace, monospace;
+  opacity: 0.75;
+}
+.site-style-ds-scale,
+.site-style-ds-atoms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.site-style-ds-scale span {
+  font-size: 12px;
+}
+.site-style-kit,
+.site-style-controls {
+  min-width: 0;
+  max-width: 100%;
+}
+@media (max-width: 960px) {
+  .site-style-builder-grid {
+    grid-template-columns: 1fr;
+  }
+  .site-style-swiss-hero,
+  .site-style-swiss-modules {
+    grid-template-columns: 1fr !important;
+  }
+  .site-style-url-row > button {
+    width: 100%;
+  }
 }
 .home-map-link {
   display: flex;
@@ -705,30 +835,19 @@
     min-height: 0 !important;
   }
   .home-hero-content {
-    padding: 44px 16px 36px !important;
-  }
-  .home-hero-badge {
-    margin-bottom: 14px !important;
-    font-size: 13px !important;
+    padding: 20px 16px 4px !important;
   }
   .home-hero-title {
-    font-size: clamp(30px, 9vw, 34px) !important;
-    line-height: 1.08 !important;
-    margin-bottom: 14px !important;
+    font-size: clamp(24px, 8vw, 30px) !important;
+    line-height: 1.1 !important;
+    margin-bottom: 8px !important;
   }
   .home-hero-title br {
     display: none;
   }
   .home-hero-lead {
     font-size: 16px !important;
-    line-height: 1.6 !important;
-  }
-  .home-hero-actions {
-    display: grid !important;
-    grid-template-columns: 1fr;
-    gap: 10px !important;
-    width: 100%;
-    margin-top: 24px !important;
+    line-height: 1.5 !important;
   }
   .home-hero-action {
     justify-content: center;

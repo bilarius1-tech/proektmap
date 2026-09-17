@@ -34,6 +34,7 @@ import type { MicroserviceItem } from "@/lib/services/data";
 import Breadcrumbs from "@/components/nav/breadcrumbs";
 import AvitoPhotoLabWorkspace from "@/components/services/avito-photo-lab";
 import VoiceGuideBuilderWorkspace from "@/components/services/voice-guide-builder";
+import SiteStyleBuilderWorkspace from "@/components/services/site-style-builder";
 
 interface ServiceDetailClientProps {
   service: MicroserviceItem;
@@ -175,7 +176,7 @@ export default function ServiceDetailClient({
       </div>
 
       {/* Main Content Area */}
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 20px" }}>
+      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 20px", minWidth: 0, overflowX: "clip" }}>
         {/* Service Header */}
         <div
           style={{
@@ -312,11 +313,13 @@ export default function ServiceDetailClient({
         </div>
 
         {/* Interactive Workspace / Tool Foundation */}
-        <div id="tool-workspace" style={{ marginBottom: 36 }}>
+        <div id="tool-workspace" style={{ marginBottom: 36, minWidth: 0, overflow: "hidden" }}>
           {service.slug === "avito-photo-uniquizer" ? (
             <AvitoPhotoLabWorkspace />
           ) : service.slug === "voice-guide-builder" ? (
             <VoiceGuideBuilderWorkspace />
+          ) : service.slug === "site-style-builder" ? (
+            <SiteStyleBuilderWorkspace />
           ) : (
             <div
               style={{
@@ -607,7 +610,7 @@ export default function ServiceDetailClient({
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))",
             gap: 24,
             marginBottom: 36,
           }}

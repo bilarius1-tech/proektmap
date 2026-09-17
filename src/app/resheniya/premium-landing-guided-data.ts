@@ -13,6 +13,7 @@ const aiSkillsRef = ref("Skill", "AI Engineering Skills", "/ai-skills", "Уси�
 const designSystemRef = ref("Паттерн", "Дизайн-система", "/sandbox/design-system", "Токены и язык продукта");
 const uiPatternsRef = ref("Паттерн", "UI-Атлас", "/ui-patterns", "Готовые секции после характера экрана");
 const designMdRef = ref("Skill", "Шаблон DESIGN.md", "/ai-skills#design-md", "Правила визуала, которые читает агент");
+const styleBuilderRef = ref("Инструмент", "Конструктор стиля", "/services/site-style-builder", "Школа + цветовая пара → DESIGN.md, не клон");
 const recipeRef = ref("Skill", "Recipe SaaS UI", "/ai-skills#recipe", "Порядок Skills: сборка → вкус → нормы → polish");
 const rfStackRef = ref("Инструмент", "AI без VPN", "/ai-without-vpn", "Как работать из РФ без западных сервисов");
 const vibeCoderRef = ref("Инструмент", "Нейро каталог: вайбкодер", "/arsenal/vibe-coder", "Стек агента-кодера под миссию");
@@ -117,7 +118,7 @@ export const guidedPremiumLandingSolution: GuidedSolution = {
       instructions: [
         {
           title: "Откройте шаблон DESIGN.md",
-          text: "На ProektMap: /ai-skills#design-md — кнопка Copy DESIGN.md.",
+          text: "На ProektMap: /ai-skills#design-md — Copy DESIGN.md. Есть референс-URL — /services/site-style-builder: школа журнал или swiss, готовая цветовая пара, не копия бренда.",
         },
         {
           title: "Создайте файл в проекте",
@@ -155,7 +156,7 @@ export const guidedPremiumLandingSolution: GuidedSolution = {
       ],
       artifact: "DESIGN.md — язык продукта",
       terms: ["дизайн-токены", "типографика"],
-      references: [designMdRef, designSystemRef, aiSkillsRef],
+      references: [designMdRef, styleBuilderRef, designSystemRef, aiSkillsRef],
     },
     {
       slug: "skills",

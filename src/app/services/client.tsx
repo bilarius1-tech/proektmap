@@ -17,6 +17,7 @@ import {
   ExternalLink,
   ShieldCheck,
   Zap,
+  Palette,
 } from "lucide-react";
 import type { MicroserviceItem, MicroserviceCategory } from "@/lib/services/data";
 import Breadcrumbs from "@/components/nav/breadcrumbs";
@@ -26,6 +27,7 @@ const ICON_MAP: Record<string, React.ReactNode> = {
   Calculator: <Calculator size={28} />,
   Code2: <Code2 size={28} />,
   Wrench: <Wrench size={28} />,
+  Palette: <Palette size={28} />,
 };
 
 interface ServicesCatalogClientProps {

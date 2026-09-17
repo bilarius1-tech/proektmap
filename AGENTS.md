@@ -43,6 +43,13 @@ rm -rf .next && npx next build && pm2 restart proektmap
 ```
 Не деплой без проверки билда!
 
+Конструктор стиля сайта (`/services/site-style-builder`) снимает токены через Playwright Chromium. После первого деплоя (или если съём пишет «не установлен Chromium»):
+
+```bash
+node node_modules/playwright-core/cli.js install chromium
+```
+Playwright не обязателен для ручного конструктора — только для кнопки «Снять токены».
+
 ### 4. Файлы на сервере
 - Проект: `/var/www/www-root/data/www/proektmap.ru`
 - PM2: `pm2 status proektmap`
@@ -66,7 +73,7 @@ rm -rf .next && npx next build && pm2 restart proektmap
 Пункты шапки и футера **только** через админку https://proektmap.ru/admin/menu (таблица `MenuItem`).
 **Не хардкодить** ссылки в `header.tsx` / `footer.tsx`.
 Шапка = 4 станции (Решения, Собрать, Инструменты, Научиться) + Карта. Новый раздел — спица станции, не новый корень.
-Агенту: править через БД/`scripts/sync-header-menu.ts` или API `/api/admin/menu` (нужна сессия admin).
+Агенту: сначала skill `hub-spoke-author` (`.cursor/skills/hub-spoke-author/SKILL.md`), затем БД/`scripts/sync-header-menu.ts` или API `/api/admin/menu` (нужна сессия admin).
 Правило: `.cursor/rules/menu.mdc`
 
 ### 5.2. Карта сайта и SEO-валидация (обязательно)
@@ -160,6 +167,15 @@ Skill: .reasonix/skills/yookassa-checkout/SKILL.md
 желательно с **Copy** готового шаблона.
 
 Эталон: `/ai-skills`. Правило агентов: `.cursor/rules/examples-teaching.mdc`.
+
+### Новый публичный раздел — сначала станция хаба
+
+| Задача | Skill | Путь |
+|--------|-------|------|
+| Куда класть ветку и как связать с хабом | `hub-spoke-author` | `.cursor/skills/hub-spoke-author/SKILL.md` |
+
+Выбрать **одну** из 4 станций (Решения / Собрать / Инструменты / Научиться), посадить спицей в хаб + `SITE_TREE` + меню, не плодить корень шапки и витрину на главной.
+Правило (auto на `src/app/**/page.tsx`): `.cursor/rules/hub-spoke.mdc`. Примеры: `.cursor/skills/hub-spoke-author/examples.md`.
 
 ### /resheniya — обязательные Skills агентов
 

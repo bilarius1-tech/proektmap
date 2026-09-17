@@ -425,11 +425,13 @@ export const DESIGN_MD_TEMPLATE = `# DESIGN.md — правила визуала
 - Тип экранов: brand (маркетинг) | product (приложение) | оба
 
 ## Направление
-- Эстетика: [editorial / product-minimal / bold-marketing / …]
+- Эстетика: [editorial / swiss / product-minimal / bold-marketing]
+- Цветовая пара: [имя пары целиком, не 4 случайных hex]
 - Характер в одном предложении: […]
 
 ## Токены (источник правды)
-- Цвета: accent […], bg […], text […], border […]
+- Цвета: accent […], bg […], text […], muted […], border […]
+- Цветовая пара целиком, не 4 случайных hex
 - Шрифты: display […], body […] — запрещены: Inter, Roboto, Arial, Space Grotesk
 - Отступы: xs/s/m/l/xl как в CSS-переменных проекта
 - Радиусы: […]

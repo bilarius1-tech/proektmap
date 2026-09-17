@@ -24,33 +24,13 @@ export default function Home() {
   return (
     <div className="home-page" style={{ fontFamily: "Inter, sans-serif", background: "var(--color-bg-primary)", color: "var(--color-text-primary)", minHeight: "100vh" }}>
       <AnimatedHero>
-        <div className="home-hero-content" style={{ background: "transparent", padding: "80px 20px 50px", textAlign: "center" }}>
-          <div className="home-hero-badge" style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 14px", borderRadius: "var(--radius-full)", background: "var(--color-accent-light)", color: "var(--color-accent)", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: "var(--space-m)" }}>
-            Что сделать сегодня
-          </div>
-          <h1 className="home-hero-title" style={{ fontFamily: "var(--font-heading)", fontSize: "clamp(28px, 5vw, 40px)", fontWeight: 800, lineHeight: 1.05, marginBottom: "var(--space-s)", letterSpacing: "-0.02em" }}>
+        <div className="home-hero-content">
+          <h1 className="home-hero-title">
             Не изучайте AI бесконечно.<br />Соберите работающий продукт
           </h1>
-          <p className="home-hero-lead" style={{ fontSize: "var(--text-l)", color: "var(--color-text-secondary)", maxWidth: 520, margin: "0 auto", lineHeight: 1.6 }}>
-            ProektMap уже выбрал стек, программы, модели, команды и промпты. Выберите продукт и выполняйте готовый маршрут до production.
+          <p className="home-hero-lead">
+            Маршрут, стек и проверки уже выбраны.
           </p>
-          <div className="home-solution-flow" aria-label="Модель готового решения">
-            {["Продукт", "Рекомендация", "Команда", "Результат", "Проверка"].map((step, index) => (
-              <div key={step}>
-                <span>{index + 1}</span>
-                <strong>{step}</strong>
-                {index < 4 && <ArrowRight size={13} aria-hidden />}
-              </div>
-            ))}
-          </div>
-          <div className="home-hero-actions" style={{ display: "flex", gap: 10, justifyContent: "center", marginTop: "var(--space-xl)", flexWrap: "wrap" }}>
-            <Link href="/resheniya" className="home-hero-action home-solutions-primary" style={{ display: "flex", alignItems: "center", gap: 8, padding: "17px 34px", borderRadius: "var(--radius-m)", background: "var(--color-accent)", color: "white", textDecoration: "none", fontSize: "var(--text-m)", fontWeight: 800 }}>
-              Открыть готовые решения AI <ArrowRight size={18} />
-            </Link>
-            <Link href="/resheniya/saas-product" className="home-hero-action" style={{ display: "flex", alignItems: "center", gap: 6, padding: "14px 28px", borderRadius: "var(--radius-m)", background: "var(--color-surface)", color: "var(--color-accent)", border: "1px solid var(--color-accent)", textDecoration: "none", fontSize: "var(--text-s)", fontWeight: 700 }}>
-              Посмотреть маршрут SaaS
-            </Link>
-          </div>
         </div>
       </AnimatedHero>
 
@@ -58,7 +38,6 @@ export default function Home() {
 
       <section className="home-hub" aria-labelledby="home-stations-title">
         <h2 id="home-stations-title">Что вы хотите сделать сегодня?</h2>
-        <p className="home-hub-lead">Четыре входа. Каталоги и лаборатории живут внутри станций, а не на первом экране.</p>
         <div className="home-station-grid">
           {HOME_STATIONS.map((station) => {
             const Icon = STATION_ICONS[station.id as keyof typeof STATION_ICONS];

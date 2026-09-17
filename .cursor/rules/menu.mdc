@@ -22,6 +22,8 @@ alwaysApply: true
 1. ребёнком одной из 4 станций в `MenuItem`;
 2. в `SITE_TREE` (`src/app/sitemap/site-map-data.ts`).
 
+Как выбрать станцию и связать с хабом: skill **`hub-spoke-author`** (`.cursor/skills/hub-spoke-author/SKILL.md`).
+
 Корень шапки меняется **только по явному решению Алексея**.
 
 Слои страницы (voice guide, примеры плохо/хорошо, SEO) — не пункты меню.

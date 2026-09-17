@@ -1,0 +1,20 @@
+---
+description: Новая публичная страница — спица одной из 4 станций хаба, не корень шапки и не витрина на главной
+globs: src/app/**/page.tsx,src/app/sitemap/site-map-data.ts,scripts/sync-header-menu.ts
+alwaysApply: false
+---
+
+# Рост хаба — спица, не новый этаж
+
+Перед новым публичным `page.tsx` (не admin/auth/dashboard) открой skill **`hub-spoke-author`**: `.cursor/skills/hub-spoke-author/SKILL.md`.
+
+Кратко:
+
+1. Одна станция: Решения `/resheniya`, Собрать `/ui-patterns`, Инструменты `/arsenal`, Научиться `/agent-engineering`.
+2. Ссылка с хаб-страницы родителя + запись в `SITE_TREE`.
+3. Меню — ребёнок станции в `scripts/sync-header-menu.ts`. Новый `parentId: null` только по решению Алексея.
+4. Не добавлять showcase-блок на `/`.
+5. Слой (озвучка, плохо/хорошо, SEO) — не пункт меню.
+
+Примеры размещения: `.cursor/skills/hub-spoke-author/examples.md`.
+Правило меню: `.cursor/rules/menu.mdc`.

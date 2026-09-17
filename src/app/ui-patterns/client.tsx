@@ -20,6 +20,7 @@ import {
   Code2,
   Flame,
   Crown,
+  Palette,
 } from "lucide-react";
 import { UIPattern, PatternCategoryMeta, AIModelTarget } from "./data";
 
@@ -135,8 +136,8 @@ export default function UIPatternsCatalogClient({ patterns, categories }: Props)
             <strong style={{ color: "var(--color-text-primary)" }}>Visual → Anatomy → WHY → Prompt → Code</strong>.
           </p>
 
-          {/* Recipes Banner */}
-          <div style={{ marginTop: "var(--space-m)", display: "flex", justifyContent: "center" }}>
+          {/* Recipes + style builder */}
+          <div style={{ marginTop: "var(--space-m)", display: "flex", justifyContent: "center", flexWrap: "wrap", gap: 10 }}>
             <Link
               href="/ui-patterns/recipes"
               style={{
@@ -155,6 +156,26 @@ export default function UIPatternsCatalogClient({ patterns, categories }: Props)
             >
               <Flame size={14} color="var(--color-warning)" />
               <span>Дизайн-Рецепты (Recipes): готовые экраны и Master-промпты</span>
+              <ArrowRight size={14} color="var(--color-accent)" />
+            </Link>
+            <Link
+              href="/services/site-style-builder"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                padding: "8px 16px",
+                background: "var(--color-bg-primary)",
+                border: "1px solid var(--color-accent)",
+                color: "var(--color-text-primary)",
+                fontSize: "var(--text-xs)",
+                fontWeight: 600,
+                textDecoration: "none",
+                borderRadius: 0,
+              }}
+            >
+              <Palette size={14} color="var(--color-accent)" />
+              <span>Снять стиль с сайта → отдать агенту</span>
               <ArrowRight size={14} color="var(--color-accent)" />
             </Link>
           </div>

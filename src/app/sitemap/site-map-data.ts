@@ -92,6 +92,7 @@ export const SITE_TREE: SiteTreeGroup[] = [
         description: "Визуальные UI-паттерны, анатомия и готовые промпты для AI",
         children: [
           { title: "Дизайн-Рецепты экранов", href: "/ui-patterns/recipes" },
+          { title: "Конструктор стиля сайта для агента", href: "/services/site-style-builder" },
         ],
       },
       {
@@ -195,6 +196,7 @@ export const SITE_TREE: SiteTreeGroup[] = [
         children: [
           { title: "Конструктор голосового проводника", href: "/services/voice-guide-builder" },
           { title: "Уникализатор фото для Авито", href: "/services/avito-photo-uniquizer" },
+          { title: "Конструктор стиля сайта для агента", href: "/services/site-style-builder" },
           { title: "Калькулятор токенов и стоимости LLM", href: "/services/prompt-token-counter" },
           { title: "SVG в React / Tailwind оптимизатор", href: "/services/svg-to-react-optimizer" },
         ],
@@ -373,6 +375,13 @@ export const SITE_TASK_HINTS: SiteTaskHint[] = [
     query: "ui паттерн секция",
     keywords: ["экран", "ui", "секц", "кнопк", "дизайн"],
     href: "/ui-patterns",
+  },
+  {
+    id: "site-style",
+    label: "Снять стиль сайта",
+    query: "стиль сайта промпт design",
+    keywords: ["стиль", "design.md", "токен", "шрифт", "промпт для дизайна"],
+    href: "/services/site-style-builder",
   },
 ];
 
