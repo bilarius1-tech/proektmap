@@ -28,6 +28,7 @@ const ICON_MAP: Record<string, React.ReactNode> = {
   Code2: <Code2 size={28} />,
   Wrench: <Wrench size={28} />,
   Palette: <Palette size={28} />,
+  Package: <Layers size={28} />,
 };
 
 interface ServicesCatalogClientProps {

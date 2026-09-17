@@ -2718,3 +2718,35 @@ Grok Bot в Cursor легко принять за ещё один чат. Тог
 
 ### Закрытие дня
 День закрыт. Коммит + push. main = master.
+
+---
+
+## 17.09.2026 — Конструктор шаблона сайта (`/services/site-template`)
+
+### Зачем
+Нужен рабочий сервис: идея + опциональный стиль → BRIEF.md, DESIGN.md и zip-среда для Cursor. Не урок и не «сайт в браузере». Основа — архив «среда для сайтов» (Codex/HTML), без зависимости от Codex.
+
+### Сделано
+- Микросервис `/services/site-template`: заказ → DeepSeek-досье (или CSS/поля fallback) → просмотр BRIEF/DESIGN/карты/промпта → скачать zip
+- База пакета: `content/site-starter/` (AGENTS.md, скиллы brief/new-page/page-reviewer, materials, shared, пример densio отдельно)
+- В zip дублируются `.cursor/skills`, `CURSOR.md`, заполненные BRIEF/DESIGN/REFERENCES/SITEMAP/HANDOFF и `shared/tokens.css`
+- Связка со съёмом стиля: опциональный URL через `/api/services/site-style-builder/extract`
+- Хаб: карточка в `/services`, ссылка с `/agent-engineering/rules`, `SITE_TREE` (tools + design + knowledge/agent-engineering)
+- Исходный zip убран из публичной раздачи (`content/site-starter-source.zip` в `.gitignore`)
+
+### SEO / карта сайта
+- `SITE_TREE` + `SITE_TASK_HINTS` («Собрать шаблон сайта»)
+- Метаданные через `/services/[slug]`
+- `validate:sitemap` — PASS (известные предупреждения bookmarks / project-vault / дубли спиц)
+
+### Проверка
+- `next build` — OK; `pm2 restart proektmap` — online
+- HTTP 200: `/services/site-template`, generate/pack API, `/resheniya`, `/vaibik`, `/avito`
+- Zip содержит BRIEF, CURSOR.md, `.cursor/skills`, пример densio не как содержание проекта
+
+### Точка отката
+- Коммит на `main` = `master`, push origin
+
+### Следующие шаги
+- Усилить DeepSeek-досье (если ключ молчит — уже есть fallback из полей)
+- По желанию: уменьшить densio-медиа в пакете или отдавать «лёгкий» zip без примера

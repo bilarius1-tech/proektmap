@@ -35,6 +35,7 @@ import Breadcrumbs from "@/components/nav/breadcrumbs";
 import AvitoPhotoLabWorkspace from "@/components/services/avito-photo-lab";
 import VoiceGuideBuilderWorkspace from "@/components/services/voice-guide-builder";
 import SiteStyleBuilderWorkspace from "@/components/services/site-style-builder";
+import SiteTemplateWorkspace from "@/components/services/site-template";
 
 interface ServiceDetailClientProps {
   service: MicroserviceItem;
@@ -320,6 +321,8 @@ export default function ServiceDetailClient({
             <VoiceGuideBuilderWorkspace />
           ) : service.slug === "site-style-builder" ? (
             <SiteStyleBuilderWorkspace />
+          ) : service.slug === "site-template" ? (
+            <SiteTemplateWorkspace />
           ) : (
             <div
               style={{

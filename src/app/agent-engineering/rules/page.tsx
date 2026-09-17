@@ -220,6 +220,24 @@ export default function RulesPage() {
               <Download size={16} /> Скачать стартовый шаблон
             </Link>
             <Link
+              href="/services/site-template"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                padding: "14px 22px",
+                background: "var(--color-bg-primary)",
+                border: "1px solid var(--color-border)",
+                color: "var(--color-text-primary)",
+                textDecoration: "none",
+                fontWeight: 700,
+                fontSize: "var(--text-s)",
+                minHeight: 52,
+              }}
+            >
+              Собрать шаблон сайта
+            </Link>
+            <Link
               href="/resheniya"
               style={{
                 display: "inline-flex",

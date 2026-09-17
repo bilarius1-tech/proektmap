@@ -4757,3 +4757,20 @@ a.guided-inline-link {
     flex-direction: column;
   }
 }
+
+@media (max-width: 900px) {
+  .site-template-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .site-template-pipe {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.spin {
+  animation: spin 0.8s linear infinite;
+}

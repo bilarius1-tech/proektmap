@@ -262,8 +262,70 @@ export const MICROSERVICES: MicroserviceItem[] = [
     relatedRoutes: [
       { label: "UI-Атлас", href: "/ui-patterns" },
       { label: "Шаблон DESIGN.md", href: "/ai-skills#design-md" },
+      { label: "Конструктор шаблона сайта", href: "/services/site-template" },
       { label: "Премиум-шаблон без AI-скуфа", href: "/resheniya/premium-landing" },
       { label: "Шпаргалка дизайнера", href: "/shpargalka/designers" }
+    ]
+  },
+  {
+    slug: "site-template",
+    title: "Конструктор шаблона сайта",
+    shortDescription: "Идея и стиль → BRIEF.md, DESIGN.md и zip-среда. Агент в Cursor собирает index.html. Рабочий пакет, не урок.",
+    fullDescription: "Рабочий инструмент: описываете сайт, при желании снимаете стиль по ссылке, скачиваете папку проекта. Внутри — кодекс агента, скиллы брифа/сборки/проверки, materials, shared и пример «Денсио» отдельно. Бриф уже заполнен, index.html пишет агент у вас на компьютере — без клона примера и без выдуманных фактов.",
+    category: "dev",
+    icon: "Package",
+    gradient: "linear-gradient(135deg, rgba(15, 184, 128, 0.16) 0%, rgba(37, 60, 48, 0.14) 100%)",
+    badges: ["Бесплатно", "Zip", "Cursor", "HTML"],
+    status: "active",
+    isFeatured: true,
+    features: [
+      "DeepSeek заполняет BRIEF.md, DESIGN.md, карту сайта и токены",
+      "Опциональный съём стиля с URL через тот же конвейер, что конструктор стиля",
+      "Zip — среда из вашего starter: .agents/skills, materials, shared, пример Денсио не как содержание",
+      "Скиллы дублируются в .cursor/skills, чтобы Cursor читал их без Codex",
+      "Промпт на сборку index.html копируется одной кнопкой",
+      "Запрет клона бренда и выдуманных фактов сидит в файлах"
+    ],
+    howToUse: [
+      {
+        step: 1,
+        title: "Опишите сайт",
+        desc: "Кто посетитель, что предлагаете, какое действие. Можно вставить ссылку на стиль."
+      },
+      {
+        step: 2,
+        title: "Соберите и скачайте zip",
+        desc: "Проверьте BRIEF и DESIGN. Скачайте папку проекта."
+      },
+      {
+        step: 3,
+        title: "Откройте в Cursor",
+        desc: "Вставьте промпт. Агент собирает index.html по файлам, не по примеру Денсио."
+      }
+    ],
+    faq: [
+      {
+        q: "Это сделает готовый сайт в браузере?",
+        a: "Нет. Сервис заполняет бриф, направление и папку. HTML собирает агент в Cursor на вашем компьютере — так задумана среда."
+      },
+      {
+        q: "Нужен ли Codex?",
+        a: "Нет. Скиллы лежат файлами в .agents/skills и копируются в .cursor/skills. Cursor читает AGENTS.md напрямую."
+      },
+      {
+        q: "Попадёт ли в шаблон клиника Денсио?",
+        a: "Пример остаётся в examples/densio как демонстрация среды. Агенту в промпте запрещено брать оттуда тексты, палитру и механику."
+      },
+      {
+        q: "Можно ли снять стиль с чужого сайта?",
+        a: "Да, поле ссылки вызывает съём токенов. В DESIGN.md уходит стилистика, не логотип и не тексты."
+      }
+    ],
+    relatedRoutes: [
+      { label: "Конструктор стиля", href: "/services/site-style-builder" },
+      { label: "Правила разработки", href: "/agent-engineering/rules" },
+      { label: "UI-Атлас", href: "/ui-patterns" },
+      { label: "Премиум-шаблон", href: "/resheniya/premium-landing" }
     ]
   }
 ];

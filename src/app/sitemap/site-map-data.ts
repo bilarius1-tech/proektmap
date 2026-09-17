@@ -53,6 +53,7 @@ export const SITE_TREE: SiteTreeGroup[] = [
           { title: "Loop — цикл с проверкой", href: "/agent-engineering/loop" },
           { title: "Graph — карта системы", href: "/agent-engineering/graph" },
           { title: "Правила разработки", href: "/agent-engineering/rules" },
+          { title: "Конструктор шаблона сайта", href: "/services/site-template" },
           { title: "Grok Bot — мануал для вайбкодера", href: "/agent-engineering/grok-bot", description: "Коллега с облачным компьютером: skills, плагины, routines" },
         ],
       },
@@ -93,6 +94,7 @@ export const SITE_TREE: SiteTreeGroup[] = [
         children: [
           { title: "Дизайн-Рецепты экранов", href: "/ui-patterns/recipes" },
           { title: "Конструктор стиля сайта для агента", href: "/services/site-style-builder" },
+          { title: "Конструктор шаблона сайта", href: "/services/site-template" },
         ],
       },
       {
@@ -197,6 +199,7 @@ export const SITE_TREE: SiteTreeGroup[] = [
           { title: "Конструктор голосового проводника", href: "/services/voice-guide-builder" },
           { title: "Уникализатор фото для Авито", href: "/services/avito-photo-uniquizer" },
           { title: "Конструктор стиля сайта для агента", href: "/services/site-style-builder" },
+          { title: "Конструктор шаблона сайта", href: "/services/site-template" },
           { title: "Калькулятор токенов и стоимости LLM", href: "/services/prompt-token-counter" },
           { title: "SVG в React / Tailwind оптимизатор", href: "/services/svg-to-react-optimizer" },
         ],
@@ -382,6 +385,13 @@ export const SITE_TASK_HINTS: SiteTaskHint[] = [
     query: "стиль сайта промпт design",
     keywords: ["стиль", "design.md", "токен", "шрифт", "промпт для дизайна"],
     href: "/services/site-style-builder",
+  },
+  {
+    id: "site-template",
+    label: "Собрать шаблон сайта",
+    query: "шаблон сайта бриф zip cursor",
+    keywords: ["шаблон сайта", "бриф сайта", "html шаблон", "среда сайта"],
+    href: "/services/site-template",
   },
 ];
 
