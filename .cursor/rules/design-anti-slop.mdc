@@ -1,0 +1,14 @@
+---
+description: Anti-slop UI — читать design-anti-slop skill перед визуальной работой
+alwaysApply: true
+---
+
+# design-anti-slop
+
+Перед UI / макетами / «почисти слоп» читать:
+
+`.cursor/skills/design-anti-slop/SKILL.md`  
+и `references/catalog.md`.
+
+Режим: audit → fix. Фиксы к системе проекта.
+Канон: `/var/www/www-root/data/www/.cursor/skills/design-anti-slop/`

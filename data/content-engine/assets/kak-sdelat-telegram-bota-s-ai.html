@@ -1,0 +1,37 @@
+<!-- content-asset:dm-tg-bot; cluster:telegram-bot; primary:Telegram-%D0%B1%D0%BE%D1%82%D0%B0%20%D1%81%20AI -->
+<p><strong>Короткий ответ:</strong> зарегистрируйте бота в BotFather, соберите TypeScript-проект на grammY в Cursor, добейтесь ответа на <code>/start</code> локально, затем один процесс PM2 на VPS. На ProektMap этот путь уже разложен: <a href="/resheniya/telegram-bot">Запустить Telegram-бота</a>.</p>
+
+<h2>Кому это нужно</h2>
+<p>Вайбкодеру и AI-инженеру, которому нужен <em>живой</em> бот в Telegram, а не ещё один туториал «hello world» без деплоя и без проверки после reboot.</p>
+
+<h2>Что рекомендует ProektMap и почему</h2>
+<ul>
+<li><strong>Cursor</strong> — писать и править код с агентом.</li>
+<li><strong>Node.js + TypeScript + grammY</strong> — предсказуемый стек под Bot API.</li>
+<li><strong>long polling + PM2</strong> — проще старт, чем webhook на первом запуске.</li>
+<li><strong>Секреты в .env, не в Git</strong> — токен не утекает.</li>
+</ul>
+<p>Альтернативы есть, но в маршруте один главный путь — чтобы не застрять на выборе.</p>
+
+<h2>Плохо → хорошо</h2>
+<p><strong>Плохо:</strong> «Напиши мне умного телеграм-бота на AI».</p>
+<p><strong>Хорошо:</strong> «По маршруту /resheniya/telegram-bot: BotFather → grammY → команды /start и /help → локальный тест → PM2 на VPS. Токен только в .env. Критерий: после reboot бот снова отвечает».</p>
+
+<h2>Что сделать за первый день</h2>
+<ol>
+<li>Откройте <a href="/resheniya/telegram-bot">маршрут</a> и workspace — этапы уже с командами и промптами.</li>
+<li>Создайте бота у @BotFather, положите токен в <code>.env</code>.</li>
+<li>Соберите обработчик <code>/start</code> и <code>/help</code>, проверьте в реальном чате.</li>
+<li>Когда локально стабильно — шаг Deploy: один процесс PM2, автозапуск.</li>
+</ol>
+<p>Наблюдаемый результат: публичный бот отвечает в Telegram и переживает перезапуск сервера.</p>
+
+<h2>Типичная ошибка</h2>
+<p>Сразу тащить «AI-мозг» (LLM в каждом сообщении), пока нет надёжного <code>/start</code> и деплоя. Сначала контур бота, потом интеллект. Для связки Cursor + Grok есть отдельный маршрут: <a href="/resheniya/grok-bot-cursor">Grok-бот в Cursor</a>.</p>
+
+<h2>Куда дальше</h2>
+<ul>
+<li><a href="/resheniya/telegram-bot">Готовый маршрут Telegram-бота</a></li>
+<li><a href="/agent-engineering">Инженерия агентов</a> — как разговаривать с Cursor по правилам</li>
+<li><a href="/models">Модели</a> — что подключать для кода и проверки</li>
+</ul>

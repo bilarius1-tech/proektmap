@@ -343,6 +343,13 @@ export async function POST(req: Request) {
     dripResult = { published: false, reason: "error", publishedToday, limit: dailyLimit };
   }
 
+  if (settings?.contentAutopilotEnabled === true) {
+    return NextResponse.json({
+      drip: dripResult,
+      collection: { scheduled: false, reason: "content-autopilot-owns-pipeline" },
+    });
+  }
+
   if (settings?.autoPublishEnabled !== true) return NextResponse.json({ drip: dripResult, collection: { scheduled: false, reason: "disabled" } });
   const now = mskNow();
   const force = !isCron || new URL(req.url).searchParams.get("force") === "1";

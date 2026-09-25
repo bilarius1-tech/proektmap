@@ -467,6 +467,10 @@ model SiteSettings {
   autoPublishIntervalMin Int     @default(45)
   lastDripPublishedAt    DateTime?
 
+  contentAutopilotEnabled    Boolean  @default(false)
+  contentAutopilotHour       Int      @default(10)
+  contentAutopilotLastRunAt  DateTime?
+  contentAutopilotDailyLimit Int      @default(1)
 
   mcpAutoScan           Boolean  @default(false)
   mcpScanDay            String   @default("monday")

@@ -1,9 +1,16 @@
 import AnimatedHero from "@/components/hero/animated-hero";
 import HomeStartExample from "@/components/home/home-start-example";
+import HomeMediaWall from "@/components/home/home-media-wall";
+import HomeHubDirectory from "@/components/home/home-hub-directory";
+import HomeMetricsBar from "@/components/home/home-metrics-bar";
 import Link from "next/link";
 import { ArrowRight, Boxes, Compass, GraduationCap, Route, Wrench } from "lucide-react";
 import { HOME_LIVE_ROUTES, HOME_MORE_LAYERS, HOME_STATIONS } from "@/lib/home/stations-data";
+import { getHomeMediaFeed } from "@/lib/home/media-feed";
+import { getHomeHubStats } from "@/lib/home/hub-stats";
 import { Metadata } from "next";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "ProektMap — Карта роста и готовые AI-решения для создания продуктов",
@@ -20,7 +27,12 @@ const STATION_ICONS = {
   learn: GraduationCap,
 } as const;
 
-export default function Home() {
+export default async function Home() {
+  const [mediaFeed, hubStats] = await Promise.all([
+    getHomeMediaFeed(),
+    getHomeHubStats(),
+  ]);
+
   return (
     <div className="home-page" style={{ fontFamily: "Inter, sans-serif", background: "var(--color-bg-primary)", color: "var(--color-text-primary)", minHeight: "100vh" }}>
       <AnimatedHero>
@@ -34,7 +46,7 @@ export default function Home() {
         </div>
       </AnimatedHero>
 
-      <div style={{ height: 1, background: "var(--color-border)" }} />
+      <HomeMediaWall feed={mediaFeed} />
 
       <section className="home-hub" aria-labelledby="home-stations-title">
         <h2 id="home-stations-title">Что вы хотите сделать сегодня?</h2>
@@ -90,6 +102,10 @@ export default function Home() {
           ))}
         </nav>
       </section>
+
+      <HomeHubDirectory />
+
+      <HomeMetricsBar stats={hubStats} />
 
       <div style={{ padding: "var(--space-xl) var(--space-m)", background: "var(--color-bg-primary)", borderTop: "1px solid var(--color-border)", textAlign: "center" }}>
         <div style={{ maxWidth: 960, margin: "0 auto", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", lineHeight: 1.8 }}>

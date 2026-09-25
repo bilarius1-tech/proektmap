@@ -1,0 +1,417 @@
+import type { ContentClusterId, DemandMatrixRow, Priority } from "./types";
+
+export type ClusterRole = "core" | "satellite" | "noise";
+
+export type ClusterDef = {
+  id: ContentClusterId;
+  title: string;
+  role: ClusterRole;
+  productUrls: string[];
+  /** Токены для эвристической привязки поста к кластеру */
+  tokens: string[];
+};
+
+/**
+ * Ядро продукта ProektMap: AI-вайбкодинг в России + обучающие материалы.
+ * Авито / маркетплейсы — спутник (клики), не контур производства активов.
+ */
+export const CORE_CLUSTER_IDS: ContentClusterId[] = [
+  "ai-agents",
+  "cursor-vibe",
+  "telegram-bot",
+  "saas-product",
+  "ai-russia",
+  "prompts-skills",
+  "mcp-tools",
+  "ui-design",
+  "microservices",
+  "llm-models",
+  "resheniya-hub",
+];
+
+export const SATELLITE_CLUSTER_IDS: ContentClusterId[] = ["avito-ai", "marketplace"];
+
+/** Канонические кластеры спроса ProektMap (продукт → поиск). */
+export const CLUSTERS: ClusterDef[] = [
+  {
+    id: "ai-agents",
+    title: "AI-агенты и инженерия агентов",
+    role: "core",
+    productUrls: ["/agent-engineering", "/ai-skills", "/resheniya"],
+    tokens: ["агент", "agent", "harness", "loop", "graph", "skill", "оркестр", "мультиагент"],
+  },
+  {
+    id: "cursor-vibe",
+    title: "Cursor / вайбкодинг",
+    role: "core",
+    productUrls: ["/vaibik", "/resheniya/saas-product", "/ai-skills"],
+    tokens: ["cursor", "вайб", "vibe", "composer", "copilot", "исходник", "ide", "вайбкодинг"],
+  },
+  {
+    id: "telegram-bot",
+    title: "Telegram-бот с AI",
+    role: "core",
+    productUrls: ["/resheniya/telegram-bot", "/resheniya/grok-bot-cursor", "/telegram"],
+    tokens: ["telegram", "телеграм", "бот", "botfather", "grammy", "aiogram"],
+  },
+  {
+    id: "saas-product",
+    title: "SaaS / сайт с AI",
+    role: "core",
+    productUrls: ["/resheniya/saas-product", "/resheniya/premium-landing", "/services/site-template"],
+    tokens: ["saas", "лендинг", "сайт", "next.js", "подписк", "юkassa", "юкасса", "landing"],
+  },
+  {
+    id: "avito-ai",
+    title: "Авито + AI (спутник, не ядро)",
+    role: "satellite",
+    productUrls: ["/avito", "/resheniya/avito-business", "/services/avito-photo-uniquizer"],
+    tokens: ["авито", "avito", "объявлен", "селлер", "фото для авито"],
+  },
+  {
+    id: "ai-russia",
+    title: "AI из России / без VPN",
+    role: "core",
+    productUrls: ["/ai-without-vpn", "/russian-ai", "/models"],
+    tokens: ["без vpn", "vpn", "yandexgpt", "gigachat", "speechkit", "российск", "deepseek", "openrouter"],
+  },
+  {
+    id: "prompts-skills",
+    title: "Промпты и Skills",
+    role: "core",
+    productUrls: ["/prompts", "/skills", "/ai-skills"],
+    tokens: ["промпт", "prompt", "skill", "скилл", "шаблон промпт"],
+  },
+  {
+    id: "mcp-tools",
+    title: "MCP и инструменты",
+    role: "core",
+    productUrls: ["/mcp", "/arsenal", "/ai-tools"],
+    tokens: ["mcp", "инструмент", "tool", "arsenal", "каталог"],
+  },
+  {
+    id: "ui-design",
+    title: "UI / дизайн с агентом",
+    role: "core",
+    productUrls: ["/ui-patterns", "/resheniya/designer-agent", "/services/site-style-builder"],
+    tokens: ["ui", "дизайн", "figma", "паттерн", "макет", "designer"],
+  },
+  {
+    id: "microservices",
+    title: "Микросервисы ProektMap",
+    role: "core",
+    productUrls: ["/services", "/services/voice-guide-builder", "/services/site-style-builder"],
+    tokens: ["микросервис", "voice guide", "токен", "конструктор стил"],
+  },
+  {
+    id: "marketplace",
+    title: "Маркетплейсы Ozon/WB (спутник)",
+    role: "satellite",
+    productUrls: ["/services"],
+    tokens: ["ozon", "озон", "wildberries", "вайлдберр", "маркетплейс", "wb "],
+  },
+  {
+    id: "llm-models",
+    title: "Модели LLM",
+    role: "core",
+    productUrls: ["/models", "/ai-without-vpn", "/russian-ai"],
+    tokens: ["llm", "gpt", "claude", "модель", "openai", "anthropic", "gemini", "grok"],
+  },
+  {
+    id: "resheniya-hub",
+    title: "Готовые решения (хаб)",
+    role: "core",
+    productUrls: ["/resheniya"],
+    tokens: ["готовые решения", "готовое решение", "маршрут", "blueprint", "resheniya", "миссию", "каталог решений"],
+  },
+  {
+    id: "noise",
+    title: "Шум / вне фокуса",
+    role: "noise",
+    productUrls: [],
+    tokens: [],
+  },
+];
+
+export function clusterById(id: ContentClusterId): ClusterDef {
+  return CLUSTERS.find((c) => c.id === id) || CLUSTERS[CLUSTERS.length - 1];
+}
+
+export function clusterPriorityCap(cluster: ContentClusterId): Priority {
+  const def = clusterById(cluster);
+  if (def.role === "satellite") return "P3";
+  if (def.role === "noise") return "P3";
+  if (CORE_CLUSTER_IDS.includes(cluster)) return "P0";
+  return "P2";
+}
+
+/**
+ * Черновик матрицы спроса: продуктовые кластеры × типовые запросы.
+ * existingUrl заполняется скриптом Фазы 0 по инвентаризации.
+ */
+export const DEMAND_MATRIX_SEED: Omit<DemandMatrixRow, "existingUrl" | "existingTitle" | "gap">[] = [
+  {
+    id: "dm-agents-what",
+    query: "что такое AI агент",
+    intent: "informational",
+    pageType: "entity",
+    cluster: "ai-agents",
+    priority: "P0",
+    productCta: "/agent-engineering",
+    uniqueValueHint: "Определение + схема Harness/Loop/Graph с ProektMap",
+    notes: "Evergreen entity",
+  },
+  {
+    id: "dm-agents-how",
+    query: "как создать AI агента с нуля",
+    intent: "how-to",
+    pageType: "guide",
+    cluster: "ai-agents",
+    priority: "P0",
+    productCta: "/agent-engineering",
+    uniqueValueHint: "Пошаговый маршрут harness→loop + первая миссия",
+    notes: "Ядро обучения",
+  },
+  {
+    id: "dm-cursor-start",
+    query: "как начать с Cursor",
+    intent: "how-to",
+    pageType: "guide",
+    cluster: "cursor-vibe",
+    priority: "P0",
+    productCta: "/vaibik",
+    uniqueValueHint: "Вайбик как миссия №1 + Skills",
+    notes: "",
+  },
+  {
+    id: "dm-cursor-vs",
+    query: "Cursor vs VS Code Copilot",
+    intent: "comparison",
+    pageType: "comparison",
+    cluster: "cursor-vibe",
+    priority: "P1",
+    productCta: "/vaibik",
+    uniqueValueHint: "Таблица для РФ: цена, VPN, модели",
+    notes: "",
+  },
+  {
+    id: "dm-tg-bot",
+    query: "как сделать telegram бота с AI",
+    intent: "how-to",
+    pageType: "guide",
+    cluster: "telegram-bot",
+    priority: "P0",
+    productCta: "/resheniya/telegram-bot",
+    uniqueValueHint: "Готовый маршрут grammY + PM2",
+    notes: "Продукт уже есть — нужен поисковый guide",
+  },
+  {
+    id: "dm-tg-grok",
+    query: "telegram бот grok cursor",
+    intent: "how-to",
+    pageType: "guide",
+    cluster: "telegram-bot",
+    priority: "P1",
+    productCta: "/resheniya/grok-bot-cursor",
+    uniqueValueHint: "Маршрут grok-bot-cursor",
+    notes: "",
+  },
+  {
+    id: "dm-saas-ai",
+    query: "как сделать saas с помощью AI",
+    intent: "how-to",
+    pageType: "guide",
+    cluster: "saas-product",
+    priority: "P0",
+    productCta: "/resheniya/saas-product",
+    uniqueValueHint: "Этапы SaaS-маршрута + DoD",
+    notes: "",
+  },
+  {
+    id: "dm-landing-ai",
+    query: "лендинг с AI за вечер",
+    intent: "commercial",
+    pageType: "commercial",
+    cluster: "saas-product",
+    priority: "P1",
+    productCta: "/resheniya/premium-landing",
+    uniqueValueHint: "Кейс/маршрут premium-landing",
+    notes: "",
+  },
+  {
+    id: "dm-avito-photo",
+    query: "уникализатор фото авито",
+    intent: "transactional",
+    pageType: "commercial",
+    cluster: "avito-ai",
+    priority: "P3",
+    productCta: "/services/avito-photo-uniquizer",
+    uniqueValueHint: "Спутник кликов — не ядро контент-цеха",
+    notes: "SATELLITE: Авито усиливает клики, не контур вайбкодинга",
+  },
+  {
+    id: "dm-avito-ai",
+    query: "нейросеть для объявлений авито",
+    intent: "commercial",
+    pageType: "guide",
+    cluster: "avito-ai",
+    priority: "P3",
+    productCta: "/resheniya/avito-business",
+    uniqueValueHint: "Не приоритет производства активов",
+    notes: "SATELLITE: не развивать как P0/P1",
+  },
+  {
+    id: "dm-no-vpn",
+    query: "нейросети без vpn россия",
+    intent: "informational",
+    pageType: "guide",
+    cluster: "ai-russia",
+    priority: "P0",
+    productCta: "/ai-without-vpn",
+    uniqueValueHint: "Актуальный стек РФ + OpenRouter/DeepSeek",
+    notes: "Страница хаба есть — усилить guide",
+  },
+  {
+    id: "dm-yandexgpt",
+    query: "yandexgpt vs deepseek для кода",
+    intent: "comparison",
+    pageType: "comparison",
+    cluster: "ai-russia",
+    priority: "P1",
+    productCta: "/models",
+    uniqueValueHint: "Сравнение с лимитами и задачами практика",
+    notes: "",
+  },
+  {
+    id: "dm-prompt",
+    query: "как писать промпты для cursor",
+    intent: "how-to",
+    pageType: "guide",
+    cluster: "prompts-skills",
+    priority: "P0",
+    productCta: "/prompts",
+    uniqueValueHint: "Плохо→хорошо из /ai-skills",
+    notes: "",
+  },
+  {
+    id: "dm-skills",
+    query: "что такое agent skills cursor",
+    intent: "informational",
+    pageType: "entity",
+    cluster: "prompts-skills",
+    priority: "P1",
+    productCta: "/ai-skills",
+    uniqueValueHint: "Карточка Skill + trust levels",
+    notes: "",
+  },
+  {
+    id: "dm-mcp",
+    query: "что такое mcp сервер",
+    intent: "informational",
+    pageType: "entity",
+    cluster: "mcp-tools",
+    priority: "P1",
+    productCta: "/mcp",
+    uniqueValueHint: "Entity + каталог MCP ProektMap",
+    notes: "",
+  },
+  {
+    id: "dm-ui-agent",
+    query: "дизайн с AI агентом",
+    intent: "how-to",
+    pageType: "guide",
+    cluster: "ui-design",
+    priority: "P1",
+    productCta: "/resheniya/designer-agent",
+    uniqueValueHint: "Маршрут designer-agent + UI-Атлас",
+    notes: "",
+  },
+  {
+    id: "dm-style-builder",
+    query: "дизайн система для AI агента",
+    intent: "commercial",
+    pageType: "guide",
+    cluster: "microservices",
+    priority: "P1",
+    productCta: "/services/site-style-builder",
+    uniqueValueHint: "Конструктор стиля → DESIGN.md",
+    notes: "",
+  },
+  {
+    id: "dm-voice-guide",
+    query: "голосовой гид для сайта",
+    intent: "commercial",
+    pageType: "commercial",
+    cluster: "microservices",
+    priority: "P1",
+    productCta: "/services/voice-guide-builder",
+    uniqueValueHint: "Микросервис voice-guide-builder",
+    notes: "",
+  },
+  {
+    id: "dm-ozon-ai",
+    query: "ai для карточек ozon",
+    intent: "commercial",
+    pageType: "guide",
+    cluster: "marketplace",
+    priority: "P3",
+    productCta: "/services",
+    uniqueValueHint: "Спутник — не раздувать",
+    notes: "SATELLITE: вне ядра вайбкодинга",
+  },
+  {
+    id: "dm-vibecoding",
+    query: "что такое вайбкодинг",
+    intent: "informational",
+    pageType: "entity",
+    cluster: "cursor-vibe",
+    priority: "P0",
+    productCta: "/vaibik",
+    uniqueValueHint: "Определение + Вайбик + отличие от «просто чата»",
+    notes: "Ядро продукта",
+  },
+  {
+    id: "dm-learn-ai-ru",
+    query: "обучение AI инженерии Россия",
+    intent: "commercial",
+    pageType: "guide",
+    cluster: "resheniya-hub",
+    priority: "P0",
+    productCta: "/agent-engineering",
+    uniqueValueHint: "Трек обучения: агенты → маршруты /resheniya",
+    notes: "Ядро: обучающие материалы",
+  },
+  {
+    id: "dm-resheniya",
+    query: "готовые AI решения для проекта",
+    intent: "commercial",
+    pageType: "commercial",
+    cluster: "resheniya-hub",
+    priority: "P0",
+    productCta: "/resheniya",
+    uniqueValueHint: "Хаб маршрутов как ответ на спрос",
+    notes: "",
+  },
+  {
+    id: "dm-faq-agents",
+    query: "чем агент отличается от чата gpt",
+    intent: "informational",
+    pageType: "faq",
+    cluster: "ai-agents",
+    priority: "P1",
+    productCta: "/agent-engineering",
+    uniqueValueHint: "FAQ-хаб с цитируемыми ответами",
+    notes: "GEO-friendly: прямой ответ сверху",
+  },
+  {
+    id: "dm-case-saas",
+    query: "кейс saas собранный с AI",
+    intent: "informational",
+    pageType: "case",
+    cluster: "saas-product",
+    priority: "P2",
+    productCta: "/resheniya/saas-product",
+    uniqueValueHint: "Реальный кейс / цифры ProektMap или партнёра",
+    notes: "Не выдумывать — только факты",
+  },
+];

@@ -614,6 +614,267 @@
   color: var(--color-accent);
 }
 
+/* ── Медиа-стена ── */
+.home-media {
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
+}
+.home-media-shell {
+  width: min(1100px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 28px 0 36px;
+}
+.home-media-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.home-media-head h2 {
+  margin: 0 0 6px;
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.home-media-head p {
+  margin: 0;
+  max-width: 420px;
+  color: var(--color-text-secondary);
+  font-size: var(--text-xs);
+  line-height: 1.55;
+}
+.home-media-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+}
+.home-media-links a {
+  color: var(--color-accent);
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+}
+.home-media-links a:hover {
+  text-decoration: underline;
+}
+.home-media-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px 12px;
+  align-items: start;
+}
+.home-media-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+  background: transparent;
+}
+.home-media-tile.is-large {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+.home-media-tile-media {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+}
+.home-media-tile.is-large .home-media-tile-media {
+  aspect-ratio: 16 / 11;
+}
+.home-media-tile-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+.home-media-tile-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 2px;
+}
+.home-media-tile-kicker {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--color-accent);
+}
+.home-media-tile-title {
+  font-family: var(--font-heading);
+  font-size: var(--text-s);
+  font-weight: 800;
+  line-height: 1.3;
+  color: var(--color-text-primary);
+}
+.home-media-tile.is-large .home-media-tile-title {
+  font-size: var(--text-m);
+  letter-spacing: -0.01em;
+}
+.home-media-tile:hover .home-media-tile-title {
+  color: var(--color-accent);
+}
+.home-media-tile:hover .home-media-tile-media img {
+  transform: scale(1.03);
+}
+
+/* ── Сетка хаба ── */
+.home-directory {
+  border-top: 1px solid var(--color-border);
+  background: var(--color-bg-primary);
+}
+.home-directory-shell {
+  width: min(1100px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 40px 0 48px;
+}
+.home-directory-shell h2 {
+  margin: 0 0 8px;
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  text-align: center;
+}
+.home-directory-lead {
+  margin: 0 auto 28px;
+  max-width: 480px;
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: var(--text-xs);
+  line-height: 1.55;
+}
+.home-directory-groups {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px 20px;
+}
+.home-directory-group h3 {
+  margin: 0 0 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--color-border);
+  font-family: var(--font-heading);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+.home-directory-group ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.home-directory-group a {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 0;
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid var(--color-border-light);
+}
+.home-directory-group a:hover .home-directory-name {
+  color: var(--color-accent);
+}
+.home-directory-name {
+  font-size: var(--text-s);
+  font-weight: 700;
+  line-height: 1.3;
+}
+.home-directory-sub {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  line-height: 1.4;
+}
+
+/* ── Тёмная метрика ── */
+.home-metrics {
+  background: #1a1a1a;
+  color: #e8e8e8;
+}
+.home-metrics-shell {
+  width: min(1100px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 40px 0 44px;
+}
+.home-metrics-shell h2 {
+  margin: 0 0 6px;
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  text-align: center;
+  color: #e8e8e8;
+}
+.home-metrics-lead {
+  margin: 0 auto 28px;
+  max-width: 420px;
+  text-align: center;
+  color: #999;
+  font-size: var(--text-xs);
+  line-height: 1.55;
+}
+.home-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  background: #333;
+  border: 1px solid #333;
+}
+.home-metrics-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 22px 16px;
+  background: #1a1a1a;
+  color: inherit;
+  text-decoration: none;
+  text-align: center;
+}
+.home-metrics-item:hover {
+  background: #242424;
+}
+.home-metrics-value {
+  font-family: var(--font-heading);
+  font-size: clamp(28px, 4vw, 36px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #0FB880;
+  line-height: 1;
+}
+.home-metrics-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #999;
+}
+
+@media (max-width: 900px) {
+  .home-media-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .home-media-tile.is-large {
+    grid-column: span 2;
+    grid-row: span 1;
+  }
+  .home-directory-groups {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 720px) {
   .home-station-grid,
   .home-route-grid,
@@ -626,6 +887,25 @@
   .home-station-card,
   .home-route-card {
     min-height: 0;
+  }
+  .home-media-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .home-media-grid {
+    grid-template-columns: 1fr;
+  }
+  .home-media-tile,
+  .home-media-tile.is-large {
+    grid-column: auto;
+    grid-row: auto;
+  }
+  .home-directory-groups {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  .home-metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 

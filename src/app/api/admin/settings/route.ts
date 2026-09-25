@@ -16,6 +16,7 @@ export async function PATCH(req: NextRequest) {
     "proPrice", "yookassaShopId", "yookassaSecretKey",
     "deepseekApiKey", "openrouterApiKey", "openrouterModel", "deepseekModel",
     "autoPublishEnabled", "autoPublishHour", "autoPublishEveningHour", "autoPublishItemsPerFeed", "autoPublishIntervalMin",
+    "contentAutopilotEnabled", "contentAutopilotHour", "contentAutopilotDailyLimit",
     "yandexMetrikaId", "yandexWebmasterId", "googleAnalyticsId",
     "seoTitle", "seoDescription", "seoKeywords",
     "headerCode", "footerCode",

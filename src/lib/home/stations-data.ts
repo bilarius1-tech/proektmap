@@ -86,3 +86,55 @@ export const HOME_MORE_LAYERS = [
   { href: "/blog", label: "Блог" },
   { href: "/sitemap", label: "Полная карта" },
 ];
+
+export type HomeHubDirectoryItem = {
+  href: string;
+  title: string;
+  subtitle: string;
+};
+
+export type HomeHubDirectoryGroup = {
+  station: string;
+  items: HomeHubDirectoryItem[];
+};
+
+/** Сетка хаба на главной: название раздела + ссылка, по 4 станциям. */
+export const HOME_HUB_DIRECTORY: HomeHubDirectoryGroup[] = [
+  {
+    station: "Решения",
+    items: [
+      { href: "/resheniya", title: "Готовые решения", subtitle: "Маршруты до работающего продукта" },
+      { href: "/resheniya/saas-product", title: "SaaS-продукт", subtitle: "Кабинет, AI-сценарий, оплата" },
+      { href: "/resheniya/telegram-bot", title: "Telegram-бот", subtitle: "Публичный бот на VPS" },
+      { href: "/vaibik", title: "Вайбик", subtitle: "Игровой вход в вайбкодинг" },
+    ],
+  },
+  {
+    station: "Собрать",
+    items: [
+      { href: "/ui-patterns", title: "UI-паттерны", subtitle: "Атлас интерфейсов с промптами" },
+      { href: "/kopilka", title: "Копилка", subtitle: "Референсы и капсулы дизайна" },
+      { href: "/project-vault", title: "Project Vault", subtitle: "ДНК проектов и капсулы" },
+      { href: "/architect", title: "AI-Архитектор", subtitle: "Идея → сущности и стек" },
+    ],
+  },
+  {
+    station: "Инструменты",
+    items: [
+      { href: "/arsenal", title: "Нейро каталог", subtitle: "Стеки и AI-инструменты" },
+      { href: "/services", title: "Микросервисы", subtitle: "Утилиты прямо в браузере" },
+      { href: "/avito", title: "Авито", subtitle: "Инструменты для продавцов" },
+      { href: "/shpargalka", title: "Шпаргалка", subtitle: "Промпты по ролям" },
+    ],
+  },
+  {
+    station: "Научиться",
+    items: [
+      { href: "/agent-engineering", title: "Инженерия агентов", subtitle: "Каркас и цикл с проверкой" },
+      { href: "/ai-skills", title: "AI Skills", subtitle: "Как писать skills для агента" },
+      { href: "/blog", title: "Блог", subtitle: "Гайды и поисковые активы" },
+      { href: "/video", title: "Видео", subtitle: "Уроки с VK Video" },
+      { href: "/glossary", title: "Глоссарий", subtitle: "Термины AI простым языком" },
+    ],
+  },
+];

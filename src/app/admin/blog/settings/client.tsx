@@ -16,6 +16,9 @@ export default function BlogSettingsClient({ settings, stats }: any) {
     autoPublishEveningHour: settings.autoPublishEveningHour || 20,
     autoPublishItemsPerFeed: settings.autoPublishItemsPerFeed || 2,
     autoPublishIntervalMin: settings.autoPublishIntervalMin || 45,
+    contentAutopilotEnabled: !!settings.contentAutopilotEnabled,
+    contentAutopilotHour: settings.contentAutopilotHour ?? 10,
+    contentAutopilotDailyLimit: settings.contentAutopilotDailyLimit ?? 1,
   });
   const [saving, setSaving] = useState(false);
 
@@ -37,6 +40,24 @@ export default function BlogSettingsClient({ settings, stats }: any) {
     const data = await res.json();
     const started = data.collection?.started || data.collection?.scheduled;
     alert(started ? "Сбор запущен в фоне. Отчёт придёт в Telegram." : `Сбор не стартовал: ${data.collection?.reason || "unknown"}`);
+    router.refresh();
+    setSaving(false);
+  }
+
+  async function triggerAutopilot() {
+    setSaving(true);
+    try {
+      const res = await fetch("/api/blog/content-autopilot?force=1", { method: "POST" });
+      const data = await res.json();
+      const r = data.result;
+      if (r?.status === "published") {
+        alert(`Опубликовано: ${r.title}\n${r.url}`);
+      } else {
+        alert(`Автопилот: ${r?.status || data.error || "unknown"}${r?.reason ? " — " + r.reason : ""}${r?.query ? "\nТема: " + r.query : ""}`);
+      }
+    } catch (e: any) {
+      alert("Ошибка: " + (e?.message || e));
+    }
     router.refresh();
     setSaving(false);
   }
@@ -98,9 +119,86 @@ export default function BlogSettingsClient({ settings, stats }: any) {
           </div>
         </div>
 
+        {/* Content Autopilot V2 */}
+        <div style={{ padding: "var(--space-l)", background: "white", borderRadius: "var(--radius-l)", border: "2px solid var(--color-accent)" }}>
+          <h2 style={{ fontSize: "var(--text-l)", fontWeight: 700, marginBottom: 8 }}>Автопилот поисковых активов</h2>
+          <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-secondary)", marginBottom: "var(--space-m)", lineHeight: 1.6 }}>
+            Раз в день сам выбирает тему из матрицы спроса (вайбкодинг / обучение / агенты — не Авито),
+            пишет guide с CTA и публикует. При включении старый сбор новостей из RSS отключается.
+          </p>
+
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "var(--space-m)", marginBottom: "var(--space-m)", alignItems: "end" }}>
+            <div>
+              <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "var(--text-s)", fontWeight: 600 }}>
+                <input
+                  type="checkbox"
+                  checked={form.contentAutopilotEnabled}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      contentAutopilotEnabled: e.target.checked,
+                      ...(e.target.checked ? { autoPublishEnabled: false } : {}),
+                    })
+                  }
+                  style={{ width: 18, height: 18 }}
+                />
+                Включить автопилот
+              </label>
+              <div style={{ fontSize: 10, color: "var(--color-text-tertiary)", marginTop: 4, marginLeft: 26 }}>
+                1 поисковый актив в сутки
+              </div>
+            </div>
+            <div>
+              <label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Час запуска (МСК)</label>
+              <input
+                type="number"
+                min={0}
+                max={23}
+                value={form.contentAutopilotHour}
+                onChange={(e) => setForm({ ...form, contentAutopilotHour: parseInt(e.target.value) || 10 })}
+                style={{ width: "100%", padding: "10px 12px", fontSize: "var(--text-s)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none" }}
+              />
+            </div>
+            <div>
+              <label style={{ display: "block", fontSize: "var(--text-xs)", fontWeight: 600, marginBottom: 4 }}>Лимит в сутки</label>
+              <input
+                type="number"
+                min={1}
+                max={3}
+                value={form.contentAutopilotDailyLimit}
+                onChange={(e) => setForm({ ...form, contentAutopilotDailyLimit: parseInt(e.target.value) || 1 })}
+                style={{ width: "100%", padding: "10px 12px", fontSize: "var(--text-s)", borderRadius: "var(--radius-s)", border: "1px solid var(--color-border)", outline: "none" }}
+              />
+            </div>
+          </div>
+
+          <button
+            onClick={triggerAutopilot}
+            disabled={saving}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "10px 20px",
+              borderRadius: "var(--radius-m)",
+              background: "var(--color-accent)",
+              color: "white",
+              border: "none",
+              fontSize: "var(--text-s)",
+              fontWeight: 600,
+              cursor: "pointer",
+            }}
+          >
+            <Play size={14} /> Запустить автопилот сейчас
+          </button>
+        </div>
+
         {/* Auto-publish settings */}
         <div style={{ padding: "var(--space-l)", background: "white", borderRadius: "var(--radius-l)", border: "1px solid var(--color-border)" }}>
-          <h2 style={{ fontSize: "var(--text-l)", fontWeight: 700, marginBottom: "var(--space-m)" }}>⏱️ Авто-публикация</h2>
+          <h2 style={{ fontSize: "var(--text-l)", fontWeight: 700, marginBottom: "var(--space-m)" }}>⏱️ Авто-публикация новостей (legacy)</h2>
+          <p style={{ fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", marginBottom: "var(--space-m)" }}>
+            RSS → AI-статьи. Не используй вместе с автопилотом активов — при включении автопилота этот сбор гасится.
+          </p>
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: "var(--space-m)", marginBottom: "var(--space-m)", alignItems: "end" }}>
             <div>

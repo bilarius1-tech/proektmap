@@ -21,7 +21,10 @@
     "voice:check": "node scripts/vaibik-voice/check.mjs",
     "voice:guides": "python3 scripts/generate-voice-guides.py --provider=yandex",
     "voice:guides:edge": "python3 scripts/generate-voice-guides.py --provider=edge",
-    "vk:sync": "npx tsx --env-file=.env scripts/sync-vk-video.ts"
+    "vk:sync": "npx tsx --env-file=.env scripts/sync-vk-video.ts",
+    "content:phase0": "npx tsx --env-file=.env scripts/content-engine/run-phase-0.ts",
+    "content:publish-p0": "npx tsx --env-file=.env scripts/content-engine/publish-p0-assets.ts",
+    "content:autopilot": "npx tsx --env-file=.env scripts/content-engine/run-autopilot.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.7.0",

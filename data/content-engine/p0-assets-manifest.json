@@ -1,0 +1,73 @@
+{
+  "generatedAt": "2026-09-25T06:16:15.139Z",
+  "count": 11,
+  "results": [
+    {
+      "demandId": "dm-agents-what",
+      "slug": "chto-takoe-ai-agent",
+      "url": "https://proektmap.ru/blog/chto-takoe-ai-agent",
+      "action": "updated"
+    },
+    {
+      "demandId": "dm-tg-bot",
+      "slug": "kak-sdelat-telegram-bota-s-ai",
+      "url": "https://proektmap.ru/blog/kak-sdelat-telegram-bota-s-ai",
+      "action": "updated"
+    },
+    {
+      "demandId": "dm-saas-ai",
+      "slug": "kak-sdelat-saas-s-pomoshchyu-ai",
+      "url": "https://proektmap.ru/blog/kak-sdelat-saas-s-pomoshchyu-ai",
+      "action": "updated"
+    },
+    {
+      "demandId": "dm-cursor-start",
+      "slug": "kak-nachat-s-cursor",
+      "url": "https://proektmap.ru/blog/kak-nachat-s-cursor",
+      "action": "updated"
+    },
+    {
+      "demandId": "dm-no-vpn",
+      "slug": "neyroseti-bez-vpn-rossiya",
+      "url": "https://proektmap.ru/blog/neyroseti-bez-vpn-rossiya",
+      "action": "updated"
+    },
+    {
+      "demandId": "dm-prompt",
+      "slug": "kak-pisat-prompty-dlya-cursor",
+      "url": "https://proektmap.ru/blog/kak-pisat-prompty-dlya-cursor",
+      "action": "updated"
+    },
+    {
+      "demandId": "dm-resheniya",
+      "slug": "gotovye-ai-resheniya-proektmap",
+      "url": "https://proektmap.ru/blog/gotovye-ai-resheniya-proektmap",
+      "action": "updated"
+    },
+    {
+      "demandId": "dm-agents-how",
+      "slug": "kak-sozdat-ai-agenta-s-nulya",
+      "url": "https://proektmap.ru/blog/kak-sozdat-ai-agenta-s-nulya",
+      "action": "created"
+    },
+    {
+      "demandId": "dm-vibecoding",
+      "slug": "chto-takoe-vaybkodling",
+      "url": "https://proektmap.ru/blog/chto-takoe-vaybkodling",
+      "action": "created"
+    },
+    {
+      "demandId": "dm-learn-ai-ru",
+      "slug": "obuchenie-ai-inzhenerii-rossiya",
+      "url": "https://proektmap.ru/blog/obuchenie-ai-inzhenerii-rossiya",
+      "action": "created"
+    },
+    {
+      "demandId": "dm-cursor-vs",
+      "slug": "cursor-vs-vscode-copilot",
+      "url": "https://proektmap.ru/blog/cursor-vs-vscode-copilot",
+      "action": "created"
+    }
+  ],
+  "note": "P0 search assets — human-authored, not auto-publish factory"
+}
