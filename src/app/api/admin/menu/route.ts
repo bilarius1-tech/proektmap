@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
       href,
       parentId: parentId || null,
       sortOrder: typeof sortOrder === "number" ? sortOrder : 0,
-      icon: icon || null,
+      icon: typeof icon === "string" && icon.trim() ? icon.trim() : null,
       emoji: emoji ? emoji.trim() : null,
       location: location || "header",
     },
@@ -58,7 +58,7 @@ export async function PUT(req: NextRequest) {
       href,
       parentId: parentId || null,
       sortOrder: typeof sortOrder === "number" ? sortOrder : 0,
-      icon: icon || null,
+      icon: typeof icon === "string" && icon.trim() ? icon.trim() : null,
       emoji: emoji ? emoji.trim() : null,
       location: location || "header",
       isActive: isActive ?? true,
@@ -74,7 +74,14 @@ export async function DELETE(req: NextRequest) {
   const id = req.nextUrl.searchParams.get("id");
   if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
   const db = await getDb();
-  await db.menuItem.deleteMany({ where: { parentId: id } });
-  await db.menuItem.delete({ where: { id } });
+  await deleteMenuTree(db, id);
   return NextResponse.json({ ok: true });
+}
+
+async function deleteMenuTree(db: Awaited<ReturnType<typeof getDb>>, id: string) {
+  const children = await db.menuItem.findMany({ where: { parentId: id }, select: { id: true } });
+  for (const child of children) {
+    await deleteMenuTree(db, child.id);
+  }
+  await db.menuItem.delete({ where: { id } });
 }

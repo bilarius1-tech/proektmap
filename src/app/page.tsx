@@ -43,6 +43,9 @@ export default async function Home() {
           <p className="home-hero-lead">
             Маршрут, стек и проверки уже выбраны.
           </p>
+          <Link href="/resheniya" className="btn btn-primary home-hero-action">
+            Открыть готовые решения <ArrowRight size={16} />
+          </Link>
         </div>
       </AnimatedHero>
 

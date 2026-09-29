@@ -2,22 +2,15 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, X, ChevronDown, Search } from "lucide-react";
+import { Menu, X, Search } from "lucide-react";
 import FavoritesIndicator from "./favorites-indicator";
 import ThemeToggle from "./theme-toggle";
 import KnowledgeButtons from "@/components/knowledge/knowledge-buttons";
+import HubNav from "./hub-nav";
+import type { HeaderMenuNode } from "@/lib/nav/get-header-menu";
 
-interface MenuItem {
-  id: string; label: string; href: string; emoji?: string; children?: MenuItem[];
-}
-
-export default function MobileMenu({ items }: { items: MenuItem[] }) {
+export default function MobileMenu({ items }: { items: HeaderMenuNode[] }) {
   const [open, setOpen] = useState(false);
-  const [expanded, setExpanded] = useState<Set<string>>(new Set());
-
-  function toggleParent(id: string) {
-    setExpanded(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
-  }
 
   return (
     <>
@@ -50,85 +43,7 @@ export default function MobileMenu({ items }: { items: MenuItem[] }) {
               </button>
             </div>
 
-            <nav style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              {items.map(item => (
-                <div key={item.id}>
-                  {item.children && item.children.length > 0 ? (
-                    <>
-                      <button onClick={() => toggleParent(item.id)} style={{
-                        display: "flex", alignItems: "center", justifyContent: "space-between",
-                        width: "100%", padding: "12px", border: "none",
-                        background: item.href === "/resheniya" ? "var(--color-accent)" : "transparent",
-                        cursor: "pointer", fontSize: "var(--text-m)", fontWeight: 600,
-                        color: item.href === "/resheniya" ? "#fff" : "var(--color-text-primary)",
-                        borderRadius: "var(--radius-m)",
-                        minHeight: 52,
-                      }}>
-                        {item.label}
-                        <ChevronDown size={16} style={{ transform: expanded.has(item.id) ? "rotate(180deg)" : "none", transition: "0.2s" }} />
-                      </button>
-                      {expanded.has(item.id) && (
-                        <div style={{ paddingLeft: "var(--space-m)" }}>
-                          {item.children.map(child => (
-                            <div key={child.id}>
-                              {(child.children?.length || 0) > 0 ? (
-                                <>
-                                  <button
-                                    type="button"
-                                    onClick={() => toggleParent(child.id)}
-                                    style={{
-                                      display: "flex", alignItems: "center", justifyContent: "space-between",
-                                      width: "100%", padding: "10px 12px", border: "none", background: "transparent",
-                                      cursor: "pointer", fontSize: "var(--text-s)", fontWeight: 600,
-                                      color: "var(--color-text-primary)",
-                                    }}
-                                  >
-                                    <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
-                                      {child.emoji && <span>{child.emoji}</span>}
-                                      {child.label}
-                                    </span>
-                                    <ChevronDown size={14} style={{ transform: expanded.has(child.id) ? "rotate(180deg)" : "none", transition: "0.2s" }} />
-                                  </button>
-                                  {expanded.has(child.id) && (
-                                    <div style={{ paddingLeft: "var(--space-m)" }}>
-                                      {child.href && child.href !== "#" && (
-                                        <Link href={child.href} onClick={() => setOpen(false)}
-                                          style={{ display: "block", padding: "8px 12px", color: "var(--color-accent)", textDecoration: "none", fontSize: "var(--text-xs)", fontWeight: 700 }}>
-                                          Открыть раздел →
-                                        </Link>
-                                      )}
-                                      {child.children!.map(g => (
-                                        <Link key={g.id} href={g.href} onClick={() => setOpen(false)}
-                                          style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", color: "var(--color-text-secondary)", textDecoration: "none", fontSize: "var(--text-s)" }}>
-                                          {g.emoji && <span style={{ fontSize: 14 }}>{g.emoji}</span>}
-                                          <span>{g.label}</span>
-                                        </Link>
-                                      ))}
-                                    </div>
-                                  )}
-                                </>
-                              ) : (
-                                <Link href={child.href} onClick={() => setOpen(false)}
-                                  style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 12px", color: "var(--color-text-secondary)", textDecoration: "none", fontSize: "var(--text-s)" }}>
-                                  {child.emoji && <span style={{ fontSize: 16 }}>{child.emoji}</span>}
-                                  <span>{child.label}</span>
-                                </Link>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <Link href={item.href} onClick={() => setOpen(false)}
-                      className={item.href === "/resheniya" ? "mobile-solutions-link" : undefined}
-                      style={{ display: "block", padding: "12px", color: "var(--color-text-primary)", textDecoration: "none", fontSize: "var(--text-m)", fontWeight: 600 }}>
-                      {item.label}
-                    </Link>
-                  )}
-                </div>
-              ))}
-            </nav>
+            <HubNav items={items} onNavigate={() => setOpen(false)} />
 
             <div className="mobile-menu-actions">
               <div className="mobile-menu-actions-title">Быстрые действия</div>

@@ -23,7 +23,7 @@ export default async function AdminMenuPage() {
         <div>
           <h1 style={{ fontSize: "var(--text-xl)", marginBottom: "var(--space-2xs)" }}>Меню</h1>
           <p style={{ color: "var(--color-text-secondary)", fontSize: "var(--text-s)" }}>
-            Единственный источник пунктов шапки и футера. Не править ссылки в коде header/footer.
+            Здесь вы сами правите левую колонку и футер. Сохранение сразу видно на сайте.
           </p>
         </div>
       </div>
@@ -39,9 +39,9 @@ export default async function AdminMenuPage() {
           lineHeight: 1.45,
         }}
       >
-        Агенты и разработчики добавляют пункты только здесь (или через API <code>/api/admin/menu</code> под admin-сессией).
-        Хардкод в <code>header.tsx</code> запрещён. Поддерживается 3 уровня: корень → группа → ссылки (на desktop группы
-        становятся колонками мега-меню).
+        Вкладка «Главное меню» — это левая колонка. Три уровня: корень, подпункт, подпункт подпункта.
+        Иконка выбирается по имени из списка. «Карта» на сайте всегда стоит внизу колонки.
+        Повторный синк из файла больше не затирает то, что сохранено здесь.
       </div>
       <MenuEditor items={JSON.parse(JSON.stringify(items))} blueprints={JSON.parse(JSON.stringify(blueprints))} allBlueprints={JSON.parse(JSON.stringify(allBlueprints))} />
     </div>

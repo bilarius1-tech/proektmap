@@ -1,56 +1,18 @@
-import { getDb } from "@/lib/db";
 import Link from "next/link";
 import { Search } from "lucide-react";
 import MobileMenu from "./mobile-menu";
 import AuthBlock from "./auth-block";
 import FavoritesIndicator from "./favorites-indicator";
 import ThemeToggle from "./theme-toggle";
-import DesktopMenuItem from "./desktop-menu-item";
 import KnowledgeButtons from "@/components/knowledge/knowledge-buttons";
+import { getHeaderMenu } from "@/lib/nav/get-header-menu";
 
 /**
- * Пункты меню берутся ТОЛЬКО из БД (админка /admin/menu).
- * Не хардкодить ссылки здесь — см. .cursor/rules/menu.mdc
+ * Верхняя полоска: логотип, поиск, вход.
+ * Разделы — в левой колонке (HubSidebar) из таблицы MenuItem.
  */
 export default async function GlobalHeader() {
-  let menuItems: any[] = [];
-  try {
-    const db = await getDb();
-    menuItems = await db.menuItem.findMany({
-      where: { parentId: null, isActive: true, location: "header" },
-      orderBy: { sortOrder: "asc" },
-      include: {
-        children: {
-          where: { isActive: true },
-          orderBy: { sortOrder: "asc" },
-          include: {
-            children: {
-              where: { isActive: true },
-              orderBy: { sortOrder: "asc" },
-            },
-          },
-        },
-      },
-    });
-  } catch {}
-
-  const isLegacyBlueprintItem = (item: any) => {
-    const label = String(item.label || "").toLowerCase();
-    const href = String(item.href || "");
-    return label === "готовые проекты" || label.includes("blueprint") || href.startsWith("/blueprints");
-  };
-
-  const mapVisible = (item: any): any => ({
-    ...item,
-    children: (item.children || [])
-      .filter((child: any) => !isLegacyBlueprintItem(child))
-      .map((child: any) => ({
-        ...child,
-        children: (child.children || []).filter((g: any) => !isLegacyBlueprintItem(g)),
-      })),
-  });
-
-  const visibleMenuItems = menuItems.filter((item) => !isLegacyBlueprintItem(item)).map(mapVisible);
+  const visibleMenuItems = await getHeaderMenu();
 
   return (
     <header
@@ -83,14 +45,6 @@ export default async function GlobalHeader() {
         >
           Карта<span style={{ color: "var(--color-accent)" }}> роста</span>
         </Link>
-        <nav
-          style={{ display: "flex", gap: 4, alignItems: "center", marginLeft: "var(--space-l)" }}
-          className="header-nav hide-mobile"
-        >
-          {visibleMenuItems.map((item: any) => (
-            <DesktopMenuItem key={item.id} item={item} />
-          ))}
-        </nav>
       </div>
 
       <div className="header-right" style={{ display: "flex", alignItems: "center", gap: "var(--space-s)" }}>

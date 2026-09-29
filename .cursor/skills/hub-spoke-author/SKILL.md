@@ -31,7 +31,7 @@ Trust: `community` до аудита. Не ставь себе `verified`.
 
 1. `.cursor/rules/menu.mdc`
 2. `src/app/sitemap/site-map-data.ts` — куда в дереве
-3. `scripts/sync-header-menu.ts` — id станций
+3. `/admin/menu` — живое меню. `sidebar-seed.ts` только досеивает отсутствующие id и не перезаписывает правки.
 4. Примеры: [examples.md](examples.md)
 
 Перед поиском по коду: `graphify query "<новая сущность> SITE_TREE menu station"`.
@@ -74,7 +74,7 @@ Trust: `community` до аудита. Не ставь себе `verified`.
 
 1. Карточка или пункт на хабе станции (каталог `/resheniya`, `/arsenal`, `/ui-patterns`, `/services`, `/agent-engineering`…).
 2. `SITE_TREE` — в группу станции, не новый `SiteTreeGroup`.
-3. Меню — ребёнок станции в `scripts/sync-header-menu.ts`, затем `npx tsx --env-file=.env scripts/sync-header-menu.ts`.
+3. Меню — ребёнок станции в `/admin/menu` (или API `/api/admin/menu`). Не перезаписывать существующие пункты синком.
 4. Если помогает живому маршруту — одна ссылка из шага `/resheniya`, не баннер «смотрите ещё».
 
 Группы `SITE_TREE`: `start` ≈ Решения, `design` ≈ Собрать, `tools`/`russia` ≈ Инструменты, `knowledge` ≈ Научиться. `legacy` / `service` / `account` — не для новых продуктов.
@@ -87,7 +87,7 @@ Hub Spoke Progress:
 - [ ] 2. Нет нового корня шапки (parentId: null)
 - [ ] 3. Нет нового showcase-блока на главной
 - [ ] 4. Запись в SITE_TREE
-- [ ] 5. Спица в sync-header-menu.ts (если пункт достоин мега-меню)
+- [ ] 5. Спица в /admin/menu (если пункт достоин колонки)
 - [ ] 6. Ссылка с хаб-страницы родителя
 - [ ] 7. metadata + canonical; динамика — в sitemap.ts
 - [ ] 8. Плохо→хорошо или before→after в данных

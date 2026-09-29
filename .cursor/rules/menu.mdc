@@ -41,34 +41,41 @@ alwaysApply: true
 - новый слой → новый пункт шапки
 - блок-витрина на главной как способ «запустить раздел»
 
-## 4 станции шапки + Карта
+## 4 станции в левой колонке + Карта
 
-В шапке максимум **5 корней**. Дети живут в мега-меню.
+Верхняя полоска: логотип, поиск, вход. Станции там не рисуются.
+
+Слева колонка на всю высоту: 4 станции плюс отдельные корни **Видео** и **Блог** (решение Алексея). «Карта» стоит внизу колонки.
+
+Новый корень (`parentId: null`) по-прежнему только по явному решению Алексея. Новая спица добавляется в `/admin/menu` ребёнком станции. Файл `sidebar-seed.ts` — только стартовая карта, не живой редактор.
 
 | id | label | href | Дети (спицы) |
 |---|---|---|---|
 | `header-resheniya` | Решения | `/resheniya` | живые маршруты `/resheniya/*`, Вайбик |
 | `header-station-build` | Собрать | `/ui-patterns` | UI-паттерны, Копилка, Vault, песочница, Архитектор |
 | `header-station-tools` | Инструменты | `/arsenal` | Нейро каталог, микросервисы, Авито, шпаргалка |
-| `header-station-learn` | Научиться | `/agent-engineering` | инженерия агентов, AI Skills, видео, блог, глоссарий |
+| `header-station-learn` | Научиться | `/agent-engineering` | инженерия агентов, AI Skills, глоссарий, гайды |
+| `header-video` | Видео | `/video` | корень, не спица «Научиться» |
+| `header-blog` | Блог | `/blog` | корень, не спица «Научиться» |
+| `header-community` | Сообщество | `/specialists` | Люди `/specialists`, Работы `/ai-workshop`. Страницы людей в меню не списком |
 | `header-sitemap` | Карта | `/sitemap` | нет, это полная карта |
 
-Стабильные id спиц: `header-arsenal`, `header-avito`, `header-agent-engineering`, `header-ai-skills`, `header-shpargalka`, `header-video`, `header-project-vault`. Их **не удалять** — только переносить под станцию.
+Стабильные id: `header-arsenal`, `header-avito`, `header-agent-engineering`, `header-ai-skills`, `header-shpargalka`, `header-video`, `header-blog`, `header-community`, `header-project-vault`. Их **не удалять**. `header-video`, `header-blog` и `header-community` остаются корнями.
 
 ## Как агенту добавить / изменить пункт
 
-1. **Предпочтительно:** попросить Алексея добавить в `/admin/menu`, либо
-2. Через Prisma/`getDb()` upsert в `menuItem` (как `scripts/sync-header-menu.ts`), либо
-3. Через API (только под сессией admin):
-   - `POST /api/admin/menu` — создать `{ label, href, location: "header"|"footer", sortOrder, parentId? }`
+Живое меню ведёт Алексей в `/admin/menu`. Агент не перезаписывает уже существующие строки.
+
+1. **По умолчанию:** попросить Алексея добавить или изменить пункт в `/admin/menu`.
+2. Если Алексей просит сделать это самому — API под admin-сессией:
+   - `POST /api/admin/menu` — создать `{ label, href, location: "header"|"footer", sortOrder, parentId?, icon? }`
    - `PUT /api/admin/menu` — обновить
    - `DELETE /api/admin/menu?id=...` — удалить
    - `POST /api/admin/menu/reorder` — порядок
+3. `scripts/sync-header-menu.ts` только создаёт отсутствующие id из `sidebar-seed.ts`. Повторный запуск не меняет подписи, ссылки, родителей и не прячет чужие пункты.
 
-После изменения меню в БД **не нужен** rebuild кода — шапка читает БД на каждый запрос.
-Rebuild нужен только если меняли код header/footer/API.
-
-Синк станций: `npx tsx --env-file=.env scripts/sync-header-menu.ts`
+После изменения меню в БД **не нужен** rebuild кода — колонка читает БД на каждый запрос.
+Rebuild нужен, только если в набор иконок колонки добавили новое имя Lucide.
 
 ## Запрещено
 

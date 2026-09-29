@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "@/app/globals.css";
 import "@/styles/tokens.css";
 import GlobalHeader from "@/components/layout/header";
+import HubSidebar from "@/components/layout/hub-sidebar";
 import BlueprintProgressBar from "@/components/layout/blueprint-progress-bar";
 import GlobalFooter from "@/components/layout/footer";
 import StreakBanner from "@/components/layout/streak-banner";
@@ -85,10 +86,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="flex flex-col min-h-dvh">
         <SessionProvider>
           <GlobalHeader />
-          <StreakBanner />
-          <main className="flex-1">{children}</main>
-          <BlueprintProgressBar />
-          <GlobalFooter />
+          <div className="app-frame">
+            <HubSidebar />
+            <div className="app-frame-main">
+              <StreakBanner />
+              <main className="flex-1">{children}</main>
+              <BlueprintProgressBar />
+              <GlobalFooter />
+            </div>
+          </div>
           <AssistantWrapper />
           <VoiceGuideWidget />
           <CookieConsent />
