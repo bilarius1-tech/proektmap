@@ -5,6 +5,21 @@
 Сайт: https://proektmap.ru | Сервер: 109.196.165.106
 
 **Центр продукта:** `/resheniya` — «Готовые решения AI» (результат → этапы → артефакт → проверка).
+
+## ⭐ Visual Factory — активная инициатива (план на 2 недели)
+
+Производственный контур визуальных решений: DONOR → DESIGN.md → Visual Solution → агентский пакет → `/resheniya`.
+
+- Концепция и философия: `docs/PROEKTMAP-VISUAL-FACTORY.md`
+- **План на 2 недели (обязателен к исполнению): `docs/VISUAL-FACTORY-PLAN.md`**
+
+Правила для агентов:
+1. Работа по Visual Factory идёт строго по `docs/VISUAL-FACTORY-PLAN.md`; концепция — философия, а не план.
+2. Сейчас строим только Visual Solutions в `/resheniya`. Без `/components`, без MCP, без платежей, без «Try with my content».
+3. Роли (промпты в `/visual-factory/prompts/`): donor-analyst → design-extractor → content-neutralizer → builder → visual-qa → packager → publisher.
+4. Артефакты класть в `/visual-factory/` (donors, analyses, designs, solutions, qa, docs).
+5. Публикуем только скриншоты наших сборок; скриншоты и материалы доноров — только внутри `/visual-factory/donors`.
+
 Старые Blueprint (`/blueprints`) — legacy. `/solutions` — другая сущность, не путать.
 
 ## Стек
