@@ -21,7 +21,7 @@ function pagePriority(href: string) {
   if (href === "/arsenal") return 0.85;
   if (href.startsWith("/arsenal/")) return href.includes("/tools/") ? 0.55 : 0.75;
   if (href.startsWith("/resheniya/")) return href.includes("workspace") ? 0.6 : 0.8;
-  if (["/blog", "/video", "/ai-tools", "/mcp", "/telegram", "/avito", "/services", "/ai-without-vpn", "/skills", "/glossary"].includes(href)) return 0.8;
+  if (["/blog", "/video", "/ai-tools", "/mcp", "/telegram", "/avito", "/services", "/ai-without-vpn", "/skills", "/glossary", "/books", "/faily"].includes(href)) return 0.8;
   if (["/terms", "/privacy", "/offer", "/refund", "/contacts"].includes(href)) return 0.4;
   if (href === "/auth") return 0.3;
   return 0.7;
@@ -49,10 +49,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let patternUrls: MetadataRoute.Sitemap = [];
   let russianAiUrls: MetadataRoute.Sitemap = [];
   let workshopUrls: MetadataRoute.Sitemap = [];
+  let shopUrls: MetadataRoute.Sitemap = [];
 
   try {
     const db = await getDb();
-    const [posts, tools, mcps, solutions, terms, patterns, russianAi, workshop] = await Promise.all([
+    const [posts, tools, mcps, solutions, terms, patterns, russianAi, workshop, shopProducts] = await Promise.all([
       db.blogPost.findMany({ where: { status: "published" }, select: { slug: true, updatedAt: true }, orderBy: { updatedAt: "desc" }, take: 500 }),
       db.aITool.findMany({ where: { isActive: true }, select: { slug: true, updatedAt: true } }),
       db.mCPServer.findMany({ where: { isActive: true }, select: { slug: true, updatedAt: true } }),
@@ -61,6 +62,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       db.buildPattern.findMany({ where: { isPublished: true }, select: { slug: true, updatedAt: true } }),
       db.russianAIProject.findMany({ where: { isPublished: true }, select: { slug: true, updatedAt: true } }),
       db.aiProject.findMany({ select: { slug: true, updatedAt: true } }),
+      db.digitalProduct.findMany({ where: { isPublished: true }, select: { slug: true, kind: true, coverUrl: true, updatedAt: true } }),
     ]);
 
     blogUrls = posts.map((item) => ({ url: `${baseUrl}/blog/${item.slug}`, lastModified: item.updatedAt, changeFrequency: "monthly", priority: 0.7 }));
@@ -71,6 +73,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     patternUrls = patterns.map((item) => ({ url: `${baseUrl}/patterns/${item.slug}`, lastModified: item.updatedAt, changeFrequency: "monthly", priority: 0.6 }));
     russianAiUrls = russianAi.map((item) => ({ url: `${baseUrl}/russian-ai/${item.slug}`, lastModified: item.updatedAt, changeFrequency: "monthly", priority: 0.6 }));
     workshopUrls = workshop.map((item) => ({ url: `${baseUrl}/ai-workshop/${item.slug}`, lastModified: item.updatedAt, changeFrequency: "monthly", priority: 0.6 }));
+    shopUrls = shopProducts.map((item) => {
+      const path = item.kind === "book" ? "books" : "faily";
+      return {
+        url: `${baseUrl}/${path}/${item.slug}`,
+        lastModified: item.updatedAt,
+        changeFrequency: "weekly" as const,
+        priority: 0.75,
+        images: item.coverUrl ? [`${baseUrl}${item.coverUrl}`] : undefined,
+      };
+    });
   } catch {}
 
   return [
@@ -137,5 +149,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...patternUrls,
     ...russianAiUrls,
     ...workshopUrls,
+    ...shopUrls,
   ];
 }

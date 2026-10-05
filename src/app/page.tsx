@@ -8,6 +8,8 @@ import { ArrowRight, Boxes, Compass, GraduationCap, Route, Wrench } from "lucide
 import { HOME_LIVE_ROUTES, HOME_MORE_LAYERS, HOME_STATIONS } from "@/lib/home/stations-data";
 import { getHomeMediaFeed } from "@/lib/home/media-feed";
 import { getHomeHubStats } from "@/lib/home/hub-stats";
+import HomeShop from "@/components/home/home-shop";
+import { getDb } from "@/lib/db/index";
 import { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -28,9 +30,15 @@ const STATION_ICONS = {
 } as const;
 
 export default async function Home() {
-  const [mediaFeed, hubStats] = await Promise.all([
+  const [mediaFeed, hubStats, shopLatest] = await Promise.all([
     getHomeMediaFeed(),
     getHomeHubStats(),
+    getDb().then((db) => db.digitalProduct.findMany({
+      where: { isPublished: true },
+      orderBy: { updatedAt: "desc" },
+      take: 4,
+      select: { slug: true, title: true, cardTitle: true, priceRub: true, kind: true, coverUrl: true, viewCount: true, litresUrl: true, ageRating: true, pageCount: true },
+    })),
   ]);
 
   return (
@@ -50,6 +58,8 @@ export default async function Home() {
       </AnimatedHero>
 
       <HomeMediaWall feed={mediaFeed} />
+
+      <HomeShop products={shopLatest} />
 
       <section className="home-hub" aria-labelledby="home-stations-title">
         <h2 id="home-stations-title">Что вы хотите сделать сегодня?</h2>

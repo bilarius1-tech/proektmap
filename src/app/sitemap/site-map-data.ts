@@ -223,6 +223,19 @@ export const SITE_TREE: SiteTreeGroup[] = [
     items: [
       { title: "Глоссарий", href: "/glossary" },
       {
+        title: "Книги",
+        href: "/books",
+        description: "PDF для педагогов: Литрес или покупка на сайте",
+        children: [
+          { title: "Найти заказ", href: "/zakaz", description: "Страница скачивания по email, если вкладка закрылась" },
+        ],
+      },
+      {
+        title: "Файлы",
+        href: "/faily",
+        description: "Цифровые архивы по категориям",
+      },
+      {
         title: "Блог",
         href: "/blog",
         children: [
@@ -385,6 +398,13 @@ export const SITE_TASK_HINTS: SiteTaskHint[] = [
     query: "стиль сайта промпт design",
     keywords: ["стиль", "design.md", "токен", "шрифт", "промпт для дизайна"],
     href: "/services/site-style-builder",
+  },
+  {
+    id: "books",
+    label: "Купить книгу",
+    query: "книга ии для учителя",
+    keywords: ["книг", "учебник", "педагог", "учитель", "pdf", "литрес"],
+    href: "/books",
   },
   {
     id: "site-template",

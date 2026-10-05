@@ -22,6 +22,7 @@ export default function DashboardClient({
   user,
   aiProjects = [],
   posts,
+  shopOrders = [],
   blueprints,
   completedIds,
   stats,
@@ -207,6 +208,35 @@ export default function DashboardClient({
           </div>
         </div>
       </div>
+
+      {shopOrders.length > 0 && (
+        <div style={{ marginBottom: "var(--space-xxl)" }}>
+          <h2 style={{ fontSize: "var(--text-l)", fontWeight: 800, margin: "0 0 12px", fontFamily: "var(--font-heading)" }}>
+            Мои покупки
+          </h2>
+          <div style={{ display: "grid", gap: 10 }}>
+            {shopOrders.map((order: { id: string; publicToken: string; amount: number; items: { title: string }[] }) => (
+              <Link
+                key={order.id}
+                href={`/zakaz/${order.publicToken}`}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  gap: 12,
+                  padding: "14px 16px",
+                  border: "1px solid var(--color-border)",
+                  background: "var(--color-bg-primary)",
+                  textDecoration: "none",
+                  color: "inherit",
+                }}
+              >
+                <span>{order.items.map((item) => item.title).join(", ")}</span>
+                <span style={{ fontWeight: 700, whiteSpace: "nowrap" }}>{order.amount} ₽</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* 2. MY PORTFOLIO SECTION (Behance for Vibe Coders) */}
       <div style={{ marginBottom: "var(--space-xxl)" }}>

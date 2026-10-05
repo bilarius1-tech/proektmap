@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Home, FileText, Layers, GitBranch, Settings, Users, Menu, Puzzle, Link as LinkIcon, Cpu, BookOpen, Palette, Map, Crown, Factory, Wrench, Sparkles, Brain, PiggyBank } from "lucide-react";
+import { Home, FileText, Layers, GitBranch, Settings, Users, Menu, Puzzle, Link as LinkIcon, Cpu, BookOpen, Palette, Map, Crown, Factory, Wrench, Sparkles, Brain, PiggyBank, ShoppingBag } from "lucide-react";
 
 const nav = [
   { href: "/admin", label: "Обзор", icon: Home },
@@ -19,6 +19,7 @@ const nav = [
   { href: "/admin/quest", label: "Квест", icon: Map },
   { href: "/admin/ai-radar", label: "AI Radar", icon: Cpu },
   { href: "/admin/design", label: "Дизайн", icon: Palette },
+  { href: "/admin/shop", label: "Магазин", icon: ShoppingBag },
   { href: "/admin/billing", label: "Биллинг", icon: Crown },
   { href: "/admin/patterns", label: "Паттерны", icon: Puzzle },
   { href: "/admin/mcp", label: "MCP-серверы", icon: Cpu },

@@ -53,6 +53,16 @@ export default async function DashboardPage() {
     include: { category: { select: { name: true } } },
   });
 
+  const shopOrders = await db.shopOrder.findMany({
+    where: {
+      status: "paid",
+      OR: [{ userId: user.id }, { email: user.email.toLowerCase() }],
+    },
+    orderBy: { paidAt: "desc" },
+    include: { items: { select: { title: true, priceRub: true } } },
+    take: 20,
+  });
+
   // Blueprints with progress
   const blueprints = await db.blueprint.findMany({
     include: {
@@ -77,6 +87,7 @@ export default async function DashboardPage() {
       user={JSON.parse(JSON.stringify(user))}
       aiProjects={JSON.parse(JSON.stringify(aiProjects))}
       posts={JSON.parse(JSON.stringify(posts))}
+      shopOrders={JSON.parse(JSON.stringify(shopOrders))}
       blueprints={JSON.parse(JSON.stringify(blueprints))}
       projects={JSON.parse(JSON.stringify(projects))}
       completedIds={JSON.parse(JSON.stringify([...completedIds]))}

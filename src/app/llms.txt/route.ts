@@ -15,6 +15,12 @@ export async function GET() {
     select: { title: true, slug: true, excerpt: true },
   });
 
+  const shop = await db.digitalProduct.findMany({
+    where: { isPublished: true },
+    orderBy: { sortOrder: "asc" },
+    select: { title: true, slug: true, kind: true, description: true, priceRub: true },
+  });
+
   // Get blueprints
   const blueprints = await db.blueprint.findMany({
     where: { isPublished: true },
@@ -36,10 +42,18 @@ export async function GET() {
     `- [Решения](${baseUrl}/solutions)`,
     `- [Telegram Боты](${baseUrl}/telegram)`,
     `- [AI без VPN](${baseUrl}/ai-without-vpn)`,
+    `- [Книги](${baseUrl}/books)`,
+    `- [Файлы магазина](${baseUrl}/faily)`,
     `- [Vibe Coding](${baseUrl}/vibecraft)`,
     ``,
     `## Blueprint'ы (маршруты разработки)`,
     ...blueprints.map(bp => `- [${bp.title}](${baseUrl}/${bp.slug}): ${bp.description || ""}`),
+    ``,
+    `## Магазин`,
+    ...shop.map((item) => {
+      const path = item.kind === "book" ? "books" : "faily";
+      return `- [${item.title}](${baseUrl}/${path}/${item.slug}): ${item.priceRub} ₽. ${(item.description || "").slice(0, 140)}`;
+    }),
     ``,
     `## Последние статьи блога`,
     ...posts.map(p => `- [${p.title}](${baseUrl}/blog/${p.slug}): ${(p.excerpt || "").slice(0, 120)}`),

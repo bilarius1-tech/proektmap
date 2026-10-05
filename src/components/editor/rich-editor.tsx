@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { Node, mergeAttributes } from "@tiptap/core";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -14,13 +15,39 @@ import TextAlign from "@tiptap/extension-text-align";
 import Highlight from "@tiptap/extension-highlight";
 import Underline from "@tiptap/extension-underline";
 import Link from "@tiptap/extension-link";
-
+import { videoEmbedSrc } from "@/lib/shop/video-embed";
 import {
   Bold, Italic, Underline as UnderlineIcon, List, ListOrdered,
   Quote, Code, ImageIcon, Heading1, Heading2, Heading3,
   Video, Upload, X, Search, Grid, Table as TableIcon, Sparkles, Wand2,
   Strikethrough, Highlighter, LinkIcon, AlignLeft, AlignCenter, AlignRight,
 } from "lucide-react";
+
+const VideoEmbed = Node.create({
+  name: "videoEmbed",
+  group: "block",
+  atom: true,
+  selectable: true,
+  addAttributes() {
+    return { src: { default: null } };
+  },
+  parseHTML() {
+    return [{
+      tag: "iframe",
+      getAttrs: (element) => {
+        const src = videoEmbedSrc((element as HTMLElement).getAttribute("src") || "");
+        return src ? { src } : false;
+      },
+    }];
+  },
+  renderHTML({ HTMLAttributes }) {
+    return ["div", { class: "video-embed" }, ["iframe", mergeAttributes(HTMLAttributes, {
+      allowfullscreen: "true",
+      allow: "autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock",
+      style: "width:100%;aspect-ratio:16/9;border:0;",
+    })]];
+  },
+});
 
 export default function RichEditor({ content, onChange, placeholder }: {
   content: string; onChange: (html: string) => void; placeholder?: string;
@@ -40,6 +67,7 @@ export default function RichEditor({ content, onChange, placeholder }: {
       TextAlign.configure({ types: ["heading", "paragraph"] }),
       Highlight.configure({ multicolor: true }),
       Underline,
+      VideoEmbed,
       Link.configure({ openOnClick: false, HTMLAttributes: { target: "_blank", rel: "noopener" } }),
       Placeholder.configure({ placeholder: placeholder || "Начните писать..." }),
     ],
@@ -61,6 +89,7 @@ export default function RichEditor({ content, onChange, placeholder }: {
       const res = await fetch("/api/upload", { method: "POST", body: fd });
       const data = await res.json();
       if (data.url) editor?.chain().focus().setImage({ src: data.url }).run();
+      else alert(data.error || "Фото не загрузилось");
       setUploading(false);
     };
     input.click();
@@ -76,24 +105,18 @@ export default function RichEditor({ content, onChange, placeholder }: {
 
   // VIDEO
   function addVideo() {
-    const url = prompt("Ссылка на видео (YouTube, VK, Rutube):"); if (!url) return;
-    if (url.includes("youtube.com") || url.includes("youtu.be")) {
-      editor?.chain().focus().setYoutubeVideo({ src: url }).run();
-    } else {
-      let embed = url;
-      if (url.includes("rutube.ru")) { const m = url.match(/video\/([\w]+)/); embed = "https://rutube.ru/play/embed/" + (m ? m[1] : ""); }
-      else if (url.includes("vk.com/video") || url.includes("vkvideo.ru")) {
-        if (!embed.includes("/video_ext")) embed = embed.replace("/video", "/video_ext");
-        if (embed.includes("vkvideo.ru")) embed = embed.replace("vkvideo.ru", "vk.com");
-        // Extract oid and id from URL like video-219351616_456239242
-        const vkMatch = embed.match(/video_ext-?(\d+)_(\d+)/);
-        if (vkMatch) {
-          embed = "https://vk.com/video_ext.php?oid=-" + vkMatch[1] + "&id=" + vkMatch[2] + "&hd=2";
-        }
-        if (!embed.includes("oid=")) embed += (embed.includes("?") ? "&" : "?") + "oid=-1";
-      }
-      editor?.chain().focus().insertContent('<div class="video-embed"><iframe src="' + embed + '" allowfullscreen style="width:100%;aspect-ratio:16/9;border:0;"></iframe></div>').run();
+    const raw = prompt("Ссылка или код вставки VK Video или Rutube:");
+    if (!raw) return;
+    if ((raw.includes("youtube.com") || raw.includes("youtu.be")) && !raw.includes("<iframe")) {
+      editor?.chain().focus().setYoutubeVideo({ src: raw }).run();
+      return;
     }
+    const src = videoEmbedSrc(raw);
+    if (!src) {
+      alert("Нужна ссылка или код iframe с vkvideo.ru, vk.com или rutube.ru");
+      return;
+    }
+    editor?.chain().focus().insertContent({ type: "videoEmbed", attrs: { src } }).run();
   }
 
   // TABLE

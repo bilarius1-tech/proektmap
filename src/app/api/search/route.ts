@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
   const query = q.toLowerCase();
 
   const [
-    glossary, patterns, mcp, tools, blog, decisions, prompts, aiProjects
+    glossary, patterns, mcp, tools, blog, decisions, prompts, aiProjects, shop
   ] = await Promise.all([
     db.glossaryTerm.findMany({
       where: { isPublished: true, OR: [
@@ -81,6 +81,14 @@ export async function GET(req: NextRequest) {
       select: { id: true, title: true, slug: true, description: true, category: true, language: true },
       take: 6,
     }),
+    db.digitalProduct.findMany({
+      where: { isPublished: true, OR: [
+        { title: { contains: query, mode: "insensitive" } },
+        { description: { contains: query, mode: "insensitive" } },
+      ]},
+      select: { id: true, title: true, slug: true, description: true, kind: true, priceRub: true },
+      take: 8,
+    }),
   ]);
 
   const results = [
@@ -100,6 +108,14 @@ export async function GET(req: NextRequest) {
       snippet: highlightText(p.why || p.body, query),
     })),
     ...aiProjects.map(p => ({ ...p, type: "aiProject", typeLabel: "🏭 AI Цех", href: "/ai-workshop/" + p.slug, snippet: highlightText(p.description, query), subtitle: p.category + (p.language === "en" ? " · EN" : " · RU") })),
+    ...shop.map(p => ({
+      id: p.id,
+      title: p.title,
+      type: "shop",
+      typeLabel: p.kind === "book" ? "Книга" : "Файл",
+      href: `${p.kind === "book" ? "/books" : "/faily"}/${p.slug}`,
+      snippet: highlightText(`${p.priceRub} ₽. ${p.description.replace(/<[^>]+>/g, " ")}`, query),
+    })),
   ];
 
   return NextResponse.json({ results, query: q, total: results.length });

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db/index";
+import { markShopOrderFromPayment } from "@/lib/shop/payments";
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,6 +10,11 @@ export async function POST(req: NextRequest) {
     if (!payment) return NextResponse.json({ ok: true });
 
     const db = await getDb();
+
+    if (payment.metadata?.purpose === "shop") {
+      await markShopOrderFromPayment(payment);
+      return NextResponse.json({ ok: true });
+    }
 
     if (event === "payment.succeeded" && payment.status === "succeeded") {
       const email = payment.metadata?.email;

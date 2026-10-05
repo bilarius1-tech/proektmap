@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRight,
+  BookOpen,
   Bot,
   CheckCircle2,
   Cpu,
@@ -495,6 +496,28 @@ export default function AgentEngineeringHubPage() {
               .
             </p>
           </article>
+        </section>
+
+        <section
+          aria-labelledby="shop-title"
+          style={{
+            marginBottom: 40,
+            padding: 20,
+            background: "var(--color-bg-primary)",
+            border: "1px solid var(--color-border)",
+          }}
+        >
+          <BookOpen size={20} style={{ color: "var(--color-accent)", marginBottom: 10 }} />
+          <h2 id="shop-title" style={{ margin: "0 0 8px", fontFamily: "var(--font-heading)", fontSize: 18 }}>
+            Книги и файлы
+          </h2>
+          <p style={{ margin: "0 0 14px", fontSize: 14, lineHeight: 1.6, color: "var(--color-text-secondary)" }}>
+            PDF для педагогов — на Литрес или сразу на сайте. Архивы zip добавляются отдельно, по категориям.
+          </p>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <Link href="/books" style={{ color: "var(--color-accent)", fontWeight: 700 }}>Книги</Link>
+            <Link href="/faily" style={{ color: "var(--color-accent)", fontWeight: 700 }}>Файлы</Link>
+          </div>
         </section>
 
         <section

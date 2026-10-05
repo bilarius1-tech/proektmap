@@ -29,6 +29,17 @@
 - Уведомления: Telegram (ядро) + SMS (квота) + PWA-push владельцу; VK Mini App — фаза 2
 - Дистрибуция: холодная рассылка по лидам konversus (отдельный домен, 20–30 писем/день)
 
+## Магазин — книги, каталоги, мануалы
+
+Канон линейки: `docs/SHOP.md`.
+
+Продаём три вида в уже открытом магазине, без нового корня шапки:
+
+1. Электронные книги — `/books`.
+2. Каталоги для новичков — `/faily`.
+3. Платные мануалы: уроки с промптами, которые копируют в работу — тоже `/faily`.
+
+Оплата ЮKassa не выдаёт Pro. Платный файл не класть в публичную папку.
 
 Старые Blueprint (`/blueprints`) — legacy. `/solutions` — другая сущность, не путать.
 
@@ -87,7 +98,7 @@ Playwright не обязателен для ручного конструкто�
 - `src/lib/` — утилиты (auth, db, project-context)
 - `prisma/schema.prisma` — модель БД
 - `prisma/seed.ts` — ПОЛНЫЙ посев (защита от сброса)
-- `docs/` — документация (DEVLOG, BUGS, ARCHITECTURE, PHILOSOPHY, RESHENIYA-V1, **SCROLL-FILM**)
+- `docs/` — документация (DEVLOG, BUGS, ARCHITECTURE, PHILOSOPHY, RESHENIYA-V1, **SCROLL-FILM**, **SHOP**)
 - `docs/SCROLL-FILM.md` — канон по scroll-лендингу / сайт-фильму (`/demo/scroll-film`)
 - `src/app/resheniya/` — готовые AI-решения (каталог, обзор, workspace)
 - `.cursor/skills/` — Skills для Cursor-агентов

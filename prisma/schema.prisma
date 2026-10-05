@@ -39,6 +39,7 @@ model User {
   payments              Payment[]
   aiProjects            AiProject[]
   projectLikes          ProjectLike[]
+  shopOrders            ShopOrder[]
 
   @@map("users")
 }
@@ -1026,6 +1027,88 @@ model VkVideo {
   @@index([publishedAt])
   @@index([isPublished, publishedAt])
   @@map("vk_videos")
+}
+
+/// Категория цифрового товара: книги или файлы (zip и др.).
+model ProductCategory {
+  id        String           @id @default(uuid())
+  title     String
+  slug      String           @unique
+  kind      String           @default("file") // book | file
+  sortOrder Int              @default(0)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  products  DigitalProduct[]
+
+  @@index([kind, sortOrder])
+  @@map("product_categories")
+}
+
+/// Книга или файл на продажу. Файл лежит в storage/shop, не в public.
+model DigitalProduct {
+  id           String          @id @default(uuid())
+  slug         String          @unique
+  title        String
+  description  String          @default("")
+  priceRub     Int
+  kind         String // book | file
+  categoryId   String
+  litresUrl    String          @default("")
+  fileName     String          @default("")
+  originalName String          @default("")
+  coverUrl     String          @default("")
+  cardTitle    String          @default("")
+  ageRating    String          @default("")
+  pageCount    Int             @default(0)
+  viewCount    Int             @default(0)
+  isPublished  Boolean         @default(false)
+  sortOrder    Int             @default(0)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  category     ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  orderItems   ShopOrderItem[]
+
+  @@index([kind, isPublished, sortOrder])
+  @@index([categoryId])
+  @@map("digital_products")
+}
+
+/// Заказ одной позиции. publicToken — секрет страницы заказа и скачивания.
+model ShopOrder {
+  id          String          @id @default(uuid())
+  publicToken String          @unique
+  email       String
+  userId      String?
+  status      String          @default("pending") // pending | paid | canceled
+  amount      Int // рубли
+  currency    String          @default("RUB")
+  yookassaId  String?         @unique
+  paidAt      DateTime?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  user        User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  items       ShopOrderItem[]
+
+  @@index([email])
+  @@index([userId, status])
+  @@map("shop_orders")
+}
+
+/// Снимок товара на момент оплаты. Скачивание идёт по fileName снимка.
+model ShopOrderItem {
+  id           String          @id @default(uuid())
+  orderId      String
+  productId    String?
+  title        String
+  priceRub     Int
+  fileName     String          @default("")
+  originalName String          @default("")
+  kind         String
+  order        ShopOrder       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product      DigitalProduct? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+  @@map("shop_order_items")
 }
 
 
