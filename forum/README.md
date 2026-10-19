@@ -36,7 +36,11 @@ tail -f storage/logs/flarum-$(date +%F).log                 # ошибки фо�
 /var/www/www-root/data/www/proektmap.ru/forum/theme/apply-theme.sh
 ```
 
-Почта: в `.env` ProektMap нет `SMTP_PASS`, поэтому форум пишет письма в лог (`mail_driver=log`). Когда появится пароль приложения Яндекса (или ящик `noreply@proektmap.ru`), вписать `SMTP_*` в `.env` и запустить `forum/scripts/configure-mail.sh`.
+Почта: пока `SMTP_PASS` в `.env` ProektMap пустой, форум пишет письма в лог (`mail_driver=log`). Подключение: пароль приложения Яндекса → `SMTP_PASS` в `.env` → `forum/scripts/configure-mail.sh`. Письма уходят через очередь в БД (`config.php` → `queue.driver=database`), её разбирает `flarum schedule:run` из cron root раз в минуту — ответ на форуме не ждёт SMTP. Хвост очереди: таблицы `queue_jobs`, `queue_failed_jobs`.
+
+Уведомления по умолчанию (для тех, кто не менял настройки; задано в `proektmap-sso`): подписка на свои темы и темы, где ответил; письмо о новом ответе в подписанной теме и при упоминании.
+
+Ссылка `/community/?compose=1` открывает окно новой темы (кнопка «Создать тему» на главной сайта).
 
 Проверка SSO целиком (вход, повторный вход, выход):
 

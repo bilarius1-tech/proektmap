@@ -18,6 +18,20 @@
         100
       );
     });
+
+    // /community/?compose=1 (кнопка «Создать тему» на главной сайта) — сразу окно новой темы.
+    // Гость с сессией ProektMap сначала проходит авто-вход, ?compose=1 сохраняется в returnTo.
+    extend('flarum/forum/components/IndexPage', 'oncreate', function () {
+      const params = new URLSearchParams(location.search);
+      if (!params.has('compose')) return;
+
+      params.delete('compose');
+      const qs = params.toString();
+      history.replaceState(history.state, '', location.pathname + (qs ? '?' + qs : '') + location.hash);
+
+      const IndexSidebar = unwrap(flarum.reg.get('core', 'forum/components/IndexSidebar'));
+      IndexSidebar.prototype.newDiscussionAction.call(null).catch(() => {});
+    });
   });
 
   module.exports = {};

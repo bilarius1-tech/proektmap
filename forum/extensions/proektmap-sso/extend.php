@@ -1,6 +1,8 @@
 <?php
 
 use Flarum\Extend;
+use Flarum\Mentions\Notification\PostMentionedBlueprint;
+use Flarum\Mentions\Notification\UserMentionedBlueprint;
 use Flarum\Post\Event\Saving;
 use ProektMap\Sso\Antispam\HoldNewcomerLinks;
 use ProektMap\Sso\Antispam\NewcomerThrottler;
@@ -28,6 +30,16 @@ return [
     (new Extend\Event())
         ->listen(OAuthLoginSuccessful::class, SyncNickname::class)
         ->listen(Saving::class, HoldNewcomerLinks::class),
+
+    // Умолчания для тех, кто не менял настройки: подписка на свои темы и ответы,
+    // письмо при упоминании. Перекрывают значения subscriptions/mentions (грузятся раньше).
+    (new Extend\User())
+        ->registerPreference('followAfterCreate', 'boolval', true)
+        ->registerPreference('followAfterReply', 'boolval', true),
+
+    (new Extend\Notification())
+        ->type(PostMentionedBlueprint::class, ['alert', 'email'])
+        ->type(UserMentionedBlueprint::class, ['alert', 'email']),
 
     (new Extend\ThrottleApi())
         ->set('proektmapNewcomer', NewcomerThrottler::class),

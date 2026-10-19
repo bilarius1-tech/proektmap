@@ -1,4 +1,4 @@
-import { ArrowRight, MessagesSquare } from "lucide-react";
+import { ArrowRight, MessagesSquare, SquarePen } from "lucide-react";
 import { COMMUNITY_NAME, COMMUNITY_NAME_ON, COMMUNITY_PATH } from "@/lib/community/config";
 import { timeAgoRu, type CommunityDiscussion } from "@/lib/community/latest";
 
@@ -61,11 +61,14 @@ export default function HomeCommunity({ discussions }: { discussions: CommunityD
         </ul>
       )}
 
-      <p style={{ margin: "16px 0 0", textAlign: "center" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center", justifyContent: "center", marginTop: 16 }}>
+        <a href={`${COMMUNITY_PATH}/?compose=1`} className="btn btn-primary" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+          <SquarePen size={16} /> Создать тему
+        </a>
         <a href={COMMUNITY_PATH} style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "var(--color-accent)", fontWeight: 700, textDecoration: "none" }}>
           Открыть {COMMUNITY_NAME} <ArrowRight size={14} />
         </a>
-      </p>
+      </div>
     </section>
   );
 }
