@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { isExternalAppHref } from "@/lib/community/config";
 import {
   Archive,
   BookOpen,
@@ -74,7 +75,13 @@ function TreeBranch({ item, level = 0, highlightHref }: { item: SiteTreeItem; le
   return (
     <li className="site-tree-node" data-level={level}>
       <div className={`site-tree-node-row ${!item.href ? "is-static" : ""}${isHit ? " is-task-hit" : ""}`}>
-        {item.href ? <Link href={item.href}>{content}</Link> : <div>{content}</div>}
+        {item.href && isExternalAppHref(item.href) ? (
+          <a href={item.href}>{content}</a>
+        ) : item.href ? (
+          <Link href={item.href}>{content}</Link>
+        ) : (
+          <div>{content}</div>
+        )}
       </div>
       {hasChildren && (
         <ul className="site-tree-children">

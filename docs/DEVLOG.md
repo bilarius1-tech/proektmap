@@ -2879,3 +2879,12 @@ Grok Bot в Cursor легко принять за ещё один чат. Тог
 - Таблицы `user_identities` (Yandex ID ↔ users.id) и `community_oauth_codes`. Вход через Яндекс без email теперь отклоняется с понятным сообщением. `/auth` учитывает `callbackUrl`.
 - Блог: блок «Обсудить на ИИ Форуме» (включается `COMMUNITY_PUBLIC=1`).
 - Бэкап форума: `forum/scripts/backup-forum.sh`, cron 03:30. E2E: `forum/scripts/e2e-sso.sh`.
+
+## 19.10.2026 (вечер) — ИИ Форум открыт: тема, антиспам, запуск
+
+- Тема форума (`forum/theme/`, `apply-theme.sh`): Inter/Onest, светлая по умолчанию, знак сайта у заголовка, favicon, подвал со ссылками на ProektMap. LESS требует `memory_limit` 1G в CLI и 512M в FPM.
+- Антиспам в `proektmap/sso`: новички (< 24 ч) — 3 темы и 20 ответов в час; пост новичка с внешней ссылкой уходит на одобрение модератору. nginx: 5/мин на `/api/auth/register|verify`.
+- Безопасность: `POST /api/auth/verify` больше не отдаёт ссылку подтверждения в ответе. `NEXTAUTH_SECRET` сменён, PM2 пересоздан без секретов в env, `start.sh` очищен (DEEPSEEK ключ — в `/root/.secrets/proektmap-legacy-start.env`).
+- SEO форума: `/community/sitemap.xml`, description и OG для тем (картинка `/api/og`), noindex служебных путей через nginx `map`, `robots.txt`.
+- Запуск: пароль beta снят, `COMMUNITY_PUBLIC=1`, пункт меню «ИИ Форум» под «Сообществом», `/community` в `SITE_TREE`. e2e SSO на проде — OK.
+- Открыто: SMTP (пустой `SMTP_PASS`), письма форума пока в лог.

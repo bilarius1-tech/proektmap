@@ -12,6 +12,11 @@ const PRIVATE_OR_INTERNAL_PREFIXES = [
   "/profile",
 ];
 
+// Публичные разделы, которые отдаёт не Next.js (nginx → отдельное приложение); page.tsx у них нет
+const EXTERNAL_APP_ROUTES: Record<string, string> = {
+  "/community": "ИИ Форум (Flarum, forum/README.md), свой sitemap: /community/sitemap.xml",
+};
+
 // Dynamic parameter patterns that are generated dynamically in sitemap.ts
 const KNOWN_DYNAMIC_GENERATORS: Record<string, string> = {
   "/skills/[slug]": "CAPABILITY_SKILLS (static array)",
@@ -171,6 +176,7 @@ export function validateSitemap(): ValidationResult {
   const existingRoutesSet = new Set(pageFiles.map(f => filePathToRoute(f, appDir)));
   for (const href of treeHrefs) {
     if (href.startsWith("http") || href.endsWith(".xml") || href.endsWith(".txt")) continue;
+    if (EXTERNAL_APP_ROUTES[href]) continue;
     if (!existingRoutesSet.has(href)) {
       // Is it a known sub-path or dynamic route?
       const matchesExisting = pageFiles.some(f => {

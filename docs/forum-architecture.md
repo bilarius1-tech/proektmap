@@ -61,6 +61,10 @@ ProektMap — единственный поставщик личности. Фо
 | `SyncProektMapSession` | Выход на сайте гасит сессию форума. Выход на форуме гасит cookie сайта. Отказ SSO не зацикливает вход |
 | `SyncNickname` | Имя на ProektMap → nickname на форуме при каждом входе |
 | `SsoConfig` | Ключи из `PROEKTMAP_SSO_*` env или блока `proektmap_sso` в `config.php` |
+| `Antispam\NewcomerThrottler` | Аккаунт моложе 24 ч: 3 темы и 20 ответов в час, сверх — 429 |
+| `Antispam\HoldNewcomerLinks` | Пост новичка с внешней ссылкой → неодобрен + флаг `approval` (очередь модератора) |
+| `Seo\DiscussionMeta` | `description` из первого поста, Open Graph, картинка — `/api/og` сайта |
+| `Seo\SitemapController` | `/community/sitemap.xml`: главная, теги, темы, видимые гостю |
 
 ---
 
@@ -95,10 +99,12 @@ ProektMap users.id (UUID)  ◄── user_identities(provider=yandex, providerAc
 | Пароли | Не передаются. Форум в режиме «только OAuth», пароль — только у админа |
 | Open redirect | `safeCallbackPath` на `/auth`, `isSafeReturnPath` в `fof/oauth` |
 | XSS | Форматтер Flarum экранирует HTML (проверено: `<script>` → текст) |
-| Rate limit | nginx `pm_community_auth` 30/мин на вход; Flarum: не чаще поста в 10 с (429) |
+| Rate limit | nginx `pm_community_auth` 30/мин на вход; `pm_site_register` 5/мин на регистрацию и подтверждение email сайта; Flarum: пост раз в 10 с; новички — 3 темы и 20 ответов в час |
+| Подтверждение email сайта | `POST /api/auth/verify` больше не отдаёт ссылку в ответе (иначе любой «подтверждал» чужой адрес, а форум доверяет `email_verified`) |
+| `NEXTAUTH_SECRET` | Сменён 19.10.2026, живёт только в `.env`. PM2 пересоздан с чистым окружением, `start.sh` без секретов |
 | Cookie | Flarum `Path=/community`, NextAuth `Path=/` — не пересекаются |
 | Логи | В логах нет кодов и токенов. `fof-oauth.log-oauth-errors=0`: иначе пишет cookie |
-| Индексация админки | `X-Robots-Tag: noindex` на `/community/admin`. На staging — на весь форум |
+| Индексация служебного | `X-Robots-Tag: noindex` (nginx `map`) на admin, api, auth, settings, notifications, logout + `robots.txt` |
 
 ---
 
@@ -136,8 +142,8 @@ ProektMap users.id (UUID)  ◄── user_identities(provider=yandex, providerAc
 
 ## 8. Что не закрыто и следующие шаги
 
-- **Запуск (этап 11):** опустошить `community-gate.conf`, `COMMUNITY_PUBLIC=1`, подпункт «ИИ Форум» → `/community` под «Сообществом» в `/admin/menu`, `robots.txt`, sitemap форума.
-- **Секреты в `start.sh` и слабый `NEXTAUTH_SECRET`** (риск №1 аудита) — сменить при запуске: все пользователи один раз выйдут.
-- **SMTP форума** — письма подтверждения нужны только пользователям с неподтверждённым email. Настроить на этапе 14.
-- **Тема (этап 6):** шрифты Inter/Onest, светлая тема по умолчанию, логотип, favicon.
-- **Антиспам (этап 8):** премодерация первых сообщений новых участников, если появится спам.
+Сделано 19.10.2026: тема (этап 6), модерация и антиспам (этап 8), открытие (этап 11).
+
+- **SMTP.** В `.env` ProektMap пустой `SMTP_PASS`, письма форума пишутся в лог. Нужен пароль приложения Яндекса или ящик `noreply@proektmap.ru` → `forum/scripts/configure-mail.sh`. Без почты не уходят только письма-уведомления; уведомления на сайте работают.
+- **Подтверждение email на сайте** не отправляет писем вообще (ссылка только в логе PM2). Пользователи с паролем без подтверждения получают на форуме неподтверждённый email. Решается тем же SMTP.
+- **Единичный 504** при создании темы (19.10, запрос шёл 72 с, повторить не удалось). Если повторится — смотреть `flarum-*.log` и nginx `error.log` по времени.

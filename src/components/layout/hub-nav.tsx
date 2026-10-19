@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 import NavIcon from "./nav-icon";
 import type { HeaderMenuNode } from "@/lib/nav/get-header-menu";
+import { isExternalAppHref } from "@/lib/community/config";
 
 const MAP_ID = "header-sitemap";
 
@@ -99,15 +100,27 @@ export default function HubNav({
       return (
         <div key={item.id} className="hub-nav-node">
           <div className={`hub-nav-line depth-${depth}`}>
-            <Link
-              href={item.href}
-              onClick={onNavigate}
-              title={item.label}
-              className={`hub-nav-row${active ? " is-active" : ""}${depth === 0 ? " is-station" : ""}`}
-            >
-              <NavIcon name={item.icon} size={depth === 0 ? 18 : 15} />
-              <span>{item.label}</span>
-            </Link>
+            {isExternalAppHref(item.href) ? (
+              <a
+                href={item.href}
+                onClick={onNavigate}
+                title={item.label}
+                className={`hub-nav-row${depth === 0 ? " is-station" : ""}`}
+              >
+                <NavIcon name={item.icon} size={depth === 0 ? 18 : 15} />
+                <span>{item.label}</span>
+              </a>
+            ) : (
+              <Link
+                href={item.href}
+                onClick={onNavigate}
+                title={item.label}
+                className={`hub-nav-row${active ? " is-active" : ""}${depth === 0 ? " is-station" : ""}`}
+              >
+                <NavIcon name={item.icon} size={depth === 0 ? 18 : 15} />
+                <span>{item.label}</span>
+              </Link>
+            )}
             {kids.length > 0 && (
               <button
                 type="button"

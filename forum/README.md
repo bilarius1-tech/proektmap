@@ -7,7 +7,8 @@
 | Flarum 2.0.x | `/var/www/www-root/data/www/proektmap-forum` (вне Git) |
 | Веб-корень nginx | `/var/www/www-root/data/www/proektmap-forum-web/community → ../proektmap-forum/public` |
 | Расширение SSO | `forum/extensions/proektmap-sso` (в Git, подключено composer path-репозиторием, симлинк) |
-| nginx | `/etc/nginx/proektmap/community.conf`, `community-gate.conf`; зона — `/etc/nginx/conf.d/proektmap-community-zones.conf` |
+| nginx | `/etc/nginx/proektmap/community.conf`, `community-gate.conf`, `site-auth-limits.conf`; зоны и `map` — `/etc/nginx/conf.d/proektmap-community-zones.conf` |
+| Тема | `forum/theme/` (LESS, шапка, подвал) → `forum/theme/apply-theme.sh` |
 | PHP | `/opt/php84/bin/php`, FPM-пул `proektmap.ru` (`/var/www/php-fpm/26.sock`, пользователь `www-root`) |
 | БД | MySQL 8, `proektmap_forum` / пользователь `proektmap_forum@localhost` |
 | Секреты | `/root/.secrets/proektmap-forum.env` (600), `config.php` форума (640) |
@@ -21,11 +22,21 @@
 
 ```bash
 cd /var/www/www-root/data/www/proektmap-forum
-sudo -u www-root /opt/php84/bin/php flarum cache:clear     # после правок расширения или настроек в БД
+sudo -u www-root /opt/php84/bin/php -d memory_limit=1G flarum cache:clear   # после правок расширения или настроек в БД
 sudo -u www-root /opt/php84/bin/php flarum migrate          # после обновления пакетов
 sudo -u www-root /opt/php84/bin/php flarum info             # версии и включённые расширения
-tail -f storage/logs/flarum-$(date +%F).log                 # ошибки форума
+tail -f storage/logs/flarum-$(date +%F).log                 # ошибки форума и письма (пока mail_driver=log)
 ```
+
+`cache:clear` пересобирает LESS темы: со стандартными 128 МБ компилятор падает по памяти. Поэтому `-d memory_limit=1G` в CLI и `php_admin_value[memory_limit] = 512M` в `/opt/php84/etc/php-fpm.d/site.d/proektmap.ru.conf` (пересборка из админки).
+
+Тема — правка файлов в `forum/theme/`, затем:
+
+```bash
+/var/www/www-root/data/www/proektmap.ru/forum/theme/apply-theme.sh
+```
+
+Почта: в `.env` ProektMap нет `SMTP_PASS`, поэтому форум пишет письма в лог (`mail_driver=log`). Когда появится пароль приложения Яндекса (или ящик `noreply@proektmap.ru`), вписать `SMTP_*` в `.env` и запустить `forum/scripts/configure-mail.sh`.
 
 Проверка SSO целиком (вход, повторный вход, выход):
 
@@ -90,12 +101,22 @@ ISPmanager может перегенерировать vhost (рядом леж�
 
 ---
 
-## Запуск для всех (снять staging)
+## Открыт для всех (с 19.10.2026)
 
-1. `/etc/nginx/proektmap/community-gate.conf` → пустой файл, `nginx -t && nginx -s reload`.
-2. `.env` ProektMap: `COMMUNITY_PUBLIC=1`, `pm2 restart proektmap` — в статьях блога появится «Обсудить на ИИ Форуме».
-3. `/admin/menu`: подпункт «ИИ Форум» → `/community` под «Сообществом».
-4. `public/robots.txt`: `Disallow: /community/admin`, `Disallow: /community/api`.
+- nginx: `community-gate.conf` = копия `forum/deploy/nginx/community-gate.open.conf` (без пароля).
+- `.env` ProektMap: `COMMUNITY_PUBLIC=1` — в статьях блога «Обсудить на ИИ Форуме».
+- Меню: `header-community-forum` «ИИ Форум» → `/community`, ребёнок «Сообщества».
+- `public/robots.txt`: служебные пути форума закрыты, `Sitemap: /community/sitemap.xml`.
+- `SITE_TREE`: `/community` (исключение `EXTERNAL_APP_ROUTES` в `scripts/validate-sitemap.ts`).
+
+Закрыть обратно на бету: `cp forum/deploy/nginx/community-gate.conf /etc/nginx/proektmap/ && nginx -t && systemctl reload nginx`, `COMMUNITY_PUBLIC=0` и перезапуск.
+
+## Модерация и антиспам
+
+- Flarum: не чаще одного поста в 10 секунд (429).
+- Участник моложе 24 часов (`NewcomerPolicy`): максимум 3 темы и 20 ответов в час (429). Пост с внешней ссылкой (не proektmap.ru) уходит на одобрение — флаг «Новый участник, внешняя ссылка» в очереди модератора.
+- Сайт: `/api/auth/register` и `/api/auth/verify` — 5 запросов в минуту с IP (+5 всплеск), nginx `site-auth-limits.conf`.
+- Модераторов назначает админ: профиль пользователя → группы → «Модератор».
 
 ---
 
@@ -111,7 +132,7 @@ ls -la /root/backups/forum/
 ```bash
 gunzip -c /root/backups/forum/proektmap_forum-<STAMP>.sql.gz | mysql proektmap_forum
 tar -xzf /root/backups/forum/proektmap_forum-files-<STAMP>.tar.gz -C /var/www/www-root/data/www/proektmap-forum
-sudo -u www-root /opt/php84/bin/php /var/www/www-root/data/www/proektmap-forum/flarum cache:clear
+sudo -u www-root /opt/php84/bin/php -d memory_limit=1G /var/www/www-root/data/www/proektmap-forum/flarum cache:clear
 ```
 
 ## Откат (rollback)

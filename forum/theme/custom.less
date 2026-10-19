@@ -1,0 +1,117 @@
+// ИИ Форум ProektMap — поверх темы Flarum. Значения = src/styles/tokens.css сайта.
+@pm-font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+@pm-font-heading: 'Onest', 'Inter', sans-serif;
+@pm-radius-s: 6px;
+@pm-radius-m: 10px;
+@pm-radius-l: 14px;
+
+body,
+input,
+button,
+select,
+textarea,
+.Button {
+  font-family: @pm-font-body;
+}
+
+h1, h2, h3,
+.Hero-title,
+.DiscussionHero-title,
+.UserCard-name {
+  font-family: @pm-font-heading;
+  letter-spacing: -0.01em;
+}
+
+// Знак сайта перед названием: тот же favicon, что у proektmap.ru
+.Header-title a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: @pm-font-heading;
+  font-weight: 800;
+  color: var(--heading-color);
+
+  &::before {
+    content: '';
+    width: 22px;
+    height: 22px;
+    flex: none;
+    background: url('/favicon.svg') center / contain no-repeat;
+  }
+}
+
+.Button,
+.FormControl,
+.Dropdown-menu {
+  border-radius: @pm-radius-s;
+}
+
+.Button--primary {
+  font-weight: 600;
+}
+
+.Composer {
+  border-radius: @pm-radius-l @pm-radius-l 0 0;
+}
+
+.Modal-content {
+  border-radius: @pm-radius-l;
+}
+
+.DiscussionListItem-title {
+  font-weight: 600;
+}
+
+.WelcomeHero {
+  background: var(--body-bg);
+  border-bottom: 1px solid var(--control-bg);
+
+  .Hero-title {
+    font-weight: 800;
+  }
+}
+
+.IndexPage-nav .TagLinkButton .Button-label {
+  white-space: normal;
+  line-height: 1.35;
+}
+
+// Подвал со ссылками обратно на сайт
+.pm-footer {
+  border-top: 1px solid var(--control-bg);
+  margin-top: 40px;
+  padding: 20px 16px 32px;
+  font-size: 13px;
+  color: var(--muted-color);
+
+  &-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    align-items: center;
+  }
+
+  a {
+    color: var(--muted-color);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--primary-color);
+    }
+  }
+
+  &-brand {
+    font-family: @pm-font-heading;
+    font-weight: 800;
+    color: var(--text-color) !important;
+    margin-right: auto;
+  }
+}
+
+@media (max-width: 767px) {
+  .pm-footer-brand {
+    width: 100%;
+  }
+}

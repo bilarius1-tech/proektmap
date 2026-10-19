@@ -3,5 +3,12 @@ Allow: /
 Disallow: /api/
 Disallow: /admin/
 Disallow: /dashboard/
+Disallow: /community/admin
+Disallow: /community/api/
+Disallow: /community/auth/
+Disallow: /community/settings
+Disallow: /community/notifications
+Disallow: /community/logout
 
 Sitemap: https://proektmap.ru/sitemap.xml
+Sitemap: https://proektmap.ru/community/sitemap.xml

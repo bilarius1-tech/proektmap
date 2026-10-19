@@ -259,6 +259,11 @@ export const SITE_TREE: SiteTreeGroup[] = [
       },
       { title: "Специалисты", href: "/specialists" },
       {
+        title: "ИИ Форум",
+        href: "/community",
+        description: "Вопросы, проекты и обсуждения участников. Вход тем же аккаунтом, что на сайте",
+      },
+      {
         title: "Экспериментальные визуализации",
         children: [
           { title: "Граф связей", href: "/graph" },

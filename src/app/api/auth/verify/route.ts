@@ -8,17 +8,16 @@ export async function POST(req: NextRequest) {
   if (!email) return NextResponse.json({ error: "email required" }, { status: 400 });
   const db = await getDb();
   const user = await db.user.findUnique({ where: { email: email.toLowerCase() } });
-  if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
-  if (user.emailVerified) return NextResponse.json({ ok: true, verified: true });
+  if (!user || user.emailVerified) return NextResponse.json({ ok: true });
 
   const token = crypto.randomBytes(32).toString("hex");
   await db.user.update({ where: { id: user.id }, data: { verifyToken: token } });
 
-  // In production: send email via SMTP
+  // Ссылка уходит только владельцу ящика: в ответе её быть не должно, иначе подтвердить можно чужой email.
   const verifyUrl = "https://proektmap.ru/verify?token=" + token;
   console.log("Verify URL:", verifyUrl);
 
-  return NextResponse.json({ ok: true, verifyUrl });
+  return NextResponse.json({ ok: true });
 }
 
 // GET — verify token

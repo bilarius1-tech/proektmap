@@ -9,6 +9,11 @@ export const COMMUNITY_MATERIALS_TAG_URL = "/community/t/materialy-proektmap";
 /** Flarum отдаёт nginx по этому пути, это не страница Next.js. */
 export const COMMUNITY_PATH = "/community";
 
+/** Ссылки на форум — обычный <a>: next/link делает prefetch и RSC-запрос в чужое приложение. */
+export function isExternalAppHref(href: string | null | undefined): boolean {
+  return !!href && (href === COMMUNITY_PATH || href.startsWith(`${COMMUNITY_PATH}/`));
+}
+
 /**
  * Пока форум закрыт паролем (staging), ссылки на него на сайте не показываем.
  * Включить при запуске: COMMUNITY_PUBLIC=1 в .env и перезапуск.
