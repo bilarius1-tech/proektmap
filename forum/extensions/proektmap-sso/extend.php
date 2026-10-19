@@ -9,6 +9,7 @@ use ProektMap\Sso\Antispam\NewcomerThrottler;
 use FoF\OAuth\Events\OAuthLoginSuccessful;
 use FoF\OAuth\Extend\RegisterProvider;
 use ProektMap\Sso\AutoLoginScript;
+use ProektMap\Sso\Formatter\LinkPolicy;
 use ProektMap\Sso\Listener\SyncNickname;
 use ProektMap\Sso\Middleware\SyncProektMapSession;
 use ProektMap\Sso\ProektMapProvider;
@@ -40,6 +41,10 @@ return [
     (new Extend\Notification())
         ->type(PostMentionedBlueprint::class, ['alert', 'email'])
         ->type(UserMentionedBlueprint::class, ['alert', 'email']),
+
+    (new Extend\Link())
+        ->setTarget(fn ($uri, $siteUrl, $attributes) => LinkPolicy::target((string) ($attributes['url'] ?? ''), (string) $siteUrl))
+        ->setRel(fn ($uri, $siteUrl, $attributes) => LinkPolicy::rel((string) ($attributes['url'] ?? ''), (string) $siteUrl)),
 
     (new Extend\ThrottleApi())
         ->set('proektmapNewcomer', NewcomerThrottler::class),

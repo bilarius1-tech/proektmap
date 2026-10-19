@@ -53,6 +53,8 @@ tail -f /var/log/proektmap-forum-queue.log                 # очередь пи
 
 Ссылка `/community/?compose=1` открывает окно новой темы (кнопка «Создать тему» на главной сайта).
 
+Ссылки в постах (`src/Formatter/LinkPolicy.php`): внутри `/community` — та же вкладка (роутер Flarum); страницы сайта proektmap.ru — новая вкладка, `rel="noopener"` (без nofollow); чужие сайты — новая вкладка, `rel="ugc nofollow noopener"`. Применяется при выводе, старые посты перепарсивать не надо.
+
 Проверка SSO целиком (вход, повторный вход, выход):
 
 ```bash
