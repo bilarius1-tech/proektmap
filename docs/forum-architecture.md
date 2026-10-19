@@ -63,7 +63,8 @@ ProektMap — единственный поставщик личности. Фо
 | `SsoConfig` | Ключи из `PROEKTMAP_SSO_*` env или блока `proektmap_sso` в `config.php` |
 | `Antispam\NewcomerThrottler` | Аккаунт моложе 24 ч: 3 темы и 20 ответов в час, сверх — 429 |
 | `Antispam\HoldNewcomerLinks` | Пост новичка с внешней ссылкой → неодобрен + флаг `approval` (очередь модератора) |
-| `Seo\DiscussionMeta` | `description` из первого поста, Open Graph, картинка — `/api/og` сайта |
+| `Seo\DiscussionMeta` | `description` из первого поста (без голых URL), Open Graph, картинка — `/api/og` сайта; темы — schema.org `DiscussionForumPosting` + `BreadcrumbList`; теги — `canonical` и `og:title`; профили `/u/*` — `noindex, follow` |
+| `Formatter\LinkPolicy` | ссылки из постов: форум — та же вкладка, сайт и чужие сайты — новая; `nofollow` только для чужих |
 | `Seo\SitemapController` | `/community/sitemap.xml`: главная, теги, темы, видимые гостю |
 
 ---

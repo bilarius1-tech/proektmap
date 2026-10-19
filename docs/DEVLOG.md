@@ -2914,3 +2914,8 @@ Grok Bot в Cursor легко принять за ещё один чат. Тог
 ## 19.10.2026 (день) — ссылки в постах форума
 
 - Ссылки из постов на чужие сайты и на страницы proektmap.ru вне форума открываются в новой вкладке (`Extend\Link` + `LinkPolicy` в `proektmap-sso`). Свои страницы сайта больше не получают `nofollow`. Ссылки внутри форума — как раньше, в той же вкладке. Тесты расширения: 14/14.
+
+## 19.10.2026 (день) — SEO форума: аудит и доработки
+
+- Аудит: robots.txt и обе карты (`/sitemap.xml` с `/community`, `/community/sitemap.xml` — главная, 11 тегов, темы) на месте; `lang="ru"`, title, description, OG, canonical у тем и главной; служебные пути — `X-Robots-Tag: noindex`; текст тем есть в HTML для робота.
+- Доработано в `DiscussionMeta`: schema.org `DiscussionForumPosting` + хлебные крошки на темах; canonical, `og:title`, `og:url` на страницах тегов; `noindex, follow` на профилях; голые URL убраны из description. В карте форума главная — `/community` (как canonical). Тесты расширения: 16/16.

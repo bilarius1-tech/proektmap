@@ -30,7 +30,7 @@ class SitemapController implements RequestHandlerInterface
     {
         $guest = new Guest();
         $forum = $this->url->to('forum');
-        $entries = [[$forum->base().'/', null, 'daily', '0.8']];
+        $entries = [[$forum->base(), null, 'daily', '0.8']];
 
         if ($this->extensions->isEnabled('flarum-tags')) {
             foreach (\Flarum\Tags\Tag::whereVisibleTo($guest)->orderBy('position')->get() as $tag) {

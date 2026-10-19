@@ -124,6 +124,7 @@ ISPmanager может перегенерировать vhost (рядом леж�
 - `.env` ProektMap: `COMMUNITY_PUBLIC=1` — в статьях блога «Обсудить на ИИ Форуме».
 - Меню: `header-community-forum` «ИИ Форум» → `/community`, ребёнок «Сообщества».
 - `public/robots.txt`: служебные пути форума закрыты, `Sitemap: /community/sitemap.xml`.
+- Проверка разметки темы: [Rich Results Test](https://search.google.com/test/rich-results) по адресу темы — должны найтись «Обсуждение на форуме» и «Навигационная цепочка».
 - `SITE_TREE`: `/community` (исключение `EXTERNAL_APP_ROUTES` в `scripts/validate-sitemap.ts`).
 - Главная сайта: блок «Сейчас на ИИ Форуме» — 5 последних тем из публичного API форума (`src/lib/community/latest.ts`, кеш 5 минут, таймаут 2,5 с; форум недоступен — блок скрыт).
 - Шапка форума: кнопка «На главную сайта» (`forum/extensions/proektmap-sso/js/dist/forum.js`, пишется вручную, без сборщика; после правки — `cache:clear`).
