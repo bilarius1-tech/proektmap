@@ -2870,3 +2870,12 @@ Grok Bot в Cursor легко принять за ещё один чат. Тог
 
 ### Закрытие дня
 День закрыт. Коммит + push. main = master.
+
+## 19.10.2026 — ИИ Форум (Flarum 2) + вход через ProektMap
+
+- Аудит и архитектура: `docs/forum-integration-audit.md`, `docs/forum-architecture.md`, эксплуатация `forum/README.md`.
+- Flarum 2.0.2 на `https://proektmap.ru/community` (staging под паролем беты), MySQL `proektmap_forum`, PHP-FPM 8.4, русский язык, 11 категорий, цвета ProektMap.
+- SSO: ProektMap выдаёт вход форуму (`/api/community/oauth/*`, PKCE, одноразовые коды), расширение `forum/extensions/proektmap-sso`: авто-регистрация без окна, авто-вход, синхронный выход.
+- Таблицы `user_identities` (Yandex ID ↔ users.id) и `community_oauth_codes`. Вход через Яндекс без email теперь отклоняется с понятным сообщением. `/auth` учитывает `callbackUrl`.
+- Блог: блок «Обсудить на ИИ Форуме» (включается `COMMUNITY_PUBLIC=1`).
+- Бэкап форума: `forum/scripts/backup-forum.sh`, cron 03:30. E2E: `forum/scripts/e2e-sso.sh`.

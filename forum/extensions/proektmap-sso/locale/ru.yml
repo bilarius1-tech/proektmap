@@ -7,3 +7,4 @@ fof-oauth:
       proektmap: Яндекс
     log_in:
       with_proektmap_button: Войти через Яндекс
+      admin_log_in_link: Вход для администратора

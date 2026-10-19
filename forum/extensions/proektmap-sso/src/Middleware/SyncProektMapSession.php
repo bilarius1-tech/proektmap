@@ -8,6 +8,7 @@ use Flarum\Http\SessionAuthenticator;
 use Flarum\Http\UrlGenerator;
 use Flarum\User\Guest;
 use Flarum\User\User;
+use Laminas\Diactoros\Response\RedirectResponse;
 use ProektMap\Sso\ProektMapCookie;
 use ProektMap\Sso\ProektMapProvider;
 use Psr\Http\Message\ResponseInterface;
@@ -33,14 +34,23 @@ class SyncProektMapSession implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $path = $this->forumPath($request);
+        $query = $request->getQueryParams();
+
+        // fof/oauth на ответ без code снова начинает вход: при отказе ProektMap это бесконечный цикл.
+        if ($path === '/auth/'.ProektMapProvider::NAME && isset($query['error']) && !isset($query['code'])) {
+            return new RedirectResponse($this->url->to('forum')->base().'/?_pm_sso=failed');
+        }
+
         $cookieHeader = $request->getHeaderLine('Cookie');
         $actor = RequestUtil::getActor($request);
         $wasLoggedIn = !$actor->isGuest();
 
+        $isLogout = in_array($path, ['/logout', '/global-logout'], true);
+
         if (
             $wasLoggedIn
             && !$actor->isAdmin()
-            && $path !== '/logout'
+            && !$isLogout
             && !str_starts_with($path, '/auth/')
             && !ProektMapCookie::hasSession($cookieHeader)
             && $this->linkedToProektMap($actor)
@@ -56,7 +66,7 @@ class SyncProektMapSession implements MiddlewareInterface
 
         $response = $handler->handle($request);
 
-        if ($path === '/logout' && $wasLoggedIn && in_array($response->getStatusCode(), [301, 302, 303], true)) {
+        if ($isLogout && $wasLoggedIn && in_array($response->getStatusCode(), [301, 302, 303], true)) {
             foreach (ProektMapCookie::expireHeaders($cookieHeader) as $header) {
                 $response = $response->withAddedHeader('Set-Cookie', $header);
             }

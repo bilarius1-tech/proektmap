@@ -39,7 +39,7 @@ class AutoLoginScript
     var key = 'pmSsoTriedAt';
     var last = Number(sessionStorage.getItem(key) || 0);
     if (Date.now() - last < 600000) return;
-    if (/[?&](_flarum_auth|_fof_oauth_unverified|error)=/.test(location.search)) return;
+    if (/[?&](_flarum_auth|_fof_oauth_unverified|_pm_sso|error)=/.test(location.search)) return;
     fetch('/api/auth/session', { credentials: 'same-origin' })
       .then(function (r) { return r.ok ? r.json() : null; })
       .then(function (s) {
