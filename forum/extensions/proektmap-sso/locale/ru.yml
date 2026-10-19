@@ -1,3 +1,8 @@
+proektmap-sso:
+  forum:
+    header:
+      home_link: На главную сайта
+
 fof-oauth:
   lib:
     providers:

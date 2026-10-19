@@ -9,6 +9,9 @@ import { HOME_LIVE_ROUTES, HOME_MORE_LAYERS, HOME_STATIONS } from "@/lib/home/st
 import { getHomeMediaFeed } from "@/lib/home/media-feed";
 import { getHomeHubStats } from "@/lib/home/hub-stats";
 import HomeShop from "@/components/home/home-shop";
+import HomeCommunity from "@/components/home/home-community";
+import { getLatestCommunityDiscussions } from "@/lib/community/latest";
+import { isCommunityPublic } from "@/lib/community/config";
 import { getDb } from "@/lib/db/index";
 import { Metadata } from "next";
 
@@ -30,7 +33,7 @@ const STATION_ICONS = {
 } as const;
 
 export default async function Home() {
-  const [mediaFeed, hubStats, shopLatest] = await Promise.all([
+  const [mediaFeed, hubStats, shopLatest, communityLatest] = await Promise.all([
     getHomeMediaFeed(),
     getHomeHubStats(),
     getDb().then((db) => db.digitalProduct.findMany({
@@ -39,6 +42,7 @@ export default async function Home() {
       take: 4,
       select: { slug: true, title: true, cardTitle: true, priceRub: true, kind: true, coverUrl: true, viewCount: true, litresUrl: true, ageRating: true, pageCount: true },
     })),
+    isCommunityPublic() ? getLatestCommunityDiscussions(5) : Promise.resolve(null),
   ]);
 
   return (
@@ -60,6 +64,8 @@ export default async function Home() {
       <HomeMediaWall feed={mediaFeed} />
 
       <HomeShop products={shopLatest} />
+
+      <HomeCommunity discussions={communityLatest} />
 
       <section className="home-hub" aria-labelledby="home-stations-title">
         <h2 id="home-stations-title">Что вы хотите сделать сегодня?</h2>

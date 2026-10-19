@@ -33,6 +33,7 @@ return [
         ->set('proektmapNewcomer', NewcomerThrottler::class),
 
     (new Extend\Frontend('forum'))
+        ->js(__DIR__.'/js/dist/forum.js')
         ->content(AutoLoginScript::class)
         ->content(DiscussionMeta::class, -100),
 

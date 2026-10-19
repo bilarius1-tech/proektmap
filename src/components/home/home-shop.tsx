@@ -19,8 +19,8 @@ export default function HomeShop({ products }: { products: ShopCardProduct[] }) 
         ))}
       </div>
       <p style={{ margin: "16px 0 0", textAlign: "center" }}>
-        <Link href="/books" style={{ color: "var(--color-accent)", fontWeight: 700, textDecoration: "none" }}>
-          Все книги <ArrowRight size={14} style={{ verticalAlign: "middle" }} />
+        <Link href="/books" style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "var(--color-accent)", fontWeight: 700, textDecoration: "none" }}>
+          Все книги <ArrowRight size={14} />
         </Link>
       </p>
     </section>

@@ -1,3 +1,8 @@
+proektmap-sso:
+  forum:
+    header:
+      home_link: ProektMap home
+
 fof-oauth:
   lib:
     providers:

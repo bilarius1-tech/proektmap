@@ -108,6 +108,8 @@ ISPmanager может перегенерировать vhost (рядом леж�
 - Меню: `header-community-forum` «ИИ Форум» → `/community`, ребёнок «Сообщества».
 - `public/robots.txt`: служебные пути форума закрыты, `Sitemap: /community/sitemap.xml`.
 - `SITE_TREE`: `/community` (исключение `EXTERNAL_APP_ROUTES` в `scripts/validate-sitemap.ts`).
+- Главная сайта: блок «Сейчас на ИИ Форуме» — 5 последних тем из публичного API форума (`src/lib/community/latest.ts`, кеш 5 минут, таймаут 2,5 с; форум недоступен — блок скрыт).
+- Шапка форума: кнопка «На главную сайта» (`forum/extensions/proektmap-sso/js/dist/forum.js`, пишется вручную, без сборщика; после правки — `cache:clear`).
 
 Закрыть обратно на бету: `cp forum/deploy/nginx/community-gate.conf /etc/nginx/proektmap/ && nginx -t && systemctl reload nginx`, `COMMUNITY_PUBLIC=0` и перезапуск.
 
