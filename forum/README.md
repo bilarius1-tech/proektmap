@@ -25,7 +25,8 @@ cd /var/www/www-root/data/www/proektmap-forum
 sudo -u www-root /opt/php84/bin/php -d memory_limit=1G flarum cache:clear   # после правок расширения или настроек в БД
 sudo -u www-root /opt/php84/bin/php flarum migrate          # после обновления пакетов
 sudo -u www-root /opt/php84/bin/php flarum info             # версии и включённые расширения
-tail -f storage/logs/flarum-$(date +%F).log                 # ошибки форума и письма (пока mail_driver=log)
+tail -f storage/logs/flarum-$(date +%F).log                 # ошибки форума
+tail -f /var/log/proektmap-forum-queue.log                 # очередь писем
 ```
 
 `cache:clear` пересобирает LESS темы: со стандартными 128 МБ компилятор падает по памяти. Поэтому `-d memory_limit=1G` в CLI и `php_admin_value[memory_limit] = 512M` в `/opt/php84/etc/php-fpm.d/site.d/proektmap.ru.conf` (пересборка из админки).
@@ -36,7 +37,17 @@ tail -f storage/logs/flarum-$(date +%F).log                 # ошибки фо�
 /var/www/www-root/data/www/proektmap.ru/forum/theme/apply-theme.sh
 ```
 
-Почта: пока `SMTP_PASS` в `.env` ProektMap пустой, форум пишет письма в лог (`mail_driver=log`). Подключение: пароль приложения Яндекса → `SMTP_PASS` в `.env` → `forum/scripts/configure-mail.sh`. Письма уходят через очередь в БД (`config.php` → `queue.driver=database`), её разбирает `flarum schedule:run` из cron root раз в минуту — ответ на форуме не ждёт SMTP. Хвост очереди: таблицы `queue_jobs`, `queue_failed_jobs`.
+Почта: SMTP Яндекса (`smtp.yandex.ru:465`, ssl), отправитель `bilariuss@yandex.ru`. Пароль приложения лежит в `SMTP_PASS` в `.env` ProektMap; после смены — `forum/scripts/configure-mail.sh`. Письма уходят через очередь в БД (`config.php` → `queue.driver=database`) — ответ на форуме не ждёт SMTP. Хвост очереди: таблицы `queue_jobs`, `queue_failed_jobs`.
+
+Очередь разбирает cron root раз в минуту:
+
+```
+* * * * * cd /var/www/www-root/data/www/proektmap-forum && sudo -u www-root /opt/php84/bin/php -d disable_functions= -d memory_limit=512M flarum queue:work --stop-when-empty --tries=3 >> /var/log/proektmap-forum-queue.log 2>&1
+```
+
+Не заменять на `flarum schedule:run`: в `/opt/php84/etc/php.ini` ISPmanager отключил `pcntl_signal`, а планировщик запускает `queue:work` без `-d disable_functions=`, и тот падает с `Call to undefined function pcntl_signal()` — очередь молча копится.
+
+Синтаксис упоминания в тексте поста во Flarum 2: `@"Имя"#1` (id пользователя без `u`).
 
 Уведомления по умолчанию (для тех, кто не менял настройки; задано в `proektmap-sso`): подписка на свои темы и темы, где ответил; письмо о новом ответе в подписанной теме и при упоминании.
 

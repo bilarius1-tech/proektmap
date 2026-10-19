@@ -2904,3 +2904,9 @@ Grok Bot в Cursor легко принять за ещё один чат. Тог
 - Главная: кнопка «Создать тему» в блоке «Сейчас на ИИ Форуме» → `/community/?compose=1` (форум сам открывает окно новой темы или вход).
 - Секрет связи сайт ↔ форум (`COMMUNITY_OAUTH_CLIENT_SECRET`) сменён, e2e SSO — OK.
 - Ждём пароль приложения Яндекса для `bilariuss@yandex.ru` → `configure-mail.sh`.
+
+## 19.10.2026 (день) — почта форума включена
+
+- SMTP Яндекса подключён (`bilariuss@yandex.ru`, пароль приложения в `.env` → `configure-mail.sh`). Прямое письмо и e2e-уведомления дошли: «новый ответ в подписанной теме» и «вас упомянули».
+- Очередь не разбиралась: в `/opt/php84/etc/php.ini` (ISPmanager) отключён `pcntl_signal`, `queue:work` падал фатально, а `schedule:run` это скрывал. Cron теперь вызывает `queue:work --stop-when-empty` напрямую с `-d disable_functions=` только для этого процесса; лог `/var/log/proektmap-forum-queue.log`.
+- Тестовые посты, уведомления и временный API-ключ удалены.
