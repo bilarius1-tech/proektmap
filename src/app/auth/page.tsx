@@ -1,9 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { trackGoal, Goals } from "@/lib/metrika";
+import { safeCallbackPath } from "@/lib/community/oauth-client";
+
+const AUTH_ERRORS: Record<string, string> = {
+  YandexNoEmail: "Яндекс не передал адрес почты. Добавьте основной email в Яндекс ID и войдите снова.",
+  AccessDenied: "Вход отклонён. Попробуйте ещё раз.",
+  OAuthCallback: "Вход через Яндекс прервался. Попробуйте ещё раз.",
+  OAuthSignin: "Не удалось начать вход через Яндекс. Попробуйте ещё раз.",
+};
+
+function getCallbackUrl(): string {
+  if (typeof window === "undefined") return "/dashboard";
+  return safeCallbackPath(new URLSearchParams(window.location.search).get("callbackUrl"));
+}
 
 export default function AuthPage() {
   const router = useRouter();
@@ -12,6 +25,14 @@ export default function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [tab, setTab] = useState<"login" | "register">("login");
+  const [fromCommunity, setFromCommunity] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("error");
+    if (code) setError(AUTH_ERRORS[code] || "Не удалось войти. Попробуйте ещё раз.");
+    setFromCommunity(params.get("from") === "community");
+  }, []);
 
   async function handleEmail(e: React.FormEvent) {
     e.preventDefault();
@@ -33,13 +54,15 @@ export default function AuthPage() {
       setLoading(false);
     } else {
       trackGoal(Goals.REGISTRATION, { method: "email" });
-      router.push("/dashboard");
+      const target = getCallbackUrl();
+      if (target.startsWith("/api/")) window.location.assign(target);
+      else router.push(target);
     }
   }
 
   async function handleYandex() {
     trackGoal(Goals.REGISTRATION, { method: "yandex" });
-    await signIn("yandex", { callbackUrl: "/dashboard" });
+    await signIn("yandex", { callbackUrl: getCallbackUrl() });
   }
 
   return (
@@ -50,7 +73,9 @@ export default function AuthPage() {
             Proekt<span style={{ color: "var(--color-accent)" }}>Map</span>
           </div>
           <p className="auth-subtitle" style={{ fontSize: "var(--text-s)", color: "var(--color-text-tertiary)" }}>
-            {tab === "login" ? "Войдите, чтобы продолжить" : "Создайте аккаунт для сохранения прогресса"}
+            {fromCommunity
+              ? "Войдите, чтобы писать на ИИ Форуме — отдельная регистрация не нужна"
+              : tab === "login" ? "Войдите, чтобы продолжить" : "Создайте аккаунт для сохранения прогресса"}
           </p>
         </div>
 

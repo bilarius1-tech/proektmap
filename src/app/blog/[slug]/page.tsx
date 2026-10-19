@@ -5,6 +5,7 @@ import { linkGlossaryTerms } from "@/lib/blog/link-glossary";
 import PostPageClient from "./client";
 import { notFound } from "next/navigation";
 import { blogCoverUrl } from "@/lib/og/card-url";
+import { COMMUNITY_MATERIALS_TAG_URL, isCommunityPublic } from "@/lib/community/config";
 
 export const dynamic = "force-dynamic";
 
@@ -182,6 +183,7 @@ export default async function PostPage({ params }: { params: Promise<{ slug: str
         tocHeadings={tocHeadings}
         linkedSkills={JSON.parse(JSON.stringify(linkedSkills))}
         linkedSolutions={JSON.parse(JSON.stringify(linkedSolutions))}
+        communityUrl={isCommunityPublic() ? COMMUNITY_MATERIALS_TAG_URL : null}
       />
     </>
   );

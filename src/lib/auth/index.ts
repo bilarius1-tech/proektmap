@@ -16,6 +16,59 @@ function getAuthPrisma() {
   return _authPrisma;
 }
 
+/**
+ * Связывает вход через Яндекс с users по стабильному Yandex ID (user_identities).
+ * Яндекс подтверждает владение почтой, поэтому email помечается подтверждённым.
+ */
+async function linkYandexAccount(input: { yandexId: string; email: string; name?: string | null; image?: string | null }) {
+  const db = getAuthPrisma();
+  const now = new Date();
+  const identity = await db.userIdentity.findUnique({
+    where: { provider_providerAccountId: { provider: "yandex", providerAccountId: input.yandexId } },
+    include: { user: true },
+  });
+
+  let dbUser = identity?.user ?? (await db.user.findUnique({ where: { email: input.email } }));
+
+  // Пользователь сменил основной адрес в Яндексе: переносим его на тот же аккаунт, если адрес свободен.
+  if (identity && dbUser && dbUser.email !== input.email) {
+    const taken = await db.user.findUnique({ where: { email: input.email }, select: { id: true } });
+    if (!taken) {
+      dbUser = await db.user.update({ where: { id: dbUser.id }, data: { email: input.email } });
+    } else {
+      console.warn("[auth] Yandex email changed to an address owned by another user; keeping link as is");
+    }
+  }
+
+  if (!dbUser) {
+    dbUser = await db.user.create({
+      data: {
+        email: input.email,
+        name: input.name || input.email.split("@")[0],
+        role: "user",
+        subscription: "free",
+        avatar: input.image || "",
+        emailVerified: now,
+      },
+    });
+  } else {
+    const data: { emailVerified?: Date; passwordHash?: string; avatar?: string } = {};
+    if (!dbUser.emailVerified) {
+      data.emailVerified = now;
+      // Пароль ставили без подтверждения почты: его мог задать кто угодно. Владелец почты вошёл через Яндекс — гасим пароль.
+      if (!identity && dbUser.passwordHash) data.passwordHash = "";
+    }
+    if (input.image && (!dbUser.avatar || dbUser.avatar.startsWith("/api/avatar"))) data.avatar = input.image;
+    if (Object.keys(data).length) await db.user.update({ where: { id: dbUser.id }, data });
+  }
+
+  await db.userIdentity.upsert({
+    where: { provider_providerAccountId: { provider: "yandex", providerAccountId: input.yandexId } },
+    create: { userId: dbUser.id, provider: "yandex", providerAccountId: input.yandexId, email: input.email, lastLoginAt: now },
+    update: { email: input.email, lastLoginAt: now },
+  });
+}
+
 export const authOptions: NextAuthOptions = {
   providers: [
     YandexProvider({
@@ -43,21 +96,17 @@ export const authOptions: NextAuthOptions = {
   pages: { signIn: "/auth" },
   callbacks: {
     async signIn({ user, account }) {
-      if (account?.provider === "yandex" && user.email) {
+      if (account?.provider === "yandex") {
+        // Без email не можем привязать вход к users.id: сессия получила бы Yandex ID вместо нашего id.
+        if (!user.email) return "/auth?error=YandexNoEmail";
         try {
-          const db = getAuthPrisma();
-          const existing = await db.user.findUnique({ where: { email: user.email.toLowerCase() } });
-          if (!existing) {
-            await db.user.create({
-              data: {
-                email: user.email.toLowerCase(),
-                name: user.name || user.email.split("@")[0],
-                role: "user",
-                subscription: "free",
-              },
-            });
-          }
-        } catch (e) { console.error("Yandex signIn error:", e); }
+          await linkYandexAccount({
+            yandexId: account.providerAccountId,
+            email: user.email.toLowerCase(),
+            name: user.name,
+            image: user.image,
+          });
+        } catch (e) { console.error("Yandex signIn error:", e instanceof Error ? e.message : e); }
       }
       return true;
     },

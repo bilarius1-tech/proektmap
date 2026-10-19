@@ -1,0 +1,35 @@
+{
+    "name": "proektmap/sso",
+    "description": "Вход на ИИ Форум ProektMap через аккаунт ProektMap (Яндекс ID): SSO-провайдер для fof/oauth.",
+    "type": "flarum-extension",
+    "license": "proprietary",
+    "require": {
+        "php": "^8.3",
+        "flarum/core": "^2.0",
+        "fof/oauth": "^2.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "ProektMap\\Sso\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ProektMap\\Sso\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "flarum-extension": {
+            "title": "ProektMap SSO",
+            "category": "feature",
+            "icon": {
+                "name": "fas fa-map-marked-alt",
+                "backgroundColor": "#2563eb",
+                "color": "#ffffff"
+            }
+        }
+    }
+}

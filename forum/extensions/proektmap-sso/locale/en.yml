@@ -1,0 +1,9 @@
+fof-oauth:
+  lib:
+    providers:
+      proektmap: Yandex
+  forum:
+    providers:
+      proektmap: Yandex
+    log_in:
+      with_proektmap_button: Log In with Yandex

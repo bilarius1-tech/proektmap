@@ -40,8 +40,44 @@ model User {
   aiProjects            AiProject[]
   projectLikes          ProjectLike[]
   shopOrders            ShopOrder[]
+  identities            UserIdentity[]
+  communityCodes        CommunityOAuthCode[]
 
   @@map("users")
+}
+
+/// Внешние аккаунты пользователя: provider = "yandex" (providerAccountId = Yandex ID).
+/// Связь с форумом хранит Flarum (login_providers: provider="proektmap", identifier = users.id).
+model UserIdentity {
+  id                String    @id @default(uuid())
+  userId            String
+  provider          String
+  providerAccountId String
+  email             String?
+  lastLoginAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("user_identities")
+}
+
+/// Одноразовые коды авторизации для входа в форум (/community). В БД только sha256 кода.
+model CommunityOAuthCode {
+  id            String    @id @default(uuid())
+  codeHash      String    @unique
+  userId        String
+  redirectUri   String
+  codeChallenge String?
+  expiresAt     DateTime
+  usedAt        DateTime?
+  createdAt     DateTime  @default(now())
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([expiresAt])
+  @@map("community_oauth_codes")
 }
 
 model Blueprint {

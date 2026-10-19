@@ -1,0 +1,9 @@
+fof-oauth:
+  lib:
+    providers:
+      proektmap: Яндекс
+  forum:
+    providers:
+      proektmap: Яндекс
+    log_in:
+      with_proektmap_button: Войти через Яндекс

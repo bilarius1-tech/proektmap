@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { Calendar, User, Tag, Eye, MessageCircle, ArrowLeft, Send, Bookmark, Rocket, Clock, List, Share2, ThumbsUp, ThumbsDown } from "lucide-react";
 import Link from "next/link";
+import { CommunityDiscussLink } from "@/components/community/discuss-link";
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString("ru", { day: "numeric", month: "long", year: "numeric" });
@@ -13,7 +14,7 @@ function formatDateShort(d: string) {
   return new Date(d).toLocaleDateString("ru", { day: "2-digit", month: "2-digit", year: "numeric" });
 }
 
-export default function PostPageClient({ post, relatedPosts, readMore, isAdmin: serverIsAdmin, readingTime, tocHeadings, linkedSkills, linkedSolutions }: any) {
+export default function PostPageClient({ post, relatedPosts, readMore, isAdmin: serverIsAdmin, readingTime, tocHeadings, linkedSkills, linkedSolutions, communityUrl }: any) {
   const [isAdmin, setIsAdmin] = useState(false);
   useEffect(() => {
     if (serverIsAdmin) { setIsAdmin(true); return; }
@@ -311,6 +312,8 @@ export default function PostPageClient({ post, relatedPosts, readMore, isAdmin: 
           </div>
         </div>
       )}
+
+      {communityUrl && <CommunityDiscussLink href={communityUrl} />}
 
       {/* Related posts */}
       {relatedPosts?.length > 0 && (
