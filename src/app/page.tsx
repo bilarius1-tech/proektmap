@@ -129,7 +129,7 @@ export default async function Home() {
       <div style={{ padding: "var(--space-xl) var(--space-m)", background: "var(--color-bg-primary)", borderTop: "1px solid var(--color-border)", textAlign: "center" }}>
         <div style={{ maxWidth: 960, margin: "0 auto", fontSize: "var(--text-xs)", color: "var(--color-text-tertiary)", lineHeight: 1.8 }}>
           <div style={{ fontWeight: 700, marginBottom: 4, color: "var(--color-text-secondary)" }}>Реквизиты</div>
-          <div>ИП Тимофеев Алексей Геннадьевич &middot; ИНН 532002912418</div>
+          <div>Самозанятый Тимофеев Алексей Геннадьевич &middot; ИНН 532002912418</div>
           <div>Email: bilariuss@yandex.ru &middot; Telegram: @bilarius</div>
           <div style={{ marginTop: "var(--space-s)", display: "flex", gap: "var(--space-m)", justifyContent: "center", flexWrap: "wrap" }}>
             <Link href="/privacy" style={{ color: "var(--color-text-tertiary)" }}>Политика</Link>

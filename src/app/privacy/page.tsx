@@ -1,6 +1,6 @@
 export const metadata = {
   title: "Политика конфиденциальности — Карта роста",
-  description: "Политика обработки персональных данных. ИП Тимофеев А.Г., ИНН 532002912418.",
+  description: "Политика обработки персональных данных. Самозанятый Тимофеев А.Г., ИНН 532002912418.",
 };
 
 export default function PrivacyPage() {
@@ -11,7 +11,7 @@ export default function PrivacyPage() {
 
       <h2 style={{ fontSize: "var(--text-l)", fontWeight: 700, marginTop: "var(--space-l)", marginBottom: "var(--space-s)" }}>1. Общие положения</h2>
       <p>Настоящая Политика конфиденциальности определяет порядок обработки и защиты персональных данных пользователей сайта <b>proektmap.ru</b> («Карта роста»).</p>
-      <p><b>Оператор персональных данных:</b> Индивидуальный предприниматель Тимофеев Алексей Геннадьевич, ИНН 532002912418, email: bilariuss@yandex.ru.</p>
+      <p><b>Оператор персональных данных:</b> Тимофеев Алексей Геннадьевич, самозанятый (плательщик налога на профессиональный доход), ИНН 532002912418, email: bilariuss@yandex.ru.</p>
 
       <h2 style={{ fontSize: "var(--text-l)", fontWeight: 700, marginTop: "var(--space-l)", marginBottom: "var(--space-s)" }}>2. Какие данные собираем</h2>
       <p>При регистрации и использовании сервиса мы можем собирать:</p>
@@ -48,7 +48,7 @@ export default function PrivacyPage() {
       <p>Мы используем cookies для: авторизации (сессия), аналитики (Яндекс.Метрика), сохранения настроек. Продолжая использовать сайт, вы соглашаетесь с этим.</p>
 
       <h2 style={{ fontSize: "var(--text-l)", fontWeight: 700, marginTop: "var(--space-l)", marginBottom: "var(--space-s)" }}>8. Контакты</h2>
-      <p>ИП Тимофеев А.Г., ИНН 532002912418<br />
+      <p>Тимофеев А.Г., самозанятый, ИНН 532002912418<br />
       Email: <a href="mailto:bilariuss@yandex.ru" style={{ color: "var(--color-accent)" }}>bilariuss@yandex.ru</a><br />
       Telegram: <a href="https://t.me/bilarius" style={{ color: "var(--color-accent)" }}>@bilarius</a></p>
     </div>

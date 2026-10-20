@@ -1,6 +1,6 @@
 export const metadata = {
   title: "Условия возврата — Карта роста",
-  description: "Порядок возврата средств за подписку Pro. ИП Тимофеев А.Г.",
+  description: "Порядок возврата средств за подписку Pro. Самозанятый Тимофеев А.Г.",
 };
 
 export default function RefundPage() {
@@ -20,7 +20,7 @@ export default function RefundPage() {
       <p>Возврат не производится: после истечения 3 дней с момента оплаты, если сервис активно использовался (пройдено более 3 этапов), за уже истекший оплаченный период.</p>
 
       <h2 style={{ fontSize: "var(--text-l)", fontWeight: 700, marginTop: "var(--space-l)", marginBottom: "var(--space-s)" }}>4. Контакты</h2>
-      <p>ИП Тимофеев Алексей Геннадьевич, ИНН 532002912418<br />
+      <p>Тимофеев Алексей Геннадьевич, самозанятый, ИНН 532002912418<br />
       Email: bilariuss@yandex.ru<br />
       Telegram: @bilarius</p>
     </div>

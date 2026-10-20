@@ -1,6 +1,6 @@
 export const metadata = {
   title: "Контакты — Карта роста",
-  description: "ИП Тимофеев А.Г., ИНН 532002912418. Свяжитесь с нами.",
+  description: "Самозанятый Тимофеев А.Г., ИНН 532002912418. Свяжитесь с нами.",
 };
 
 export default function ContactsPage() {
@@ -11,9 +11,9 @@ export default function ContactsPage() {
       <div style={{ padding: "var(--space-l)", background: "var(--color-bg-secondary)", borderRadius: "var(--radius-l)", border: "1px solid var(--color-border-light)", marginBottom: "var(--space-l)" }}>
         <h2 style={{ fontSize: "var(--text-l)", fontWeight: 700, marginBottom: "var(--space-m)" }}>Реквизиты</h2>
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-          <div><b>Исполнитель:</b> Индивидуальный предприниматель Тимофеев Алексей Геннадьевич</div>
+          <div><b>Исполнитель:</b> Тимофеев Алексей Геннадьевич, самозанятый (плательщик налога на профессиональный доход)</div>
           <div><b>ИНН:</b> 532002912418</div>
-          <div><b>Юридический адрес:</b> РФ, Новгородская область</div>
+          <div><b>Регион:</b> РФ, Новгородская область</div>
           <div><b>Email:</b> bilariuss@yandex.ru</div>
           <div><b>Telegram:</b> @bilarius</div>
           <div><b>Телефон:</b> +7 921 201-32-52</div>

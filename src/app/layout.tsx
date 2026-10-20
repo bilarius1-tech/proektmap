@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   keywords: ["создать сайт", "создать телеграм бота", "создать saas", "создать crm", "готовые решения ai", "разработка с ии", "маршрут ai-продукта", "cursor инструкция", "claude code"],
   authors: [{ name: "Тимофеев Алексей Геннадьевич" }],
   creator: "Тимофеев Алексей",
-  publisher: "ИП Тимофеев А.Г.",
+  publisher: "Самозанятый Тимофеев А.Г.",
   robots: { index: true, follow: true },
   alternates: { canonical: "https://proektmap.ru", types: { "application/rss+xml": "https://proektmap.ru/blog/rss.xml" } },
   openGraph: {

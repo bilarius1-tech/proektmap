@@ -75,7 +75,7 @@ export default async function GlobalFooter() {
       </div>
 
       <div className="max-w-[1000px] mx-auto mt-xl pt-m border-t border-border-light text-center text-xs text-text-tertiary">
-        © 2026 Карта роста. Школа AI-инженеров. ИП Тимофеев Алексей Геннадьевич, ИНН 532002912418.
+        © 2026 Карта роста. Школа AI-инженеров. Самозанятый Тимофеев Алексей Геннадьевич, ИНН 532002912418.
         <div className="mt-1">
           <a href="/admin" className="text-text-tertiary text-[10px] no-underline opacity-30">админка</a>
         </div>
